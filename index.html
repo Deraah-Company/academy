@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منظومة مطابقة القوى والأكاديمية - المطور</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SheetJS for Excel processing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; }
+        
+        /* Modern Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .tab-btn { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .tab-btn.active { border-bottom-color: #4f46e5; color: #4f46e5; font-weight: bold; background-color: #eef2ff; }
+        .tab-content { display: none; animation: fadeIn 0.4s ease-in-out; }
+        .tab-content.active { display: block; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .table-container { max-height: 65vh; overflow-y: auto; scrollbar-width: thin; }
+        thead th { position: sticky; top: 0; z-index: 10; box-shadow: 0 1px 2px rgba(0,0,0,0.05); backdrop-filter: blur(8px); background-color: rgba(248, 250, 252, 0.95); }
+        
+        /* Drag & Drop Styles */
+        .drop-zone { transition: all 0.3s ease; border: 2px dashed #cbd5e1; }
+        .drop-zone.dragover { background-color: #eef2ff; border-color: #4f46e5; transform: scale(1.02); }
+
+        .loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(5px); }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- Loading Screen -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div id="loadingContent" class="text-center">
+            <div class="relative inline-block">
+                <i class="fas fa-circle-notch fa-spin text-6xl text-indigo-600"></i>
+                <i class="fas fa-file-excel absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xl text-indigo-400"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-700 mt-6">جاري التحليل والمطابقة...</h2>
+            <p class="text-slate-500 mt-2">يرجى الانتظار لحين الانتهاء من معالجة البيانات</p>
+        </div>
+    </div>
+
+    <div class="max-w-screen-2xl mx-auto px-4 py-8">
+        
+        <!-- Header -->
+        <header class="bg-white shadow-sm rounded-2xl p-8 mb-8 border border-slate-100 flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+            <div class="absolute bottom-0 left-0 w-24 h-24 bg-blue-50 rounded-full -ml-8 -mb-8 blur-xl"></div>
+            
+            <div class="relative z-10">
+                <h1 class="text-3xl font-extrabold text-slate-800 mb-2 tracking-tight">منظومة تحليل بيانات <span class="text-indigo-600">الأكاديمية والقوى</span></h1>
+                <p class="text-slate-500">منصة متطورة لمطابقة بيانات الموظفين، الشهادات، وتحليل الأداء وفترات العمل.</p>
+            </div>
+            <div class="mt-4 md:mt-0 relative z-10 bg-indigo-50 text-indigo-700 px-5 py-3 rounded-xl border border-indigo-100 flex items-center gap-2 font-medium shadow-sm">
+                <i class="fas fa-calendar-alt text-indigo-500"></i>
+                <span id="currentDateDisplay">يتم حساب التعيين بناءً على تاريخ اليوم</span>
+            </div>
+        </header>
+
+        <!-- Upload Section (Drag & Drop) -->
+        <div class="bg-white shadow-sm rounded-2xl p-8 mb-8 border border-slate-100">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Zone 1 -->
+                <div id="dropZoneWf" class="drop-zone rounded-2xl p-8 text-center cursor-pointer bg-slate-50 hover:bg-slate-100 flex flex-col items-center justify-center min-h-[200px]" onclick="document.getElementById('workforceFile').click()">
+                    <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl mb-4 shadow-sm">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-2 text-slate-700">1. ملف مطابقة القوى (البائعين)</h3>
+                    <p class="text-sm text-slate-500 mb-4">اضغط لاختيار الملف أو قم بسحبه وإفلاته هنا</p>
+                    <span id="wfFileName" class="text-sm font-semibold text-blue-600 bg-blue-50 px-4 py-2 rounded-full hidden"></span>
+                    <input type="file" id="workforceFile" accept=".xlsx, .xls" class="hidden" onchange="handleFileSelect(event, 'wfFileName')" />
+                </div>
+                
+                <!-- Zone 2 -->
+                <div id="dropZoneAc" class="drop-zone rounded-2xl p-8 text-center cursor-pointer bg-slate-50 hover:bg-slate-100 flex flex-col items-center justify-center min-h-[200px]" onclick="document.getElementById('academyFile').click()">
+                    <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-2xl mb-4 shadow-sm">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-2 text-slate-700">2. تقرير الأكاديمية (الشهادات)</h3>
+                    <p class="text-sm text-slate-500 mb-4">اضغط لاختيار الملف أو قم بسحبه وإفلاته هنا</p>
+                    <span id="acFileName" class="text-sm font-semibold text-emerald-600 bg-emerald-50 px-4 py-2 rounded-full hidden"></span>
+                    <input type="file" id="academyFile" accept=".xlsx, .xls" class="hidden" onchange="handleFileSelect(event, 'acFileName')" />
+                </div>
+
+            </div>
+
+            <!-- Error Message Banner -->
+            <div id="uploadErrorMessage" class="hidden mt-6 bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl flex items-center justify-center gap-3 font-bold">
+                <i class="fas fa-exclamation-circle text-xl"></i>
+                <span id="uploadErrorText"></span>
+            </div>
+
+            <div class="mt-8 flex justify-center border-t border-slate-100 pt-8">
+                <button onclick="processFiles()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-10 rounded-xl shadow-md hover:shadow-lg transform transition hover:-translate-y-1 flex items-center text-lg">
+                    <i class="fas fa-bolt ml-3"></i> معالجة البيانات واستخراج النتائج
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Section (Hidden initially) -->
+        <div id="resultsSection" class="bg-white shadow-sm rounded-2xl border border-slate-100 overflow-hidden hidden">
+            
+            <!-- Modern Tabs -->
+            <div class="flex flex-wrap border-b border-slate-200 bg-slate-50/50">
+                <button class="tab-btn active px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'activeTab')">
+                    <i class="fas fa-user-check ml-2"></i> على رأس العمل
+                </button>
+                <button class="tab-btn px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'tenure1Tab')">
+                    <i class="fas fa-hourglass-start ml-2"></i> أقل من 3 شهور
+                </button>
+                <button class="tab-btn px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'tenure2Tab')">
+                    <i class="fas fa-hourglass-half ml-2"></i> من 3 إلى سنتين
+                </button>
+                <button class="tab-btn px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'tenure3Tab')">
+                    <i class="fas fa-hourglass-end ml-2"></i> أكثر من سنتين
+                </button>
+                <button class="tab-btn px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'excludedTab')">
+                    <i class="fas fa-user-times ml-2"></i> المستبعدين
+                </button>
+                <button class="tab-btn px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'missingTab')">
+                    <i class="fas fa-user-secret ml-2"></i> بالأكاديمية فقط
+                </button>
+                <button class="tab-btn px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'analysisTab')">
+                    <i class="fas fa-chart-pie ml-2"></i> التحليل والإحصائيات
+                </button>
+            </div>
+
+            <div class="p-6 md:p-8">
+                
+                <!-- Tab 1: Active (With Filters) -->
+                <div id="activeTab" class="tab-content active">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="text-2xl font-bold text-slate-800 flex items-center">
+                            <i class="fas fa-users text-indigo-500 ml-2"></i> جميع الموظفين (على رأس العمل)
+                            <span id="activeCount" class="mr-3 bg-indigo-100 text-indigo-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
+                        </h2>
+                        
+                        <!-- Filters -->
+                        <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+                            <div class="relative">
+                                <i class="fas fa-search absolute right-3 top-3 text-slate-400"></i>
+                                <input type="text" id="searchName" onkeyup="applyActiveFilters()" placeholder="بحث بالاسم أو الرقم..." class="pl-4 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 w-full md:w-64">
+                            </div>
+                            <div class="relative">
+                                <select id="filterRegion" onchange="applyActiveFilters()" class="pl-4 pr-8 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 w-full md:w-64 appearance-none bg-white">
+                                    <option value="">كل الأقاليم</option>
+                                    <!-- Options injected via JS -->
+                                </select>
+                                <i class="fas fa-chevron-down absolute left-3 top-3 text-slate-400 text-sm pointer-events-none"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container border border-slate-200 rounded-xl shadow-sm">
+                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
+                            <thead class="bg-slate-50 text-slate-600">
+                                <tr id="activeTableHeader">
+                                    <!-- Injected via JS to keep code DRY -->
+                                </tr>
+                            </thead>
+                            <tbody id="activeTableBody" class="bg-white divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab: < 3 Months -->
+                <div id="tenure1Tab" class="tab-content">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-slate-800">موظفون فترة عملهم <span class="text-orange-500">أقل من 3 شهور</span></h2>
+                        <span id="t1Count" class="bg-orange-100 text-orange-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
+                    </div>
+                    <div class="table-container border border-slate-200 rounded-xl shadow-sm">
+                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right"><thead class="bg-slate-50 text-slate-600"><tr id="t1Header"></tr></thead><tbody id="t1Body" class="bg-white divide-y divide-slate-100"></tbody></table>
+                    </div>
+                </div>
+
+                <!-- Tab: 3 Months to 2 Years -->
+                <div id="tenure2Tab" class="tab-content">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-slate-800">موظفون فترة عملهم <span class="text-blue-500">من 3 شهور إلى سنتين</span></h2>
+                        <span id="t2Count" class="bg-blue-100 text-blue-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
+                    </div>
+                    <div class="table-container border border-slate-200 rounded-xl shadow-sm">
+                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right"><thead class="bg-slate-50 text-slate-600"><tr id="t2Header"></tr></thead><tbody id="t2Body" class="bg-white divide-y divide-slate-100"></tbody></table>
+                    </div>
+                </div>
+
+                <!-- Tab: > 2 Years -->
+                <div id="tenure3Tab" class="tab-content">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-slate-800">موظفون فترة عملهم <span class="text-emerald-500">أكثر من سنتين</span></h2>
+                        <span id="t3Count" class="bg-emerald-100 text-emerald-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
+                    </div>
+                    <div class="table-container border border-slate-200 rounded-xl shadow-sm">
+                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right"><thead class="bg-slate-50 text-slate-600"><tr id="t3Header"></tr></thead><tbody id="t3Body" class="bg-white divide-y divide-slate-100"></tbody></table>
+                    </div>
+                </div>
+
+                <!-- Tab: Excluded -->
+                <div id="excludedTab" class="tab-content">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-slate-800">بيانات الموظفين المستبعدين</h2>
+                        <span id="excludedCount" class="bg-red-100 text-red-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
+                    </div>
+                    <div class="table-container border border-slate-200 rounded-xl shadow-sm">
+                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
+                            <thead class="bg-slate-50 text-slate-600">
+                                <tr>
+                                    <th class="px-6 py-4 font-semibold uppercase tracking-wider">الرقم الوظيفي</th>
+                                    <th class="px-6 py-4 font-semibold uppercase tracking-wider">الاسم</th>
+                                    <th class="px-6 py-4 font-semibold uppercase tracking-wider">حالة الاستبعاد</th>
+                                </tr>
+                            </thead>
+                            <tbody id="excludedTableBody" class="bg-white divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab: Missing (In Academy, Not in Workforce) -->
+                <div id="missingTab" class="tab-content">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-slate-800">أرقام وظيفية بالأكاديمية وغير موجودة بالقوى</h2>
+                        <span id="missingCount" class="bg-yellow-100 text-yellow-800 text-sm font-bold px-3 py-1 rounded-full">0</span>
+                    </div>
+                    <div class="table-container border border-slate-200 rounded-xl shadow-sm">
+                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
+                            <thead class="bg-slate-50 text-slate-600">
+                                <tr>
+                                    <th class="px-6 py-4 font-semibold uppercase tracking-wider">الرقم الوظيفي</th>
+                                    <th class="px-6 py-4 font-semibold uppercase tracking-wider">الاسم في الأكاديمية (إن وجد)</th>
+                                    <th class="px-6 py-4 font-semibold uppercase tracking-wider">عدد الشهادات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="missingTableBody" class="bg-white divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab: Analysis -->
+                <div id="analysisTab" class="tab-content">
+                    
+                    <!-- Region Exclusion Controls -->
+                    <div class="bg-white border border-slate-200 shadow-sm rounded-xl p-5 mb-8">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i class="fas fa-filter text-indigo-500"></i>
+                            <h3 class="font-bold text-slate-800 text-lg">تضمين / استبعاد الأقاليم من الإحصائية</h3>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-4">قم بإزالة العلامة من الإقليم الذي لا ترغب باحتسابه في الجداول والأرقام أدناه.</p>
+                        <div id="regionExclusionContainer" class="flex flex-wrap gap-3">
+                            <!-- Checkboxes injected via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Export Controls -->
+                    <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-5 mb-8 flex flex-wrap gap-4 items-center justify-between shadow-sm">
+                        <h3 class="font-bold text-indigo-800 flex items-center text-lg"><i class="fas fa-download ml-2"></i> تصدير البيانات الشامل (Excel)</h3>
+                        <div class="flex flex-wrap gap-2" id="exportButtonsContainer">
+                            <button onclick="exportAllData()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-6 rounded-lg shadow transition transform hover:-translate-y-0.5">
+                                <i class="fas fa-file-excel ml-2"></i> تحميل الكل (مجمع)
+                            </button>
+                            <!-- Region buttons will be injected here -->
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                        <!-- General Stats -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group hover:border-indigo-200 transition">
+                            <div class="absolute -left-6 -top-6 text-indigo-50 opacity-50 group-hover:opacity-100 transition"><i class="fas fa-chart-pie text-9xl"></i></div>
+                            <h3 class="font-bold text-xl border-b border-slate-100 pb-3 mb-4 relative z-10 text-slate-700">الحالة العامة (مفلتر)</h3>
+                            <ul class="space-y-4 relative z-10 text-base">
+                                <li class="flex justify-between items-center"><span>على رأس العمل:</span> <span id="statActive" class="font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-lg">0</span></li>
+                                <li class="flex justify-between items-center text-slate-400 text-sm"><span>المستبعدين (إجمالي):</span> <span id="statExcluded" class="font-medium">0</span></li>
+                                <li class="flex justify-between items-center text-slate-400 text-sm"><span>بالأكاديمية فقط (إجمالي):</span> <span id="statMissing" class="font-medium">0</span></li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Tenure Stats -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group hover:border-blue-200 transition">
+                            <div class="absolute -left-6 -top-6 text-blue-50 opacity-50 group-hover:opacity-100 transition"><i class="fas fa-clock text-9xl"></i></div>
+                            <h3 class="font-bold text-xl border-b border-slate-100 pb-3 mb-4 relative z-10 text-slate-700">فترات العمل (مفلتر)</h3>
+                            <ul class="space-y-4 relative z-10 text-base">
+                                <li class="flex justify-between items-center"><span>أقل من 3 شهور:</span> <span id="statLess3" class="font-bold text-slate-700 bg-slate-100 px-3 py-1 rounded-lg">0</span></li>
+                                <li class="flex justify-between items-center"><span>من 3 شهور إلى سنتين:</span> <span id="stat3to2" class="font-bold text-slate-700 bg-slate-100 px-3 py-1 rounded-lg">0</span></li>
+                                <li class="flex justify-between items-center"><span>أكثر من سنتين:</span> <span id="statOver2" class="font-bold text-slate-700 bg-slate-100 px-3 py-1 rounded-lg">0</span></li>
+                            </ul>
+                        </div>
+
+                        <!-- Certificate Quick Stats -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group hover:border-emerald-200 transition">
+                            <div class="absolute -left-6 -top-6 text-emerald-50 opacity-50 group-hover:opacity-100 transition"><i class="fas fa-award text-9xl"></i></div>
+                            <h3 class="font-bold text-xl border-b border-slate-100 pb-3 mb-4 relative z-10 text-slate-700">الشهادات (مفلتر)</h3>
+                            <ul class="space-y-4 relative z-10 text-base">
+                                <li class="flex justify-between items-center"><span>أكملوا 20 فأكثر:</span> <span id="statCert20" class="font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-lg">0</span></li>
+                                <li class="flex justify-between items-center"><span>أقل من 20 شهادة:</span> <span id="statCertLess20" class="font-bold text-orange-600 bg-orange-50 px-3 py-1 rounded-lg">0</span></li>
+                                <li class="flex justify-between items-center"><span>بدون شهادات (0):</span> <span id="statCert0" class="font-bold text-red-600 bg-red-50 px-3 py-1 rounded-lg">0</span></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Region Analysis Table -->
+                    <h3 class="text-2xl font-bold text-slate-800 mb-4 flex items-center">
+                        <i class="fas fa-map-marker-alt text-indigo-500 ml-2"></i> تحليل الأقاليم للشهادات
+                    </h3>
+                    <div class="table-container border border-slate-200 rounded-xl shadow-sm">
+                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
+                            <thead class="bg-slate-800 text-white">
+                                <tr>
+                                    <th class="px-5 py-4 font-semibold tracking-wider">الإقليم</th>
+                                    <th class="px-5 py-4 font-semibold tracking-wider">إجمالي الموظفين</th>
+                                    <th class="px-5 py-4 font-semibold text-emerald-300">20 شهادة فأكثر</th>
+                                    <th class="px-5 py-4 font-semibold text-emerald-300">النسبة %</th>
+                                    <th class="px-5 py-4 font-semibold text-orange-300">أقل من 20</th>
+                                    <th class="px-5 py-4 font-semibold text-orange-300">النسبة %</th>
+                                    <th class="px-5 py-4 font-semibold text-red-300">0 شهادة</th>
+                                    <th class="px-5 py-4 font-semibold text-red-300">النسبة %</th>
+                                </tr>
+                            </thead>
+                            <tbody id="regionAnalysisTableBody" class="bg-white divide-y divide-slate-200">
+                                <!-- Data injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Setup Drag and Drop ---
+        ['Wf', 'Ac'].forEach(type => {
+            const dropZone = document.getElementById(`dropZone${type}`);
+            const input = document.getElementById(type === 'Wf' ? 'workforceFile' : 'academyFile');
+            
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+            ['dragleave', 'dragend'].forEach(evt => {
+                dropZone.addEventListener(evt, () => dropZone.classList.remove('dragover'));
+            });
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                if (e.dataTransfer.files.length) {
+                    input.files = e.dataTransfer.files;
+                    handleFileSelect({target: input}, `${type.toLowerCase()}FileName`);
+                }
+            });
+        });
+
+        function handleFileSelect(event, displayId) {
+            const file = event.target.files[0];
+            if (file) {
+                const display = document.getElementById(displayId);
+                display.innerText = file.name;
+                display.classList.remove('hidden');
+                display.classList.add('inline-block');
+                
+                // Hide error message if user selects a file
+                document.getElementById('uploadErrorMessage').classList.add('hidden');
+            }
+        }
+
+        // Custom Error showing logic to avoid iframe alert crash
+        function showError(message) {
+            const errorBanner = document.getElementById('uploadErrorMessage');
+            document.getElementById('uploadErrorText').innerText = message;
+            errorBanner.classList.remove('hidden');
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function showFatalError(errorObj) {
+            console.error(errorObj);
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.innerHTML = `
+                <div class="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-md mx-auto border border-red-100">
+                    <i class="fas fa-exclamation-triangle text-6xl text-red-500 mb-4"></i>
+                    <h2 class="text-2xl font-bold text-slate-800">حدث خطأ أثناء المعالجة!</h2>
+                    <p class="text-slate-500 mt-2 mb-6">يرجى التأكد من أن ملفات الإكسل بنفس الصيغة والتنسيق المطلوب.</p>
+                    <button onclick="document.getElementById('loadingOverlay').style.display='none'; location.reload();" class="bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 px-6 py-2 rounded-lg font-bold transition">حسناً، إعادة تحميل الصفحة</button>
+                </div>
+            `;
+            overlay.style.display = 'flex';
+        }
+
+        // --- Configuration ---
+        const regionManagerMap = {
+            "احمد عمار": "إقليم جده والمدينة", "اشرف البركي": "اقليم الشرقية",
+            "حسام البني": "اقليم الجنوب", "زكي سريه": "La beaute",
+            "سليمان حمدي": "اقليم الساحل", "عادل السيد السحراوي": "اقليم الشمالية",
+            "علاء محمود محمد الزيني": "اقليم مكة والطائف", "إبراهيم مساعد": "الحرمين",
+            "محمد الطوخي": "الخليج", "محمد دللول": "إقليم جده وينبع",
+            "وحيد حامد": "إقليم جنوب الرياض والمولات", "وسيم يوسف نجمه": "اقليم شمال الرياض و تبوك",
+            "عماد جابر": "Q&A"
+        };
+
+        const excludedStatuses = ['استقالة', 'استقاله', 'إنهاء خدمة', 'انهاء خدمة', 'انهاء خدمه', 'انقطاع', 'انتقل إلى', 'انتقل الي', 'نقل'];
+        const targetMonthsKeys = ["10-2025", "11-2025", "12-2025", "01-2026", "02-2026", "03-2026", "04-2026", "05-2026", "06-2026"];
+
+        // --- Global State ---
+        let globalData = {
+            allActive: [],
+            excludedEmployees: [],
+            missingEmployees: [],
+            regionsSet: new Set(),
+            excludedRegions: new Set()
+        };
+
+        document.getElementById('currentDateDisplay').innerText = `تاريخ اليوم: ${new Date().toLocaleDateString('ar-EG')}`;
+
+        function switchTab(event, tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            if(event && event.currentTarget) {
+                event.currentTarget.classList.add('active');
+            }
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function cleanString(str) { return str == null ? "" : str.toString().trim(); }
+        
+        function isExcluded(status) {
+            if (!status) return false;
+            const cleanStat = cleanString(status).toLowerCase();
+            return excludedStatuses.some(ex => cleanStat.includes(ex.toLowerCase()));
+        }
+
+        function determineRegion(managerName) {
+            let manager = cleanString(managerName);
+            if (regionManagerMap[manager]) return regionManagerMap[manager];
+            for (let key in regionManagerMap) {
+                if (manager.includes(key) || key.includes(manager)) return regionManagerMap[key];
+            }
+            return manager ? "غير محدد (" + manager + ")" : "غير محدد";
+        }
+
+        function parseExcelDate(excelValue) {
+            if (!excelValue) return null;
+            if (typeof excelValue === 'number') return new Date((excelValue - (25567 + 2)) * 86400 * 1000);
+            if (typeof excelValue === 'string') {
+                let parts = excelValue.split(/[\/\-]/);
+                if (parts.length === 3 && parts[0].length <= 2 && parts[2].length === 4) {
+                    return new Date(parts[2], parseInt(parts[1])-1, parts[0]);
+                }
+                let d = new Date(excelValue);
+                if (!isNaN(d)) return d;
+            }
+            return null;
+        }
+
+        function parseCertificateDate(cellValue) {
+            if (!cellValue || cellValue === "-") return null;
+            let match = cellValue.toString().match(/(\d{2})\/(\d{2})\/(\d{4})/);
+            if (match) return { key: `${match[2]}-${match[3]}` };
+            return null;
+        }
+
+        function calculateTenureMonths(hireDateStr) {
+            let hireDate = parseExcelDate(hireDateStr);
+            if (!hireDate || isNaN(hireDate)) return -1;
+            let today = new Date();
+            let months = (today.getFullYear() - hireDate.getFullYear()) * 12;
+            months -= hireDate.getMonth();
+            months += today.getMonth();
+            return months <= 0 ? 0 : months;
+        }
+
+        function formatDateDisplay(excelVal) {
+            let d = parseExcelDate(excelVal);
+            if (!d || isNaN(d)) return cleanString(excelVal);
+            return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+        }
+
+        async function processFiles() {
+            document.getElementById('uploadErrorMessage').classList.add('hidden');
+            
+            const wfFile = document.getElementById('workforceFile').files[0];
+            const acFile = document.getElementById('academyFile').files[0];
+            if (!wfFile || !acFile) { 
+                showError("الرجاء إرفاق كلا الملفين (ملف القوى وملف الأكاديمية) قبل البدء في المعالجة."); 
+                return; 
+            }
+
+            // Restore loading content to default just in case it was modified by an error previously
+            document.getElementById('loadingOverlay').innerHTML = `
+                <div id="loadingContent" class="text-center">
+                    <div class="relative inline-block">
+                        <i class="fas fa-circle-notch fa-spin text-6xl text-indigo-600"></i>
+                        <i class="fas fa-file-excel absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xl text-indigo-400"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-700 mt-6">جاري التحليل والمطابقة...</h2>
+                    <p class="text-slate-500 mt-2">يرجى الانتظار لحين الانتهاء من معالجة البيانات</p>
+                </div>
+            `;
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            
+            try {
+                const wfData = await readExcel(wfFile);
+                const acData = await readExcel(acFile);
+                analyzeData(wfData, acData);
+                document.getElementById('resultsSection').classList.remove('hidden');
+                document.getElementById('loadingOverlay').style.display = 'none';
+            } catch (error) {
+                showFatalError(error);
+            }
+        }
+
+        function readExcel(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array', cellDates: false});
+                        resolve(XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1, defval: ""}));
+                    } catch (err) { reject(err); }
+                };
+                reader.onerror = (e) => reject(e);
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        function analyzeData(wfRows, acRows) {
+            globalData = { allActive: [], excludedEmployees: [], missingEmployees: [], regionsSet: new Set(), excludedRegions: new Set() };
+            let employeeMap = {};
+            let allWfIds = new Set();
+
+            // 1. Workforce
+            for (let i = 1; i < wfRows.length; i++) {
+                let row = wfRows[i];
+                if (!row || row.length < 2) continue;
+                
+                let id = cleanString(row[0]); if (!id) continue;
+                allWfIds.add(id);
+                
+                let name = cleanString(row[1]), hireDate = row[4], status = cleanString(row[9]);
+                let supervisor = row.length > 13 ? cleanString(row[13]) : "";
+                let manager = row.length > 15 ? cleanString(row[15]) : "";
+                
+                if (isExcluded(status)) {
+                    globalData.excludedEmployees.push({ id, name, status });
+                } else {
+                    let region = determineRegion(manager);
+                    globalData.regionsSet.add(region);
+                    
+                    let emp = { id, name, hireDate, status, supervisor, manager, region, totalCerts: 0, monthsData: {} };
+                    targetMonthsKeys.forEach(m => emp.monthsData[m] = 0);
+                    
+                    let tenure = calculateTenureMonths(hireDate);
+                    emp.tenureMonths = tenure;
+                    
+                    employeeMap[id] = emp;
+                    globalData.allActive.push(emp);
+                }
+            }
+
+            // 2. Academy
+            let missingMap = {};
+            for (let i = 1; i < acRows.length; i++) {
+                let row = acRows[i];
+                if (!row || row.length < 15) continue;
+                let id = cleanString(row[14]); if (!id) continue;
+
+                let certValue = row.length > 38 ? row[38] : "-";
+                let certInfo = parseCertificateDate(certValue);
+
+                if (employeeMap[id]) {
+                    if (certInfo) {
+                        employeeMap[id].totalCerts++;
+                        if (employeeMap[id].monthsData[certInfo.key] !== undefined) employeeMap[id].monthsData[certInfo.key]++;
+                    }
+                } else if (!allWfIds.has(id)) {
+                    if (!missingMap[id]) missingMap[id] = { id, name: row.length > 2 ? cleanString(row[2]) : "غير متوفر", totalCerts: 0 };
+                    if (certInfo) missingMap[id].totalCerts++;
+                }
+            }
+            globalData.missingEmployees = Object.values(missingMap);
+
+            buildFilterUI();
+            applyActiveFilters(); // Will also render tables and analysis
+        }
+
+        function buildFilterUI() {
+            let selectHtml = '<option value="">كل الأقاليم</option>';
+            let checksHtml = '';
+            
+            Array.from(globalData.regionsSet).sort().forEach(reg => {
+                selectHtml += `<option value="${reg}">${reg}</option>`;
+                checksHtml += `
+                    <label class="flex items-center space-x-2 space-x-reverse bg-white border rounded-lg px-4 py-2 cursor-pointer hover:bg-slate-50 transition shadow-sm">
+                        <input type="checkbox" checked value="${reg}" onchange="toggleRegionExclusion(this)" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                        <span class="text-sm font-medium text-slate-700">${reg}</span>
+                    </label>
+                `;
+            });
+            document.getElementById('filterRegion').innerHTML = selectHtml;
+            document.getElementById('regionExclusionContainer').innerHTML = checksHtml;
+        }
+
+        function toggleRegionExclusion(checkbox) {
+            if (checkbox.checked) globalData.excludedRegions.delete(checkbox.value);
+            else globalData.excludedRegions.add(checkbox.value);
+            updateAnalysisUI();
+        }
+
+        function applyActiveFilters() {
+            let sName = document.getElementById('searchName').value.toLowerCase();
+            let sReg = document.getElementById('filterRegion').value;
+
+            let filtered = globalData.allActive.filter(e => {
+                let matchName = e.name.toLowerCase().includes(sName) || e.id.toLowerCase().includes(sName);
+                let matchReg = sReg === "" || e.region === sReg;
+                return matchName && matchReg;
+            });
+
+            let t1 = filtered.filter(e => e.tenureMonths >= 0 && e.tenureMonths < 3);
+            let t2 = filtered.filter(e => e.tenureMonths >= 3 && e.tenureMonths <= 24);
+            let t3 = filtered.filter(e => e.tenureMonths > 24);
+
+            // Using exactly the corrected IDs for the counts (t1Count, t2Count, t3Count)
+            renderTable('active', filtered);
+            renderTable('t1', t1);
+            renderTable('t2', t2);
+            renderTable('t3', t3);
+
+            // Render Static tabs
+            document.getElementById('excludedTableBody').innerHTML = globalData.excludedEmployees.map(e => `<tr><td class="px-6 py-4">${e.id}</td><td class="px-6 py-4">${e.name}</td><td class="px-6 py-4"><span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs">${e.status}</span></td></tr>`).join('');
+            document.getElementById('missingTableBody').innerHTML = globalData.missingEmployees.map(e => `<tr><td class="px-6 py-4 font-bold">${e.id}</td><td class="px-6 py-4">${e.name}</td><td class="px-6 py-4 font-bold text-indigo-600">${e.totalCerts}</td></tr>`).join('');
+            
+            document.getElementById('excludedCount').innerText = globalData.excludedEmployees.length;
+            document.getElementById('missingCount').innerText = globalData.missingEmployees.length;
+
+            updateAnalysisUI();
+        }
+
+        function renderTable(prefix, dataArray) {
+            // Header
+            let headerHtml = `
+                <th class="px-4 py-4 font-semibold uppercase">الرقم الوظيفي</th>
+                <th class="px-4 py-4 font-semibold uppercase w-48">الاسم</th>
+                <th class="px-4 py-4 font-semibold uppercase">التعيين</th>
+                <th class="px-4 py-4 font-semibold uppercase">المشرف</th>
+                <th class="px-4 py-4 font-semibold uppercase">الإقليم</th>
+                <th class="px-4 py-4 font-semibold uppercase bg-indigo-50 text-indigo-800">إجمالي الشهادات</th>
+            `;
+            targetMonthsKeys.forEach(m => headerHtml += `<th class="px-2 py-4 font-medium text-xs">${m.replace('-','/')}</th>`);
+            
+            let idHeader = prefix === 'active' ? 'activeTableHeader' : `${prefix}Header`;
+            document.getElementById(idHeader).innerHTML = headerHtml;
+
+            // Body
+            let bodyHtml = dataArray.map(emp => {
+                let monthsHtml = targetMonthsKeys.map(k => {
+                    let val = emp.monthsData[k];
+                    let cls = val > 0 ? "text-emerald-600 font-bold bg-emerald-50" : "text-slate-400";
+                    return `<td class="px-2 py-3 whitespace-nowrap text-center ${cls}">${val}</td>`;
+                }).join('');
+                
+                let certCls = emp.totalCerts >= 20 ? "bg-emerald-100 text-emerald-800" : (emp.totalCerts > 0 ? "bg-blue-100 text-blue-800" : "bg-red-100 text-red-800");
+
+                return `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="px-4 py-3 font-bold text-slate-700">${emp.id}</td>
+                        <td class="px-4 py-3 font-medium text-slate-800 truncate max-w-[200px]" title="${emp.name}">${emp.name}</td>
+                        <td class="px-4 py-3 text-slate-500 text-xs" dir="ltr">${formatDateDisplay(emp.hireDate)}</td>
+                        <td class="px-4 py-3 text-slate-600 text-xs">${emp.supervisor}</td>
+                        <td class="px-4 py-3"><span class="px-2 py-1 bg-slate-100 rounded border border-slate-200 text-xs whitespace-nowrap">${emp.region}</span></td>
+                        <td class="px-4 py-3 text-center"><span class="px-3 py-1 rounded-full font-bold text-xs ${certCls}">${emp.totalCerts}</span></td>
+                        ${monthsHtml}
+                    </tr>
+                `;
+            }).join('');
+            
+            let idBody = prefix === 'active' ? 'activeTableBody' : `${prefix}Body`;
+            let idCount = prefix === 'active' ? 'activeCount' : `${prefix}Count`;
+            
+            document.getElementById(idBody).innerHTML = bodyHtml;
+            // The fatal bug was here (calling an element ID that didn't exist in HTML)
+            document.getElementById(idCount).innerText = dataArray.length;
+        }
+
+        function updateAnalysisUI() {
+            let analysis = {
+                active: 0,
+                tenure: { less3: 0, between3and24: 0, over24: 0 },
+                certs: { over20: 0, less20: 0, zero: 0 },
+                regions: {}
+            };
+
+            // Calculate based on included regions only
+            globalData.allActive.forEach(emp => {
+                if (globalData.excludedRegions.has(emp.region)) return; // Skip excluded
+
+                analysis.active++;
+                
+                if (emp.tenureMonths >= 0) {
+                    if (emp.tenureMonths < 3) analysis.tenure.less3++;
+                    else if (emp.tenureMonths <= 24) analysis.tenure.between3and24++;
+                    else analysis.tenure.over24++;
+                }
+
+                if (emp.totalCerts >= 20) analysis.certs.over20++;
+                else if (emp.totalCerts > 0) analysis.certs.less20++;
+                else analysis.certs.zero++;
+
+                if (!analysis.regions[emp.region]) {
+                    analysis.regions[emp.region] = { total: 0, over20: 0, less20: 0, zero: 0, employees: [] };
+                }
+                
+                let regStats = analysis.regions[emp.region];
+                regStats.total++;
+                regStats.employees.push(emp);
+                
+                if (emp.totalCerts >= 20) regStats.over20++;
+                else if (emp.totalCerts > 0) regStats.less20++;
+                else regStats.zero++;
+            });
+
+            // Update UI
+            document.getElementById('statActive').innerText = analysis.active;
+            document.getElementById('statExcluded').innerText = globalData.excludedEmployees.length; // Static global
+            document.getElementById('statMissing').innerText = globalData.missingEmployees.length; // Static global
+
+            document.getElementById('statLess3').innerText = analysis.tenure.less3;
+            document.getElementById('stat3to2').innerText = analysis.tenure.between3and24;
+            document.getElementById('statOver2').innerText = analysis.tenure.over24;
+
+            document.getElementById('statCert20').innerText = analysis.certs.over20;
+            document.getElementById('statCertLess20').innerText = analysis.certs.less20;
+            document.getElementById('statCert0').innerText = analysis.certs.zero;
+
+            let regHtml = '';
+            let exportBtnsHtml = '';
+            
+            // Sort regions for display
+            let sortedRegions = Object.keys(analysis.regions).sort();
+            
+            sortedRegions.forEach(reg => {
+                let stats = analysis.regions[reg];
+                let p20 = stats.total > 0 ? Math.round((stats.over20 / stats.total) * 100) : 0;
+                let pLess = stats.total > 0 ? Math.round((stats.less20 / stats.total) * 100) : 0;
+                let p0 = stats.total > 0 ? Math.round((stats.zero / stats.total) * 100) : 0;
+
+                regHtml += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-5 py-4 font-bold text-slate-700">${reg}</td>
+                        <td class="px-5 py-4 font-bold text-lg">${stats.total}</td>
+                        <td class="px-5 py-4 text-emerald-600 font-bold">${stats.over20}</td>
+                        <td class="px-5 py-4 text-sm text-slate-400">${p20}%</td>
+                        <td class="px-5 py-4 text-orange-600 font-bold">${stats.less20}</td>
+                        <td class="px-5 py-4 text-sm text-slate-400">${pLess}%</td>
+                        <td class="px-5 py-4 text-red-600 font-bold">${stats.zero}</td>
+                        <td class="px-5 py-4 text-sm text-slate-400">${p0}%</td>
+                    </tr>
+                `;
+
+                exportBtnsHtml += `
+                    <button onclick="exportRegion('${reg}')" class="bg-white hover:bg-indigo-50 text-indigo-700 text-sm font-medium py-2 px-4 rounded border border-indigo-200 transition shadow-sm">
+                        <i class="fas fa-download mr-1"></i> ${reg}
+                    </button>
+                `;
+            });
+            
+            if (sortedRegions.length === 0) {
+                regHtml = `<tr><td colspan="8" class="text-center py-8 text-slate-500">تم استبعاد كافة الأقاليم.</td></tr>`;
+            }
+            
+            document.getElementById('regionAnalysisTableBody').innerHTML = regHtml;
+            
+            // Preserve the "Download All" button and append region buttons
+            let downloadAllBtn = `
+                <button onclick="exportAllData()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-6 rounded-lg shadow transition transform hover:-translate-y-0.5">
+                    <i class="fas fa-file-excel ml-2"></i> تحميل الكل (مجمع)
+                </button>
+            `;
+            document.getElementById('exportButtonsContainer').innerHTML = downloadAllBtn + exportBtnsHtml;
+        }
+
+        // --- Export Logic ---
+        function generateEmployeeAOA(employeesArray) {
+            let aoa = [];
+            let header = ["الرقم الوظيفي", "الاسم", "تاريخ التعيين", "المشرف", "مدير الإقليم", "الإقليم", "المدة (أشهر)", "إجمالي الشهادات"];
+            targetMonthsKeys.forEach(m => header.push(m.replace('-','/')));
+            aoa.push(header);
+
+            employeesArray.forEach(emp => {
+                let row = [ emp.id, emp.name, formatDateDisplay(emp.hireDate), emp.supervisor, emp.manager, emp.region, emp.tenureMonths, emp.totalCerts ];
+                targetMonthsKeys.forEach(m => row.push(emp.monthsData[m]));
+                aoa.push(row);
+            });
+            return aoa;
+        }
+
+        function exportAllData() {
+            let wb = XLSX.utils.book_new();
+            
+            // Generate valid data excluding skipped regions
+            let validActive = globalData.allActive.filter(e => !globalData.excludedRegions.has(e.region));
+            
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(generateEmployeeAOA(validActive)), "جميع البائعين المعتمدين");
+            
+            // Split by tenure for convenience in the export
+            let t1 = validActive.filter(e => e.tenureMonths >= 0 && e.tenureMonths < 3);
+            let t2 = validActive.filter(e => e.tenureMonths >= 3 && e.tenureMonths <= 24);
+            let t3 = validActive.filter(e => e.tenureMonths > 24);
+            
+            if(t1.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(generateEmployeeAOA(t1)), "أقل من 3 شهور");
+            if(t2.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(generateEmployeeAOA(t2)), "من 3 لسنتين");
+            if(t3.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(generateEmployeeAOA(t3)), "أكثر من سنتين");
+
+            // Build Stats Matrix
+            let analysisAOA = [["الإقليم", "إجمالي الموظفين", "20 شهادة فأكثر", "النسبة %", "أقل من 20", "النسبة %", "0 شهادة", "النسبة %"]];
+            // Recalculate quick stats for export
+            let tempRegions = {};
+            validActive.forEach(emp => {
+                if (!tempRegions[emp.region]) tempRegions[emp.region] = { total: 0, over20: 0, less20: 0, zero: 0 };
+                let r = tempRegions[emp.region];
+                r.total++;
+                if (emp.totalCerts >= 20) r.over20++;
+                else if (emp.totalCerts > 0) r.less20++;
+                else r.zero++;
+            });
+            
+            for (let reg in tempRegions) {
+                let s = tempRegions[reg];
+                analysisAOA.push([
+                    reg, s.total, 
+                    s.over20, (s.total?Math.round((s.over20/s.total)*100):0)+'%',
+                    s.less20, (s.total?Math.round((s.less20/s.total)*100):0)+'%',
+                    s.zero, (s.total?Math.round((s.zero/s.total)*100):0)+'%'
+                ]);
+            }
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(analysisAOA), "تحليل الأقاليم المعتمدة");
+
+            // Excluded/Missing
+            let excAOA = [["الرقم الوظيفي", "الاسم", "الحالة"]];
+            globalData.excludedEmployees.forEach(e => excAOA.push([e.id, e.name, e.status]));
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(excAOA), "المستبعدين");
+
+            let misAOA = [["الرقم الوظيفي", "الاسم بالاكاديمية", "عدد الشهادات"]];
+            globalData.missingEmployees.forEach(e => misAOA.push([e.id, e.name, e.totalCerts]));
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(misAOA), "بالأكاديمية فقط");
+
+            XLSX.writeFile(wb, "التحليل_الشامل_الحديث.xlsx");
+        }
+
+        function exportRegion(regionName) {
+            let employees = globalData.allActive.filter(e => e.region === regionName);
+            if (!employees.length) return;
+
+            let wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(generateEmployeeAOA(employees)), "بائعين " + regionName.substring(0,20));
+
+            let total = employees.length, over20 = 0, less20 = 0, zero = 0;
+            employees.forEach(e => {
+                if (e.totalCerts >= 20) over20++; else if (e.totalCerts > 0) less20++; else zero++;
+            });
+
+            let statAOA = [
+                ["البيان", "العدد", "النسبة المئوية"],
+                ["إجمالي الموظفين بالإقليم", total, "100%"],
+                ["حاصلون على 20 شهادة فأكثر", over20, (total?Math.round((over20/total)*100):0) + "%"],
+                ["حاصلون على أقل من 20 شهادة", less20, (total?Math.round((less20/total)*100):0) + "%"],
+                ["لم يحصلوا على أي شهادة (0)", zero, (total?Math.round((zero/total)*100):0) + "%"]
+            ];
+            
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(statAOA), "إحصائيات الإقليم");
+            XLSX.writeFile(wb, `تقرير_${regionName}.xlsx`);
+        }
+    </script>
+</body>
+</html>
