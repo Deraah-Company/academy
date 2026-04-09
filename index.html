@@ -1111,6 +1111,18 @@
             let wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(generateEmployeeAOA(employees)), "بائعين " + regionName.substring(0,20));
 
+            // Add Non-Cert Sheet for this specific region
+            let nonCertAOA = [["الرقم الوظيفي", "الاسم", "الإقليم", ...nonCertCoursesKeys]];
+            employees.forEach(emp => {
+                let row = [emp.id, emp.name, emp.region];
+                nonCertCoursesKeys.forEach(c => {
+                    let p = emp.nonCertProgress[c];
+                    row.push(p !== null ? p + "%" : "-");
+                });
+                nonCertAOA.push(row);
+            });
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(nonCertAOA), "دورات بدون شهادات");
+
             let total = employees.length, over20 = 0, less20 = 0, zero = 0;
             employees.forEach(e => {
                 if (e.totalCerts >= 20) over20++; else if (e.totalCerts > 0) less20++; else zero++;
