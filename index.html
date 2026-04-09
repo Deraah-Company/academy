@@ -132,6 +132,9 @@
                 <button class="tab-btn px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'missingTab')">
                     <i class="fas fa-user-secret ml-2"></i> بالأكاديمية فقط
                 </button>
+                <button class="tab-btn px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'nonCertTab')">
+                    <i class="fas fa-book-open ml-2"></i> دورات بدون شهادات
+                </button>
                 <button class="tab-btn px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'analysisTab')">
                     <i class="fas fa-chart-pie ml-2"></i> التحليل والإحصائيات
                 </button>
@@ -248,6 +251,26 @@
                     </div>
                 </div>
 
+                <!-- Tab: Non-Certificate Courses -->
+                <div id="nonCertTab" class="tab-content">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="text-2xl font-bold text-slate-800 flex items-center">
+                            <i class="fas fa-book-open text-indigo-500 ml-2"></i> الدورات بدون شهادات (نسبة التقدم)
+                            <span id="nonCertCount" class="mr-3 bg-indigo-100 text-indigo-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
+                        </h2>
+                    </div>
+                    <div class="table-container border border-slate-200 rounded-xl shadow-sm">
+                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
+                            <thead class="bg-slate-50 text-slate-600">
+                                <tr id="nonCertHeader">
+                                    <!-- Injected via JS -->
+                                </tr>
+                            </thead>
+                            <tbody id="nonCertTableBody" class="bg-white divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <!-- Tab: Analysis -->
                 <div id="analysisTab" class="tab-content">
                     
@@ -309,28 +332,65 @@
                         </div>
                     </div>
 
+                    <!-- Sub-tabs for Analysis -->
+                    <div class="flex border-b border-slate-200 mb-6 bg-slate-50 rounded-t-xl overflow-hidden">
+                        <button class="analysis-sub-tab-btn active px-6 py-3 font-bold text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50 transition focus:outline-none" onclick="switchAnalysisSubTab(event, 'certAnalysisSection')">
+                            <i class="fas fa-certificate ml-2"></i> تحليل الشهادات
+                        </button>
+                        <button class="analysis-sub-tab-btn px-6 py-3 font-semibold text-slate-500 border-b-2 border-transparent hover:bg-slate-100 transition focus:outline-none" onclick="switchAnalysisSubTab(event, 'nonCertAnalysisSection')">
+                            <i class="fas fa-book-open ml-2"></i> إحصائيات الدورات بدون شهادات
+                        </button>
+                    </div>
+
                     <!-- Region Analysis Table -->
-                    <h3 class="text-2xl font-bold text-slate-800 mb-4 flex items-center">
-                        <i class="fas fa-map-marker-alt text-indigo-500 ml-2"></i> تحليل الأقاليم للشهادات
-                    </h3>
-                    <div class="table-container border border-slate-200 rounded-xl shadow-sm">
-                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
-                            <thead class="bg-slate-800 text-white">
-                                <tr>
-                                    <th class="px-5 py-4 font-semibold tracking-wider">الإقليم</th>
-                                    <th class="px-5 py-4 font-semibold tracking-wider">إجمالي الموظفين</th>
-                                    <th class="px-5 py-4 font-semibold text-emerald-300">20 شهادة فأكثر</th>
-                                    <th class="px-5 py-4 font-semibold text-emerald-300">النسبة %</th>
-                                    <th class="px-5 py-4 font-semibold text-orange-300">أقل من 20</th>
-                                    <th class="px-5 py-4 font-semibold text-orange-300">النسبة %</th>
-                                    <th class="px-5 py-4 font-semibold text-red-300">0 شهادة</th>
-                                    <th class="px-5 py-4 font-semibold text-red-300">النسبة %</th>
-                                </tr>
-                            </thead>
-                            <tbody id="regionAnalysisTableBody" class="bg-white divide-y divide-slate-200">
-                                <!-- Data injected here -->
-                            </tbody>
-                        </table>
+                    <div id="certAnalysisSection">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4 flex items-center">
+                            <i class="fas fa-map-marker-alt text-indigo-500 ml-2"></i> تحليل الأقاليم للشهادات
+                        </h3>
+                        <div class="table-container border border-slate-200 rounded-xl shadow-sm mb-8">
+                            <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
+                                <thead class="bg-slate-800 text-white">
+                                    <tr>
+                                        <th class="px-5 py-4 font-semibold tracking-wider">الإقليم</th>
+                                        <th class="px-5 py-4 font-semibold tracking-wider">إجمالي الموظفين</th>
+                                        <th class="px-5 py-4 font-semibold text-emerald-300">20 شهادة فأكثر</th>
+                                        <th class="px-5 py-4 font-semibold text-emerald-300">النسبة %</th>
+                                        <th class="px-5 py-4 font-semibold text-orange-300">أقل من 20</th>
+                                        <th class="px-5 py-4 font-semibold text-orange-300">النسبة %</th>
+                                        <th class="px-5 py-4 font-semibold text-red-300">0 شهادة</th>
+                                        <th class="px-5 py-4 font-semibold text-red-300">النسبة %</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="regionAnalysisTableBody" class="bg-white divide-y divide-slate-200">
+                                    <!-- Data injected here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Non-Certificate Courses Analysis -->
+                    <div id="nonCertAnalysisSection" style="display: none;">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4 flex items-center">
+                            <i class="fas fa-tasks text-indigo-500 ml-2"></i> إحصائيات الدورات بدون شهادات (مفلتر)
+                        </h3>
+                        <div class="table-container border border-slate-200 rounded-xl shadow-sm mb-8">
+                            <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
+                                <thead class="bg-slate-700 text-white">
+                                    <tr>
+                                        <th class="px-5 py-4 font-semibold tracking-wider w-1/4">اسم الدورة</th>
+                                        <th class="px-5 py-4 font-semibold tracking-wider">إجمالي المسجلين/الحضور</th>
+                                        <th class="px-5 py-4 font-semibold text-emerald-300">اكتمل 100%</th>
+                                        <th class="px-5 py-4 font-semibold text-blue-300">من 50% إلى 99%</th>
+                                        <th class="px-5 py-4 font-semibold text-orange-300">أقل من 50%</th>
+                                        <th class="px-5 py-4 font-semibold text-red-300">لم يكمل (0%)</th>
+                                        <th class="px-5 py-4 font-semibold text-slate-300">لم يدخل (-)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="nonCertAnalysisTableBody" class="bg-white divide-y divide-slate-200">
+                                    <!-- Data injected here -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
@@ -344,56 +404,68 @@
             const dropZone = document.getElementById(`dropZone${type}`);
             const input = document.getElementById(type === 'Wf' ? 'workforceFile' : 'academyFile');
             
-            dropZone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                dropZone.classList.add('dragover');
-            });
-            ['dragleave', 'dragend'].forEach(evt => {
-                dropZone.addEventListener(evt, () => dropZone.classList.remove('dragover'));
-            });
-            dropZone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                dropZone.classList.remove('dragover');
-                if (e.dataTransfer.files.length) {
-                    input.files = e.dataTransfer.files;
-                    handleFileSelect({target: input}, `${type.toLowerCase()}FileName`);
-                }
-            });
+            // إضافة شرط للتحقق من وجود العنصر قبل إضافة الأحداث (Null Check) لمنع توقف الكود
+            if (dropZone && input) {
+                dropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('dragover');
+                });
+                ['dragleave', 'dragend'].forEach(evt => {
+                    dropZone.addEventListener(evt, () => dropZone.classList.remove('dragover'));
+                });
+                dropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('dragover');
+                    if (e.dataTransfer.files.length) {
+                        input.files = e.dataTransfer.files;
+                        handleFileSelect({target: input}, `${type.toLowerCase()}FileName`);
+                    }
+                });
+            }
         });
 
         function handleFileSelect(event, displayId) {
             const file = event.target.files[0];
             if (file) {
                 const display = document.getElementById(displayId);
-                display.innerText = file.name;
-                display.classList.remove('hidden');
-                display.classList.add('inline-block');
+                if(display) {
+                    display.innerText = file.name;
+                    display.classList.remove('hidden');
+                    display.classList.add('inline-block');
+                }
                 
                 // Hide error message if user selects a file
-                document.getElementById('uploadErrorMessage').classList.add('hidden');
+                const errorMsg = document.getElementById('uploadErrorMessage');
+                if(errorMsg) errorMsg.classList.add('hidden');
             }
         }
 
         // Custom Error showing logic to avoid iframe alert crash
         function showError(message) {
             const errorBanner = document.getElementById('uploadErrorMessage');
-            document.getElementById('uploadErrorText').innerText = message;
-            errorBanner.classList.remove('hidden');
-            document.getElementById('loadingOverlay').style.display = 'none';
+            const errorText = document.getElementById('uploadErrorText');
+            if(errorBanner && errorText) {
+                errorText.innerText = message;
+                errorBanner.classList.remove('hidden');
+            }
+            const overlay = document.getElementById('loadingOverlay');
+            if(overlay) overlay.style.display = 'none';
         }
 
         function showFatalError(errorObj) {
             console.error(errorObj);
             const overlay = document.getElementById('loadingOverlay');
-            overlay.innerHTML = `
-                <div class="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-md mx-auto border border-red-100">
-                    <i class="fas fa-exclamation-triangle text-6xl text-red-500 mb-4"></i>
-                    <h2 class="text-2xl font-bold text-slate-800">حدث خطأ أثناء المعالجة!</h2>
-                    <p class="text-slate-500 mt-2 mb-6">يرجى التأكد من أن ملفات الإكسل بنفس الصيغة والتنسيق المطلوب.</p>
-                    <button onclick="document.getElementById('loadingOverlay').style.display='none'; location.reload();" class="bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 px-6 py-2 rounded-lg font-bold transition">حسناً، إعادة تحميل الصفحة</button>
-                </div>
-            `;
-            overlay.style.display = 'flex';
+            if(overlay) {
+                overlay.innerHTML = `
+                    <div class="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-md mx-auto border border-red-100">
+                        <i class="fas fa-exclamation-triangle text-6xl text-red-500 mb-4"></i>
+                        <h2 class="text-2xl font-bold text-slate-800">حدث خطأ أثناء المعالجة!</h2>
+                        <p class="text-slate-500 mt-2 mb-6">يرجى التأكد من أن ملفات الإكسل بنفس الصيغة والتنسيق المطلوب.</p>
+                        <button onclick="document.getElementById('loadingOverlay').style.display='none'; location.reload();" class="bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 px-6 py-2 rounded-lg font-bold transition">حسناً، إعادة تحميل الصفحة</button>
+                    </div>
+                `;
+                overlay.style.display = 'flex';
+            }
         }
 
         // --- Configuration ---
@@ -409,6 +481,11 @@
 
         const excludedStatuses = ['استقالة', 'استقاله', 'إنهاء خدمة', 'انهاء خدمة', 'انهاء خدمه', 'انقطاع', 'انتقل إلى', 'انتقل الي', 'نقل'];
         const targetMonthsKeys = ["10-2025", "11-2025", "12-2025", "01-2026", "02-2026", "03-2026", "04-2026", "05-2026", "06-2026"];
+
+        const nonCertCoursesKeys = [
+            "1+2 Offer", "delivery order software", "Updates and New Circulars", 
+            "Deraah Seminars", "Deraah's new products", "Deraah campaigns"
+        ];
 
         // --- Global State ---
         let globalData = {
@@ -427,7 +504,29 @@
             if(event && event.currentTarget) {
                 event.currentTarget.classList.add('active');
             }
-            document.getElementById(tabId).classList.add('active');
+            const targetTab = document.getElementById(tabId);
+            if(targetTab) targetTab.classList.add('active');
+        }
+
+        function switchAnalysisSubTab(event, sectionId) {
+            document.querySelectorAll('.analysis-sub-tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'text-indigo-600', 'border-indigo-600', 'bg-indigo-50');
+                btn.classList.add('text-slate-500', 'border-transparent');
+                btn.classList.remove('font-bold');
+                btn.classList.add('font-semibold');
+            });
+            
+            if(event && event.currentTarget) {
+                const btn = event.currentTarget;
+                btn.classList.remove('text-slate-500', 'border-transparent', 'font-semibold');
+                btn.classList.add('active', 'text-indigo-600', 'border-indigo-600', 'bg-indigo-50', 'font-bold');
+            }
+
+            document.getElementById('certAnalysisSection').style.display = 'none';
+            document.getElementById('nonCertAnalysisSection').style.display = 'none';
+            
+            const targetSec = document.getElementById(sectionId);
+            if(targetSec) targetSec.style.display = 'block';
         }
 
         function cleanString(str) { return str == null ? "" : str.toString().trim(); }
@@ -484,8 +583,23 @@
             return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}`;
         }
 
+        function parseProgress(val) {
+            if (val === "" || val === undefined || val === null) return null; // null means not entered
+            if (typeof val === 'string') {
+                let parsed = parseFloat(val.replace('%', '').trim());
+                return isNaN(parsed) ? null : parsed;
+            }
+            if (typeof val === 'number') {
+                if (val <= 1 && val > 0 && val.toString().includes('.')) return Math.round(val * 100);
+                if (val === 1) return 100;
+                return val;
+            }
+            return null;
+        }
+
         async function processFiles() {
-            document.getElementById('uploadErrorMessage').classList.add('hidden');
+            const errorBanner = document.getElementById('uploadErrorMessage');
+            if(errorBanner) errorBanner.classList.add('hidden');
             
             const wfFile = document.getElementById('workforceFile').files[0];
             const acFile = document.getElementById('academyFile').files[0];
@@ -494,25 +608,31 @@
                 return; 
             }
 
-            // Restore loading content to default just in case it was modified by an error previously
-            document.getElementById('loadingOverlay').innerHTML = `
-                <div id="loadingContent" class="text-center">
-                    <div class="relative inline-block">
-                        <i class="fas fa-circle-notch fa-spin text-6xl text-indigo-600"></i>
-                        <i class="fas fa-file-excel absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xl text-indigo-400"></i>
+            // Restore loading content to default
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if(loadingOverlay) {
+                loadingOverlay.innerHTML = `
+                    <div id="loadingContent" class="text-center">
+                        <div class="relative inline-block">
+                            <i class="fas fa-circle-notch fa-spin text-6xl text-indigo-600"></i>
+                            <i class="fas fa-file-excel absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xl text-indigo-400"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-slate-700 mt-6">جاري التحليل والمطابقة...</h2>
+                        <p class="text-slate-500 mt-2">يرجى الانتظار لحين الانتهاء من معالجة البيانات</p>
                     </div>
-                    <h2 class="text-2xl font-bold text-slate-700 mt-6">جاري التحليل والمطابقة...</h2>
-                    <p class="text-slate-500 mt-2">يرجى الانتظار لحين الانتهاء من معالجة البيانات</p>
-                </div>
-            `;
-            document.getElementById('loadingOverlay').style.display = 'flex';
+                `;
+                loadingOverlay.style.display = 'flex';
+            }
             
             try {
                 const wfData = await readExcel(wfFile);
                 const acData = await readExcel(acFile);
                 analyzeData(wfData, acData);
-                document.getElementById('resultsSection').classList.remove('hidden');
-                document.getElementById('loadingOverlay').style.display = 'none';
+                
+                const resultsSec = document.getElementById('resultsSection');
+                if(resultsSec) resultsSec.classList.remove('hidden');
+                
+                if(loadingOverlay) loadingOverlay.style.display = 'none';
             } catch (error) {
                 showFatalError(error);
             }
@@ -555,8 +675,9 @@
                     let region = determineRegion(manager);
                     globalData.regionsSet.add(region);
                     
-                    let emp = { id, name, hireDate, status, supervisor, manager, region, totalCerts: 0, monthsData: {} };
+                    let emp = { id, name, hireDate, status, supervisor, manager, region, totalCerts: 0, monthsData: {}, nonCertProgress: {} };
                     targetMonthsKeys.forEach(m => emp.monthsData[m] = 0);
+                    nonCertCoursesKeys.forEach(c => emp.nonCertProgress[c] = null);
                     
                     let tenure = calculateTenureMonths(hireDate);
                     emp.tenureMonths = tenure;
@@ -573,16 +694,29 @@
                 if (!row || row.length < 15) continue;
                 let id = cleanString(row[14]); if (!id) continue;
 
-                let certValue = row.length > 38 ? row[38] : "-";
+                let certValue = row.length > 38 ? cleanString(row[38]) : "-";
+                let courseName = row.length > 1 ? cleanString(row[1]) : "";
+                let progressRaw = row.length > 26 ? row[26] : null;
+
                 let certInfo = parseCertificateDate(certValue);
 
                 if (employeeMap[id]) {
-                    if (certInfo) {
+                    if (certValue === "-") {
+                        // Check for non-certificate courses
+                        let courseLower = courseName.toLowerCase();
+                        let matchedCourse = nonCertCoursesKeys.find(c => courseLower.includes(c.toLowerCase()));
+                        if (matchedCourse) {
+                            let parsedProg = parseProgress(progressRaw);
+                            if (parsedProg !== null) {
+                                employeeMap[id].nonCertProgress[matchedCourse] = parsedProg;
+                            }
+                        }
+                    } else if (certInfo) {
                         employeeMap[id].totalCerts++;
                         if (employeeMap[id].monthsData[certInfo.key] !== undefined) employeeMap[id].monthsData[certInfo.key]++;
                     }
                 } else if (!allWfIds.has(id)) {
-                    if (!missingMap[id]) missingMap[id] = { id, name: row.length > 2 ? cleanString(row[2]) : "غير متوفر", totalCerts: 0 };
+                    if (!missingMap[id]) missingMap[id] = { id, name: row.length > 5 ? cleanString(row[5]) : "غير متوفر", totalCerts: 0 };
                     if (certInfo) missingMap[id].totalCerts++;
                 }
             }
@@ -616,8 +750,11 @@
         }
 
         function applyActiveFilters() {
-            let sName = document.getElementById('searchName').value.toLowerCase();
-            let sReg = document.getElementById('filterRegion').value;
+            const searchInput = document.getElementById('searchName');
+            const filterRegionSelect = document.getElementById('filterRegion');
+            
+            let sName = searchInput ? searchInput.value.toLowerCase() : "";
+            let sReg = filterRegionSelect ? filterRegionSelect.value : "";
 
             let filtered = globalData.allActive.filter(e => {
                 let matchName = e.name.toLowerCase().includes(sName) || e.id.toLowerCase().includes(sName);
@@ -629,18 +766,24 @@
             let t2 = filtered.filter(e => e.tenureMonths >= 3 && e.tenureMonths <= 24);
             let t3 = filtered.filter(e => e.tenureMonths > 24);
 
-            // Using exactly the corrected IDs for the counts (t1Count, t2Count, t3Count)
             renderTable('active', filtered);
             renderTable('t1', t1);
             renderTable('t2', t2);
             renderTable('t3', t3);
+            renderNonCertTable(filtered);
 
             // Render Static tabs
-            document.getElementById('excludedTableBody').innerHTML = globalData.excludedEmployees.map(e => `<tr><td class="px-6 py-4">${e.id}</td><td class="px-6 py-4">${e.name}</td><td class="px-6 py-4"><span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs">${e.status}</span></td></tr>`).join('');
-            document.getElementById('missingTableBody').innerHTML = globalData.missingEmployees.map(e => `<tr><td class="px-6 py-4 font-bold">${e.id}</td><td class="px-6 py-4">${e.name}</td><td class="px-6 py-4 font-bold text-indigo-600">${e.totalCerts}</td></tr>`).join('');
+            const excludedBody = document.getElementById('excludedTableBody');
+            if(excludedBody) excludedBody.innerHTML = globalData.excludedEmployees.map(e => `<tr><td class="px-6 py-4">${e.id}</td><td class="px-6 py-4">${e.name}</td><td class="px-6 py-4"><span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs">${e.status}</span></td></tr>`).join('');
             
-            document.getElementById('excludedCount').innerText = globalData.excludedEmployees.length;
-            document.getElementById('missingCount').innerText = globalData.missingEmployees.length;
+            const missingBody = document.getElementById('missingTableBody');
+            if(missingBody) missingBody.innerHTML = globalData.missingEmployees.map(e => `<tr><td class="px-6 py-4 font-bold">${e.id}</td><td class="px-6 py-4">${e.name}</td><td class="px-6 py-4 font-bold text-indigo-600">${e.totalCerts}</td></tr>`).join('');
+            
+            const excludedCount = document.getElementById('excludedCount');
+            if(excludedCount) excludedCount.innerText = globalData.excludedEmployees.length;
+            
+            const missingCount = document.getElementById('missingCount');
+            if(missingCount) missingCount.innerText = globalData.missingEmployees.length;
 
             updateAnalysisUI();
         }
@@ -658,7 +801,8 @@
             targetMonthsKeys.forEach(m => headerHtml += `<th class="px-2 py-4 font-medium text-xs">${m.replace('-','/')}</th>`);
             
             let idHeader = prefix === 'active' ? 'activeTableHeader' : `${prefix}Header`;
-            document.getElementById(idHeader).innerHTML = headerHtml;
+            const headerEl = document.getElementById(idHeader);
+            if(headerEl) headerEl.innerHTML = headerHtml;
 
             // Body
             let bodyHtml = dataArray.map(emp => {
@@ -686,9 +830,56 @@
             let idBody = prefix === 'active' ? 'activeTableBody' : `${prefix}Body`;
             let idCount = prefix === 'active' ? 'activeCount' : `${prefix}Count`;
             
-            document.getElementById(idBody).innerHTML = bodyHtml;
-            // The fatal bug was here (calling an element ID that didn't exist in HTML)
-            document.getElementById(idCount).innerText = dataArray.length;
+            const bodyEl = document.getElementById(idBody);
+            if(bodyEl) bodyEl.innerHTML = bodyHtml;
+            
+            const countEl = document.getElementById(idCount);
+            if(countEl) countEl.innerText = dataArray.length;
+        }
+
+        function renderNonCertTable(dataArray) {
+            let headerHtml = `
+                <th class="px-4 py-4 font-semibold uppercase">الرقم الوظيفي</th>
+                <th class="px-4 py-4 font-semibold uppercase w-48">الاسم</th>
+                <th class="px-4 py-4 font-semibold uppercase">الإقليم</th>
+            `;
+            nonCertCoursesKeys.forEach(c => headerHtml += `<th class="px-2 py-4 font-medium text-xs bg-indigo-50 border-r border-white">${c}</th>`);
+            
+            const headerEl = document.getElementById('nonCertHeader');
+            if(headerEl) headerEl.innerHTML = headerHtml;
+
+            let bodyHtml = dataArray.map(emp => {
+                let coursesHtml = nonCertCoursesKeys.map(c => {
+                    let val = emp.nonCertProgress[c];
+                    let display = "";
+                    let cls = "text-slate-400";
+                    if (val !== null) {
+                        display = val + "%";
+                        if (val === 100) cls = "text-emerald-600 font-bold bg-emerald-50";
+                        else if (val >= 50) cls = "text-blue-600 font-bold bg-blue-50";
+                        else if (val > 0) cls = "text-orange-600 font-bold bg-orange-50";
+                        else cls = "text-red-500 font-bold bg-red-50"; // 0%
+                    } else {
+                        display = "-"; // Didn't enter
+                    }
+                    return `<td class="px-2 py-3 whitespace-nowrap text-center ${cls}">${display}</td>`;
+                }).join('');
+
+                return `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                        <td class="px-4 py-3 font-bold text-slate-700">${emp.id}</td>
+                        <td class="px-4 py-3 font-medium text-slate-800 truncate max-w-[200px]" title="${emp.name}">${emp.name}</td>
+                        <td class="px-4 py-3"><span class="px-2 py-1 bg-slate-100 rounded border border-slate-200 text-xs whitespace-nowrap">${emp.region}</span></td>
+                        ${coursesHtml}
+                    </tr>
+                `;
+            }).join('');
+
+            const bodyEl = document.getElementById('nonCertTableBody');
+            if(bodyEl) bodyEl.innerHTML = bodyHtml;
+            
+            const countEl = document.getElementById('nonCertCount');
+            if(countEl) countEl.innerText = dataArray.length;
         }
 
         function updateAnalysisUI() {
@@ -696,8 +887,13 @@
                 active: 0,
                 tenure: { less3: 0, between3and24: 0, over24: 0 },
                 certs: { over20: 0, less20: 0, zero: 0 },
-                regions: {}
+                regions: {},
+                nonCerts: {}
             };
+
+            nonCertCoursesKeys.forEach(c => {
+                analysis.nonCerts[c] = { totalTaken: 0, p100: 0, p50to99: 0, pLess50: 0, p0: 0, pNull: 0 };
+            });
 
             // Calculate based on included regions only
             globalData.allActive.forEach(emp => {
@@ -726,20 +922,39 @@
                 if (emp.totalCerts >= 20) regStats.over20++;
                 else if (emp.totalCerts > 0) regStats.less20++;
                 else regStats.zero++;
+
+                // Non Cert Stats
+                nonCertCoursesKeys.forEach(c => {
+                    let p = emp.nonCertProgress[c];
+                    let stats = analysis.nonCerts[c];
+                    
+                    if (p !== null) stats.totalTaken++;
+
+                    if (p === 100) stats.p100++;
+                    else if (p >= 50 && p < 100) stats.p50to99++;
+                    else if (p > 0 && p < 50) stats.pLess50++;
+                    else if (p === 0) stats.p0++;
+                    else stats.pNull++; // Covers p === null
+                });
             });
 
-            // Update UI
-            document.getElementById('statActive').innerText = analysis.active;
-            document.getElementById('statExcluded').innerText = globalData.excludedEmployees.length; // Static global
-            document.getElementById('statMissing').innerText = globalData.missingEmployees.length; // Static global
+            // Update UI safely
+            const uis = {
+                'statActive': analysis.active,
+                'statExcluded': globalData.excludedEmployees.length,
+                'statMissing': globalData.missingEmployees.length,
+                'statLess3': analysis.tenure.less3,
+                'stat3to2': analysis.tenure.between3and24,
+                'statOver2': analysis.tenure.over24,
+                'statCert20': analysis.certs.over20,
+                'statCertLess20': analysis.certs.less20,
+                'statCert0': analysis.certs.zero
+            };
 
-            document.getElementById('statLess3').innerText = analysis.tenure.less3;
-            document.getElementById('stat3to2').innerText = analysis.tenure.between3and24;
-            document.getElementById('statOver2').innerText = analysis.tenure.over24;
-
-            document.getElementById('statCert20').innerText = analysis.certs.over20;
-            document.getElementById('statCertLess20').innerText = analysis.certs.less20;
-            document.getElementById('statCert0').innerText = analysis.certs.zero;
+            for(const [id, val] of Object.entries(uis)) {
+                const el = document.getElementById(id);
+                if(el) el.innerText = val;
+            }
 
             let regHtml = '';
             let exportBtnsHtml = '';
@@ -777,7 +992,27 @@
                 regHtml = `<tr><td colspan="8" class="text-center py-8 text-slate-500">تم استبعاد كافة الأقاليم.</td></tr>`;
             }
             
-            document.getElementById('regionAnalysisTableBody').innerHTML = regHtml;
+            const regionBody = document.getElementById('regionAnalysisTableBody');
+            if(regionBody) regionBody.innerHTML = regHtml;
+
+            // Render Non-Cert Analysis
+            let nonCertHtml = '';
+            nonCertCoursesKeys.forEach(c => {
+                let s = analysis.nonCerts[c];
+                nonCertHtml += `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                        <td class="px-5 py-4 font-bold text-slate-700 bg-slate-50 border-l border-white">${c}</td>
+                        <td class="px-5 py-4 font-bold text-lg">${s.totalTaken}</td>
+                        <td class="px-5 py-4 text-emerald-600 font-bold">${s.p100}</td>
+                        <td class="px-5 py-4 text-blue-600 font-bold">${s.p50to99}</td>
+                        <td class="px-5 py-4 text-orange-600 font-bold">${s.pLess50}</td>
+                        <td class="px-5 py-4 text-red-500 font-bold">${s.p0}</td>
+                        <td class="px-5 py-4 text-slate-400 font-bold">${s.pNull}</td>
+                    </tr>
+                `;
+            });
+            const nonCertBody = document.getElementById('nonCertAnalysisTableBody');
+            if(nonCertBody) nonCertBody.innerHTML = nonCertHtml;
             
             // Preserve the "Download All" button and append region buttons
             let downloadAllBtn = `
@@ -785,7 +1020,8 @@
                     <i class="fas fa-file-excel ml-2"></i> تحميل الكل (مجمع)
                 </button>
             `;
-            document.getElementById('exportButtonsContainer').innerHTML = downloadAllBtn + exportBtnsHtml;
+            const exportContainer = document.getElementById('exportButtonsContainer');
+            if(exportContainer) exportContainer.innerHTML = downloadAllBtn + exportBtnsHtml;
         }
 
         // --- Export Logic ---
@@ -811,6 +1047,18 @@
             
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(generateEmployeeAOA(validActive)), "جميع البائعين المعتمدين");
             
+            // Add Non-Cert Sheet
+            let nonCertAOA = [["الرقم الوظيفي", "الاسم", "الإقليم", ...nonCertCoursesKeys]];
+            validActive.forEach(emp => {
+                let row = [emp.id, emp.name, emp.region];
+                nonCertCoursesKeys.forEach(c => {
+                    let p = emp.nonCertProgress[c];
+                    row.push(p !== null ? p + "%" : "-");
+                });
+                nonCertAOA.push(row);
+            });
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(nonCertAOA), "دورات بدون شهادات");
+
             // Split by tenure for convenience in the export
             let t1 = validActive.filter(e => e.tenureMonths >= 0 && e.tenureMonths < 3);
             let t2 = validActive.filter(e => e.tenureMonths >= 3 && e.tenureMonths <= 24);
