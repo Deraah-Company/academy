@@ -70,28 +70,39 @@
 
         <!-- Upload Section (Drag & Drop) -->
         <div class="bg-white shadow-sm rounded-2xl p-8 mb-8 border border-slate-100">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6"> 
                 
                 <!-- Zone 1 -->
-                <div id="dropZoneWf" class="drop-zone rounded-2xl p-8 text-center cursor-pointer bg-slate-50 hover:bg-slate-100 flex flex-col items-center justify-center min-h-[200px]" onclick="document.getElementById('workforceFile').click()">
-                    <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl mb-4 shadow-sm">
+                <div id="dropZoneWf" class="drop-zone rounded-2xl p-6 text-center cursor-pointer bg-slate-50 hover:bg-slate-100 flex flex-col items-center justify-center min-h-[180px]" onclick="document.getElementById('workforceFile').click()">
+                    <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl mb-3 shadow-sm">
                         <i class="fas fa-users"></i>
                     </div>
-                    <h3 class="font-bold text-xl mb-2 text-slate-700">1. ملف مطابقة القوى (البائعين)</h3>
-                    <p class="text-sm text-slate-500 mb-4">اضغط لاختيار الملف أو قم بسحبه وإفلاته هنا</p>
-                    <span id="wfFileName" class="text-sm font-semibold text-blue-600 bg-blue-50 px-4 py-2 rounded-full hidden"></span>
+                    <h3 class="font-bold text-lg mb-1 text-slate-700">1. القوى (البائعين)</h3>
+                    <p class="text-xs text-slate-500 mb-3">اختر الملف أو اسحبه هنا</p>
+                    <span id="wfFileName" class="text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full hidden"></span>
                     <input type="file" id="workforceFile" accept=".xlsx, .xls" class="hidden" onchange="handleFileSelect(event, 'wfFileName')" />
                 </div>
                 
                 <!-- Zone 2 -->
-                <div id="dropZoneAc" class="drop-zone rounded-2xl p-8 text-center cursor-pointer bg-slate-50 hover:bg-slate-100 flex flex-col items-center justify-center min-h-[200px]" onclick="document.getElementById('academyFile').click()">
-                    <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-2xl mb-4 shadow-sm">
+                <div id="dropZoneAc" class="drop-zone rounded-2xl p-6 text-center cursor-pointer bg-slate-50 hover:bg-slate-100 flex flex-col items-center justify-center min-h-[180px]" onclick="document.getElementById('academyFile').click()">
+                    <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-xl mb-3 shadow-sm">
                         <i class="fas fa-graduation-cap"></i>
                     </div>
-                    <h3 class="font-bold text-xl mb-2 text-slate-700">2. تقرير الأكاديمية (الشهادات)</h3>
-                    <p class="text-sm text-slate-500 mb-4">اضغط لاختيار الملف أو قم بسحبه وإفلاته هنا</p>
-                    <span id="acFileName" class="text-sm font-semibold text-emerald-600 bg-emerald-50 px-4 py-2 rounded-full hidden"></span>
+                    <h3 class="font-bold text-lg mb-1 text-slate-700">2. الأكاديمية (الشهادات الحالية)</h3>
+                    <p class="text-xs text-slate-500 mb-3">اختر الملف أو اسحبه هنا</p>
+                    <span id="acFileName" class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full hidden"></span>
                     <input type="file" id="academyFile" accept=".xlsx, .xls" class="hidden" onchange="handleFileSelect(event, 'acFileName')" />
+                </div>
+
+                <!-- Zone 3 (Old Academy for Comparison) -->
+                <div id="dropZoneOldAc" class="drop-zone rounded-2xl p-6 text-center cursor-pointer bg-slate-50 hover:bg-slate-100 flex flex-col items-center justify-center min-h-[180px]" onclick="document.getElementById('oldAcademyFile').click()">
+                    <div class="w-14 h-14 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xl mb-3 shadow-sm">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-1 text-slate-700">3. الأكاديمية (السابق للمقارنة)</h3>
+                    <p class="text-xs text-slate-500 mb-3">اختياري - تقرير قديم للمقارنة</p>
+                    <span id="oldAcFileName" class="text-xs font-semibold text-purple-600 bg-purple-50 px-3 py-1.5 rounded-full hidden"></span>
+                    <input type="file" id="oldAcademyFile" accept=".xlsx, .xls" class="hidden" onchange="handleFileSelect(event, 'oldAcFileName')" />
                 </div>
 
             </div>
@@ -138,9 +149,14 @@
                 <button class="tab-btn px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'analysisTab')">
                     <i class="fas fa-chart-pie ml-2"></i> التحليل والإحصائيات
                 </button>
-                <!-- التاب الجديدة للتقدم الشهري التراكمي -->
-                <button class="tab-btn px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base bg-indigo-50 border-r border-indigo-100" onclick="switchTab(event, 'monthlyProgressTab')">
-                    <i class="fas fa-calendar-check text-indigo-600 ml-2"></i> التقدم الشهري (تراكمي)
+                <button class="tab-btn px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'monthlyProgressTab')">
+                    <i class="fas fa-calendar-check ml-2"></i> التقدم الشهري
+                </button>
+                <button class="tab-btn px-5 py-4 text-yellow-700 font-bold bg-yellow-50 border-r border-yellow-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'eliteTab')">
+                    <i class="fas fa-star ml-2"></i> النخبة
+                </button>
+                <button class="tab-btn px-5 py-4 text-purple-700 font-bold bg-purple-50 border-r border-purple-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'comparisonTab')">
+                    <i class="fas fa-balance-scale ml-2"></i> مقارنة الفترات
                 </button>
             </div>
 
@@ -235,7 +251,7 @@
                     </div>
                 </div>
 
-                <!-- Tab: Missing (In Academy, Not in Workforce) -->
+                <!-- Tab: Missing -->
                 <div id="missingTab" class="tab-content">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-slate-800">أرقام وظيفية بالأكاديمية وغير موجودة بالقوى</h2>
@@ -275,14 +291,14 @@
                     </div>
                 </div>
 
-                <!-- Tab: Monthly Progress (New Tab) -->
+                <!-- Tab: Monthly Progress -->
                 <div id="monthlyProgressTab" class="tab-content">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 bg-indigo-50 p-6 rounded-2xl border border-indigo-100">
                         <div>
                             <h2 class="text-2xl font-bold text-indigo-900 flex items-center mb-2">
                                 <i class="fas fa-calendar-check text-indigo-500 ml-2"></i> نسبة التقدم الشهري التراكمي
                             </h2>
-                            <p class="text-indigo-700 text-sm">يقوم النظام بحساب الإنجاز التراكمي حتى الشهر المختار. <span class="font-bold text-red-600">ملاحظة:</span> يتم استبعاد الموظفين الذين تم تعيينهم بعد الشهر المختار تلقائياً.</p>
+                            <p class="text-indigo-700 text-sm">يقوم النظام بحساب الإنجاز التراكمي. <span class="font-bold text-red-600">ملاحظة:</span> الحد الأقصى للمستهدف لا يتجاوز 20 شهادة.</p>
                         </div>
                         
                         <div class="flex items-center gap-3 bg-white p-2 rounded-xl shadow-sm border border-indigo-100">
@@ -293,7 +309,6 @@
                         </div>
                     </div>
 
-                    <!-- Statistics Cards for the chosen month -->
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center border-b-4 border-b-indigo-500">
                             <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xl ml-3 shrink-0">
@@ -303,7 +318,7 @@
                                 <p class="text-slate-500 text-xs font-bold mb-1">المستهدف للفترة</p>
                                 <div class="flex items-baseline gap-1">
                                     <span id="monthlyTargetCerts" class="text-2xl font-extrabold text-slate-800">0</span>
-                                    <span class="text-slate-400 font-medium text-xs">شهادة</span>
+                                    <span class="text-slate-400 font-medium text-xs">شهادة (كحد أقصى)</span>
                                 </div>
                             </div>
                         </div>
@@ -371,7 +386,6 @@
                 <!-- Tab: Analysis -->
                 <div id="analysisTab" class="tab-content">
                     
-                    <!-- Region Exclusion Controls -->
                     <div class="bg-white border border-slate-200 shadow-sm rounded-xl p-5 mb-8">
                         <div class="flex items-center gap-2 mb-3">
                             <i class="fas fa-filter text-indigo-500"></i>
@@ -383,19 +397,16 @@
                         </div>
                     </div>
 
-                    <!-- Export Controls -->
                     <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-5 mb-8 flex flex-wrap gap-4 items-center justify-between shadow-sm">
                         <h3 class="font-bold text-indigo-800 flex items-center text-lg"><i class="fas fa-download ml-2"></i> تصدير البيانات الشامل (Excel)</h3>
                         <div class="flex flex-wrap gap-2" id="exportButtonsContainer">
                             <button onclick="exportAllData()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-6 rounded-lg shadow transition transform hover:-translate-y-0.5">
                                 <i class="fas fa-file-excel ml-2"></i> تحميل الكل (مجمع)
                             </button>
-                            <!-- Region buttons will be injected here -->
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                        <!-- General Stats -->
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group hover:border-indigo-200 transition">
                             <div class="absolute -left-6 -top-6 text-indigo-50 opacity-50 group-hover:opacity-100 transition"><i class="fas fa-chart-pie text-9xl"></i></div>
                             <h3 class="font-bold text-xl border-b border-slate-100 pb-3 mb-4 relative z-10 text-slate-700">الحالة العامة (مفلتر)</h3>
@@ -406,7 +417,6 @@
                             </ul>
                         </div>
                         
-                        <!-- Tenure Stats -->
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group hover:border-blue-200 transition">
                             <div class="absolute -left-6 -top-6 text-blue-50 opacity-50 group-hover:opacity-100 transition"><i class="fas fa-clock text-9xl"></i></div>
                             <h3 class="font-bold text-xl border-b border-slate-100 pb-3 mb-4 relative z-10 text-slate-700">فترات العمل (مفلتر)</h3>
@@ -417,7 +427,6 @@
                             </ul>
                         </div>
 
-                        <!-- Certificate Quick Stats -->
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group hover:border-emerald-200 transition">
                             <div class="absolute -left-6 -top-6 text-emerald-50 opacity-50 group-hover:opacity-100 transition"><i class="fas fa-award text-9xl"></i></div>
                             <h3 class="font-bold text-xl border-b border-slate-100 pb-3 mb-4 relative z-10 text-slate-700">الشهادات (مفلتر)</h3>
@@ -429,7 +438,6 @@
                         </div>
                     </div>
 
-                    <!-- Sub-tabs for Analysis -->
                     <div class="flex border-b border-slate-200 mb-6 bg-slate-50 rounded-t-xl overflow-hidden">
                         <button class="analysis-sub-tab-btn active px-6 py-3 font-bold text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50 transition focus:outline-none" onclick="switchAnalysisSubTab(event, 'certAnalysisSection')">
                             <i class="fas fa-certificate ml-2"></i> تحليل الشهادات (الإجمالي)
@@ -439,7 +447,6 @@
                         </button>
                     </div>
 
-                    <!-- Region Analysis Table -->
                     <div id="certAnalysisSection">
                         <h3 class="text-2xl font-bold text-slate-800 mb-4 flex items-center">
                             <i class="fas fa-map-marker-alt text-indigo-500 ml-2"></i> تحليل الأقاليم للشهادات (مبني على 20 شهادة)
@@ -465,7 +472,6 @@
                         </div>
                     </div>
 
-                    <!-- Non-Certificate Courses Analysis -->
                     <div id="nonCertAnalysisSection" style="display: none;">
                         <h3 class="text-2xl font-bold text-slate-800 mb-4 flex items-center">
                             <i class="fas fa-tasks text-indigo-500 ml-2"></i> إحصائيات الدورات بدون شهادات (مفلتر)
@@ -491,15 +497,68 @@
                     </div>
                 </div>
 
+                <!-- Tab: Elite (النخبة) -->
+                <div id="eliteTab" class="tab-content">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-800 flex items-center">
+                                <i class="fas fa-star text-yellow-500 ml-2"></i> دورات النخبة
+                                <span id="eliteCount" class="mr-3 bg-yellow-100 text-yellow-800 text-sm font-bold px-3 py-1 rounded-full">0</span>
+                            </h2>
+                            <p class="text-slate-500 text-sm mt-1">يعرض فقط الموظفين المرتبطين بدورتي النخبة وحالة إنجازهم.</p>
+                        </div>
+                        <button onclick="exportEliteData()" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2.5 px-6 rounded-lg shadow transition transform hover:-translate-y-0.5">
+                            <i class="fas fa-file-excel ml-2"></i> تصدير إكسيل (النخبة فقط)
+                        </button>
+                    </div>
+                    
+                    <div class="table-container border border-slate-200 rounded-xl shadow-sm">
+                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
+                            <thead class="bg-slate-800 text-white">
+                                <tr>
+                                    <th class="px-5 py-4 font-semibold tracking-wider">الرقم الوظيفي</th>
+                                    <th class="px-5 py-4 font-semibold tracking-wider">الاسم</th>
+                                    <th class="px-5 py-4 font-semibold tracking-wider">الإقليم</th>
+                                    <th class="px-5 py-4 font-semibold tracking-wider" id="eliteCourse1Head">دورة النخبة 1</th>
+                                    <th class="px-5 py-4 font-semibold tracking-wider" id="eliteCourse2Head">دورة النخبة 2</th>
+                                    <th class="px-5 py-4 font-semibold tracking-wider">حالة الاستكمال</th>
+                                </tr>
+                            </thead>
+                            <tbody id="eliteTableBody" class="bg-white divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab: Comparison (المقارنة) -->
+                <div id="comparisonTab" class="tab-content">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 bg-purple-50 p-6 rounded-2xl border border-purple-100">
+                        <div>
+                            <h2 class="text-2xl font-bold text-purple-900 flex items-center mb-2">
+                                <i class="fas fa-balance-scale text-purple-500 ml-2"></i> مقارنة الفترات (الأقاليم)
+                            </h2>
+                            <p class="text-purple-700 text-sm">يقارن عدد ونسبة الموظفين الحاصلين على <span class="font-bold">20 شهادة فأكثر</span> بين التقرير الحالي والتقرير السابق.</p>
+                        </div>
+                    </div>
+                    
+                    <div id="comparisonContent" class="table-container border border-slate-200 rounded-xl shadow-sm">
+                        <!-- Table is injected here -->
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 
     <script>
         // --- Setup Drag and Drop ---
-        ['Wf', 'Ac'].forEach(type => {
+        ['Wf', 'Ac', 'OldAc'].forEach(type => {
             const dropZone = document.getElementById(`dropZone${type}`);
-            const input = document.getElementById(type === 'Wf' ? 'workforceFile' : 'academyFile');
+            let inputId = '';
+            if (type === 'Wf') inputId = 'workforceFile';
+            else if (type === 'Ac') inputId = 'academyFile';
+            else if (type === 'OldAc') inputId = 'oldAcademyFile';
+            
+            const input = document.getElementById(inputId);
             
             if (dropZone && input) {
                 dropZone.addEventListener('dragover', (e) => {
@@ -575,12 +634,17 @@
 
         const excludedStatuses = ['استقالة', 'استقاله', 'إنهاء خدمة', 'انهاء خدمة', 'انهاء خدمه', 'انقطاع', 'انتقل إلى', 'انتقل الي', 'نقل'];
         
-        // تم تغييرها لمتغير (let) عشان تتحدث تلقائياً حسب الشهور اللي في ملف الإكسيل
         let targetMonthsKeys = ["10-2025", "11-2025", "12-2025", "01-2026", "02-2026", "03-2026", "04-2026", "05-2026", "06-2026"];
 
         const nonCertCoursesKeys = [
             "1+2 Offer", "delivery order software", "Updates and New Circulars", 
             "Deraah Seminars", "Deraah's new products", "Deraah campaigns"
+        ];
+
+        // تم إضافة أسماء دورتي النخبة المطلوبة هنا
+        const eliteCoursesKeys = [
+            "Sales Scenarios for Deraah Oud's Top Products", 
+            "Sales Scenarios for DERAAH's Top Products"
         ];
 
         // --- Global State ---
@@ -590,7 +654,8 @@
             missingEmployees: [],
             regionsSet: new Set(),
             excludedRegions: new Set(),
-            allExtractedMonths: new Set() // مصفوفة لتخزين الشهور المستخرجة ديناميكياً
+            allExtractedMonths: new Set(),
+            hasOldData: false 
         };
 
         document.getElementById('currentDateDisplay').innerText = `تاريخ اليوم: ${new Date().toLocaleDateString('ar-EG')}`;
@@ -681,7 +746,7 @@
         }
 
         function parseProgress(val) {
-            if (val === "" || val === undefined || val === null) return null; // null means not entered
+            if (val === "" || val === undefined || val === null) return null; 
             if (typeof val === 'string') {
                 let parsed = parseFloat(val.replace('%', '').trim());
                 return isNaN(parsed) ? null : parsed;
@@ -700,8 +765,10 @@
             
             const wfFile = document.getElementById('workforceFile').files[0];
             const acFile = document.getElementById('academyFile').files[0];
+            const oldAcFile = document.getElementById('oldAcademyFile').files[0];
+
             if (!wfFile || !acFile) { 
-                showError("الرجاء إرفاق كلا الملفين (ملف القوى وملف الأكاديمية) قبل البدء في المعالجة."); 
+                showError("الرجاء إرفاق ملف القوى وملف الأكاديمية الحالي قبل البدء في المعالجة."); 
                 return; 
             }
 
@@ -723,7 +790,12 @@
             try {
                 const wfData = await readExcel(wfFile);
                 const acData = await readExcel(acFile);
-                analyzeData(wfData, acData);
+                let oldAcData = null;
+                if (oldAcFile) {
+                    oldAcData = await readExcel(oldAcFile);
+                }
+                
+                analyzeData(wfData, acData, oldAcData);
                 
                 const resultsSec = document.getElementById('resultsSection');
                 if(resultsSec) resultsSec.classList.remove('hidden');
@@ -748,8 +820,8 @@
             });
         }
 
-        function analyzeData(wfRows, acRows) {
-            globalData = { allActive: [], excludedEmployees: [], missingEmployees: [], regionsSet: new Set(), excludedRegions: new Set(), allExtractedMonths: new Set() };
+        function analyzeData(wfRows, acRows, oldAcRows) {
+            globalData = { allActive: [], excludedEmployees: [], missingEmployees: [], regionsSet: new Set(), excludedRegions: new Set(), allExtractedMonths: new Set(), hasOldData: !!oldAcRows };
             let employeeMap = {};
             let allWfIds = new Set();
 
@@ -771,9 +843,15 @@
                     let region = determineRegion(manager);
                     globalData.regionsSet.add(region);
                     
-                    let emp = { id, name, hireDate, status, supervisor, manager, region, totalCerts: 0, monthsData: {}, nonCertProgress: {} };
+                    let emp = { 
+                        id, name, hireDate, status, supervisor, manager, region, 
+                        totalCerts: 0, oldTotalCerts: 0, 
+                        monthsData: {}, nonCertProgress: {}, 
+                        eliteProgress: {}, eliteAssigned: false 
+                    };
                     targetMonthsKeys.forEach(m => emp.monthsData[m] = 0);
                     nonCertCoursesKeys.forEach(c => emp.nonCertProgress[c] = null);
+                    eliteCoursesKeys.forEach(c => emp.eliteProgress[c] = false);
                     
                     let tenure = calculateTenureMonths(hireDate);
                     emp.tenureMonths = tenure;
@@ -783,7 +861,7 @@
                 }
             }
 
-            // 2. Academy
+            // 2. Academy (Current)
             let missingMap = {};
             for (let i = 1; i < acRows.length; i++) {
                 let row = acRows[i];
@@ -792,14 +870,22 @@
 
                 let certValue = row.length > 38 ? cleanString(row[38]) : "-";
                 let courseName = row.length > 1 ? cleanString(row[1]) : "";
+                let courseLower = courseName.toLowerCase();
                 let progressRaw = row.length > 26 ? row[26] : null;
 
                 let certInfo = parseCertificateDate(certValue);
 
                 if (employeeMap[id]) {
+                    // تحقق من دورات النخبة الجديدة - هنا فقط من يرتبط بالدورة سيتم تعليمه كمعين للنخبة
+                    let matchedElite = eliteCoursesKeys.find(c => courseLower.includes(c.toLowerCase()));
+                    if (matchedElite) {
+                        employeeMap[id].eliteAssigned = true; // تم الربط بدورة النخبة في الأكاديمية
+                        if (certValue !== "-" || parseProgress(progressRaw) === 100) {
+                            employeeMap[id].eliteProgress[matchedElite] = true;
+                        }
+                    }
+
                     if (certValue === "-") {
-                        // Check for non-certificate courses
-                        let courseLower = courseName.toLowerCase();
                         let matchedCourse = nonCertCoursesKeys.find(c => courseLower.includes(c.toLowerCase()));
                         if (matchedCourse) {
                             let parsedProg = parseProgress(progressRaw);
@@ -809,7 +895,7 @@
                         }
                     } else if (certInfo) {
                         employeeMap[id].totalCerts++;
-                        globalData.allExtractedMonths.add(certInfo.key); // تجميع الشهور ديناميكياً
+                        globalData.allExtractedMonths.add(certInfo.key);
                         
                         if (employeeMap[id].monthsData[certInfo.key] === undefined) {
                              employeeMap[id].monthsData[certInfo.key] = 0;
@@ -826,7 +912,24 @@
             }
             globalData.missingEmployees = Object.values(missingMap);
 
-            // ترتيب وتحديث قائمة الشهور عشان تعتمد على اللي موجود في الملف وتتوسع لوحدها
+            // 3. Old Academy (For Comparison)
+            if (oldAcRows) {
+                let oldCertMap = {};
+                for (let i = 1; i < oldAcRows.length; i++) {
+                    let row = oldAcRows[i];
+                    if (!row || row.length < 15) continue;
+                    let id = cleanString(row[14]); if (!id) continue;
+                    let certValue = row.length > 38 ? cleanString(row[38]) : "-";
+                    let certInfo = parseCertificateDate(certValue);
+                    if (certInfo) {
+                        oldCertMap[id] = (oldCertMap[id] || 0) + 1;
+                    }
+                }
+                globalData.allActive.forEach(emp => {
+                    emp.oldTotalCerts = oldCertMap[emp.id] || 0;
+                });
+            }
+
             let sortedExtracted = Array.from(globalData.allExtractedMonths).sort((a, b) => {
                 let [m1, y1] = a.split('-').map(Number);
                 let [m2, y2] = b.split('-').map(Number);
@@ -835,7 +938,6 @@
             
             if(sortedExtracted.length > 0) {
                 targetMonthsKeys = sortedExtracted;
-                // تأكد أن كل موظف عنده الصفر في الشهور الجديدة لو مجابش فيها
                 globalData.allActive.forEach(emp => {
                     targetMonthsKeys.forEach(m => {
                         if (emp.monthsData[m] === undefined) emp.monthsData[m] = 0;
@@ -843,12 +945,16 @@
                 });
             }
 
+            let e1 = document.getElementById('eliteCourse1Head');
+            let e2 = document.getElementById('eliteCourse2Head');
+            if (e1 && eliteCoursesKeys[0]) e1.innerText = eliteCoursesKeys[0];
+            if (e2 && eliteCoursesKeys[1]) e2.innerText = eliteCoursesKeys[1];
+
             populateMonthSelect();
             buildFilterUI();
             applyActiveFilters();
         }
 
-        // --- دالة جديدة لتعبئة قائمة الشهور الديناميكية ---
         function populateMonthSelect() {
             const select = document.getElementById('progressMonthSelect');
             if(!select) return;
@@ -859,32 +965,27 @@
                 opt.text = m.replace('-', '/');
                 select.appendChild(opt);
             });
-            // اختيار آخر شهر بشكل افتراضي
             if(targetMonthsKeys.length > 0) {
                 select.value = targetMonthsKeys[targetMonthsKeys.length - 1];
             }
         }
 
-        // --- دالة حساب التقدم الشهري التراكمي للتاب الجديدة ---
         function updateMonthlyProgressTab() {
             const selectedMonth = document.getElementById('progressMonthSelect').value;
             if (!selectedMonth) return;
 
-            // استخراج الشهر والسنة من الاختيار للمقارنة مع تاريخ التعيين
             let [selM, selY] = selectedMonth.split('-').map(Number);
             let selectedTotalMonths = selY * 12 + selM;
 
-            // 1. تحديد الشهور المشمولة في الحساب (من البداية حتى الشهر المختار)
             let monthsToInclude = [];
             for (let m of targetMonthsKeys) {
                 monthsToInclude.push(m);
                 if (m === selectedMonth) break;
             }
 
-            // 2. حساب إجمالي الشهادات المتراكمة لكل موظف وتحديد الموظفين المستبعدين (بسبب التعيين الحديث)
             let maxCerts = 0;
             let employeeProgress = {}; 
-            let employeeExcludedState = {}; // لتسجيل من تم استبعاده بناء على تاريخ التعيين
+            let employeeExcludedState = {}; 
 
             globalData.allActive.forEach(emp => {
                 if (globalData.excludedRegions.has(emp.region)) return;
@@ -895,7 +996,6 @@
                 if (empDate && !isNaN(empDate)) {
                     let hM = empDate.getMonth() + 1;
                     let hY = empDate.getFullYear();
-                    // لو عدد الشهور الكلي لتاريخ التعيين أكبر من الشهر المختار، يبقى الموظف ده جه بعدين
                     if ((hY * 12 + hM) > selectedTotalMonths) {
                         isExcludedByDate = true;
                     }
@@ -903,7 +1003,6 @@
                 
                 employeeExcludedState[emp.id] = isExcludedByDate;
 
-                // لو الموظف معتمد (تعيينه قديم وموجود في الفترة دي) نحسب شهاداته لتحديد التارجت
                 if (!isExcludedByDate) {
                     let sum = 0;
                     monthsToInclude.forEach(m => {
@@ -914,10 +1013,10 @@
                 }
             });
 
-            // تحديث كارت التارجت
+            if (maxCerts > 20) maxCerts = 20;
+
             document.getElementById('monthlyTargetCerts').innerText = maxCerts;
 
-            // 3. تجميع النتائج حسب الأقاليم وحساب الإجماليات للكروت العلوية
             let regionStats = {};
             let overallStats = { valid: 0, excluded: 0, achieved: 0, failed: 0 };
 
@@ -929,11 +1028,9 @@
                 }
                 
                 if (employeeExcludedState[emp.id]) {
-                    // الموظف ده تعيينه جديد ومستبعد من الإحصائية دي
                     regionStats[emp.region].excludedNew++;
                     overallStats.excluded++;
                 } else {
-                    // الموظف ده معتمد وداخل في الإحصائية
                     regionStats[emp.region].valid++;
                     overallStats.valid++;
                     
@@ -941,7 +1038,6 @@
                         regionStats[emp.region].achieved++;
                         overallStats.achieved++;
                     } else if (maxCerts === 0 && employeeProgress[emp.id] === 0) {
-                        // حالة استثنائية: لو مفيش ولا شهادة في الفترة دي أصلاً
                         regionStats[emp.region].achieved++;
                         overallStats.achieved++;
                     } else {
@@ -951,7 +1047,6 @@
                 }
             });
 
-            // 4. تحديث الكروت العلوية بالإجماليات
             document.getElementById('monthlyOverallValid').innerText = overallStats.valid;
             document.getElementById('monthlyOverallExcluded').innerText = overallStats.excluded;
             
@@ -963,7 +1058,6 @@
             document.getElementById('monthlyOverallFailed').innerText = overallStats.failed;
             document.getElementById('monthlyOverallFailedPct').innerText = overallFailPct + "%";
 
-            // 5. رسم الجدول
             let html = '';
             let sortedRegions = Object.keys(regionStats).sort();
             
@@ -1013,7 +1107,7 @@
         function toggleRegionExclusion(checkbox) {
             if (checkbox.checked) globalData.excludedRegions.delete(checkbox.value);
             else globalData.excludedRegions.add(checkbox.value);
-            updateAnalysisUI();
+            applyActiveFilters(); 
         }
 
         function applyActiveFilters() {
@@ -1038,8 +1132,9 @@
             renderTable('t2', t2);
             renderTable('t3', t3);
             renderNonCertTable(filtered);
+            renderEliteTable(filtered);
+            renderComparisonTable(filtered);
 
-            // Render Static tabs
             const excludedBody = document.getElementById('excludedTableBody');
             if(excludedBody) excludedBody.innerHTML = globalData.excludedEmployees.map(e => `<tr><td class="px-6 py-4">${e.id}</td><td class="px-6 py-4">${e.name}</td><td class="px-6 py-4"><span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs">${e.status}</span></td></tr>`).join('');
             
@@ -1056,7 +1151,6 @@
         }
 
         function renderTable(prefix, dataArray) {
-            // Header
             let headerHtml = `
                 <th class="px-4 py-4 font-semibold uppercase">الرقم الوظيفي</th>
                 <th class="px-4 py-4 font-semibold uppercase w-48">الاسم</th>
@@ -1071,7 +1165,6 @@
             const headerEl = document.getElementById(idHeader);
             if(headerEl) headerEl.innerHTML = headerHtml;
 
-            // Body
             let bodyHtml = dataArray.map(emp => {
                 let monthsHtml = targetMonthsKeys.map(k => {
                     let val = emp.monthsData[k];
@@ -1149,6 +1242,127 @@
             if(countEl) countEl.innerText = dataArray.length;
         }
 
+        function renderEliteTable(dataArray) {
+            // فلترة لعرض من هم مسجلين في دورات النخبة فقط (الـ 240 اسم تقريباً)
+            let eliteData = dataArray.filter(emp => emp.eliteAssigned);
+
+            let c1Key = eliteCoursesKeys[0];
+            let c2Key = eliteCoursesKeys[1];
+
+            let bodyHtml = eliteData.map(emp => {
+                let hasC1 = c1Key ? emp.eliteProgress[c1Key] : false;
+                let hasC2 = c2Key ? emp.eliteProgress[c2Key] : false;
+
+                let completedCount = (hasC1 ? 1 : 0) + (hasC2 ? 1 : 0);
+                
+                let statusHtml = '';
+                if (completedCount === 2) {
+                    statusHtml = `<span class="bg-emerald-100 text-emerald-700 font-bold px-3 py-1 rounded-full text-xs"><i class="fas fa-check-double ml-1"></i> استكمل بالكامل (2)</span>`;
+                } else if (completedCount === 1) {
+                    statusHtml = `<span class="bg-orange-100 text-orange-700 font-bold px-3 py-1 rounded-full text-xs"><i class="fas fa-exclamation-circle ml-1"></i> جزء (1)</span>`;
+                } else {
+                    statusHtml = `<span class="bg-red-100 text-red-700 font-bold px-3 py-1 rounded-full text-xs"><i class="fas fa-times-circle ml-1"></i> لم يستكمل (0)</span>`;
+                }
+
+                return `
+                    <tr class="hover:bg-yellow-50 transition border-b border-slate-100">
+                        <td class="px-5 py-4 font-bold text-slate-700">${emp.id}</td>
+                        <td class="px-5 py-4 font-medium text-slate-800 truncate max-w-[200px]" title="${emp.name}">${emp.name}</td>
+                        <td class="px-5 py-4"><span class="px-2 py-1 bg-slate-100 rounded border border-slate-200 text-xs whitespace-nowrap">${emp.region}</span></td>
+                        <td class="px-5 py-4 font-bold ${hasC1 ? 'text-emerald-500' : 'text-slate-300'}">${hasC1 ? '<i class="fas fa-check text-lg"></i>' : '-'}</td>
+                        <td class="px-5 py-4 font-bold ${hasC2 ? 'text-emerald-500' : 'text-slate-300'}">${hasC2 ? '<i class="fas fa-check text-lg"></i>' : '-'}</td>
+                        <td class="px-5 py-4">${statusHtml}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            const bodyEl = document.getElementById('eliteTableBody');
+            if (bodyEl) bodyEl.innerHTML = bodyHtml;
+
+            const countEl = document.getElementById('eliteCount');
+            if(countEl) countEl.innerText = eliteData.length;
+        }
+
+        function renderComparisonTable(dataArray) {
+            const container = document.getElementById('comparisonContent');
+            if (!container) return;
+
+            if (!globalData.hasOldData) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <i class="fas fa-info-circle text-5xl text-purple-200 mb-4"></i>
+                        <h3 class="text-xl font-bold text-slate-600">برجاء رفع ملف "تقرير الأكاديمية القديم" لعرض المقارنة</h3>
+                        <p class="text-slate-400 mt-2">يتم إرفاقه من الواجهة الرئيسية في الخانة رقم 3</p>
+                    </div>`;
+                return;
+            }
+
+            let regionStats = {};
+            dataArray.forEach(emp => {
+                if (globalData.excludedRegions.has(emp.region)) return;
+                
+                if (!regionStats[emp.region]) {
+                    regionStats[emp.region] = { total: 0, oldOver20: 0, newOver20: 0 };
+                }
+                
+                let stats = regionStats[emp.region];
+                stats.total++;
+                if (emp.oldTotalCerts >= 20) stats.oldOver20++;
+                if (emp.totalCerts >= 20) stats.newOver20++;
+            });
+
+            let html = `
+                <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
+                    <thead class="bg-purple-800 text-white">
+                        <tr>
+                            <th class="px-5 py-4 font-semibold tracking-wider">الإقليم</th>
+                            <th class="px-5 py-4 font-semibold tracking-wider">إجمالي الموظفين المعتمدين</th>
+                            <th class="px-5 py-4 font-semibold text-purple-200">التقرير السابق (أكملوا 20)</th>
+                            <th class="px-5 py-4 font-semibold text-emerald-300">التقرير الحالي (أكملوا 20)</th>
+                            <th class="px-5 py-4 font-semibold">نسبة التحسن (بناءً على النسبة)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-slate-200">
+            `;
+
+            let sortedRegions = Object.keys(regionStats).sort();
+            
+            sortedRegions.forEach(reg => {
+                let s = regionStats[reg];
+                let oldPct = s.total > 0 ? (s.oldOver20 / s.total) * 100 : 0;
+                let newPct = s.total > 0 ? (s.newOver20 / s.total) * 100 : 0;
+                let diffPct = newPct - oldPct;
+                let diffCount = s.newOver20 - s.oldOver20;
+
+                let diffHtml = '';
+                if (diffPct > 0) {
+                    diffHtml = `<span class="text-emerald-600 font-bold bg-emerald-50 px-2 py-1 rounded"><i class="fas fa-arrow-up ml-1"></i> ${diffPct.toFixed(1)}% (+${diffCount} موظف)</span>`;
+                } else if (diffPct < 0) {
+                    diffHtml = `<span class="text-red-600 font-bold bg-red-50 px-2 py-1 rounded"><i class="fas fa-arrow-down ml-1"></i> ${Math.abs(diffPct).toFixed(1)}% (${diffCount} موظف)</span>`;
+                } else {
+                    diffHtml = `<span class="text-slate-500 font-medium bg-slate-50 px-2 py-1 rounded"><i class="fas fa-equals ml-1"></i> 0% (لا تغيير)</span>`;
+                }
+
+                html += `
+                    <tr class="hover:bg-purple-50 transition border-b border-slate-100">
+                        <td class="px-5 py-4 font-bold text-slate-700">${reg}</td>
+                        <td class="px-5 py-4 font-bold text-lg text-slate-500">${s.total}</td>
+                        <td class="px-5 py-4 text-purple-600 font-bold bg-purple-50/50">${s.oldOver20} <span class="text-xs font-normal">(${oldPct.toFixed(1)}%)</span></td>
+                        <td class="px-5 py-4 text-emerald-600 font-bold bg-emerald-50/50">${s.newOver20} <span class="text-xs font-normal">(${newPct.toFixed(1)}%)</span></td>
+                        <td class="px-5 py-4">${diffHtml}</td>
+                    </tr>
+                `;
+            });
+
+            if (sortedRegions.length === 0) {
+                html += `<tr><td colspan="5" class="text-center py-8 text-slate-500">تم استبعاد كافة الأقاليم.</td></tr>`;
+            }
+
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+
         function updateAnalysisUI() {
             let analysis = {
                 active: 0,
@@ -1189,7 +1403,6 @@
                 else if (emp.totalCerts > 0) regStats.less20++;
                 else regStats.zero++;
 
-                // Non Cert Stats
                 nonCertCoursesKeys.forEach(c => {
                     let p = emp.nonCertProgress[c];
                     let stats = analysis.nonCerts[c];
@@ -1285,11 +1498,9 @@
             const exportContainer = document.getElementById('exportButtonsContainer');
             if(exportContainer) exportContainer.innerHTML = downloadAllBtn + exportBtnsHtml;
 
-            // تحديث التاب الجديدة مع تغيير الأقاليم المستبعدة
             updateMonthlyProgressTab();
         }
 
-        // --- Export Logic ---
         function generateEmployeeAOA(employeesArray) {
             let aoa = [];
             let header = ["الرقم الوظيفي", "الاسم", "تاريخ التعيين", "المشرف", "مدير الإقليم", "الإقليم", "المدة (أشهر)", "إجمالي الشهادات"];
@@ -1302,6 +1513,34 @@
                 aoa.push(row);
             });
             return aoa;
+        }
+
+        function exportEliteData() {
+            let wb = XLSX.utils.book_new();
+            // فلترة الموظفين لتصدير الذين لهم علاقة بدورات النخبة فقط
+            let validActive = globalData.allActive.filter(e => !globalData.excludedRegions.has(e.region) && e.eliteAssigned);
+            
+            let c1Key = eliteCoursesKeys[0] || "دورة 1";
+            let c2Key = eliteCoursesKeys[1] || "دورة 2";
+
+            let aoa = [["الرقم الوظيفي", "الاسم", "الإقليم", c1Key, c2Key, "مجموع المستكمل", "الحالة الوصفية"]];
+            
+            validActive.forEach(emp => {
+                let hasC1 = eliteCoursesKeys[0] ? emp.eliteProgress[eliteCoursesKeys[0]] : false;
+                let hasC2 = eliteCoursesKeys[1] ? emp.eliteProgress[eliteCoursesKeys[1]] : false;
+                let count = (hasC1 ? 1 : 0) + (hasC2 ? 1 : 0);
+                
+                let desc = count === 2 ? "استكمل بالكامل" : (count === 1 ? "جزء" : "لم يستكمل");
+                
+                aoa.push([
+                    emp.id, emp.name, emp.region,
+                    hasC1 ? "نعم" : "لا", hasC2 ? "نعم" : "لا",
+                    count, desc
+                ]);
+            });
+
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), "تقرير دورات النخبة");
+            XLSX.writeFile(wb, "تقرير_دورات_النخبة.xlsx");
         }
 
         function exportAllData() {
