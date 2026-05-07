@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منظومة مطابقة القوى والأكاديمية - المطور</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- SheetJS for Excel processing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -28,18 +25,21 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         .table-container { max-height: 65vh; overflow-y: auto; scrollbar-width: thin; }
-        thead th { position: sticky; top: 0; z-index: 10; box-shadow: 0 1px 2px rgba(0,0,0,0.05); backdrop-filter: blur(8px); background-color: rgba(248, 250, 252, 0.95); }
+        thead th { position: sticky; top: 0; z-index: 10; box-shadow: 0 1px 2px rgba(0,0,0,0.05); backdrop-filter: blur(8px); background-color: #f1f5f9; }
         
         /* Drag & Drop Styles */
         .drop-zone { transition: all 0.3s ease; border: 2px dashed #cbd5e1; }
         .drop-zone.dragover { background-color: #eef2ff; border-color: #4f46e5; transform: scale(1.02); }
 
         .loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(5px); }
+
+        /* Modal Styles */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 10000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+        .modal-content { background: white; width: 90%; max-width: 1000px; max-height: 90vh; border-radius: 1rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); display: flex; flex-direction: column; animation: fadeIn 0.3s ease-out; }
     </style>
 </head>
 <body class="text-slate-800">
 
-    <!-- Loading Screen -->
     <div class="loading-overlay" id="loadingOverlay">
         <div id="loadingContent" class="text-center">
             <div class="relative inline-block">
@@ -51,9 +51,57 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="supervisorModal">
+        <div class="modal-content overflow-hidden">
+            <div class="flex justify-between items-center p-6 border-b border-slate-200 bg-slate-50 rounded-t-2xl">
+                <div>
+                    <h3 class="text-2xl font-bold text-slate-800" id="modalSupName">اسم المشرف</h3>
+                    <p class="text-slate-500 mt-1" id="modalSupRegion"><i class="fas fa-map-marker-alt text-indigo-400"></i> الإقليم</p>
+                </div>
+                <button onclick="closeSupervisorDetails()" class="text-slate-400 hover:text-red-500 transition focus:outline-none">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto" style="max-height: 70vh;">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl text-center">
+                        <p class="text-indigo-600 text-sm font-bold">إجمالي الموظفين</p>
+                        <p class="text-3xl font-extrabold text-indigo-800 mt-1" id="mTotal">0</p>
+                    </div>
+                    <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-xl text-center">
+                        <p class="text-emerald-600 text-sm font-bold">20 شهادة فأكثر</p>
+                        <p class="text-3xl font-extrabold text-emerald-800 mt-1" id="mOver20">0</p>
+                    </div>
+                    <div class="bg-orange-50 border border-orange-100 p-4 rounded-xl text-center">
+                        <p class="text-orange-600 text-sm font-bold">أقل من 20</p>
+                        <p class="text-3xl font-extrabold text-orange-800 mt-1" id="mLess20">0</p>
+                    </div>
+                    <div class="bg-red-50 border border-red-100 p-4 rounded-xl text-center">
+                        <p class="text-red-600 text-sm font-bold">بدون شهادات (0)</p>
+                        <p class="text-3xl font-extrabold text-red-800 mt-1" id="mZero">0</p>
+                    </div>
+                </div>
+                <div class="border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                    <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
+                        <thead class="bg-slate-100 text-slate-700">
+                            <tr>
+                                <th class="px-4 py-3 font-semibold">الرقم الوظيفي</th>
+                                <th class="px-4 py-3 font-semibold">اسم الموظف</th>
+                                <th class="px-4 py-3 font-semibold">تاريخ التعيين</th>
+                                <th class="px-4 py-3 font-semibold">الشهادات الحالية</th>
+                                <th class="px-4 py-3 font-semibold">الشهادات (سابقاً)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modalEmpTableBody" class="bg-white divide-y divide-slate-100">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="max-w-screen-2xl mx-auto px-4 py-8">
         
-        <!-- Header -->
         <header class="bg-white shadow-sm rounded-2xl p-8 mb-8 border border-slate-100 flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
             <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full -mr-10 -mt-10 blur-2xl"></div>
             <div class="absolute bottom-0 left-0 w-24 h-24 bg-blue-50 rounded-full -ml-8 -mb-8 blur-xl"></div>
@@ -68,11 +116,9 @@
             </div>
         </header>
 
-        <!-- Upload Section (Drag & Drop) -->
         <div class="bg-white shadow-sm rounded-2xl p-8 mb-8 border border-slate-100">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6"> 
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 
-                <!-- Zone 1 -->
                 <div id="dropZoneWf" class="drop-zone rounded-2xl p-6 text-center cursor-pointer bg-slate-50 hover:bg-slate-100 flex flex-col items-center justify-center min-h-[180px]" onclick="document.getElementById('workforceFile').click()">
                     <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl mb-3 shadow-sm">
                         <i class="fas fa-users"></i>
@@ -83,7 +129,6 @@
                     <input type="file" id="workforceFile" accept=".xlsx, .xls" class="hidden" onchange="handleFileSelect(event, 'wfFileName')" />
                 </div>
                 
-                <!-- Zone 2 -->
                 <div id="dropZoneAc" class="drop-zone rounded-2xl p-6 text-center cursor-pointer bg-slate-50 hover:bg-slate-100 flex flex-col items-center justify-center min-h-[180px]" onclick="document.getElementById('academyFile').click()">
                     <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-xl mb-3 shadow-sm">
                         <i class="fas fa-graduation-cap"></i>
@@ -94,7 +139,6 @@
                     <input type="file" id="academyFile" accept=".xlsx, .xls" class="hidden" onchange="handleFileSelect(event, 'acFileName')" />
                 </div>
 
-                <!-- Zone 3 (Old Academy for Comparison) -->
                 <div id="dropZoneOldAc" class="drop-zone rounded-2xl p-6 text-center cursor-pointer bg-slate-50 hover:bg-slate-100 flex flex-col items-center justify-center min-h-[180px]" onclick="document.getElementById('oldAcademyFile').click()">
                     <div class="w-14 h-14 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xl mb-3 shadow-sm">
                         <i class="fas fa-history"></i>
@@ -107,7 +151,6 @@
 
             </div>
 
-            <!-- Error Message Banner -->
             <div id="uploadErrorMessage" class="hidden mt-6 bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl flex items-center justify-center gap-3 font-bold">
                 <i class="fas fa-exclamation-circle text-xl"></i>
                 <span id="uploadErrorText"></span>
@@ -120,10 +163,8 @@
             </div>
         </div>
 
-        <!-- Results Section (Hidden initially) -->
         <div id="resultsSection" class="bg-white shadow-sm rounded-2xl border border-slate-100 overflow-hidden hidden">
             
-            <!-- Modern Tabs -->
             <div class="flex flex-wrap border-b border-slate-200 bg-slate-50/50">
                 <button class="tab-btn active px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'activeTab')">
                     <i class="fas fa-user-check ml-2"></i> على رأس العمل
@@ -146,6 +187,9 @@
                 <button class="tab-btn px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'nonCertTab')">
                     <i class="fas fa-book-open ml-2"></i> دورات بدون شهادات
                 </button>
+                <button class="tab-btn px-5 py-4 text-blue-700 font-bold bg-blue-50 border-r border-blue-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'supervisorsTab')">
+                    <i class="fas fa-sitemap ml-2"></i> تقييم المشرفين
+                </button>
                 <button class="tab-btn px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'analysisTab')">
                     <i class="fas fa-chart-pie ml-2"></i> التحليل والإحصائيات
                 </button>
@@ -162,7 +206,6 @@
 
             <div class="p-6 md:p-8">
                 
-                <!-- Tab 1: Active (With Filters) -->
                 <div id="activeTab" class="tab-content active">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                         <h2 class="text-2xl font-bold text-slate-800 flex items-center">
@@ -170,7 +213,6 @@
                             <span id="activeCount" class="mr-3 bg-indigo-100 text-indigo-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
                         </h2>
                         
-                        <!-- Filters -->
                         <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
                             <div class="relative">
                                 <i class="fas fa-search absolute right-3 top-3 text-slate-400"></i>
@@ -179,7 +221,6 @@
                             <div class="relative">
                                 <select id="filterRegion" onchange="applyActiveFilters()" class="pl-4 pr-8 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 w-full md:w-64 appearance-none bg-white">
                                     <option value="">كل الأقاليم</option>
-                                    <!-- Options injected via JS -->
                                 </select>
                                 <i class="fas fa-chevron-down absolute left-3 top-3 text-slate-400 text-sm pointer-events-none"></i>
                             </div>
@@ -188,50 +229,44 @@
                     
                     <div class="table-container border border-slate-200 rounded-xl shadow-sm">
                         <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
-                            <thead class="bg-slate-50 text-slate-600">
-                                <tr id="activeTableHeader">
-                                    <!-- Injected via JS to keep code DRY -->
-                                </tr>
+                            <thead class="bg-slate-100 text-slate-800 border-b border-slate-200">
+                                <tr id="activeTableHeader"></tr>
                             </thead>
                             <tbody id="activeTableBody" class="bg-white divide-y divide-slate-100"></tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- Tab: < 3 Months -->
                 <div id="tenure1Tab" class="tab-content">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-slate-800">موظفون فترة عملهم <span class="text-orange-500">أقل من 3 شهور</span></h2>
                         <span id="t1Count" class="bg-orange-100 text-orange-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
                     </div>
                     <div class="table-container border border-slate-200 rounded-xl shadow-sm">
-                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right"><thead class="bg-slate-50 text-slate-600"><tr id="t1Header"></tr></thead><tbody id="t1Body" class="bg-white divide-y divide-slate-100"></tbody></table>
+                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right"><thead class="bg-slate-100 text-slate-800"><tr id="t1Header"></tr></thead><tbody id="t1Body" class="bg-white divide-y divide-slate-100"></tbody></table>
                     </div>
                 </div>
 
-                <!-- Tab: 3 Months to 2 Years -->
                 <div id="tenure2Tab" class="tab-content">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-slate-800">موظفون فترة عملهم <span class="text-blue-500">من 3 شهور إلى سنتين</span></h2>
                         <span id="t2Count" class="bg-blue-100 text-blue-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
                     </div>
                     <div class="table-container border border-slate-200 rounded-xl shadow-sm">
-                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right"><thead class="bg-slate-50 text-slate-600"><tr id="t2Header"></tr></thead><tbody id="t2Body" class="bg-white divide-y divide-slate-100"></tbody></table>
+                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right"><thead class="bg-slate-100 text-slate-800"><tr id="t2Header"></tr></thead><tbody id="t2Body" class="bg-white divide-y divide-slate-100"></tbody></table>
                     </div>
                 </div>
 
-                <!-- Tab: > 2 Years -->
                 <div id="tenure3Tab" class="tab-content">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-slate-800">موظفون فترة عملهم <span class="text-emerald-500">أكثر من سنتين</span></h2>
                         <span id="t3Count" class="bg-emerald-100 text-emerald-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
                     </div>
                     <div class="table-container border border-slate-200 rounded-xl shadow-sm">
-                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right"><thead class="bg-slate-50 text-slate-600"><tr id="t3Header"></tr></thead><tbody id="t3Body" class="bg-white divide-y divide-slate-100"></tbody></table>
+                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right"><thead class="bg-slate-100 text-slate-800"><tr id="t3Header"></tr></thead><tbody id="t3Body" class="bg-white divide-y divide-slate-100"></tbody></table>
                     </div>
                 </div>
 
-                <!-- Tab: Excluded -->
                 <div id="excludedTab" class="tab-content">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-slate-800">بيانات الموظفين المستبعدين</h2>
@@ -239,7 +274,7 @@
                     </div>
                     <div class="table-container border border-slate-200 rounded-xl shadow-sm">
                         <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
-                            <thead class="bg-slate-50 text-slate-600">
+                            <thead class="bg-slate-100 text-slate-800">
                                 <tr>
                                     <th class="px-6 py-4 font-semibold uppercase tracking-wider">الرقم الوظيفي</th>
                                     <th class="px-6 py-4 font-semibold uppercase tracking-wider">الاسم</th>
@@ -251,7 +286,6 @@
                     </div>
                 </div>
 
-                <!-- Tab: Missing -->
                 <div id="missingTab" class="tab-content">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-slate-800">أرقام وظيفية بالأكاديمية وغير موجودة بالقوى</h2>
@@ -259,7 +293,7 @@
                     </div>
                     <div class="table-container border border-slate-200 rounded-xl shadow-sm">
                         <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
-                            <thead class="bg-slate-50 text-slate-600">
+                            <thead class="bg-slate-100 text-slate-800">
                                 <tr>
                                     <th class="px-6 py-4 font-semibold uppercase tracking-wider">الرقم الوظيفي</th>
                                     <th class="px-6 py-4 font-semibold uppercase tracking-wider">الاسم في الأكاديمية (إن وجد)</th>
@@ -271,7 +305,6 @@
                     </div>
                 </div>
 
-                <!-- Tab: Non-Certificate Courses -->
                 <div id="nonCertTab" class="tab-content">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                         <h2 class="text-2xl font-bold text-slate-800 flex items-center">
@@ -281,17 +314,61 @@
                     </div>
                     <div class="table-container border border-slate-200 rounded-xl shadow-sm">
                         <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
-                            <thead class="bg-slate-50 text-slate-600">
-                                <tr id="nonCertHeader">
-                                    <!-- Injected via JS -->
-                                </tr>
+                            <thead class="bg-slate-100 text-slate-800 border-b border-slate-200">
+                                <tr id="nonCertHeader"></tr>
                             </thead>
                             <tbody id="nonCertTableBody" class="bg-white divide-y divide-slate-100"></tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- Tab: Monthly Progress -->
+                <div id="supervisorsTab" class="tab-content">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 bg-blue-50 p-6 rounded-2xl border border-blue-100">
+                        <div>
+                            <h2 class="text-2xl font-bold text-blue-900 flex items-center mb-2">
+                                <i class="fas fa-sitemap text-blue-500 ml-2"></i> تقييم المشرفين (حسب القطاع)
+                            </h2>
+                            <p class="text-blue-700 text-sm">اختر مدير القطاع لعرض أداء المشرفين التابعين له وتقييم البائعين. اضغط على اسم المشرف للتفاصيل.</p>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                            <div class="relative bg-white rounded-xl shadow-sm border border-blue-100 p-1 w-full md:w-auto flex">
+                                <span class="text-slate-500 p-2 pr-3"><i class="fas fa-filter"></i></span>
+                                <select id="supRegionFilter" onchange="updateSupervisorsTab()" class="pl-4 pr-2 py-2 focus:outline-none w-full bg-transparent font-bold text-blue-800 cursor-pointer min-w-[200px]">
+                                    <option value="">جميع القطاعات / الأقاليم</option>
+                                </select>
+                            </div>
+                            
+                            <div class="relative bg-white rounded-xl shadow-sm border border-blue-100 p-1 w-full md:w-auto flex">
+                                <span class="text-slate-500 p-2 pr-3"><i class="fas fa-search"></i></span>
+                                <input type="text" id="supSearchFilter" onkeyup="updateSupervisorsTab()" placeholder="ابحث عن مشرف..." class="pl-4 pr-2 py-2 focus:outline-none w-full bg-transparent text-slate-700">
+                            </div>
+
+                            <button onclick="exportSupervisorsData()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-xl shadow transition transform hover:-translate-y-0.5 whitespace-nowrap h-full flex items-center">
+                                <i class="fas fa-file-excel ml-2"></i> تصدير إكسيل
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-container border border-slate-200 rounded-xl shadow-sm">
+                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
+                            <thead class="bg-slate-100 text-slate-800 border-b border-slate-200">
+                                <tr>
+                                    <th class="px-5 py-4 font-semibold tracking-wider">اسم المشرف</th>
+                                    <th class="px-5 py-4 font-semibold tracking-wider">مدير القطاع / الإقليم</th>
+                                    <th class="px-5 py-4 font-semibold tracking-wider">إجمالي البائعين</th>
+                                    <th class="px-5 py-4 font-semibold text-emerald-600">أكملوا المستهدف (20+)</th>
+                                    <th class="px-5 py-4 font-semibold text-orange-600">أقل من 20 (عجز)</th>
+                                    <th class="px-5 py-4 font-semibold text-red-600">أصفار (بدون)</th>
+                                    <th class="px-5 py-4 font-semibold text-purple-600" title="بناءً على التقرير السابق">مقدار التقدم</th>
+                                </tr>
+                            </thead>
+                            <tbody id="supervisorsTableBody" class="bg-white divide-y divide-slate-200">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <div id="monthlyProgressTab" class="tab-content">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 bg-indigo-50 p-6 rounded-2xl border border-indigo-100">
                         <div>
@@ -304,97 +381,67 @@
                         <div class="flex items-center gap-3 bg-white p-2 rounded-xl shadow-sm border border-indigo-100">
                             <label for="progressMonthSelect" class="font-bold text-slate-700 whitespace-nowrap pl-2">اختر الشهر:</label>
                             <select id="progressMonthSelect" onchange="updateMonthlyProgressTab()" class="pl-4 pr-8 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 appearance-none bg-white font-medium text-indigo-700 w-32 cursor-pointer">
-                                <!-- سيتم التعبئة بواسطة جافاسكربت -->
                             </select>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center border-b-4 border-b-indigo-500">
-                            <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xl ml-3 shrink-0">
-                                <i class="fas fa-bullseye"></i>
-                            </div>
+                            <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xl ml-3 shrink-0"><i class="fas fa-bullseye"></i></div>
                             <div>
                                 <p class="text-slate-500 text-xs font-bold mb-1">المستهدف للفترة</p>
-                                <div class="flex items-baseline gap-1">
-                                    <span id="monthlyTargetCerts" class="text-2xl font-extrabold text-slate-800">0</span>
-                                    <span class="text-slate-400 font-medium text-xs">شهادة (كحد أقصى)</span>
-                                </div>
+                                <div class="flex items-baseline gap-1"><span id="monthlyTargetCerts" class="text-2xl font-extrabold text-slate-800">0</span><span class="text-slate-400 font-medium text-xs">شهادة (كحد أقصى)</span></div>
                             </div>
                         </div>
-
                         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center border-b-4 border-b-blue-500">
-                            <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl ml-3 shrink-0">
-                                <i class="fas fa-users"></i>
-                            </div>
+                            <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl ml-3 shrink-0"><i class="fas fa-users"></i></div>
                             <div>
                                 <p class="text-slate-500 text-xs font-bold mb-1">إجمالي المعتمدين بالفترة</p>
-                                <div class="flex flex-col">
-                                    <span id="monthlyOverallValid" class="text-2xl font-extrabold text-slate-800">0</span>
-                                    <span class="text-red-500 font-medium text-xs mt-1" title="تعيينهم جاء بعد الشهر المختار">تم استبعاد: <span id="monthlyOverallExcluded" class="font-bold">0</span></span>
-                                </div>
+                                <div class="flex flex-col"><span id="monthlyOverallValid" class="text-2xl font-extrabold text-slate-800">0</span><span class="text-red-500 font-medium text-xs mt-1" title="تعيينهم جاء بعد الشهر المختار">تم استبعاد: <span id="monthlyOverallExcluded" class="font-bold">0</span></span></div>
                             </div>
                         </div>
-
                         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center border-b-4 border-b-emerald-500">
-                            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-xl ml-3 shrink-0">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
+                            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-xl ml-3 shrink-0"><i class="fas fa-check-circle"></i></div>
                             <div>
                                 <p class="text-slate-500 text-xs font-bold mb-1">حققوا المستهدف</p>
-                                <div class="flex items-baseline gap-2">
-                                    <span id="monthlyOverallAchieved" class="text-2xl font-extrabold text-slate-800">0</span>
-                                    <span id="monthlyOverallAchievedPct" class="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded text-sm">0%</span>
-                                </div>
+                                <div class="flex items-baseline gap-2"><span id="monthlyOverallAchieved" class="text-2xl font-extrabold text-slate-800">0</span><span id="monthlyOverallAchievedPct" class="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded text-sm">0%</span></div>
                             </div>
                         </div>
-
                         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center border-b-4 border-b-orange-500">
-                            <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-xl ml-3 shrink-0">
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </div>
+                            <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-xl ml-3 shrink-0"><i class="fas fa-exclamation-triangle"></i></div>
                             <div>
                                 <p class="text-slate-500 text-xs font-bold mb-1">لم يحققوا المستهدف (عجز)</p>
-                                <div class="flex items-baseline gap-2">
-                                    <span id="monthlyOverallFailed" class="text-2xl font-extrabold text-slate-800">0</span>
-                                    <span id="monthlyOverallFailedPct" class="text-orange-600 font-bold bg-orange-50 px-2 py-0.5 rounded text-sm">0%</span>
-                                </div>
+                                <div class="flex items-baseline gap-2"><span id="monthlyOverallFailed" class="text-2xl font-extrabold text-slate-800">0</span><span id="monthlyOverallFailedPct" class="text-orange-600 font-bold bg-orange-50 px-2 py-0.5 rounded text-sm">0%</span></div>
                             </div>
                         </div>
                     </div>
 
                     <div class="table-container border border-slate-200 rounded-xl shadow-sm">
                         <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
-                            <thead class="bg-slate-800 text-white">
+                            <thead class="bg-slate-100 text-slate-800 border-b border-slate-200">
                                 <tr>
                                     <th class="px-5 py-4 font-semibold tracking-wider">الإقليم</th>
                                     <th class="px-5 py-4 font-semibold tracking-wider" title="الموظفين المعينين قبل أو خلال الشهر المختار">المعتمدين للحساب</th>
-                                    <th class="px-5 py-4 font-semibold text-emerald-300">أكملوا المستهدف</th>
-                                    <th class="px-5 py-4 font-semibold text-emerald-300">نسبة الإنجاز %</th>
-                                    <th class="px-5 py-4 font-semibold text-orange-300">عجز (لم يكملوا)</th>
-                                    <th class="px-5 py-4 font-semibold text-orange-300">نسبة العجز %</th>
-                                    <th class="px-5 py-4 font-semibold text-slate-300 bg-slate-700" title="موظفون تعيينهم جاء بعد الشهر المختار ولن يتم حسابهم في نسب العجز والانجاز">مستبعد (تعيين أحدث)</th>
+                                    <th class="px-5 py-4 font-semibold text-emerald-600">أكملوا المستهدف</th>
+                                    <th class="px-5 py-4 font-semibold text-emerald-600">نسبة الإنجاز %</th>
+                                    <th class="px-5 py-4 font-semibold text-orange-600">عجز (لم يكملوا)</th>
+                                    <th class="px-5 py-4 font-semibold text-orange-600">نسبة العجز %</th>
+                                    <th class="px-5 py-4 font-semibold text-slate-600 bg-slate-200" title="موظفون تعيينهم جاء بعد الشهر المختار ولن يتم حسابهم في نسب العجز والانجاز">مستبعد (تعيين أحدث)</th>
                                 </tr>
                             </thead>
-                            <tbody id="monthlyProgressTableBody" class="bg-white divide-y divide-slate-200">
-                                <!-- Data injected here -->
-                            </tbody>
+                            <tbody id="monthlyProgressTableBody" class="bg-white divide-y divide-slate-200"></tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- Tab: Analysis -->
                 <div id="analysisTab" class="tab-content">
-                    
                     <div class="bg-white border border-slate-200 shadow-sm rounded-xl p-5 mb-8">
                         <div class="flex items-center gap-2 mb-3">
                             <i class="fas fa-filter text-indigo-500"></i>
                             <h3 class="font-bold text-slate-800 text-lg">تضمين / استبعاد الأقاليم من الإحصائية</h3>
                         </div>
                         <p class="text-xs text-slate-500 mb-4">قم بإزالة العلامة من الإقليم الذي لا ترغب باحتسابه في الجداول والأرقام أدناه (ينطبق أيضاً على جدول التقدم الشهري).</p>
-                        <div id="regionExclusionContainer" class="flex flex-wrap gap-3">
-                            <!-- Checkboxes injected via JS -->
-                        </div>
+                        <div id="regionExclusionContainer" class="flex flex-wrap gap-3"></div>
                     </div>
 
                     <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-5 mb-8 flex flex-wrap gap-4 items-center justify-between shadow-sm">
@@ -453,21 +500,19 @@
                         </h3>
                         <div class="table-container border border-slate-200 rounded-xl shadow-sm mb-8">
                             <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
-                                <thead class="bg-slate-800 text-white">
+                                <thead class="bg-slate-100 text-slate-800 border-b border-slate-200">
                                     <tr>
                                         <th class="px-5 py-4 font-semibold tracking-wider">الإقليم</th>
                                         <th class="px-5 py-4 font-semibold tracking-wider">إجمالي الموظفين</th>
-                                        <th class="px-5 py-4 font-semibold text-emerald-300">20 شهادة فأكثر</th>
-                                        <th class="px-5 py-4 font-semibold text-emerald-300">النسبة %</th>
-                                        <th class="px-5 py-4 font-semibold text-orange-300">أقل من 20</th>
-                                        <th class="px-5 py-4 font-semibold text-orange-300">النسبة %</th>
-                                        <th class="px-5 py-4 font-semibold text-red-300">0 شهادة</th>
-                                        <th class="px-5 py-4 font-semibold text-red-300">النسبة %</th>
+                                        <th class="px-5 py-4 font-semibold text-emerald-600">20 شهادة فأكثر</th>
+                                        <th class="px-5 py-4 font-semibold text-emerald-600">النسبة %</th>
+                                        <th class="px-5 py-4 font-semibold text-orange-600">أقل من 20</th>
+                                        <th class="px-5 py-4 font-semibold text-orange-600">النسبة %</th>
+                                        <th class="px-5 py-4 font-semibold text-red-600">0 شهادة</th>
+                                        <th class="px-5 py-4 font-semibold text-red-600">النسبة %</th>
                                     </tr>
                                 </thead>
-                                <tbody id="regionAnalysisTableBody" class="bg-white divide-y divide-slate-200">
-                                    <!-- Data injected here -->
-                                </tbody>
+                                <tbody id="regionAnalysisTableBody" class="bg-white divide-y divide-slate-200"></tbody>
                             </table>
                         </div>
                     </div>
@@ -478,43 +523,39 @@
                         </h3>
                         <div class="table-container border border-slate-200 rounded-xl shadow-sm mb-8">
                             <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
-                                <thead class="bg-slate-700 text-white">
+                                <thead class="bg-slate-100 text-slate-800 border-b border-slate-200">
                                     <tr>
                                         <th class="px-5 py-4 font-semibold tracking-wider w-1/4">اسم الدورة</th>
                                         <th class="px-5 py-4 font-semibold tracking-wider">إجمالي المسجلين/الحضور</th>
-                                        <th class="px-5 py-4 font-semibold text-emerald-300">اكتمل 100%</th>
-                                        <th class="px-5 py-4 font-semibold text-blue-300">من 50% إلى 99%</th>
-                                        <th class="px-5 py-4 font-semibold text-orange-300">أقل من 50%</th>
-                                        <th class="px-5 py-4 font-semibold text-red-300">لم يكمل (0%)</th>
-                                        <th class="px-5 py-4 font-semibold text-slate-300">لم يدخل (-)</th>
+                                        <th class="px-5 py-4 font-semibold text-emerald-600">اكتمل 100%</th>
+                                        <th class="px-5 py-4 font-semibold text-blue-600">من 50% إلى 99%</th>
+                                        <th class="px-5 py-4 font-semibold text-orange-600">أقل من 50%</th>
+                                        <th class="px-5 py-4 font-semibold text-red-600">لم يكمل (0%)</th>
+                                        <th class="px-5 py-4 font-semibold text-slate-600">لم يدخل (-)</th>
                                     </tr>
                                 </thead>
-                                <tbody id="nonCertAnalysisTableBody" class="bg-white divide-y divide-slate-200">
-                                    <!-- Data injected here -->
-                                </tbody>
+                                <tbody id="nonCertAnalysisTableBody" class="bg-white divide-y divide-slate-200"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- Tab: Elite (النخبة) -->
                 <div id="eliteTab" class="tab-content">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                         <div>
                             <h2 class="text-2xl font-bold text-slate-800 flex items-center">
                                 <i class="fas fa-star text-yellow-500 ml-2"></i> دورات النخبة
-                                <span id="eliteCount" class="mr-3 bg-yellow-100 text-yellow-800 text-sm font-bold px-3 py-1 rounded-full">0</span>
                             </h2>
-                            <p class="text-slate-500 text-sm mt-1">يعرض فقط الموظفين المرتبطين بدورتي النخبة وحالة إنجازهم.</p>
+                            <p class="text-slate-500 text-sm mt-1">يعرض حالة إنجاز دورتي النخبة للموظفين المستهدفين فقط (الذين لديهم بيانات بالدورتين في الأكاديمية).</p>
                         </div>
                         <button onclick="exportEliteData()" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2.5 px-6 rounded-lg shadow transition transform hover:-translate-y-0.5">
-                            <i class="fas fa-file-excel ml-2"></i> تصدير إكسيل (النخبة فقط)
+                            <i class="fas fa-file-excel ml-2"></i> تصدير إكسيل (النخبة)
                         </button>
                     </div>
                     
                     <div class="table-container border border-slate-200 rounded-xl shadow-sm">
                         <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
-                            <thead class="bg-slate-800 text-white">
+                            <thead class="bg-slate-100 text-slate-800 border-b border-slate-200">
                                 <tr>
                                     <th class="px-5 py-4 font-semibold tracking-wider">الرقم الوظيفي</th>
                                     <th class="px-5 py-4 font-semibold tracking-wider">الاسم</th>
@@ -529,7 +570,6 @@
                     </div>
                 </div>
 
-                <!-- Tab: Comparison (المقارنة) -->
                 <div id="comparisonTab" class="tab-content">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 bg-purple-50 p-6 rounded-2xl border border-purple-100">
                         <div>
@@ -541,8 +581,7 @@
                     </div>
                     
                     <div id="comparisonContent" class="table-container border border-slate-200 rounded-xl shadow-sm">
-                        <!-- Table is injected here -->
-                    </div>
+                        </div>
                 </div>
 
             </div>
@@ -588,7 +627,6 @@
                     display.classList.remove('hidden');
                     display.classList.add('inline-block');
                 }
-                
                 const errorMsg = document.getElementById('uploadErrorMessage');
                 if(errorMsg) errorMsg.classList.add('hidden');
             }
@@ -621,7 +659,6 @@
             }
         }
 
-        // --- Configuration ---
         const regionManagerMap = {
             "احمد عمار": "إقليم جده والمدينة", "اشرف البركي": "اقليم الشرقية",
             "حسام البني": "اقليم الجنوب", "زكي سريه": "La beaute",
@@ -633,29 +670,17 @@
         };
 
         const excludedStatuses = ['استقالة', 'استقاله', 'إنهاء خدمة', 'انهاء خدمة', 'انهاء خدمه', 'انقطاع', 'انتقل إلى', 'انتقل الي', 'نقل'];
-        
         let targetMonthsKeys = ["10-2025", "11-2025", "12-2025", "01-2026", "02-2026", "03-2026", "04-2026", "05-2026", "06-2026"];
-
-        const nonCertCoursesKeys = [
-            "1+2 Offer", "delivery order software", "Updates and New Circulars", 
-            "Deraah Seminars", "Deraah's new products", "Deraah campaigns"
-        ];
-
-        // تم إضافة أسماء دورتي النخبة المطلوبة هنا
+        const nonCertCoursesKeys = ["1+2 Offer", "delivery order software", "Updates and New Circulars", "Deraah Seminars", "Deraah's new products", "Deraah campaigns"];
+        
+        // --- تحديث أسماء دورات النخبة ---
         const eliteCoursesKeys = [
             "Sales Scenarios for Deraah Oud's Top Products", 
             "Sales Scenarios for DERAAH's Top Products"
         ];
 
-        // --- Global State ---
         let globalData = {
-            allActive: [],
-            excludedEmployees: [],
-            missingEmployees: [],
-            regionsSet: new Set(),
-            excludedRegions: new Set(),
-            allExtractedMonths: new Set(),
-            hasOldData: false 
+            allActive: [], excludedEmployees: [], missingEmployees: [], regionsSet: new Set(), excludedRegions: new Set(), allExtractedMonths: new Set(), hasOldData: false
         };
 
         document.getElementById('currentDateDisplay').innerText = `تاريخ اليوم: ${new Date().toLocaleDateString('ar-EG')}`;
@@ -663,30 +688,23 @@
         function switchTab(event, tabId) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            if(event && event.currentTarget) {
-                event.currentTarget.classList.add('active');
-            }
+            if(event && event.currentTarget) event.currentTarget.classList.add('active');
             const targetTab = document.getElementById(tabId);
             if(targetTab) targetTab.classList.add('active');
         }
 
         function switchAnalysisSubTab(event, sectionId) {
             document.querySelectorAll('.analysis-sub-tab-btn').forEach(btn => {
-                btn.classList.remove('active', 'text-indigo-600', 'border-indigo-600', 'bg-indigo-50');
-                btn.classList.add('text-slate-500', 'border-transparent');
-                btn.classList.remove('font-bold');
-                btn.classList.add('font-semibold');
+                btn.classList.remove('active', 'text-indigo-600', 'border-indigo-600', 'bg-indigo-50', 'font-bold');
+                btn.classList.add('text-slate-500', 'border-transparent', 'font-semibold');
             });
-            
             if(event && event.currentTarget) {
                 const btn = event.currentTarget;
                 btn.classList.remove('text-slate-500', 'border-transparent', 'font-semibold');
                 btn.classList.add('active', 'text-indigo-600', 'border-indigo-600', 'bg-indigo-50', 'font-bold');
             }
-
             document.getElementById('certAnalysisSection').style.display = 'none';
             document.getElementById('nonCertAnalysisSection').style.display = 'none';
-            
             const targetSec = document.getElementById(sectionId);
             if(targetSec) targetSec.style.display = 'block';
         }
@@ -713,9 +731,7 @@
             if (typeof excelValue === 'number') return new Date((excelValue - (25567 + 2)) * 86400 * 1000);
             if (typeof excelValue === 'string') {
                 let parts = excelValue.split(/[\/\-]/);
-                if (parts.length === 3 && parts[0].length <= 2 && parts[2].length === 4) {
-                    return new Date(parts[2], parseInt(parts[1])-1, parts[0]);
-                }
+                if (parts.length === 3 && parts[0].length <= 2 && parts[2].length === 4) return new Date(parts[2], parseInt(parts[1])-1, parts[0]);
                 let d = new Date(excelValue);
                 if (!isNaN(d)) return d;
             }
@@ -746,7 +762,7 @@
         }
 
         function parseProgress(val) {
-            if (val === "" || val === undefined || val === null) return null; 
+            if (val === "" || val === undefined || val === null) return null;
             if (typeof val === 'string') {
                 let parsed = parseFloat(val.replace('%', '').trim());
                 return isNaN(parsed) ? null : parsed;
@@ -767,23 +783,15 @@
             const acFile = document.getElementById('academyFile').files[0];
             const oldAcFile = document.getElementById('oldAcademyFile').files[0];
 
-            if (!wfFile || !acFile) { 
-                showError("الرجاء إرفاق ملف القوى وملف الأكاديمية الحالي قبل البدء في المعالجة."); 
-                return; 
-            }
+            if (!wfFile || !acFile) { showError("الرجاء إرفاق ملف القوى وملف الأكاديمية الحالي قبل البدء في المعالجة."); return; }
 
             const loadingOverlay = document.getElementById('loadingOverlay');
             if(loadingOverlay) {
                 loadingOverlay.innerHTML = `
                     <div id="loadingContent" class="text-center">
-                        <div class="relative inline-block">
-                            <i class="fas fa-circle-notch fa-spin text-6xl text-indigo-600"></i>
-                            <i class="fas fa-file-excel absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xl text-indigo-400"></i>
-                        </div>
+                        <div class="relative inline-block"><i class="fas fa-circle-notch fa-spin text-6xl text-indigo-600"></i><i class="fas fa-file-excel absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xl text-indigo-400"></i></div>
                         <h2 class="text-2xl font-bold text-slate-700 mt-6">جاري التحليل والمطابقة...</h2>
-                        <p class="text-slate-500 mt-2">يرجى الانتظار لحين الانتهاء من معالجة البيانات</p>
-                    </div>
-                `;
+                    </div>`;
                 loadingOverlay.style.display = 'flex';
             }
             
@@ -791,19 +799,14 @@
                 const wfData = await readExcel(wfFile);
                 const acData = await readExcel(acFile);
                 let oldAcData = null;
-                if (oldAcFile) {
-                    oldAcData = await readExcel(oldAcFile);
-                }
+                if (oldAcFile) oldAcData = await readExcel(oldAcFile);
                 
                 analyzeData(wfData, acData, oldAcData);
                 
                 const resultsSec = document.getElementById('resultsSection');
                 if(resultsSec) resultsSec.classList.remove('hidden');
-                
                 if(loadingOverlay) loadingOverlay.style.display = 'none';
-            } catch (error) {
-                showFatalError(error);
-            }
+            } catch (error) { showFatalError(error); }
         }
 
         function readExcel(file) {
@@ -825,16 +828,14 @@
             let employeeMap = {};
             let allWfIds = new Set();
 
-            // 1. Workforce
             for (let i = 1; i < wfRows.length; i++) {
                 let row = wfRows[i];
                 if (!row || row.length < 2) continue;
-                
                 let id = cleanString(row[0]); if (!id) continue;
                 allWfIds.add(id);
                 
                 let name = cleanString(row[1]), hireDate = row[4], status = cleanString(row[9]);
-                let supervisor = row.length > 13 ? cleanString(row[13]) : "";
+                let supervisor = row.length > 13 ? cleanString(row[13]) : "بدون مشرف";
                 let manager = row.length > 15 ? cleanString(row[15]) : "";
                 
                 if (isExcluded(status)) {
@@ -843,43 +844,34 @@
                     let region = determineRegion(manager);
                     globalData.regionsSet.add(region);
                     
-                    let emp = { 
-                        id, name, hireDate, status, supervisor, manager, region, 
-                        totalCerts: 0, oldTotalCerts: 0, 
-                        monthsData: {}, nonCertProgress: {}, 
-                        eliteProgress: {}, eliteAssigned: false 
-                    };
+                    // --- إضافة isEliteTarget لمعرفة الموظف المستهدف في النخبة ---
+                    let emp = { id, name, hireDate, status, supervisor, manager, region, totalCerts: 0, oldTotalCerts: 0, monthsData: {}, nonCertProgress: {}, eliteProgress: {}, isEliteTarget: false };
+                    
                     targetMonthsKeys.forEach(m => emp.monthsData[m] = 0);
                     nonCertCoursesKeys.forEach(c => emp.nonCertProgress[c] = null);
                     eliteCoursesKeys.forEach(c => emp.eliteProgress[c] = false);
-                    
-                    let tenure = calculateTenureMonths(hireDate);
-                    emp.tenureMonths = tenure;
-                    
+                    emp.tenureMonths = calculateTenureMonths(hireDate);
                     employeeMap[id] = emp;
                     globalData.allActive.push(emp);
                 }
             }
 
-            // 2. Academy (Current)
             let missingMap = {};
             for (let i = 1; i < acRows.length; i++) {
                 let row = acRows[i];
                 if (!row || row.length < 15) continue;
                 let id = cleanString(row[14]); if (!id) continue;
-
                 let certValue = row.length > 38 ? cleanString(row[38]) : "-";
                 let courseName = row.length > 1 ? cleanString(row[1]) : "";
                 let courseLower = courseName.toLowerCase();
                 let progressRaw = row.length > 26 ? row[26] : null;
-
                 let certInfo = parseCertificateDate(certValue);
 
                 if (employeeMap[id]) {
-                    // تحقق من دورات النخبة الجديدة - هنا فقط من يرتبط بالدورة سيتم تعليمه كمعين للنخبة
                     let matchedElite = eliteCoursesKeys.find(c => courseLower.includes(c.toLowerCase()));
                     if (matchedElite) {
-                        employeeMap[id].eliteAssigned = true; // تم الربط بدورة النخبة في الأكاديمية
+                        // --- لو ظهر اسم الموظف قدام الدورة دي في شيت الأكاديمية، يتم تعليمه كمستهدف ---
+                        employeeMap[id].isEliteTarget = true;
                         if (certValue !== "-" || parseProgress(progressRaw) === 100) {
                             employeeMap[id].eliteProgress[matchedElite] = true;
                         }
@@ -889,30 +881,21 @@
                         let matchedCourse = nonCertCoursesKeys.find(c => courseLower.includes(c.toLowerCase()));
                         if (matchedCourse) {
                             let parsedProg = parseProgress(progressRaw);
-                            if (parsedProg !== null) {
-                                employeeMap[id].nonCertProgress[matchedCourse] = parsedProg;
-                            }
+                            if (parsedProg !== null) employeeMap[id].nonCertProgress[matchedCourse] = parsedProg;
                         }
                     } else if (certInfo) {
                         employeeMap[id].totalCerts++;
                         globalData.allExtractedMonths.add(certInfo.key);
-                        
-                        if (employeeMap[id].monthsData[certInfo.key] === undefined) {
-                             employeeMap[id].monthsData[certInfo.key] = 0;
-                        }
+                        if (employeeMap[id].monthsData[certInfo.key] === undefined) employeeMap[id].monthsData[certInfo.key] = 0;
                         employeeMap[id].monthsData[certInfo.key]++;
                     }
                 } else if (!allWfIds.has(id)) {
                     if (!missingMap[id]) missingMap[id] = { id, name: row.length > 5 ? cleanString(row[5]) : "غير متوفر", totalCerts: 0 };
-                    if (certInfo) {
-                        missingMap[id].totalCerts++;
-                        globalData.allExtractedMonths.add(certInfo.key);
-                    }
+                    if (certInfo) { missingMap[id].totalCerts++; globalData.allExtractedMonths.add(certInfo.key); }
                 }
             }
             globalData.missingEmployees = Object.values(missingMap);
 
-            // 3. Old Academy (For Comparison)
             if (oldAcRows) {
                 let oldCertMap = {};
                 for (let i = 1; i < oldAcRows.length; i++) {
@@ -921,13 +904,9 @@
                     let id = cleanString(row[14]); if (!id) continue;
                     let certValue = row.length > 38 ? cleanString(row[38]) : "-";
                     let certInfo = parseCertificateDate(certValue);
-                    if (certInfo) {
-                        oldCertMap[id] = (oldCertMap[id] || 0) + 1;
-                    }
+                    if (certInfo) oldCertMap[id] = (oldCertMap[id] || 0) + 1;
                 }
-                globalData.allActive.forEach(emp => {
-                    emp.oldTotalCerts = oldCertMap[emp.id] || 0;
-                });
+                globalData.allActive.forEach(emp => emp.oldTotalCerts = oldCertMap[emp.id] || 0);
             }
 
             let sortedExtracted = Array.from(globalData.allExtractedMonths).sort((a, b) => {
@@ -935,18 +914,12 @@
                 let [m2, y2] = b.split('-').map(Number);
                 return y1 !== y2 ? y1 - y2 : m1 - m2;
             });
-            
             if(sortedExtracted.length > 0) {
                 targetMonthsKeys = sortedExtracted;
-                globalData.allActive.forEach(emp => {
-                    targetMonthsKeys.forEach(m => {
-                        if (emp.monthsData[m] === undefined) emp.monthsData[m] = 0;
-                    });
-                });
+                globalData.allActive.forEach(emp => { targetMonthsKeys.forEach(m => { if (emp.monthsData[m] === undefined) emp.monthsData[m] = 0; }); });
             }
 
-            let e1 = document.getElementById('eliteCourse1Head');
-            let e2 = document.getElementById('eliteCourse2Head');
+            let e1 = document.getElementById('eliteCourse1Head'); let e2 = document.getElementById('eliteCourse2Head');
             if (e1 && eliteCoursesKeys[0]) e1.innerText = eliteCoursesKeys[0];
             if (e2 && eliteCoursesKeys[1]) e2.innerText = eliteCoursesKeys[1];
 
@@ -960,112 +933,70 @@
             if(!select) return;
             select.innerHTML = '';
             targetMonthsKeys.forEach(m => {
-                let opt = document.createElement('option');
-                opt.value = m;
-                opt.text = m.replace('-', '/');
-                select.appendChild(opt);
+                let opt = document.createElement('option'); opt.value = m; opt.text = m.replace('-', '/'); select.appendChild(opt);
             });
-            if(targetMonthsKeys.length > 0) {
-                select.value = targetMonthsKeys[targetMonthsKeys.length - 1];
-            }
+            if(targetMonthsKeys.length > 0) select.value = targetMonthsKeys[targetMonthsKeys.length - 1];
         }
 
         function updateMonthlyProgressTab() {
             const selectedMonth = document.getElementById('progressMonthSelect').value;
             if (!selectedMonth) return;
-
             let [selM, selY] = selectedMonth.split('-').map(Number);
             let selectedTotalMonths = selY * 12 + selM;
-
             let monthsToInclude = [];
-            for (let m of targetMonthsKeys) {
-                monthsToInclude.push(m);
-                if (m === selectedMonth) break;
-            }
+            for (let m of targetMonthsKeys) { monthsToInclude.push(m); if (m === selectedMonth) break; }
 
             let maxCerts = 0;
-            let employeeProgress = {}; 
-            let employeeExcludedState = {}; 
+            let employeeProgress = {}; let employeeExcludedState = {}; 
 
             globalData.allActive.forEach(emp => {
                 if (globalData.excludedRegions.has(emp.region)) return;
-
                 let isExcludedByDate = false;
                 let empDate = parseExcelDate(emp.hireDate);
-                
                 if (empDate && !isNaN(empDate)) {
-                    let hM = empDate.getMonth() + 1;
-                    let hY = empDate.getFullYear();
-                    if ((hY * 12 + hM) > selectedTotalMonths) {
-                        isExcludedByDate = true;
-                    }
+                    let hM = empDate.getMonth() + 1; let hY = empDate.getFullYear();
+                    if ((hY * 12 + hM) > selectedTotalMonths) isExcludedByDate = true;
                 }
-                
                 employeeExcludedState[emp.id] = isExcludedByDate;
 
                 if (!isExcludedByDate) {
-                    let sum = 0;
-                    monthsToInclude.forEach(m => {
-                        sum += (emp.monthsData[m] || 0);
-                    });
+                    let sum = 0; monthsToInclude.forEach(m => sum += (emp.monthsData[m] || 0));
                     employeeProgress[emp.id] = sum;
                     if (sum > maxCerts) maxCerts = sum;
                 }
             });
 
             if (maxCerts > 20) maxCerts = 20;
-
             document.getElementById('monthlyTargetCerts').innerText = maxCerts;
 
-            let regionStats = {};
-            let overallStats = { valid: 0, excluded: 0, achieved: 0, failed: 0 };
+            let regionStats = {}; let overallStats = { valid: 0, excluded: 0, achieved: 0, failed: 0 };
 
             globalData.allActive.forEach(emp => {
                 if (globalData.excludedRegions.has(emp.region)) return;
-
-                if (!regionStats[emp.region]) {
-                    regionStats[emp.region] = { valid: 0, excludedNew: 0, achieved: 0, failed: 0 };
-                }
+                if (!regionStats[emp.region]) regionStats[emp.region] = { valid: 0, excludedNew: 0, achieved: 0, failed: 0 };
                 
                 if (employeeExcludedState[emp.id]) {
-                    regionStats[emp.region].excludedNew++;
-                    overallStats.excluded++;
+                    regionStats[emp.region].excludedNew++; overallStats.excluded++;
                 } else {
-                    regionStats[emp.region].valid++;
-                    overallStats.valid++;
-                    
-                    if (employeeProgress[emp.id] >= maxCerts && maxCerts > 0) {
-                        regionStats[emp.region].achieved++;
-                        overallStats.achieved++;
-                    } else if (maxCerts === 0 && employeeProgress[emp.id] === 0) {
-                        regionStats[emp.region].achieved++;
-                        overallStats.achieved++;
-                    } else {
-                        regionStats[emp.region].failed++;
-                        overallStats.failed++;
-                    }
+                    regionStats[emp.region].valid++; overallStats.valid++;
+                    if (employeeProgress[emp.id] >= maxCerts && maxCerts > 0) { regionStats[emp.region].achieved++; overallStats.achieved++; }
+                    else if (maxCerts === 0 && employeeProgress[emp.id] === 0) { regionStats[emp.region].achieved++; overallStats.achieved++; }
+                    else { regionStats[emp.region].failed++; overallStats.failed++; }
                 }
             });
 
             document.getElementById('monthlyOverallValid').innerText = overallStats.valid;
             document.getElementById('monthlyOverallExcluded').innerText = overallStats.excluded;
-            
             let overallAchPct = overallStats.valid > 0 ? Math.round((overallStats.achieved / overallStats.valid) * 100) : 0;
             let overallFailPct = overallStats.valid > 0 ? Math.round((overallStats.failed / overallStats.valid) * 100) : 0;
-            
-            document.getElementById('monthlyOverallAchieved').innerText = overallStats.achieved;
-            document.getElementById('monthlyOverallAchievedPct').innerText = overallAchPct + "%";
-            document.getElementById('monthlyOverallFailed').innerText = overallStats.failed;
-            document.getElementById('monthlyOverallFailedPct').innerText = overallFailPct + "%";
+            document.getElementById('monthlyOverallAchieved').innerText = overallStats.achieved; document.getElementById('monthlyOverallAchievedPct').innerText = overallAchPct + "%";
+            document.getElementById('monthlyOverallFailed').innerText = overallStats.failed; document.getElementById('monthlyOverallFailedPct').innerText = overallFailPct + "%";
 
-            let html = '';
-            let sortedRegions = Object.keys(regionStats).sort();
-            
+            let html = ''; let sortedRegions = Object.keys(regionStats).sort();
             sortedRegions.forEach(reg => {
                 let stats = regionStats[reg];
                 let percentAchieved = stats.valid > 0 ? Math.round((stats.achieved / stats.valid) * 100) : 0;
                 let percentFailed = stats.valid > 0 ? Math.round((stats.failed / stats.valid) * 100) : 0;
-
                 html += `
                     <tr class="hover:bg-slate-50 transition border-b border-slate-100">
                         <td class="px-5 py-4 font-bold text-slate-700">${reg}</td>
@@ -1075,24 +1006,20 @@
                         <td class="px-5 py-4 text-orange-600 font-bold">${stats.failed}</td>
                         <td class="px-5 py-4 text-sm text-slate-500 font-medium">${percentFailed}%</td>
                         <td class="px-5 py-4 font-bold text-red-500 bg-slate-50">${stats.excludedNew > 0 ? stats.excludedNew : '-'}</td>
-                    </tr>
-                `;
+                    </tr>`;
             });
-
-            if (sortedRegions.length === 0) {
-                html = `<tr><td colspan="7" class="text-center py-8 text-slate-500">لا توجد بيانات (ربما تم استبعاد كافة الأقاليم).</td></tr>`;
-            }
-
-            const tbody = document.getElementById('monthlyProgressTableBody');
-            if (tbody) tbody.innerHTML = html;
+            if (sortedRegions.length === 0) html = `<tr><td colspan="7" class="text-center py-8 text-slate-500">لا توجد بيانات.</td></tr>`;
+            const tbody = document.getElementById('monthlyProgressTableBody'); if (tbody) tbody.innerHTML = html;
         }
 
         function buildFilterUI() {
             let selectHtml = '<option value="">كل الأقاليم</option>';
             let checksHtml = '';
+            let supFilterHtml = '<option value="">جميع القطاعات / الأقاليم</option>';
             
             Array.from(globalData.regionsSet).sort().forEach(reg => {
                 selectHtml += `<option value="${reg}">${reg}</option>`;
+                supFilterHtml += `<option value="${reg}">${reg}</option>`;
                 checksHtml += `
                     <label class="flex items-center space-x-2 space-x-reverse bg-white border rounded-lg px-4 py-2 cursor-pointer hover:bg-slate-50 transition shadow-sm">
                         <input type="checkbox" checked value="${reg}" onchange="toggleRegionExclusion(this)" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
@@ -1101,6 +1028,7 @@
                 `;
             });
             document.getElementById('filterRegion').innerHTML = selectHtml;
+            document.getElementById('supRegionFilter').innerHTML = supFilterHtml;
             document.getElementById('regionExclusionContainer').innerHTML = checksHtml;
         }
 
@@ -1141,13 +1069,128 @@
             const missingBody = document.getElementById('missingTableBody');
             if(missingBody) missingBody.innerHTML = globalData.missingEmployees.map(e => `<tr><td class="px-6 py-4 font-bold">${e.id}</td><td class="px-6 py-4">${e.name}</td><td class="px-6 py-4 font-bold text-indigo-600">${e.totalCerts}</td></tr>`).join('');
             
-            const excludedCount = document.getElementById('excludedCount');
-            if(excludedCount) excludedCount.innerText = globalData.excludedEmployees.length;
-            
-            const missingCount = document.getElementById('missingCount');
-            if(missingCount) missingCount.innerText = globalData.missingEmployees.length;
+            const excludedCount = document.getElementById('excludedCount'); if(excludedCount) excludedCount.innerText = globalData.excludedEmployees.length;
+            const missingCount = document.getElementById('missingCount'); if(missingCount) missingCount.innerText = globalData.missingEmployees.length;
 
             updateAnalysisUI();
+            updateSupervisorsTab(); 
+        }
+
+        let currentSupervisorsData = [];
+
+        function updateSupervisorsTab() {
+            let supRegion = document.getElementById('supRegionFilter').value;
+            let supSearch = document.getElementById('supSearchFilter').value.toLowerCase();
+            
+            let supStats = {};
+            
+            globalData.allActive.forEach(emp => {
+                if (globalData.excludedRegions.has(emp.region)) return;
+                if (supRegion && emp.region !== supRegion) return;
+                
+                let supName = cleanString(emp.supervisor);
+                if (!supName) supName = "بدون مشرف";
+
+                if (supSearch && !supName.toLowerCase().includes(supSearch)) return;
+
+                if (!supStats[supName]) {
+                    supStats[supName] = { 
+                        name: supName, region: emp.region, total: 0, 
+                        over20: 0, less20: 0, zero: 0, oldOver20: 0, employees: [] 
+                    };
+                }
+
+                let s = supStats[supName];
+                s.total++;
+                s.employees.push(emp);
+
+                if (emp.totalCerts >= 20) s.over20++;
+                else if (emp.totalCerts > 0) s.less20++;
+                else s.zero++;
+
+                if (emp.oldTotalCerts >= 20) s.oldOver20++;
+            });
+
+            currentSupervisorsData = Object.values(supStats).sort((a, b) => b.total - a.total);
+
+            let html = '';
+            currentSupervisorsData.forEach(s => {
+                let diff = s.over20 - s.oldOver20;
+                let diffHtml = '-';
+                if (globalData.hasOldData) {
+                    if (diff > 0) diffHtml = `<span class="text-emerald-600 font-bold"><i class="fas fa-arrow-up"></i> +${diff}</span>`;
+                    else if (diff < 0) diffHtml = `<span class="text-red-600 font-bold"><i class="fas fa-arrow-down"></i> ${diff}</span>`;
+                    else diffHtml = `<span class="text-slate-400 font-bold">= 0</span>`;
+                } else {
+                    diffHtml = `<span class="text-slate-300 text-xs">لا يوجد قديم</span>`;
+                }
+
+                html += `
+                    <tr class="hover:bg-blue-50 transition border-b border-slate-100 cursor-pointer group" onclick="showSupervisorDetails('${s.name}', '${s.region}')">
+                        <td class="px-5 py-4 font-bold text-blue-700 group-hover:text-blue-900">${s.name}</td>
+                        <td class="px-5 py-4 text-slate-500">${s.region}</td>
+                        <td class="px-5 py-4 font-bold text-lg">${s.total}</td>
+                        <td class="px-5 py-4 text-emerald-600 font-bold">${s.over20}</td>
+                        <td class="px-5 py-4 text-orange-600 font-bold">${s.less20}</td>
+                        <td class="px-5 py-4 text-red-600 font-bold">${s.zero}</td>
+                        <td class="px-5 py-4">${diffHtml}</td>
+                    </tr>
+                `;
+            });
+
+            if(currentSupervisorsData.length === 0) html = `<tr><td colspan="7" class="text-center py-8 text-slate-500">لا يوجد مشرفين مطابقين للبحث.</td></tr>`;
+            
+            document.getElementById('supervisorsTableBody').innerHTML = html;
+        }
+
+        function showSupervisorDetails(supName, regionName) {
+            let supData = currentSupervisorsData.find(s => s.name === supName && s.region === regionName);
+            if (!supData) return;
+
+            document.getElementById('modalSupName').innerText = supName;
+            document.getElementById('modalSupRegion').innerHTML = `<i class="fas fa-map-marker-alt text-indigo-400"></i> ${regionName}`;
+            
+            document.getElementById('mTotal').innerText = supData.total;
+            document.getElementById('mOver20').innerText = supData.over20;
+            document.getElementById('mLess20').innerText = supData.less20;
+            document.getElementById('mZero').innerText = supData.zero;
+
+            let html = supData.employees.map(emp => {
+                let certCls = emp.totalCerts >= 20 ? "text-emerald-600 font-bold" : (emp.totalCerts > 0 ? "text-orange-600 font-bold" : "text-red-600 font-bold");
+                return `
+                    <tr class="hover:bg-slate-50 border-b border-slate-100">
+                        <td class="px-4 py-3 text-slate-600 font-bold">${emp.id}</td>
+                        <td class="px-4 py-3 text-slate-800">${emp.name}</td>
+                        <td class="px-4 py-3 text-slate-500 text-xs" dir="ltr">${formatDateDisplay(emp.hireDate)}</td>
+                        <td class="px-4 py-3 ${certCls}">${emp.totalCerts}</td>
+                        <td class="px-4 py-3 text-slate-400 font-medium">${globalData.hasOldData ? emp.oldTotalCerts : '-'}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('modalEmpTableBody').innerHTML = html;
+            document.getElementById('supervisorModal').style.display = 'flex';
+        }
+
+        function closeSupervisorDetails() {
+            document.getElementById('supervisorModal').style.display = 'none';
+        }
+
+        function exportSupervisorsData() {
+            if (currentSupervisorsData.length === 0) return;
+            let wb = XLSX.utils.book_new();
+            let aoa = [["اسم المشرف", "القطاع / الإقليم", "إجمالي البائعين", "أكملوا (20+)", "أقل من 20", "أصفار (بدون)"]];
+            if(globalData.hasOldData) aoa[0].push("المكملين في السابق", "مقدار التقدم");
+
+            currentSupervisorsData.forEach(s => {
+                let row = [s.name, s.region, s.total, s.over20, s.less20, s.zero];
+                if(globalData.hasOldData) {
+                    row.push(s.oldOver20, s.over20 - s.oldOver20);
+                }
+                aoa.push(row);
+            });
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), "تقييم المشرفين");
+            XLSX.writeFile(wb, "تقرير_تقييم_المشرفين.xlsx");
         }
 
         function renderTable(prefix, dataArray) {
@@ -1175,7 +1218,7 @@
                 let certCls = emp.totalCerts >= 20 ? "bg-emerald-100 text-emerald-800" : (emp.totalCerts > 0 ? "bg-blue-100 text-blue-800" : "bg-red-100 text-red-800");
 
                 return `
-                    <tr class="hover:bg-slate-50 transition">
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
                         <td class="px-4 py-3 font-bold text-slate-700">${emp.id}</td>
                         <td class="px-4 py-3 font-medium text-slate-800 truncate max-w-[200px]" title="${emp.name}">${emp.name}</td>
                         <td class="px-4 py-3 text-slate-500 text-xs" dir="ltr">${formatDateDisplay(emp.hireDate)}</td>
@@ -1190,11 +1233,8 @@
             let idBody = prefix === 'active' ? 'activeTableBody' : `${prefix}Body`;
             let idCount = prefix === 'active' ? 'activeCount' : `${prefix}Count`;
             
-            const bodyEl = document.getElementById(idBody);
-            if(bodyEl) bodyEl.innerHTML = bodyHtml;
-            
-            const countEl = document.getElementById(idCount);
-            if(countEl) countEl.innerText = dataArray.length;
+            const bodyEl = document.getElementById(idBody); if(bodyEl) bodyEl.innerHTML = bodyHtml;
+            const countEl = document.getElementById(idCount); if(countEl) countEl.innerText = dataArray.length;
         }
 
         function renderNonCertTable(dataArray) {
@@ -1204,24 +1244,19 @@
                 <th class="px-4 py-4 font-semibold uppercase">الإقليم</th>
             `;
             nonCertCoursesKeys.forEach(c => headerHtml += `<th class="px-2 py-4 font-medium text-xs bg-indigo-50 border-r border-white">${c}</th>`);
-            
-            const headerEl = document.getElementById('nonCertHeader');
-            if(headerEl) headerEl.innerHTML = headerHtml;
+            const headerEl = document.getElementById('nonCertHeader'); if(headerEl) headerEl.innerHTML = headerHtml;
 
             let bodyHtml = dataArray.map(emp => {
                 let coursesHtml = nonCertCoursesKeys.map(c => {
                     let val = emp.nonCertProgress[c];
-                    let display = "";
-                    let cls = "text-slate-400";
+                    let display = ""; let cls = "text-slate-400";
                     if (val !== null) {
                         display = val + "%";
                         if (val === 100) cls = "text-emerald-600 font-bold bg-emerald-50";
                         else if (val >= 50) cls = "text-blue-600 font-bold bg-blue-50";
                         else if (val > 0) cls = "text-orange-600 font-bold bg-orange-50";
                         else cls = "text-red-500 font-bold bg-red-50"; 
-                    } else {
-                        display = "-"; 
-                    }
+                    } else { display = "-"; }
                     return `<td class="px-2 py-3 whitespace-nowrap text-center ${cls}">${display}</td>`;
                 }).join('');
 
@@ -1234,35 +1269,25 @@
                     </tr>
                 `;
             }).join('');
-
-            const bodyEl = document.getElementById('nonCertTableBody');
-            if(bodyEl) bodyEl.innerHTML = bodyHtml;
-            
-            const countEl = document.getElementById('nonCertCount');
-            if(countEl) countEl.innerText = dataArray.length;
+            const bodyEl = document.getElementById('nonCertTableBody'); if(bodyEl) bodyEl.innerHTML = bodyHtml;
+            const countEl = document.getElementById('nonCertCount'); if(countEl) countEl.innerText = dataArray.length;
         }
 
         function renderEliteTable(dataArray) {
-            // فلترة لعرض من هم مسجلين في دورات النخبة فقط (الـ 240 اسم تقريباً)
-            let eliteData = dataArray.filter(emp => emp.eliteAssigned);
+            let c1Key = eliteCoursesKeys[0]; let c2Key = eliteCoursesKeys[1];
+            
+            // --- فلترة الموظفين المستهدفين بالنخبة فقط ---
+            let eliteTargets = dataArray.filter(emp => emp.isEliteTarget);
 
-            let c1Key = eliteCoursesKeys[0];
-            let c2Key = eliteCoursesKeys[1];
-
-            let bodyHtml = eliteData.map(emp => {
+            let bodyHtml = eliteTargets.map(emp => {
                 let hasC1 = c1Key ? emp.eliteProgress[c1Key] : false;
                 let hasC2 = c2Key ? emp.eliteProgress[c2Key] : false;
-
                 let completedCount = (hasC1 ? 1 : 0) + (hasC2 ? 1 : 0);
                 
                 let statusHtml = '';
-                if (completedCount === 2) {
-                    statusHtml = `<span class="bg-emerald-100 text-emerald-700 font-bold px-3 py-1 rounded-full text-xs"><i class="fas fa-check-double ml-1"></i> استكمل بالكامل (2)</span>`;
-                } else if (completedCount === 1) {
-                    statusHtml = `<span class="bg-orange-100 text-orange-700 font-bold px-3 py-1 rounded-full text-xs"><i class="fas fa-exclamation-circle ml-1"></i> جزء (1)</span>`;
-                } else {
-                    statusHtml = `<span class="bg-red-100 text-red-700 font-bold px-3 py-1 rounded-full text-xs"><i class="fas fa-times-circle ml-1"></i> لم يستكمل (0)</span>`;
-                }
+                if (completedCount === 2) statusHtml = `<span class="bg-emerald-100 text-emerald-700 font-bold px-3 py-1 rounded-full text-xs"><i class="fas fa-check-double ml-1"></i> استكمل بالكامل (2)</span>`;
+                else if (completedCount === 1) statusHtml = `<span class="bg-orange-100 text-orange-700 font-bold px-3 py-1 rounded-full text-xs"><i class="fas fa-exclamation-circle ml-1"></i> جزء (1)</span>`;
+                else statusHtml = `<span class="bg-red-100 text-red-700 font-bold px-3 py-1 rounded-full text-xs"><i class="fas fa-times-circle ml-1"></i> لم يستكمل (0)</span>`;
 
                 return `
                     <tr class="hover:bg-yellow-50 transition border-b border-slate-100">
@@ -1275,12 +1300,12 @@
                     </tr>
                 `;
             }).join('');
-
-            const bodyEl = document.getElementById('eliteTableBody');
-            if (bodyEl) bodyEl.innerHTML = bodyHtml;
-
-            const countEl = document.getElementById('eliteCount');
-            if(countEl) countEl.innerText = eliteData.length;
+            
+            if (eliteTargets.length === 0) {
+                bodyHtml = `<tr><td colspan="6" class="text-center py-8 text-slate-500">لا توجد بيانات لموظفي النخبة في هذا الفلتر.</td></tr>`;
+            }
+            
+            const bodyEl = document.getElementById('eliteTableBody'); if (bodyEl) bodyEl.innerHTML = bodyHtml;
         }
 
         function renderComparisonTable(dataArray) {
@@ -1300,11 +1325,7 @@
             let regionStats = {};
             dataArray.forEach(emp => {
                 if (globalData.excludedRegions.has(emp.region)) return;
-                
-                if (!regionStats[emp.region]) {
-                    regionStats[emp.region] = { total: 0, oldOver20: 0, newOver20: 0 };
-                }
-                
+                if (!regionStats[emp.region]) regionStats[emp.region] = { total: 0, oldOver20: 0, newOver20: 0 };
                 let stats = regionStats[emp.region];
                 stats.total++;
                 if (emp.oldTotalCerts >= 20) stats.oldOver20++;
@@ -1313,12 +1334,12 @@
 
             let html = `
                 <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
-                    <thead class="bg-purple-800 text-white">
+                    <thead class="bg-slate-100 text-slate-800 border-b border-slate-200">
                         <tr>
                             <th class="px-5 py-4 font-semibold tracking-wider">الإقليم</th>
                             <th class="px-5 py-4 font-semibold tracking-wider">إجمالي الموظفين المعتمدين</th>
-                            <th class="px-5 py-4 font-semibold text-purple-200">التقرير السابق (أكملوا 20)</th>
-                            <th class="px-5 py-4 font-semibold text-emerald-300">التقرير الحالي (أكملوا 20)</th>
+                            <th class="px-5 py-4 font-semibold text-purple-600">التقرير السابق (أكملوا 20)</th>
+                            <th class="px-5 py-4 font-semibold text-emerald-600">التقرير الحالي (أكملوا 20)</th>
                             <th class="px-5 py-4 font-semibold">نسبة التحسن (بناءً على النسبة)</th>
                         </tr>
                     </thead>
@@ -1326,7 +1347,6 @@
             `;
 
             let sortedRegions = Object.keys(regionStats).sort();
-            
             sortedRegions.forEach(reg => {
                 let s = regionStats[reg];
                 let oldPct = s.total > 0 ? (s.oldOver20 / s.total) * 100 : 0;
@@ -1335,13 +1355,9 @@
                 let diffCount = s.newOver20 - s.oldOver20;
 
                 let diffHtml = '';
-                if (diffPct > 0) {
-                    diffHtml = `<span class="text-emerald-600 font-bold bg-emerald-50 px-2 py-1 rounded"><i class="fas fa-arrow-up ml-1"></i> ${diffPct.toFixed(1)}% (+${diffCount} موظف)</span>`;
-                } else if (diffPct < 0) {
-                    diffHtml = `<span class="text-red-600 font-bold bg-red-50 px-2 py-1 rounded"><i class="fas fa-arrow-down ml-1"></i> ${Math.abs(diffPct).toFixed(1)}% (${diffCount} موظف)</span>`;
-                } else {
-                    diffHtml = `<span class="text-slate-500 font-medium bg-slate-50 px-2 py-1 rounded"><i class="fas fa-equals ml-1"></i> 0% (لا تغيير)</span>`;
-                }
+                if (diffPct > 0) diffHtml = `<span class="text-emerald-600 font-bold bg-emerald-50 px-2 py-1 rounded"><i class="fas fa-arrow-up ml-1"></i> ${diffPct.toFixed(1)}% (+${diffCount} موظف)</span>`;
+                else if (diffPct < 0) diffHtml = `<span class="text-red-600 font-bold bg-red-50 px-2 py-1 rounded"><i class="fas fa-arrow-down ml-1"></i> ${Math.abs(diffPct).toFixed(1)}% (${diffCount} موظف)</span>`;
+                else diffHtml = `<span class="text-slate-500 font-medium bg-slate-50 px-2 py-1 rounded"><i class="fas fa-equals ml-1"></i> 0% (لا تغيير)</span>`;
 
                 html += `
                     <tr class="hover:bg-purple-50 transition border-b border-slate-100">
@@ -1354,31 +1370,17 @@
                 `;
             });
 
-            if (sortedRegions.length === 0) {
-                html += `<tr><td colspan="5" class="text-center py-8 text-slate-500">تم استبعاد كافة الأقاليم.</td></tr>`;
-            }
-
+            if (sortedRegions.length === 0) html += `<tr><td colspan="5" class="text-center py-8 text-slate-500">تم استبعاد كافة الأقاليم.</td></tr>`;
             html += `</tbody></table>`;
             container.innerHTML = html;
         }
 
-
         function updateAnalysisUI() {
-            let analysis = {
-                active: 0,
-                tenure: { less3: 0, between3and24: 0, over24: 0 },
-                certs: { over20: 0, less20: 0, zero: 0 },
-                regions: {},
-                nonCerts: {}
-            };
-
-            nonCertCoursesKeys.forEach(c => {
-                analysis.nonCerts[c] = { totalTaken: 0, p100: 0, p50to99: 0, pLess50: 0, p0: 0, pNull: 0 };
-            });
+            let analysis = { active: 0, tenure: { less3: 0, between3and24: 0, over24: 0 }, certs: { over20: 0, less20: 0, zero: 0 }, regions: {}, nonCerts: {} };
+            nonCertCoursesKeys.forEach(c => analysis.nonCerts[c] = { totalTaken: 0, p100: 0, p50to99: 0, pLess50: 0, p0: 0, pNull: 0 });
 
             globalData.allActive.forEach(emp => {
                 if (globalData.excludedRegions.has(emp.region)) return; 
-
                 analysis.active++;
                 
                 if (emp.tenureMonths >= 0) {
@@ -1391,24 +1393,18 @@
                 else if (emp.totalCerts > 0) analysis.certs.less20++;
                 else analysis.certs.zero++;
 
-                if (!analysis.regions[emp.region]) {
-                    analysis.regions[emp.region] = { total: 0, over20: 0, less20: 0, zero: 0, employees: [] };
-                }
+                if (!analysis.regions[emp.region]) analysis.regions[emp.region] = { total: 0, over20: 0, less20: 0, zero: 0, employees: [] };
                 
                 let regStats = analysis.regions[emp.region];
-                regStats.total++;
-                regStats.employees.push(emp);
+                regStats.total++; regStats.employees.push(emp);
                 
                 if (emp.totalCerts >= 20) regStats.over20++;
                 else if (emp.totalCerts > 0) regStats.less20++;
                 else regStats.zero++;
 
                 nonCertCoursesKeys.forEach(c => {
-                    let p = emp.nonCertProgress[c];
-                    let stats = analysis.nonCerts[c];
-                    
+                    let p = emp.nonCertProgress[c]; let stats = analysis.nonCerts[c];
                     if (p !== null) stats.totalTaken++;
-
                     if (p === 100) stats.p100++;
                     else if (p >= 50 && p < 100) stats.p50to99++;
                     else if (p > 0 && p < 50) stats.pLess50++;
@@ -1417,26 +1413,17 @@
                 });
             });
 
-            const uis = {
-                'statActive': analysis.active,
-                'statExcluded': globalData.excludedEmployees.length,
-                'statMissing': globalData.missingEmployees.length,
-                'statLess3': analysis.tenure.less3,
-                'stat3to2': analysis.tenure.between3and24,
-                'statOver2': analysis.tenure.over24,
-                'statCert20': analysis.certs.over20,
-                'statCertLess20': analysis.certs.less20,
-                'statCert0': analysis.certs.zero
-            };
+            document.getElementById('statActive').innerText = analysis.active;
+            document.getElementById('statExcluded').innerText = globalData.excludedEmployees.length;
+            document.getElementById('statMissing').innerText = globalData.missingEmployees.length;
+            document.getElementById('statLess3').innerText = analysis.tenure.less3;
+            document.getElementById('stat3to2').innerText = analysis.tenure.between3and24;
+            document.getElementById('statOver2').innerText = analysis.tenure.over24;
+            document.getElementById('statCert20').innerText = analysis.certs.over20;
+            document.getElementById('statCertLess20').innerText = analysis.certs.less20;
+            document.getElementById('statCert0').innerText = analysis.certs.zero;
 
-            for(const [id, val] of Object.entries(uis)) {
-                const el = document.getElementById(id);
-                if(el) el.innerText = val;
-            }
-
-            let regHtml = '';
-            let exportBtnsHtml = '';
-            
+            let regHtml = ''; let exportBtnsHtml = '';
             let sortedRegions = Object.keys(analysis.regions).sort();
             
             sortedRegions.forEach(reg => {
@@ -1457,7 +1444,6 @@
                         <td class="px-5 py-4 text-sm text-slate-400">${p0}%</td>
                     </tr>
                 `;
-
                 exportBtnsHtml += `
                     <button onclick="exportRegion('${reg}')" class="bg-white hover:bg-indigo-50 text-indigo-700 text-sm font-medium py-2 px-4 rounded border border-indigo-200 transition shadow-sm">
                         <i class="fas fa-download mr-1"></i> ${reg}
@@ -1465,12 +1451,8 @@
                 `;
             });
             
-            if (sortedRegions.length === 0) {
-                regHtml = `<tr><td colspan="8" class="text-center py-8 text-slate-500">تم استبعاد كافة الأقاليم.</td></tr>`;
-            }
-            
-            const regionBody = document.getElementById('regionAnalysisTableBody');
-            if(regionBody) regionBody.innerHTML = regHtml;
+            if (sortedRegions.length === 0) regHtml = `<tr><td colspan="8" class="text-center py-8 text-slate-500">تم استبعاد كافة الأقاليم.</td></tr>`;
+            const regionBody = document.getElementById('regionAnalysisTableBody'); if(regionBody) regionBody.innerHTML = regHtml;
 
             let nonCertHtml = '';
             nonCertCoursesKeys.forEach(c => {
@@ -1487,17 +1469,14 @@
                     </tr>
                 `;
             });
-            const nonCertBody = document.getElementById('nonCertAnalysisTableBody');
-            if(nonCertBody) nonCertBody.innerHTML = nonCertHtml;
+            const nonCertBody = document.getElementById('nonCertAnalysisTableBody'); if(nonCertBody) nonCertBody.innerHTML = nonCertHtml;
             
             let downloadAllBtn = `
                 <button onclick="exportAllData()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-6 rounded-lg shadow transition transform hover:-translate-y-0.5">
                     <i class="fas fa-file-excel ml-2"></i> تحميل الكل (مجمع)
                 </button>
             `;
-            const exportContainer = document.getElementById('exportButtonsContainer');
-            if(exportContainer) exportContainer.innerHTML = downloadAllBtn + exportBtnsHtml;
-
+            const exportContainer = document.getElementById('exportButtonsContainer'); if(exportContainer) exportContainer.innerHTML = downloadAllBtn + exportBtnsHtml;
             updateMonthlyProgressTab();
         }
 
@@ -1506,7 +1485,6 @@
             let header = ["الرقم الوظيفي", "الاسم", "تاريخ التعيين", "المشرف", "مدير الإقليم", "الإقليم", "المدة (أشهر)", "إجمالي الشهادات"];
             targetMonthsKeys.forEach(m => header.push(m.replace('-','/')));
             aoa.push(header);
-
             employeesArray.forEach(emp => {
                 let row = [ emp.id, emp.name, formatDateDisplay(emp.hireDate), emp.supervisor, emp.manager, emp.region, emp.tenureMonths, emp.totalCerts ];
                 targetMonthsKeys.forEach(m => row.push(emp.monthsData[m]));
@@ -1517,46 +1495,33 @@
 
         function exportEliteData() {
             let wb = XLSX.utils.book_new();
-            // فلترة الموظفين لتصدير الذين لهم علاقة بدورات النخبة فقط
-            let validActive = globalData.allActive.filter(e => !globalData.excludedRegions.has(e.region) && e.eliteAssigned);
             
-            let c1Key = eliteCoursesKeys[0] || "دورة 1";
-            let c2Key = eliteCoursesKeys[1] || "دورة 2";
-
+            // --- فلترة الموظفين المستهدفين بالنخبة فقط لتصديرهم للإكسيل ---
+            let validActive = globalData.allActive.filter(e => !globalData.excludedRegions.has(e.region) && e.isEliteTarget);
+            
+            let c1Key = eliteCoursesKeys[0] || "دورة 1"; let c2Key = eliteCoursesKeys[1] || "دورة 2";
             let aoa = [["الرقم الوظيفي", "الاسم", "الإقليم", c1Key, c2Key, "مجموع المستكمل", "الحالة الوصفية"]];
             
             validActive.forEach(emp => {
                 let hasC1 = eliteCoursesKeys[0] ? emp.eliteProgress[eliteCoursesKeys[0]] : false;
                 let hasC2 = eliteCoursesKeys[1] ? emp.eliteProgress[eliteCoursesKeys[1]] : false;
                 let count = (hasC1 ? 1 : 0) + (hasC2 ? 1 : 0);
-                
                 let desc = count === 2 ? "استكمل بالكامل" : (count === 1 ? "جزء" : "لم يستكمل");
-                
-                aoa.push([
-                    emp.id, emp.name, emp.region,
-                    hasC1 ? "نعم" : "لا", hasC2 ? "نعم" : "لا",
-                    count, desc
-                ]);
+                aoa.push([emp.id, emp.name, emp.region, hasC1 ? "نعم" : "لا", hasC2 ? "نعم" : "لا", count, desc]);
             });
-
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), "تقرير دورات النخبة");
             XLSX.writeFile(wb, "تقرير_دورات_النخبة.xlsx");
         }
 
         function exportAllData() {
             let wb = XLSX.utils.book_new();
-            
             let validActive = globalData.allActive.filter(e => !globalData.excludedRegions.has(e.region));
-            
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(generateEmployeeAOA(validActive)), "جميع البائعين المعتمدين");
             
             let nonCertAOA = [["الرقم الوظيفي", "الاسم", "الإقليم", ...nonCertCoursesKeys]];
             validActive.forEach(emp => {
                 let row = [emp.id, emp.name, emp.region];
-                nonCertCoursesKeys.forEach(c => {
-                    let p = emp.nonCertProgress[c];
-                    row.push(p !== null ? p + "%" : "-");
-                });
+                nonCertCoursesKeys.forEach(c => { let p = emp.nonCertProgress[c]; row.push(p !== null ? p + "%" : "-"); });
                 nonCertAOA.push(row);
             });
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(nonCertAOA), "دورات بدون شهادات");
@@ -1574,20 +1539,12 @@
             validActive.forEach(emp => {
                 if (!tempRegions[emp.region]) tempRegions[emp.region] = { total: 0, over20: 0, less20: 0, zero: 0 };
                 let r = tempRegions[emp.region];
-                r.total++;
-                if (emp.totalCerts >= 20) r.over20++;
-                else if (emp.totalCerts > 0) r.less20++;
-                else r.zero++;
+                r.total++; if (emp.totalCerts >= 20) r.over20++; else if (emp.totalCerts > 0) r.less20++; else r.zero++;
             });
             
             for (let reg in tempRegions) {
                 let s = tempRegions[reg];
-                analysisAOA.push([
-                    reg, s.total, 
-                    s.over20, (s.total?Math.round((s.over20/s.total)*100):0)+'%',
-                    s.less20, (s.total?Math.round((s.less20/s.total)*100):0)+'%',
-                    s.zero, (s.total?Math.round((s.zero/s.total)*100):0)+'%'
-                ]);
+                analysisAOA.push([reg, s.total, s.over20, (s.total?Math.round((s.over20/s.total)*100):0)+'%', s.less20, (s.total?Math.round((s.less20/s.total)*100):0)+'%', s.zero, (s.total?Math.round((s.zero/s.total)*100):0)+'%']);
             }
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(analysisAOA), "تحليل الأقاليم المعتمدة");
 
@@ -1612,18 +1569,13 @@
             let nonCertAOA = [["الرقم الوظيفي", "الاسم", "الإقليم", ...nonCertCoursesKeys]];
             employees.forEach(emp => {
                 let row = [emp.id, emp.name, emp.region];
-                nonCertCoursesKeys.forEach(c => {
-                    let p = emp.nonCertProgress[c];
-                    row.push(p !== null ? p + "%" : "-");
-                });
+                nonCertCoursesKeys.forEach(c => { let p = emp.nonCertProgress[c]; row.push(p !== null ? p + "%" : "-"); });
                 nonCertAOA.push(row);
             });
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(nonCertAOA), "دورات بدون شهادات");
 
             let total = employees.length, over20 = 0, less20 = 0, zero = 0;
-            employees.forEach(e => {
-                if (e.totalCerts >= 20) over20++; else if (e.totalCerts > 0) less20++; else zero++;
-            });
+            employees.forEach(e => { if (e.totalCerts >= 20) over20++; else if (e.totalCerts > 0) less20++; else zero++; });
 
             let statAOA = [
                 ["البيان", "العدد", "النسبة المئوية"],
