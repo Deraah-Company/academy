@@ -60,9 +60,14 @@
                     <h3 class="text-2xl font-bold text-slate-800" id="modalSupName">اسم المشرف</h3>
                     <p class="text-slate-500 mt-1" id="modalSupRegion"><i class="fas fa-map-marker-alt text-indigo-400"></i> الإقليم</p>
                 </div>
-                <button onclick="closeSupervisorDetails()" class="text-slate-400 hover:text-red-500 transition focus:outline-none">
-                    <i class="fas fa-times text-2xl"></i>
-                </button>
+                <div class="flex items-center gap-3">
+                    <button onclick="exportCurrentSupervisorModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-lg shadow transition flex items-center gap-2 text-sm">
+                        <i class="fas fa-file-excel"></i> تنزيل Excel
+                    </button>
+                    <button onclick="closeSupervisorDetails()" class="text-slate-400 hover:text-red-500 transition focus:outline-none">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
             </div>
             <div class="p-6 overflow-y-auto" style="max-height: 70vh;">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -970,7 +975,7 @@
                 let manager = row.length > 15 ? cleanString(row[15]) : "";
                 
                 // تجهيز الموظف بالبيانات الأساسية (سواء كان على رأس العمل أم مستبعد)
-                let emp = { id, name, hireDate, status, supervisor, manager, region: determineRegion(manager), totalCerts: 0, oldTotalCerts: 0, monthsData: {}, nonCertProgress: {}, eliteProgress: {}, isEliteTarget: false };
+                let emp = { id, name, hireDate, status, supervisor, manager, region: determineRegion(manager), email: "", totalCerts: 0, oldTotalCerts: 0, monthsData: {}, nonCertProgress: {}, eliteProgress: {}, isEliteTarget: false };
                 targetMonthsKeys.forEach(m => emp.monthsData[m] = 0);
                 nonCertCoursesKeys.forEach(c => emp.nonCertProgress[c] = null);
                 eliteCoursesKeys.forEach(c => emp.eliteProgress[c] = false);
@@ -992,6 +997,11 @@
                 let row = acRows[i];
                 if (!row || row.length < 15) continue;
                 let id = cleanString(row[14]); if (!id) continue;
+                // استخراج الإيميل من عمود G (index 6)
+                let rowEmail = row.length > 6 ? cleanString(row[6]) : "";
+                if (rowEmail && employeeMap[id] && !employeeMap[id].email) {
+                    employeeMap[id].email = rowEmail;
+                }
                 let certValue = row.length > 38 ? cleanString(row[38]) : "-";
                 let courseName = row.length > 1 ? cleanString(row[1]) : "";
                 let courseLower = courseName.toLowerCase();
@@ -1051,7 +1061,8 @@
                     if (!missingMap[id]) {
                         missingMap[id] = { 
                             id, 
-                            name: row.length > 5 ? cleanString(row[5]) : "غير متوفر", 
+                            name: row.length > 5 ? cleanString(row[5]) : "غير متوفر",
+                            email: rowEmail || "",
                             totalCerts: 0, 
                             eliteProgress: {}, 
                             isEliteTarget: false 
@@ -1358,6 +1369,7 @@
         }
 
         let currentSupervisorsData = [];
+        let currentModalSupData = null;
 
         function updateSupervisorsTab() {
             let supRegion = document.getElementById('supRegionFilter').value;
@@ -1427,6 +1439,7 @@
         function showSupervisorDetails(supName, regionName) {
             let supData = currentSupervisorsData.find(s => s.name === supName && s.region === regionName);
             if (!supData) return;
+            currentModalSupData = supData;
 
             document.getElementById('modalSupName').innerText = supName;
             document.getElementById('modalSupRegion').innerHTML = `<i class="fas fa-map-marker-alt text-indigo-400"></i> ${regionName}`;
@@ -1455,6 +1468,24 @@
 
         function closeSupervisorDetails() {
             document.getElementById('supervisorModal').style.display = 'none';
+        }
+
+        function exportCurrentSupervisorModal() {
+            if (!currentModalSupData) return;
+            let wb = XLSX.utils.book_new();
+            let aoa = [["الرقم الوظيفي", "اسم الموظف", "تاريخ التعيين", "الشهادات الحالية", "الشهادات (سابقاً)"]];
+            currentModalSupData.employees.forEach(emp => {
+                aoa.push([
+                    emp.id,
+                    emp.name,
+                    formatDateDisplay(emp.hireDate),
+                    emp.totalCerts,
+                    globalData.hasOldData ? emp.oldTotalCerts : "-"
+                ]);
+            });
+            let sheetName = currentModalSupData.name.substring(0, 25);
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), sheetName);
+            XLSX.writeFile(wb, `تقرير_${currentModalSupData.name}.xlsx`);
         }
 
         function exportSupervisorsData() {
@@ -1837,14 +1868,14 @@
             let validActive = globalData.allActive.filter(e => !globalData.excludedRegions.has(e.region) && e.isEliteTarget);
             
             let c1Key = eliteCoursesKeys[0] || "دورة 1"; let c2Key = eliteCoursesKeys[1] || "دورة 2";
-            let aoa = [["الرقم الوظيفي", "الاسم", "الإقليم", c1Key, c2Key, "مجموع المستكمل", "الحالة الوصفية"]];
+            let aoa = [["الرقم الوظيفي", "الاسم", "الإيميل", "الإقليم", c1Key, c2Key, "مجموع المستكمل", "الحالة الوصفية"]];
             
             validActive.forEach(emp => {
                 let hasC1 = eliteCoursesKeys[0] ? emp.eliteProgress[eliteCoursesKeys[0]] : false;
                 let hasC2 = eliteCoursesKeys[1] ? emp.eliteProgress[eliteCoursesKeys[1]] : false;
                 let count = (hasC1 ? 1 : 0) + (hasC2 ? 1 : 0);
                 let desc = count === 2 ? "استكمل بالكامل" : (count === 1 ? "جزء" : "لم يستكمل");
-                aoa.push([emp.id, emp.name, emp.region, hasC1 ? "نعم" : "لا", hasC2 ? "نعم" : "لا", count, desc]);
+                aoa.push([emp.id, emp.name, emp.email || "", emp.region, hasC1 ? "نعم" : "لا", hasC2 ? "نعم" : "لا", count, desc]);
             });
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), "تقرير دورات النخبة");
             XLSX.writeFile(wb, "تقرير_دورات_النخبة.xlsx");
