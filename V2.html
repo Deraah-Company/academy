@@ -1,0 +1,2055 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منظومة مطابقة القوى والأكاديمية — النسخة المتطورة</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --glass-bg: rgba(255,255,255,0.06);
+            --glass-border: rgba(255,255,255,0.12);
+            --glass-hover: rgba(255,255,255,0.10);
+            --accent: #6366f1;
+            --accent-glow: rgba(99,102,241,0.35);
+            --emerald: #10b981;
+            --amber: #f59e0b;
+            --rose: #f43f5e;
+            --cyan: #06b6d4;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Tajawal', 'Segoe UI', sans-serif;
+            background: #0a0e1a;
+            color: #e2e8f0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ─── Animated Background ─── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(99,102,241,0.18) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 80% 80%, rgba(16,185,129,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 60% 30%, rgba(6,182,212,0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+            animation: bgPulse 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes bgPulse {
+            0% { opacity: 0.8; }
+            100% { opacity: 1; transform: scale(1.03); }
+        }
+
+        .page-wrap { position: relative; z-index: 1; }
+
+        /* ─── Glass Card ─── */
+        .glass {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 1.25rem;
+        }
+
+        .glass-dark {
+            background: rgba(10,14,26,0.7);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 1.25rem;
+        }
+
+        /* ─── Scrollbar ─── */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.8); }
+
+        /* ─── Tabs ─── */
+        .tab-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            padding: 10px 12px;
+            background: rgba(10,14,26,0.6);
+            border-bottom: 1px solid var(--glass-border);
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(200,210,230,0.7);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+            background: transparent;
+        }
+
+        .tab-btn:hover {
+            background: var(--glass-hover);
+            color: #e2e8f0;
+            border-color: var(--glass-border);
+        }
+
+        .tab-btn.active {
+            background: rgba(99,102,241,0.2);
+            border-color: rgba(99,102,241,0.5);
+            color: #a5b4fc;
+            box-shadow: 0 0 16px rgba(99,102,241,0.2);
+        }
+
+        .tab-btn.active-emerald { background: rgba(16,185,129,0.18); border-color: rgba(16,185,129,0.4); color: #6ee7b7; }
+        .tab-btn.active-amber   { background: rgba(245,158,11,0.18); border-color: rgba(245,158,11,0.4); color: #fcd34d; }
+        .tab-btn.active-purple  { background: rgba(168,85,247,0.18); border-color: rgba(168,85,247,0.4); color: #d8b4fe; }
+        .tab-btn.active-rose    { background: rgba(244,63,94,0.18);  border-color: rgba(244,63,94,0.4);  color: #fda4af; }
+        .tab-btn.active-cyan    { background: rgba(6,182,212,0.18);  border-color: rgba(6,182,212,0.4);  color: #67e8f9; }
+
+        .tab-content { display: none; animation: fadeSlideIn 0.35s ease; }
+        .tab-content.active { display: block; }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── Tables ─── */
+        .table-container {
+            max-height: 65vh;
+            overflow: auto;
+            border-radius: 14px;
+            border: 1px solid var(--glass-border);
+            cursor: grab;
+        }
+
+        .table-container:active { cursor: grabbing; }
+        .table-container.is-dragging { user-select: none; }
+
+        table {
+            min-width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(15,20,40,0.95);
+            backdrop-filter: blur(10px);
+            padding: 14px 18px;
+            font-weight: 700;
+            text-align: right;
+            color: #94a3b8;
+            font-size: 12px;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        tbody td {
+            padding: 12px 18px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            color: #cbd5e1;
+        }
+
+        tbody tr:hover td { background: rgba(99,102,241,0.07); }
+        tbody tr:last-child td { border-bottom: none; }
+
+        /* ─── Stat Cards ─── */
+        .stat-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(16px);
+            border-radius: 16px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .stat-card:hover::before { opacity: 1; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+
+        .stat-card.indigo::before { background: radial-gradient(circle at top right, rgba(99,102,241,0.15), transparent 70%); }
+        .stat-card.emerald::before { background: radial-gradient(circle at top right, rgba(16,185,129,0.15), transparent 70%); }
+        .stat-card.amber::before { background: radial-gradient(circle at top right, rgba(245,158,11,0.15), transparent 70%); }
+        .stat-card.rose::before { background: radial-gradient(circle at top right, rgba(244,63,94,0.15), transparent 70%); }
+        .stat-card.cyan::before { background: radial-gradient(circle at top right, rgba(6,182,212,0.15), transparent 70%); }
+        .stat-card.purple::before { background: radial-gradient(circle at top right, rgba(168,85,247,0.15), transparent 70%); }
+
+        /* ─── Badge ─── */
+        .badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .badge-indigo { background: rgba(99,102,241,0.2); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.3); }
+        .badge-emerald { background: rgba(16,185,129,0.2); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3); }
+        .badge-amber { background: rgba(245,158,11,0.2); color: #fcd34d; border: 1px solid rgba(245,158,11,0.3); }
+        .badge-rose { background: rgba(244,63,94,0.2); color: #fda4af; border: 1px solid rgba(244,63,94,0.3); }
+        .badge-slate { background: rgba(100,116,139,0.2); color: #94a3b8; border: 1px solid rgba(100,116,139,0.2); }
+        .badge-cyan { background: rgba(6,182,212,0.2); color: #67e8f9; border: 1px solid rgba(6,182,212,0.3); }
+        .badge-purple { background: rgba(168,85,247,0.2); color: #d8b4fe; border: 1px solid rgba(168,85,247,0.3); }
+
+        /* ─── Buttons ─── */
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 9px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            border: 1px solid transparent;
+        }
+
+        .btn:hover { transform: translateY(-1px); }
+        .btn-indigo { background: rgba(99,102,241,0.25); color: #a5b4fc; border-color: rgba(99,102,241,0.4); }
+        .btn-indigo:hover { background: rgba(99,102,241,0.4); box-shadow: 0 4px 20px rgba(99,102,241,0.3); }
+        .btn-emerald { background: rgba(16,185,129,0.2); color: #6ee7b7; border-color: rgba(16,185,129,0.35); }
+        .btn-emerald:hover { background: rgba(16,185,129,0.35); box-shadow: 0 4px 20px rgba(16,185,129,0.25); }
+        .btn-amber { background: rgba(245,158,11,0.2); color: #fcd34d; border-color: rgba(245,158,11,0.35); }
+        .btn-amber:hover { background: rgba(245,158,11,0.35); box-shadow: 0 4px 20px rgba(245,158,11,0.25); }
+        .btn-blue { background: rgba(59,130,246,0.2); color: #93c5fd; border-color: rgba(59,130,246,0.35); }
+        .btn-blue:hover { background: rgba(59,130,246,0.35); box-shadow: 0 4px 20px rgba(59,130,246,0.25); }
+        .btn-rose { background: rgba(244,63,94,0.2); color: #fda4af; border-color: rgba(244,63,94,0.35); }
+        .btn-rose:hover { background: rgba(244,63,94,0.35); }
+        .btn-ghost { background: var(--glass-bg); color: #94a3b8; border-color: var(--glass-border); }
+        .btn-ghost:hover { background: var(--glass-hover); color: #e2e8f0; }
+
+        /* ─── Drop Zone ─── */
+        .drop-zone {
+            border: 2px dashed rgba(99,102,241,0.3);
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 18px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: rgba(99,102,241,0.7);
+            background: rgba(99,102,241,0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(99,102,241,0.2);
+        }
+
+        /* ─── Loading ─── */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(10,14,26,0.92);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            backdrop-filter: blur(8px);
+        }
+
+        .spinner-ring {
+            width: 70px; height: 70px;
+            border: 3px solid rgba(99,102,241,0.2);
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ─── Modal ─── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(10,14,26,0.85);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: #0f1628;
+            border: 1px solid rgba(99,102,241,0.25);
+            width: 92%;
+            max-width: 1050px;
+            max-height: 92vh;
+            border-radius: 20px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.6), 0 0 80px rgba(99,102,241,0.08);
+            display: flex;
+            flex-direction: column;
+            animation: modalIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.93) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* ─── Input / Select ─── */
+        .glass-input {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            color: #e2e8f0;
+            padding: 9px 14px;
+            font-size: 13px;
+            font-family: 'Tajawal', sans-serif;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .glass-input::placeholder { color: rgba(148,163,184,0.6); }
+        .glass-input:focus {
+            border-color: rgba(99,102,241,0.5);
+            background: rgba(99,102,241,0.08);
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+        }
+
+        select.glass-input option { background: #0f1628; color: #e2e8f0; }
+
+        /* ─── Progress Bar ─── */
+        .progress-bar-outer {
+            background: rgba(255,255,255,0.08);
+            border-radius: 100px;
+            height: 6px;
+            overflow: hidden;
+        }
+        .progress-bar-inner { height: 100%; border-radius: 100px; transition: width 0.8s ease; }
+
+        /* ─── Search Highlight ─── */
+        .highlight { background: rgba(99,102,241,0.3); border-radius: 3px; padding: 0 2px; }
+
+        /* ─── Glow Numbers ─── */
+        .glow-number { text-shadow: 0 0 20px currentColor; }
+
+        /* ─── Timeline Section ─── */
+        .heatmap-cell {
+            width: 32px; height: 32px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .heatmap-cell:hover { transform: scale(1.2); z-index: 10; }
+
+        /* ─── Comparison Dashboard ─── */
+        .compare-bar {
+            height: 12px;
+            border-radius: 100px;
+            transition: width 0.8s ease;
+        }
+
+        /* ─── Tooltip ─── */
+        [data-tip] { position: relative; }
+        [data-tip]:hover::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: calc(100% + 8px);
+            right: 50%;
+            transform: translateX(50%);
+            background: rgba(15,22,42,0.98);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 12px;
+            color: #e2e8f0;
+            white-space: nowrap;
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        /* ─── Checkbox Region ─── */
+        .region-check-label {
+            display: flex; align-items: center; gap: 8px;
+            padding: 7px 14px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            color: #94a3b8;
+            transition: all 0.2s;
+        }
+
+        .region-check-label:hover { background: var(--glass-hover); color: #e2e8f0; }
+        .region-check-label input:checked ~ span { color: #a5b4fc; }
+        .region-check-label:has(input:checked) {
+            border-color: rgba(99,102,241,0.4);
+            background: rgba(99,102,241,0.1);
+        }
+
+        /* ─── Chart styling ─── */
+        canvas { max-width: 100%; }
+
+        /* ─── Animations ─── */
+        .fade-in-up { animation: fadeSlideIn 0.5s ease both; }
+        .delay-1 { animation-delay: 0.05s; }
+        .delay-2 { animation-delay: 0.10s; }
+        .delay-3 { animation-delay: 0.15s; }
+        .delay-4 { animation-delay: 0.20s; }
+
+        /* Drag scroll hint */
+        .drag-hint {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 11px; color: rgba(148,163,184,0.5);
+            margin-bottom: 6px;
+        }
+
+        /* ─── Timeline New sections ─── */
+        .timeline-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 20px;
+        }
+
+        /* ─── Supervisor modal stats ─── */
+        .modal-stat-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        /* Section headings */
+        .section-heading {
+            font-size: 20px;
+            font-weight: 800;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Intro process button */
+        .process-btn {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 800;
+            font-family: 'Tajawal', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 24px rgba(99,102,241,0.4);
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .process-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 36px rgba(99,102,241,0.55);
+        }
+
+        /* Icon circle */
+        .icon-circle {
+            width: 52px; height: 52px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        /* Analysis sub tab */
+        .sub-tab-btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: rgba(148,163,184,0.7);
+            border: 1px solid transparent;
+        }
+        .sub-tab-btn:hover { color: #e2e8f0; background: var(--glass-hover); }
+        .sub-tab-btn.active { color: #a5b4fc; background: rgba(99,102,241,0.15); border-color: rgba(99,102,241,0.35); }
+
+        /* Quick search result count */
+        .search-result-info {
+            font-size: 12px;
+            color: rgba(148,163,184,0.6);
+            margin-top: 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ─── Loading Overlay ─── -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="text-center">
+        <div class="spinner-ring mx-auto mb-6"></div>
+        <h2 class="text-xl font-bold text-slate-200 mb-2">جاري التحليل والمطابقة...</h2>
+        <p class="text-slate-400 text-sm">يرجى الانتظار لحين الانتهاء من معالجة البيانات</p>
+    </div>
+</div>
+
+<!-- ─── Supervisor Detail Modal ─── -->
+<div class="modal-overlay" id="supervisorModal">
+    <div class="modal-content overflow-hidden">
+        <!-- Header -->
+        <div class="flex justify-between items-center p-6 border-b border-white/10">
+            <div>
+                <h3 class="text-xl font-black text-white" id="modalSupName">اسم المشرف</h3>
+                <p class="text-slate-400 mt-1 text-sm" id="modalSupRegion"><i class="fas fa-map-marker-alt text-indigo-400 ml-1"></i> الإقليم</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="exportCurrentSupervisorModal()" class="btn btn-emerald" data-tip="تصدير Excel للمشرف">
+                    <i class="fas fa-file-excel"></i>
+                    <span class="hidden sm:inline">تصدير Excel</span>
+                </button>
+                <button onclick="closeSupervisorDetails()" class="btn btn-rose w-10 h-10 p-0 justify-center">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Stats -->
+        <div class="p-6 overflow-y-auto" style="max-height:72vh;">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="modal-stat-card">
+                    <p class="text-xs text-slate-500 font-bold mb-1">إجمالي الموظفين</p>
+                    <p class="text-3xl font-black text-indigo-400 glow-number" id="mTotal">0</p>
+                </div>
+                <div class="modal-stat-card">
+                    <p class="text-xs text-slate-500 font-bold mb-1">20 شهادة فأكثر</p>
+                    <p class="text-3xl font-black text-emerald-400 glow-number" id="mOver20">0</p>
+                </div>
+                <div class="modal-stat-card">
+                    <p class="text-xs text-slate-500 font-bold mb-1">أقل من 20</p>
+                    <p class="text-3xl font-black text-amber-400 glow-number" id="mLess20">0</p>
+                </div>
+                <div class="modal-stat-card">
+                    <p class="text-xs text-slate-500 font-bold mb-1">بدون شهادات</p>
+                    <p class="text-3xl font-black text-rose-400 glow-number" id="mZero">0</p>
+                </div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr>
+                        <th>الرقم الوظيفي</th>
+                        <th>اسم الموظف</th>
+                        <th>تاريخ التعيين</th>
+                        <th>الشهادات الحالية</th>
+                        <th>الشهادات (سابقاً)</th>
+                    </tr></thead>
+                    <tbody id="modalEmpTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ─── Main Content ─── -->
+<div class="page-wrap max-w-screen-2xl mx-auto px-4 py-8">
+
+    <!-- Header -->
+    <header class="glass mb-8 p-8 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-l from-transparent via-transparent to-indigo-900/20 pointer-events-none"></div>
+        <div class="absolute top-0 left-0 w-72 h-72 bg-indigo-600/10 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl pointer-events-none"></div>
+        <div class="flex flex-col md:flex-row justify-between items-center gap-6 relative z-10">
+            <div>
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="icon-circle bg-indigo-600/20 text-indigo-400">
+                        <i class="fas fa-chart-network"></i>
+                    </div>
+                    <h1 class="text-3xl font-black tracking-tight">
+                        منظومة تحليل <span style="background: linear-gradient(90deg,#818cf8,#6ee7b7); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">الأكاديمية والقوى</span>
+                    </h1>
+                </div>
+                <p class="text-slate-400 text-sm">منصة متطورة لمطابقة بيانات الموظفين، الشهادات، وتحليل الأداء وفترات العمل.</p>
+            </div>
+            <div class="glass-dark px-5 py-3 flex items-center gap-3">
+                <i class="fas fa-calendar-alt text-indigo-400"></i>
+                <span id="currentDateDisplay" class="text-sm font-bold text-slate-300">يتم حساب التعيين بناءً على تاريخ اليوم</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Upload Section -->
+    <section class="glass p-8 mb-8" id="uploadSection">
+        <h2 class="text-lg font-bold text-slate-300 mb-6 flex items-center gap-2">
+            <i class="fas fa-cloud-upload-alt text-indigo-400"></i> رفع ملفات البيانات
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div id="dropZoneWf" class="drop-zone p-6 text-center min-h-[170px] flex flex-col items-center justify-center" onclick="document.getElementById('workforceFile').click()">
+                <div class="icon-circle bg-blue-500/15 text-blue-400 mb-3"><i class="fas fa-users"></i></div>
+                <h3 class="font-bold text-slate-200 mb-1">1. القوى (البائعين)</h3>
+                <p class="text-xs text-slate-500 mb-3">اختر الملف أو اسحبه هنا</p>
+                <span id="wfFileName" class="badge badge-indigo hidden"></span>
+                <input type="file" id="workforceFile" accept=".xlsx,.xls" class="hidden" onchange="handleFileSelect(event,'wfFileName')">
+            </div>
+            <div id="dropZoneAc" class="drop-zone p-6 text-center min-h-[170px] flex flex-col items-center justify-center" onclick="document.getElementById('academyFile').click()">
+                <div class="icon-circle bg-emerald-500/15 text-emerald-400 mb-3"><i class="fas fa-graduation-cap"></i></div>
+                <h3 class="font-bold text-slate-200 mb-1">2. الأكاديمية (الشهادات الحالية)</h3>
+                <p class="text-xs text-slate-500 mb-3">اختر الملف أو اسحبه هنا</p>
+                <span id="acFileName" class="badge badge-emerald hidden"></span>
+                <input type="file" id="academyFile" accept=".xlsx,.xls" class="hidden" onchange="handleFileSelect(event,'acFileName')">
+            </div>
+            <div id="dropZoneOldAc" class="drop-zone p-6 text-center min-h-[170px] flex flex-col items-center justify-center" onclick="document.getElementById('oldAcademyFile').click()">
+                <div class="icon-circle bg-purple-500/15 text-purple-400 mb-3"><i class="fas fa-history"></i></div>
+                <h3 class="font-bold text-slate-200 mb-1">3. الأكاديمية (للمقارنة)</h3>
+                <p class="text-xs text-slate-500 mb-3">اختياري — تقرير قديم للمقارنة</p>
+                <span id="oldAcFileName" class="badge badge-purple hidden"></span>
+                <input type="file" id="oldAcademyFile" accept=".xlsx,.xls" class="hidden" onchange="handleFileSelect(event,'oldAcFileName')">
+            </div>
+        </div>
+
+        <div id="uploadErrorMessage" class="hidden mt-6 bg-rose-500/10 border border-rose-500/30 text-rose-300 px-6 py-4 rounded-xl flex items-center gap-3">
+            <i class="fas fa-exclamation-circle text-rose-400 text-xl"></i>
+            <span id="uploadErrorText" class="font-bold text-sm"></span>
+        </div>
+
+        <div class="mt-8 flex justify-center border-t border-white/08 pt-8">
+            <button onclick="processFiles()" class="process-btn">
+                <i class="fas fa-bolt"></i> معالجة البيانات واستخراج النتائج
+            </button>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <div id="resultsSection" class="glass overflow-hidden hidden">
+
+        <!-- Tab Bar -->
+        <div class="tab-bar" id="mainTabBar">
+            <button class="tab-btn active" onclick="switchTab(event,'activeTab','active')"><i class="fas fa-user-check"></i> على رأس العمل</button>
+            <button class="tab-btn" onclick="switchTab(event,'tenure1Tab','amber')"><i class="fas fa-hourglass-start"></i> أقل من 3 شهور</button>
+            <button class="tab-btn" onclick="switchTab(event,'tenure2Tab','cyan')"><i class="fas fa-hourglass-half"></i> 3 إلى سنتين</button>
+            <button class="tab-btn" onclick="switchTab(event,'tenure3Tab','emerald')"><i class="fas fa-hourglass-end"></i> أكثر من سنتين</button>
+            <button class="tab-btn" onclick="switchTab(event,'excludedTab','rose')"><i class="fas fa-user-times"></i> المستبعدين</button>
+            <button class="tab-btn" onclick="switchTab(event,'missingTab','amber')"><i class="fas fa-user-secret"></i> بالأكاديمية فقط</button>
+            <button class="tab-btn" onclick="switchTab(event,'nonCertTab','cyan')"><i class="fas fa-book-open"></i> دورات بدون شهادات</button>
+            <button class="tab-btn" onclick="switchTab(event,'supervisorsTab','indigo')"><i class="fas fa-sitemap"></i> تقييم المشرفين</button>
+            <button class="tab-btn" onclick="switchTab(event,'analysisTab','purple')"><i class="fas fa-chart-pie"></i> التحليل والإحصائيات</button>
+            <button class="tab-btn" onclick="switchTab(event,'monthlyProgressTab','indigo')"><i class="fas fa-calendar-check"></i> التقدم الشهري</button>
+            <button class="tab-btn" onclick="switchTab(event,'eliteTab','amber')"><i class="fas fa-star"></i> النخبة</button>
+            <button class="tab-btn" onclick="switchTab(event,'comparisonTab','purple')"><i class="fas fa-balance-scale"></i> مقارنة الفترات</button>
+            <button class="tab-btn" onclick="switchTab(event,'timelineTab','rose')"><i class="fas fa-clock"></i> أوقات الذروة</button>
+        </div>
+
+        <div class="p-6 md:p-8">
+
+            <!-- ─── Tab: على رأس العمل ─── -->
+            <div id="activeTab" class="tab-content active">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <h2 class="section-heading">
+                        <i class="fas fa-users text-indigo-400"></i>
+                        جميع الموظفين (على رأس العمل)
+                        <span class="badge badge-indigo" id="activeCount">0</span>
+                    </h2>
+                    <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                        <div class="relative">
+                            <i class="fas fa-search absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm pointer-events-none"></i>
+                            <input type="text" id="searchName" onkeyup="applyActiveFilters()" placeholder="بحث بالاسم أو الرقم أو الإقليم..." class="glass-input pr-10 w-full md:w-72">
+                        </div>
+                        <div class="relative">
+                            <i class="fas fa-filter absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm pointer-events-none"></i>
+                            <select id="filterRegion" onchange="applyActiveFilters()" class="glass-input pr-10 w-full md:w-56 appearance-none">
+                                <option value="">كل الأقاليم</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="drag-hint"><i class="fas fa-arrows-alt-h"></i> اسحب الجدول يميناً أو يساراً للتمرير</div>
+                <div class="table-container" id="tc-active">
+                    <table>
+                        <thead><tr id="activeTableHeader"></tr></thead>
+                        <tbody id="activeTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ─── Tab: أقل من 3 شهور ─── -->
+            <div id="tenure1Tab" class="tab-content">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="section-heading"><i class="fas fa-hourglass-start text-amber-400"></i> موظفون فترة عملهم <span class="text-amber-300">أقل من 3 شهور</span> <span class="badge badge-amber" id="t1Count">0</span></h2>
+                </div>
+                <div class="drag-hint"><i class="fas fa-arrows-alt-h"></i> اسحب الجدول للتمرير</div>
+                <div class="table-container" id="tc-t1">
+                    <table><thead><tr id="t1Header"></tr></thead><tbody id="t1Body"></tbody></table>
+                </div>
+            </div>
+
+            <!-- ─── Tab: 3 إلى سنتين ─── -->
+            <div id="tenure2Tab" class="tab-content">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="section-heading"><i class="fas fa-hourglass-half text-cyan-400"></i> موظفون فترة عملهم <span class="text-cyan-300">من 3 شهور إلى سنتين</span> <span class="badge badge-cyan" id="t2Count">0</span></h2>
+                </div>
+                <div class="drag-hint"><i class="fas fa-arrows-alt-h"></i> اسحب الجدول للتمرير</div>
+                <div class="table-container" id="tc-t2">
+                    <table><thead><tr id="t2Header"></tr></thead><tbody id="t2Body"></tbody></table>
+                </div>
+            </div>
+
+            <!-- ─── Tab: أكثر من سنتين ─── -->
+            <div id="tenure3Tab" class="tab-content">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="section-heading"><i class="fas fa-hourglass-end text-emerald-400"></i> موظفون فترة عملهم <span class="text-emerald-300">أكثر من سنتين</span> <span class="badge badge-emerald" id="t3Count">0</span></h2>
+                </div>
+                <div class="drag-hint"><i class="fas fa-arrows-alt-h"></i> اسحب الجدول للتمرير</div>
+                <div class="table-container" id="tc-t3">
+                    <table><thead><tr id="t3Header"></tr></thead><tbody id="t3Body"></tbody></table>
+                </div>
+            </div>
+
+            <!-- ─── Tab: المستبعدين ─── -->
+            <div id="excludedTab" class="tab-content">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="section-heading"><i class="fas fa-user-times text-rose-400"></i> بيانات الموظفين المستبعدين <span class="badge badge-rose" id="excludedCount">0</span></h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead><tr>
+                            <th>الرقم الوظيفي</th><th>الاسم</th><th>حالة الاستبعاد</th>
+                        </tr></thead>
+                        <tbody id="excludedTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ─── Tab: بالأكاديمية فقط ─── -->
+            <div id="missingTab" class="tab-content">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="section-heading"><i class="fas fa-user-secret text-amber-400"></i> أرقام وظيفية بالأكاديمية وغير موجودة بالقوى <span class="badge badge-amber" id="missingCount">0</span></h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead><tr>
+                            <th>الرقم الوظيفي</th><th>الاسم في الأكاديمية</th><th>عدد الشهادات</th>
+                        </tr></thead>
+                        <tbody id="missingTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ─── Tab: دورات بدون شهادات ─── -->
+            <div id="nonCertTab" class="tab-content">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="section-heading"><i class="fas fa-book-open text-cyan-400"></i> الدورات بدون شهادات (نسبة التقدم) <span class="badge badge-cyan" id="nonCertCount">0</span></h2>
+                </div>
+                <div class="drag-hint"><i class="fas fa-arrows-alt-h"></i> اسحب الجدول للتمرير</div>
+                <div class="table-container" id="tc-nonCert">
+                    <table><thead><tr id="nonCertHeader"></tr></thead><tbody id="nonCertTableBody"></tbody></table>
+                </div>
+            </div>
+
+            <!-- ─── Tab: تقييم المشرفين ─── -->
+            <div id="supervisorsTab" class="tab-content">
+                <div class="glass p-6 mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 class="section-heading mb-1"><i class="fas fa-sitemap text-indigo-400"></i> تقييم المشرفين (حسب القطاع)</h2>
+                        <p class="text-slate-400 text-sm">اضغط على اسم المشرف للتفاصيل الكاملة</p>
+                    </div>
+                    <div class="flex flex-wrap gap-3 items-center w-full md:w-auto">
+                        <div class="relative">
+                            <i class="fas fa-filter absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs pointer-events-none"></i>
+                            <select id="supRegionFilter" onchange="updateSupervisorsTab()" class="glass-input pr-8 appearance-none min-w-[180px]">
+                                <option value="">جميع القطاعات</option>
+                            </select>
+                        </div>
+                        <div class="relative">
+                            <i class="fas fa-search absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs pointer-events-none"></i>
+                            <input type="text" id="supSearchFilter" onkeyup="updateSupervisorsTab()" placeholder="ابحث عن مشرف..." class="glass-input pr-8 w-44">
+                        </div>
+                        <button onclick="exportSupervisorsData()" class="btn btn-blue"><i class="fas fa-file-excel"></i> تصدير Excel</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead><tr>
+                            <th>اسم المشرف</th>
+                            <th>مدير القطاع / الإقليم</th>
+                            <th>إجمالي البائعين</th>
+                            <th style="color:#6ee7b7">أكملوا المستهدف (20+)</th>
+                            <th style="color:#fcd34d">أقل من 20 (عجز)</th>
+                            <th style="color:#fda4af">أصفار (بدون)</th>
+                            <th style="color:#d8b4fe">مقدار التقدم</th>
+                        </tr></thead>
+                        <tbody id="supervisorsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ─── Tab: التحليل والإحصائيات ─── -->
+            <div id="analysisTab" class="tab-content">
+                <!-- Region exclusion -->
+                <div class="glass p-5 mb-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="fas fa-filter text-indigo-400"></i>
+                        <h3 class="font-bold text-slate-200">تضمين / استبعاد الأقاليم من الإحصائية</h3>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-4">قم بإزالة العلامة من الإقليم الذي لا ترغب باحتسابه في الجداول والأرقام.</p>
+                    <div id="regionExclusionContainer" class="flex flex-wrap gap-3"></div>
+                </div>
+
+                <!-- Export -->
+                <div class="glass p-5 mb-6 flex flex-wrap gap-4 items-center justify-between">
+                    <h3 class="font-bold text-slate-200 flex items-center gap-2"><i class="fas fa-download text-emerald-400"></i> تصدير البيانات الشامل (Excel)</h3>
+                    <div class="flex flex-wrap gap-2" id="exportButtonsContainer">
+                        <button onclick="exportAllData()" class="btn btn-emerald"><i class="fas fa-file-excel"></i> تحميل الكل (مجمع)</button>
+                    </div>
+                </div>
+
+                <!-- Stat Cards -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
+                    <div class="stat-card indigo fade-in-up">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="icon-circle bg-indigo-500/15 text-indigo-400 text-base"><i class="fas fa-chart-pie"></i></div>
+                            <h3 class="font-bold text-slate-300">الحالة العامة (مفلتر)</h3>
+                        </div>
+                        <ul class="space-y-3 text-sm">
+                            <li class="flex justify-between items-center"><span class="text-slate-400">على رأس العمل:</span> <span id="statActive" class="badge badge-indigo">0</span></li>
+                            <li class="flex justify-between items-center"><span class="text-slate-500 text-xs">المستبعدين:</span> <span id="statExcluded" class="text-slate-500 font-bold">0</span></li>
+                            <li class="flex justify-between items-center"><span class="text-slate-500 text-xs">بالأكاديمية فقط:</span> <span id="statMissing" class="text-slate-500 font-bold">0</span></li>
+                        </ul>
+                    </div>
+                    <div class="stat-card cyan fade-in-up delay-1">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="icon-circle bg-cyan-500/15 text-cyan-400 text-base"><i class="fas fa-clock"></i></div>
+                            <h3 class="font-bold text-slate-300">فترات العمل (مفلتر)</h3>
+                        </div>
+                        <ul class="space-y-3 text-sm">
+                            <li class="flex justify-between items-center"><span class="text-slate-400">أقل من 3 شهور:</span> <span id="statLess3" class="badge badge-amber">0</span></li>
+                            <li class="flex justify-between items-center"><span class="text-slate-400">من 3 شهور إلى سنتين:</span> <span id="stat3to2" class="badge badge-cyan">0</span></li>
+                            <li class="flex justify-between items-center"><span class="text-slate-400">أكثر من سنتين:</span> <span id="statOver2" class="badge badge-emerald">0</span></li>
+                        </ul>
+                    </div>
+                    <div class="stat-card emerald fade-in-up delay-2">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="icon-circle bg-emerald-500/15 text-emerald-400 text-base"><i class="fas fa-award"></i></div>
+                            <h3 class="font-bold text-slate-300">الشهادات (مفلتر)</h3>
+                        </div>
+                        <ul class="space-y-3 text-sm">
+                            <li class="flex justify-between items-center"><span class="text-slate-400">أكملوا 20 فأكثر:</span> <span id="statCert20" class="badge badge-emerald">0</span></li>
+                            <li class="flex justify-between items-center"><span class="text-slate-400">أقل من 20 شهادة:</span> <span id="statCertLess20" class="badge badge-amber">0</span></li>
+                            <li class="flex justify-between items-center"><span class="text-slate-400">بدون شهادات (0):</span> <span id="statCert0" class="badge badge-rose">0</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Sub tabs -->
+                <div class="flex gap-2 mb-5">
+                    <button class="sub-tab-btn active" onclick="switchAnalysisSubTab(event,'certAnalysisSection')"><i class="fas fa-certificate ml-1"></i> تحليل الشهادات</button>
+                    <button class="sub-tab-btn" onclick="switchAnalysisSubTab(event,'nonCertAnalysisSection')"><i class="fas fa-book-open ml-1"></i> الدورات بدون شهادات</button>
+                </div>
+
+                <div id="certAnalysisSection">
+                    <h3 class="font-bold text-slate-300 mb-4 text-base"><i class="fas fa-map-marker-alt text-indigo-400 ml-1"></i> تحليل الأقاليم للشهادات (مبني على 20 شهادة)</h3>
+                    <div class="table-container mb-8">
+                        <table>
+                            <thead><tr>
+                                <th>الإقليم</th><th>إجمالي الموظفين</th>
+                                <th style="color:#6ee7b7">20 شهادة فأكثر</th><th style="color:#6ee7b7">النسبة %</th>
+                                <th style="color:#fcd34d">أقل من 20</th><th style="color:#fcd34d">النسبة %</th>
+                                <th style="color:#fda4af">0 شهادة</th><th style="color:#fda4af">النسبة %</th>
+                            </tr></thead>
+                            <tbody id="regionAnalysisTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="nonCertAnalysisSection" style="display:none;">
+                    <h3 class="font-bold text-slate-300 mb-4 text-base"><i class="fas fa-tasks text-indigo-400 ml-1"></i> إحصائيات الدورات بدون شهادات</h3>
+                    <div class="table-container mb-8">
+                        <table>
+                            <thead><tr>
+                                <th class="w-1/4">اسم الدورة</th>
+                                <th>إجمالي المسجلين</th>
+                                <th style="color:#6ee7b7">اكتمل 100%</th>
+                                <th style="color:#67e8f9">50%–99%</th>
+                                <th style="color:#fcd34d">أقل من 50%</th>
+                                <th style="color:#fda4af">لم يكمل (0%)</th>
+                                <th style="color:#94a3b8">لم يدخل (−)</th>
+                            </tr></thead>
+                            <tbody id="nonCertAnalysisTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── Tab: التقدم الشهري ─── -->
+            <div id="monthlyProgressTab" class="tab-content">
+                <div class="glass p-6 mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 class="section-heading mb-1"><i class="fas fa-calendar-check text-indigo-400"></i> نسبة التقدم الشهري التراكمي</h2>
+                        <p class="text-slate-400 text-sm">الحد الأقصى للمستهدف لا يتجاوز <span class="text-rose-300 font-bold">20 شهادة</span></p>
+                    </div>
+                    <div class="flex items-center gap-3 glass-dark p-2 rounded-xl">
+                        <label class="font-bold text-slate-400 text-sm whitespace-nowrap pl-2">اختر الشهر:</label>
+                        <select id="progressMonthSelect" onchange="updateMonthlyProgressTab()" class="glass-input appearance-none w-32 cursor-pointer font-bold"></select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="stat-card indigo"><div class="flex items-center gap-3"><div class="icon-circle bg-indigo-500/15 text-indigo-400 text-base"><i class="fas fa-bullseye"></i></div><div><p class="text-xs text-slate-500 font-bold mb-1">المستهدف للفترة</p><div class="flex items-baseline gap-1"><span id="monthlyTargetCerts" class="text-2xl font-black text-indigo-300">0</span><span class="text-slate-500 text-xs font-medium">شهادة</span></div></div></div></div>
+                    <div class="stat-card cyan"><div class="flex items-center gap-3"><div class="icon-circle bg-cyan-500/15 text-cyan-400 text-base"><i class="fas fa-users"></i></div><div><p class="text-xs text-slate-500 font-bold mb-1">إجمالي المعتمدين</p><span id="monthlyOverallValid" class="text-2xl font-black text-cyan-300">0</span><p class="text-xs text-rose-400 mt-1">مستبعد: <span id="monthlyOverallExcluded" class="font-black">0</span></p></div></div></div>
+                    <div class="stat-card emerald"><div class="flex items-center gap-3"><div class="icon-circle bg-emerald-500/15 text-emerald-400 text-base"><i class="fas fa-check-circle"></i></div><div><p class="text-xs text-slate-500 font-bold mb-1">حققوا المستهدف</p><div class="flex items-baseline gap-2"><span id="monthlyOverallAchieved" class="text-2xl font-black text-emerald-300">0</span><span id="monthlyOverallAchievedPct" class="badge badge-emerald">0%</span></div></div></div></div>
+                    <div class="stat-card amber"><div class="flex items-center gap-3"><div class="icon-circle bg-amber-500/15 text-amber-400 text-base"><i class="fas fa-exclamation-triangle"></i></div><div><p class="text-xs text-slate-500 font-bold mb-1">لم يحققوا (عجز)</p><div class="flex items-baseline gap-2"><span id="monthlyOverallFailed" class="text-2xl font-black text-amber-300">0</span><span id="monthlyOverallFailedPct" class="badge badge-amber">0%</span></div></div></div></div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead><tr>
+                            <th>الإقليم</th>
+                            <th title="الموظفين المعينين قبل أو خلال الشهر">المعتمدين للحساب</th>
+                            <th style="color:#6ee7b7">أكملوا المستهدف</th>
+                            <th style="color:#6ee7b7">نسبة الإنجاز %</th>
+                            <th style="color:#fcd34d">عجز (لم يكملوا)</th>
+                            <th style="color:#fcd34d">نسبة العجز %</th>
+                            <th style="color:#94a3b8" title="تعيينهم أحدث من الشهر المختار">مستبعد (تعيين أحدث)</th>
+                        </tr></thead>
+                        <tbody id="monthlyProgressTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ─── Tab: النخبة ─── -->
+            <div id="eliteTab" class="tab-content">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <div>
+                        <h2 class="section-heading mb-1"><i class="fas fa-star text-amber-400"></i> دورات النخبة</h2>
+                        <p class="text-slate-500 text-sm">يعرض حالة إنجاز دورتي النخبة للموظفين المستهدفين فقط</p>
+                    </div>
+                    <button onclick="exportEliteData()" class="btn btn-amber"><i class="fas fa-file-excel"></i> تصدير Excel</button>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="stat-card"><p class="text-xs text-slate-500 font-bold mb-1">إجمالي المستهدفين</p><p class="text-3xl font-black text-slate-200" id="eliteStatTotal">0</p></div>
+                    <div class="stat-card indigo"><p class="text-xs text-slate-500 font-bold mb-1">أكملوا الدورة الأولى</p><p class="text-3xl font-black text-indigo-400" id="eliteStatC1">0</p></div>
+                    <div class="stat-card purple"><p class="text-xs text-slate-500 font-bold mb-1">أكملوا الدورة الثانية</p><p class="text-3xl font-black text-purple-400" id="eliteStatC2">0</p></div>
+                    <div class="stat-card emerald"><p class="text-xs text-slate-500 font-bold mb-1">أكملوا الدورتين</p><p class="text-3xl font-black text-emerald-400" id="eliteStatBoth">0</p></div>
+                </div>
+
+                <div class="table-container mb-8">
+                    <table>
+                        <thead><tr>
+                            <th>الرقم الوظيفي</th><th>الاسم</th><th>الإقليم</th>
+                            <th id="eliteCourse1Head" style="color:#fcd34d">دورة النخبة 1</th>
+                            <th id="eliteCourse2Head" style="color:#fcd34d">دورة النخبة 2</th>
+                            <th>حالة الاستكمال</th>
+                        </tr></thead>
+                        <tbody id="eliteTableBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="glass p-6 border border-rose-500/20">
+                    <h3 class="font-bold text-rose-300 mb-2 flex items-center gap-2 text-base">
+                        <i class="fas fa-exclamation-triangle text-rose-400"></i>
+                        مستهدفون في النخبة (لكنهم مستبعدون أو غير موجودين بالقوى)
+                        <span id="eliteOffTargetCount" class="badge badge-rose">0</span>
+                    </h3>
+                    <p class="text-slate-500 text-sm mb-5">هؤلاء ظهرت أسماؤهم في دورات النخبة لكنهم إما مستبعدون أو غير مدرجين بشيت القوى.</p>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr>
+                                <th>الرقم الوظيفي</th><th>الاسم</th><th>سبب الاستبعاد</th>
+                                <th id="eliteOffCourse1Head" style="color:#fcd34d">دورة النخبة 1</th>
+                                <th id="eliteOffCourse2Head" style="color:#fcd34d">دورة النخبة 2</th>
+                            </tr></thead>
+                            <tbody id="eliteOffTargetTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── Tab: مقارنة الفترات ─── -->
+            <div id="comparisonTab" class="tab-content">
+                <div class="glass p-6 mb-6 border border-purple-500/20">
+                    <h2 class="section-heading mb-1"><i class="fas fa-balance-scale text-purple-400"></i> مقارنة الفترات (الأقاليم)</h2>
+                    <p class="text-slate-400 text-sm">يقارن عدد ونسبة الموظفين الحاصلين على <span class="text-amber-300 font-bold">20 شهادة فأكثر</span> بين التقرير الحالي والسابق.</p>
+                </div>
+                <div id="comparisonContent" class="table-container"></div>
+            </div>
+
+            <!-- ─── Tab: أوقات الذروة ─── -->
+            <div id="timelineTab" class="tab-content">
+                <div class="glass p-6 mb-6 border border-rose-500/20">
+                    <h2 class="section-heading mb-1"><i class="fas fa-clock text-rose-400"></i> أوقات الذروة ونشاط الحصول على الشهادات</h2>
+                    <p class="text-slate-400 text-sm">تحليل وقت وتاريخ الحصول على جميع الشهادات لمعرفة أكثر الأوقات والأيام نشاطاً.</p>
+                </div>
+
+                <!-- Top Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+                    <div class="stat-card indigo fade-in-up">
+                        <div class="flex items-center gap-4">
+                            <div class="icon-circle bg-indigo-500/15 text-indigo-400"><i class="fas fa-calendar-day"></i></div>
+                            <div>
+                                <p class="text-xs text-slate-500 font-bold mb-1">أكثر يوم نشاطاً</p>
+                                <p id="topActiveDayDate" class="text-xl font-black text-indigo-300">-</p>
+                                <p class="text-xs text-indigo-500 mt-1">بمجموع <span id="topActiveDayCount" class="font-black text-indigo-400">0</span> شهادة</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card emerald fade-in-up delay-1">
+                        <div class="flex items-center gap-4">
+                            <div class="icon-circle bg-emerald-500/15 text-emerald-400"><i class="fas fa-calendar-week"></i></div>
+                            <div>
+                                <p class="text-xs text-slate-500 font-bold mb-1">أكثر أسبوع نشاطاً</p>
+                                <p id="topActiveWeek" class="text-xl font-black text-emerald-300">-</p>
+                                <p class="text-xs text-emerald-500 mt-1">بمجموع <span id="topActiveWeekCount" class="font-black text-emerald-400">0</span> شهادة</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card amber fade-in-up delay-2">
+                        <div class="flex items-center gap-4">
+                            <div class="icon-circle bg-amber-500/15 text-amber-400"><i class="fas fa-hourglass-half"></i></div>
+                            <div>
+                                <p class="text-xs text-slate-500 font-bold mb-1">ساعة الذروة (تجميعي)</p>
+                                <p id="peakHourTime" class="text-xl font-black text-amber-300">-</p>
+                                <p class="text-xs text-amber-500 mt-1">بمجموع <span id="peakHourCount" class="font-black text-amber-400">0</span> شهادة</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Extra Timeline Options -->
+                <div class="glass p-5 mb-6">
+                    <h3 class="font-bold text-slate-300 mb-4 text-sm flex items-center gap-2"><i class="fas fa-sliders-h text-indigo-400"></i> خيارات التحليل المتقدم</h3>
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="filterTimelineByPeriod('all')" id="tlBtnAll" class="btn btn-indigo active-tl-btn">كل الفترات</button>
+                        <button onclick="filterTimelineByPeriod('am')" id="tlBtnAm" class="btn btn-ghost">فترة الصباح (6ص–12م)</button>
+                        <button onclick="filterTimelineByPeriod('pm')" id="tlBtnPm" class="btn btn-ghost">فترة الظهيرة (12م–6م)</button>
+                        <button onclick="filterTimelineByPeriod('eve')" id="tlBtnEve" class="btn btn-ghost">المساء (6م–12ص)</button>
+                        <button onclick="sortDailyChart('asc')" class="btn btn-ghost"><i class="fas fa-sort-amount-up-alt"></i> ترتيب تصاعدي</button>
+                        <button onclick="sortDailyChart('desc')" class="btn btn-ghost"><i class="fas fa-sort-amount-down"></i> ترتيب تنازلي</button>
+                        <button onclick="sortDailyChart('date')" class="btn btn-ghost"><i class="fas fa-calendar"></i> ترتيب بالتاريخ</button>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
+                    <div class="timeline-card">
+                        <h3 class="font-bold text-slate-300 mb-4 text-sm border-b border-white/08 pb-3"><i class="fas fa-chart-bar text-indigo-400 ml-2"></i> الشهادات حسب ساعة اليوم</h3>
+                        <div class="relative h-72"><canvas id="hourlyChart"></canvas></div>
+                    </div>
+                    <div class="timeline-card">
+                        <h3 class="font-bold text-slate-300 mb-4 text-sm border-b border-white/08 pb-3"><i class="fas fa-chart-line text-emerald-400 ml-2"></i> المعدل اليومي</h3>
+                        <div class="relative h-72"><canvas id="dailyChart"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Heatmap by day of week -->
+                <div class="timeline-card mb-6">
+                    <h3 class="font-bold text-slate-300 mb-4 text-sm border-b border-white/08 pb-3"><i class="fas fa-th text-rose-400 ml-2"></i> خريطة الحرارة — توزيع الشهادات على أيام الأسبوع</h3>
+                    <div id="weekdayHeatmap" class="flex flex-wrap gap-3 items-center"></div>
+                </div>
+
+                <!-- Top days table -->
+                <div class="timeline-card">
+                    <h3 class="font-bold text-slate-300 mb-4 text-sm border-b border-white/08 pb-3"><i class="fas fa-trophy text-amber-400 ml-2"></i> أعلى 10 أيام نشاطاً</h3>
+                    <div class="table-container" style="max-height:300px;">
+                        <table>
+                            <thead><tr><th>#</th><th>التاريخ</th><th>عدد الشهادات</th><th>التوزيع النسبي</th></tr></thead>
+                            <tbody id="topDaysTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /p-6 -->
+    </div><!-- /resultsSection -->
+</div><!-- /page-wrap -->
+
+<script>
+// ─── Global State ───────────────────────────────────────────────────────────
+let hourlyChartInstance = null;
+let dailyChartInstance = null;
+let tlCurrentPeriod = 'all';
+let tlCurrentSort = 'date';
+
+const regionManagerMap = {
+    "احمد عمار":"إقليم جده والمدينة","اشرف البركي":"اقليم الشرقية",
+    "حسام البني":"اقليم الجنوب","زكي سريه":"La beaute",
+    "سليمان حمدي":"اقليم الساحل","عادل السيد السحراوي":"اقليم الشمالية",
+    "علاء محمود محمد الزيني":"اقليم مكة والطائف","إبراهيم مساعد":"الحرمين",
+    "محمد الطوخي":"الخليج","محمود عباس حسن بلال":"إقليم جده وينبع",
+    "وحيد حامد":"إقليم جنوب الرياض والمولات","وسيم يوسف نجمه":"اقليم شمال الرياض و تبوك",
+    "عماد جابر":"Q&A"
+};
+
+const excludedStatuses = ['استقالة','استقاله','إنهاء خدمة','انهاء خدمة','انهاء خدمه','انقطاع','انتقل إلى','انتقل الي','نقل'];
+let targetMonthsKeys = ["10-2025","11-2025","12-2025","01-2026","02-2026","03-2026","04-2026","05-2026","06-2026"];
+const nonCertCoursesKeys = ["1+2 Offer","delivery order software","Updates and New Circulars","Deraah Seminars","Deraah's new products","Deraah campaigns"];
+const eliteCoursesKeys = ["Sales Scenarios for Deraah Oud's Top Products","Sales Scenarios for DERAAH's Top Products"];
+
+let globalData = {
+    allActive:[], excludedEmployees:[], missingEmployees:[],
+    regionsSet: new Set(), excludedRegions: new Set(),
+    allExtractedMonths: new Set(), hasOldData: false,
+    timeline: { hourly: Array(24).fill(0), daily:{}, weekly:{}, weekday: Array(7).fill(0) }
+};
+
+document.getElementById('currentDateDisplay').innerText = `تاريخ اليوم: ${new Date().toLocaleDateString('ar-EG')}`;
+
+// ─── Drag Scroll ─────────────────────────────────────────────────────────────
+function initDragScroll(el) {
+    if (!el) return;
+    let isDown = false, startX, startY, scrollLeft, scrollTop;
+    el.addEventListener('mousedown', e => {
+        isDown = true; el.classList.add('is-dragging');
+        startX = e.pageX - el.offsetLeft; startY = e.pageY - el.offsetTop;
+        scrollLeft = el.scrollLeft; scrollTop = el.scrollTop;
+    });
+    el.addEventListener('mouseleave', () => { isDown = false; el.classList.remove('is-dragging'); });
+    el.addEventListener('mouseup', () => { isDown = false; el.classList.remove('is-dragging'); });
+    el.addEventListener('mousemove', e => {
+        if (!isDown) return; e.preventDefault();
+        el.scrollLeft = scrollLeft - (e.pageX - el.offsetLeft - startX);
+        el.scrollTop  = scrollTop  - (e.pageY - el.offsetTop  - startY);
+    });
+}
+
+// Init drag scroll on all table-containers
+function initAllDragScrolls() {
+    document.querySelectorAll('.table-container').forEach(initDragScroll);
+}
+
+// ─── Drag-and-Drop File Upload ────────────────────────────────────────────────
+['Wf','Ac','OldAc'].forEach(type => {
+    const dzId = `dropZone${type}`;
+    const inputId = type==='Wf'?'workforceFile': type==='Ac'?'academyFile':'oldAcademyFile';
+    const dz = document.getElementById(dzId);
+    const input = document.getElementById(inputId);
+    if (!dz || !input) return;
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+    ['dragleave','dragend'].forEach(ev => dz.addEventListener(ev, () => dz.classList.remove('dragover')));
+    dz.addEventListener('drop', e => {
+        e.preventDefault(); dz.classList.remove('dragover');
+        if (e.dataTransfer.files.length) {
+            const dt = new DataTransfer();
+            dt.items.add(e.dataTransfer.files[0]);
+            input.files = dt.files;
+            const nameSpanId = type==='Wf'?'wfFileName': type==='Ac'?'acFileName':'oldAcFileName';
+            const span = document.getElementById(nameSpanId);
+            if (span) { span.innerText = e.dataTransfer.files[0].name; span.classList.remove('hidden'); }
+        }
+    });
+});
+
+function handleFileSelect(event, spanId) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const span = document.getElementById(spanId);
+    if (span) { span.innerText = file.name; span.classList.remove('hidden'); }
+}
+
+// ─── Tabs ────────────────────────────────────────────────────────────────────
+function switchTab(event, tabId, colorKey) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active','active-emerald','active-amber','active-purple','active-rose','active-cyan','active-indigo'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    if (event && event.currentTarget) {
+        const btn = event.currentTarget;
+        btn.classList.add('active');
+        if (colorKey && colorKey !== 'active') btn.classList.add(`active-${colorKey}`);
+    }
+    const t = document.getElementById(tabId);
+    if (t) t.classList.add('active');
+}
+
+function switchAnalysisSubTab(event, sectionId) {
+    document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+    if (event && event.currentTarget) event.currentTarget.classList.add('active');
+    document.getElementById('certAnalysisSection').style.display = 'none';
+    document.getElementById('nonCertAnalysisSection').style.display = 'none';
+    const t = document.getElementById(sectionId); if(t) t.style.display = 'block';
+}
+
+// ─── Error / Loading ──────────────────────────────────────────────────────────
+function showError(msg) {
+    const b = document.getElementById('uploadErrorMessage'); const t = document.getElementById('uploadErrorText');
+    if (b && t) { t.innerText = msg; b.classList.remove('hidden'); }
+}
+
+function showFatalError(error) {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+        overlay.innerHTML = `
+            <div class="text-center p-8 glass rounded-2xl max-w-md">
+                <i class="fas fa-exclamation-triangle text-5xl text-rose-400 mb-4"></i>
+                <h2 class="text-xl font-black text-rose-300 mb-2">خطأ في قراءة الملفات</h2>
+                <p class="text-slate-400 text-sm mb-4">${error.message || 'تأكد من أن الملفات بالصيغة الصحيحة'}</p>
+                <button onclick="location.reload()" class="btn btn-rose mx-auto">إعادة تحميل الصفحة</button>
+            </div>`;
+    }
+}
+
+// ─── File Processing ──────────────────────────────────────────────────────────
+async function processFiles() {
+    const errorBanner = document.getElementById('uploadErrorMessage');
+    if (errorBanner) errorBanner.classList.add('hidden');
+    const wfFile = document.getElementById('workforceFile').files[0];
+    const acFile = document.getElementById('academyFile').files[0];
+    const oldAcFile = document.getElementById('oldAcademyFile').files[0];
+    if (!wfFile || !acFile) { showError('الرجاء إرفاق ملف القوى وملف الأكاديمية الحالي قبل البدء.'); return; }
+    document.getElementById('loadingOverlay').style.display = 'flex';
+    try {
+        const wfData = await readExcel(wfFile);
+        const acData = await readExcel(acFile);
+        let oldAcData = oldAcFile ? await readExcel(oldAcFile) : null;
+        analyzeData(wfData, acData, oldAcData);
+        document.getElementById('resultsSection').classList.remove('hidden');
+        document.getElementById('loadingOverlay').style.display = 'none';
+        setTimeout(initAllDragScrolls, 400);
+    } catch(error) { showFatalError(error); }
+}
+
+function readExcel(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+            try {
+                const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array', cellDates:false});
+                resolve(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1, defval:''}));
+            } catch(err) { reject(err); }
+        };
+        reader.onerror = e => reject(e);
+        reader.readAsArrayBuffer(file);
+    });
+}
+
+// ─── Utilities ────────────────────────────────────────────────────────────────
+function cleanString(str) { return str==null ? '' : str.toString().trim(); }
+function isExcluded(status) {
+    if (!status) return false;
+    const s = cleanString(status).toLowerCase();
+    return excludedStatuses.some(ex => s.includes(ex.toLowerCase()));
+}
+function determineRegion(managerName) {
+    let m = cleanString(managerName);
+    if (regionManagerMap[m]) return regionManagerMap[m];
+    for (let k in regionManagerMap) if (m.includes(k)||k.includes(m)) return regionManagerMap[k];
+    return m ? 'غير محدد ('+m+')' : 'غير محدد';
+}
+function parseExcelDate(v) {
+    if (!v) return null;
+    if (typeof v === 'number') return new Date((v-(25567+2))*86400*1000);
+    if (typeof v === 'string') {
+        let p = v.split(/[\/\-]/);
+        if (p.length===3 && p[0].length<=2 && p[2].length===4) return new Date(p[2],parseInt(p[1])-1,p[0]);
+        let d = new Date(v); if (!isNaN(d)) return d;
+    }
+    return null;
+}
+function parseCertificateDate(cellValue) {
+    if (!cellValue||cellValue==='-') return null;
+    let m = cellValue.toString().match(/(\d{2})\/(\d{2})\/(\d{4})/);
+    if (m) return { key:`${m[2]}-${m[3]}` };
+    return null;
+}
+function getWeekNumber(d) {
+    d = new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+    d.setUTCDate(d.getUTCDate()+4-(d.getUTCDay()||7));
+    let y = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+    return Math.ceil(((d-y)/86400000+1)/7);
+}
+function calculateTenureMonths(hireDateStr) {
+    let d = parseExcelDate(hireDateStr);
+    if (!d||isNaN(d)) return -1;
+    let today = new Date();
+    let m = (today.getFullYear()-d.getFullYear())*12 - d.getMonth() + today.getMonth();
+    return m<=0 ? 0 : m;
+}
+function formatDateDisplay(v) {
+    let d = parseExcelDate(v);
+    if (!d||isNaN(d)) return cleanString(v);
+    return `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
+}
+function parseProgress(val) {
+    if (val===''||val===undefined||val===null) return null;
+    if (typeof val==='string') { let p=parseFloat(val.replace('%','').trim()); return isNaN(p)?null:p; }
+    if (typeof val==='number') {
+        if (val<=1&&val>0&&val.toString().includes('.')) return Math.round(val*100);
+        if (val===1) return 100; return val;
+    }
+    return null;
+}
+
+// ─── Analyze Data ────────────────────────────────────────────────────────────
+function analyzeData(wfRows, acRows, oldAcRows) {
+    globalData = {
+        allActive:[], excludedEmployees:[], missingEmployees:[],
+        regionsSet:new Set(), excludedRegions:new Set(), allExtractedMonths:new Set(), hasOldData:!!oldAcRows,
+        timeline:{ hourly:Array(24).fill(0), daily:{}, weekly:{}, weekday:Array(7).fill(0) }
+    };
+    let employeeMap={}, allWfIds=new Set();
+
+    for (let i=1; i<wfRows.length; i++) {
+        let row=wfRows[i]; if(!row||row.length<2) continue;
+        let id=cleanString(row[0]); if(!id) continue;
+        allWfIds.add(id);
+        let name=cleanString(row[1]), hireDate=row[4], status=cleanString(row[9]);
+        let supervisor=row.length>13?cleanString(row[13]):'بدون مشرف';
+        let manager=row.length>15?cleanString(row[15]):'';
+        let emp={id,name,hireDate,status,supervisor,manager,region:determineRegion(manager),email:'',totalCerts:0,oldTotalCerts:0,monthsData:{},nonCertProgress:{},eliteProgress:{},isEliteTarget:false};
+        targetMonthsKeys.forEach(m=>emp.monthsData[m]=0);
+        nonCertCoursesKeys.forEach(c=>emp.nonCertProgress[c]=null);
+        eliteCoursesKeys.forEach(c=>emp.eliteProgress[c]=false);
+        emp.tenureMonths=calculateTenureMonths(hireDate);
+        employeeMap[id]=emp;
+        if (isExcluded(status)) globalData.excludedEmployees.push(emp);
+        else { globalData.regionsSet.add(emp.region); globalData.allActive.push(emp); }
+    }
+
+    let missingMap={};
+    for (let i=1; i<acRows.length; i++) {
+        let row=acRows[i]; if(!row||row.length<15) continue;
+        let id=cleanString(row[14]); if(!id) continue;
+        let rowEmail=row.length>6?cleanString(row[6]):'';
+        if (rowEmail&&employeeMap[id]&&!employeeMap[id].email) employeeMap[id].email=rowEmail;
+        let certValue=row.length>38?cleanString(row[38]):'-';
+        let courseName=row.length>1?cleanString(row[1]):'';
+        let courseLower=courseName.toLowerCase();
+        let progressRaw=row.length>26?row[26]:null;
+        let certInfo=parseCertificateDate(certValue);
+
+        // Timeline extraction
+        if (certValue!=='-') {
+            let timeRegex=/(\d{2})\/(\d{2})\/(\d{4})[\s\r\n]+(\d{1,2}):(\d{2}):(\d{2})[\s\r\n]*(am|pm)/gi;
+            let match;
+            while ((match=timeRegex.exec(certValue))!==null) {
+                let day=match[1],month=match[2],year=match[3];
+                let hour=parseInt(match[4],10), ampm=match[7].toLowerCase();
+                if (ampm==='pm'&&hour<12) hour+=12;
+                if (ampm==='am'&&hour===12) hour=0;
+                globalData.timeline.hourly[hour]++;
+                let dateKey=`${year}-${month}-${day}`;
+                globalData.timeline.daily[dateKey]=(globalData.timeline.daily[dateKey]||0)+1;
+                let d=new Date(parseInt(year),parseInt(month)-1,parseInt(day));
+                let wk=getWeekNumber(d);
+                let weekKey=`الأسبوع ${wk} - ${year}`;
+                globalData.timeline.weekly[weekKey]=(globalData.timeline.weekly[weekKey]||0)+1;
+                let wd=d.getDay(); // 0=Sun
+                globalData.timeline.weekday[wd]=(globalData.timeline.weekday[wd]||0)+1;
+            }
+        }
+
+        if (employeeMap[id]) {
+            let matchedElite=eliteCoursesKeys.find(c=>courseLower.includes(c.toLowerCase()));
+            if (matchedElite) {
+                employeeMap[id].isEliteTarget=true;
+                if (certValue!=='-'||parseProgress(progressRaw)===100) employeeMap[id].eliteProgress[matchedElite]=true;
+            }
+            if (certValue==='-') {
+                let matchedCourse=nonCertCoursesKeys.find(c=>courseLower.includes(c.toLowerCase()));
+                if (matchedCourse) {
+                    let p=parseProgress(progressRaw);
+                    if (p!==null) employeeMap[id].nonCertProgress[matchedCourse]=p;
+                }
+            } else if (certInfo) {
+                employeeMap[id].totalCerts++;
+                globalData.allExtractedMonths.add(certInfo.key);
+                if (employeeMap[id].monthsData[certInfo.key]===undefined) employeeMap[id].monthsData[certInfo.key]=0;
+                employeeMap[id].monthsData[certInfo.key]++;
+            }
+        } else if (!allWfIds.has(id)) {
+            if (!missingMap[id]) {
+                missingMap[id]={id,name:row.length>5?cleanString(row[5]):'غير متوفر',email:rowEmail||'',totalCerts:0,eliteProgress:{},isEliteTarget:false};
+                eliteCoursesKeys.forEach(c=>missingMap[id].eliteProgress[c]=false);
+            }
+            let me=eliteCoursesKeys.find(c=>courseLower.includes(c.toLowerCase()));
+            if (me) {
+                missingMap[id].isEliteTarget=true;
+                if (certValue!=='-'||parseProgress(progressRaw)===100) missingMap[id].eliteProgress[me]=true;
+            }
+            if (certInfo) { missingMap[id].totalCerts++; globalData.allExtractedMonths.add(certInfo.key); }
+        }
+    }
+    globalData.missingEmployees=Object.values(missingMap);
+
+    if (oldAcRows) {
+        let oldCertMap={};
+        for (let i=1; i<oldAcRows.length; i++) {
+            let row=oldAcRows[i]; if(!row||row.length<15) continue;
+            let id=cleanString(row[14]); if(!id) continue;
+            let cv=row.length>38?cleanString(row[38]):'-';
+            let ci=parseCertificateDate(cv);
+            if (ci) oldCertMap[id]=(oldCertMap[id]||0)+1;
+        }
+        globalData.allActive.forEach(emp=>emp.oldTotalCerts=oldCertMap[emp.id]||0);
+    }
+
+    let sorted=Array.from(globalData.allExtractedMonths).sort((a,b)=>{
+        let [m1,y1]=a.split('-').map(Number); let [m2,y2]=b.split('-').map(Number);
+        return y1!==y2?y1-y2:m1-m2;
+    });
+    if (sorted.length>0) {
+        targetMonthsKeys=sorted;
+        globalData.allActive.forEach(emp=>targetMonthsKeys.forEach(m=>{if(emp.monthsData[m]===undefined) emp.monthsData[m]=0;}));
+    }
+
+    // Update elite headers
+    let e1=document.getElementById('eliteCourse1Head'),e2=document.getElementById('eliteCourse2Head');
+    let oe1=document.getElementById('eliteOffCourse1Head'),oe2=document.getElementById('eliteOffCourse2Head');
+    if(e1&&eliteCoursesKeys[0]) e1.innerText=eliteCoursesKeys[0];
+    if(e2&&eliteCoursesKeys[1]) e2.innerText=eliteCoursesKeys[1];
+    if(oe1&&eliteCoursesKeys[0]) oe1.innerText=eliteCoursesKeys[0];
+    if(oe2&&eliteCoursesKeys[1]) oe2.innerText=eliteCoursesKeys[1];
+
+    populateMonthSelect();
+    buildFilterUI();
+    applyActiveFilters();
+    renderTimelineDashboard();
+}
+
+// ─── Timeline Dashboard ───────────────────────────────────────────────────────
+function renderTimelineDashboard() {
+    let maxDay='-', maxDayCount=0;
+    for(let date in globalData.timeline.daily) {
+        if(globalData.timeline.daily[date]>maxDayCount) { maxDayCount=globalData.timeline.daily[date]; maxDay=date; }
+    }
+    let maxWeek='-', maxWeekCount=0;
+    for(let w in globalData.timeline.weekly) {
+        if(globalData.timeline.weekly[w]>maxWeekCount) { maxWeekCount=globalData.timeline.weekly[w]; maxWeek=w; }
+    }
+    let peakHour=0, peakHourCount=0;
+    globalData.timeline.hourly.forEach((c,h)=>{ if(c>peakHourCount){peakHourCount=c;peakHour=h;} });
+    let formattedPeakHour=`${peakHour%12||12}:00 ${peakHour<12?'ص':'م'}`;
+
+    document.getElementById('topActiveDayDate').innerText=maxDay!=='-'?maxDay:'لا توجد بيانات';
+    document.getElementById('topActiveDayCount').innerText=maxDayCount;
+    document.getElementById('topActiveWeek').innerText=maxWeek!=='-'?maxWeek:'لا توجد بيانات';
+    document.getElementById('topActiveWeekCount').innerText=maxWeekCount;
+    document.getElementById('peakHourTime').innerText=peakHourCount>0?formattedPeakHour:'لا توجد بيانات';
+    document.getElementById('peakHourCount').innerText=peakHourCount;
+
+    renderHourlyChart(globalData.timeline.hourly);
+    renderDailyChart('date');
+    renderWeekdayHeatmap();
+    renderTopDaysTable();
+}
+
+function renderHourlyChart(data) {
+    const labels=Array.from({length:24},(_,i)=>`${i%12||12} ${i<12?'ص':'م'}`);
+    if(hourlyChartInstance) hourlyChartInstance.destroy();
+    const ctx=document.getElementById('hourlyChart').getContext('2d');
+    const maxVal=Math.max(...data,1);
+    const colors=data.map(v=>v===maxVal?'rgba(244,63,94,0.85)':'rgba(99,102,241,0.6)');
+    hourlyChartInstance=new Chart(ctx,{
+        type:'bar',
+        data:{labels,datasets:[{label:'الشهادات',data,backgroundColor:colors,borderColor:colors.map(c=>c.replace('0.6','1').replace('0.85','1')),borderWidth:1,borderRadius:5}]},
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{title:i=>`الساعة: ${i[0].label}`,label:i=>`${i.raw} شهادة`}}},scales:{y:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#64748b'}},x:{grid:{display:false},ticks:{color:'#64748b',font:{size:10}}}}}
+    });
+}
+
+function renderDailyChart(sortMode) {
+    tlCurrentSort=sortMode;
+    let entries=Object.entries(globalData.timeline.daily);
+    if (sortMode==='asc') entries.sort((a,b)=>a[1]-b[1]);
+    else if (sortMode==='desc') entries.sort((a,b)=>b[1]-a[1]);
+    else entries.sort((a,b)=>a[0].localeCompare(b[0]));
+    const sortedDates=entries.map(e=>e[0]);
+    const sortedCounts=entries.map(e=>e[1]);
+    if(dailyChartInstance) dailyChartInstance.destroy();
+    const ctx=document.getElementById('dailyChart').getContext('2d');
+    const grad=ctx.createLinearGradient(0,0,0,300);
+    grad.addColorStop(0,'rgba(16,185,129,0.3)');
+    grad.addColorStop(1,'rgba(16,185,129,0.02)');
+    dailyChartInstance=new Chart(ctx,{
+        type:'line',
+        data:{labels:sortedDates,datasets:[{label:'الشهادات',data:sortedCounts,fill:true,backgroundColor:grad,borderColor:'rgb(16,185,129)',tension:0.3,pointBackgroundColor:'rgb(16,185,129)',pointRadius:3,borderWidth:2}]},
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#64748b'}},x:{grid:{display:false},ticks:{color:'#64748b',font:{size:9},maxTicksLimit:15}}}}
+    });
+}
+
+function sortDailyChart(mode) { renderDailyChart(mode); }
+
+function filterTimelineByPeriod(period) {
+    tlCurrentPeriod=period;
+    document.querySelectorAll('[id^="tlBtn"]').forEach(b=>{ b.classList.remove('btn-indigo'); b.classList.add('btn-ghost'); });
+    const btns={all:'tlBtnAll',am:'tlBtnAm',pm:'tlBtnPm',eve:'tlBtnEve'};
+    const btn=document.getElementById(btns[period]);
+    if(btn){ btn.classList.remove('btn-ghost'); btn.classList.add('btn-indigo'); }
+    let data;
+    if (period==='all') data=[...globalData.timeline.hourly];
+    else if (period==='am') { data=Array(24).fill(0); for(let i=6;i<12;i++) data[i]=globalData.timeline.hourly[i]; }
+    else if (period==='pm') { data=Array(24).fill(0); for(let i=12;i<18;i++) data[i]=globalData.timeline.hourly[i]; }
+    else if (period==='eve') { data=Array(24).fill(0); for(let i=18;i<24;i++) data[i]=globalData.timeline.hourly[i]; for(let i=0;i<6;i++) data[i]=globalData.timeline.hourly[i]; }
+    renderHourlyChart(data);
+}
+
+function renderWeekdayHeatmap() {
+    const days=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+    const wd=globalData.timeline.weekday;
+    const maxWd=Math.max(...wd,1);
+    const container=document.getElementById('weekdayHeatmap');
+    if(!container) return;
+    let html='';
+    days.forEach((d,i)=>{
+        const ratio=wd[i]/maxWd;
+        const alpha=Math.round(ratio*100);
+        let color,textColor;
+        if(alpha>80){color=`rgba(99,102,241,0.85)`;textColor='#fff';}
+        else if(alpha>50){color=`rgba(99,102,241,0.5)`;textColor='#c7d2fe';}
+        else if(alpha>20){color=`rgba(99,102,241,0.25)`;textColor='#818cf8';}
+        else{color=`rgba(99,102,241,0.08)`;textColor='#475569';}
+        html+=`<div style="text-align:center;">
+            <div style="font-size:11px;color:#64748b;margin-bottom:6px;">${d}</div>
+            <div class="heatmap-cell" style="background:${color};color:${textColor};width:60px;height:60px;border-radius:12px;flex-direction:column;gap:2px;" data-tip="${wd[i]} شهادة">
+                <span style="font-size:16px;font-weight:900;">${wd[i]}</span>
+                <span style="font-size:9px;opacity:0.7;">${Math.round(ratio*100)}%</span>
+            </div>
+        </div>`;
+    });
+    container.innerHTML=html;
+}
+
+function renderTopDaysTable() {
+    const tbody=document.getElementById('topDaysTableBody');
+    if(!tbody) return;
+    const entries=Object.entries(globalData.timeline.daily).sort((a,b)=>b[1]-a[1]).slice(0,10);
+    const maxVal=entries.length>0?entries[0][1]:1;
+    let html='';
+    entries.forEach(([date,count],i)=>{
+        const pct=Math.round((count/maxVal)*100);
+        html+=`<tr>
+            <td class="font-black text-slate-400">#${i+1}</td>
+            <td class="font-bold text-slate-200" dir="ltr">${date}</td>
+            <td><span class="badge badge-amber">${count}</span></td>
+            <td style="min-width:150px;">
+                <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:${pct}%;background:linear-gradient(90deg,#6366f1,#10b981);"></div></div>
+            </td>
+        </tr>`;
+    });
+    if(!entries.length) html='<tr><td colspan="4" class="text-center text-slate-500 py-6">لا توجد بيانات</td></tr>';
+    tbody.innerHTML=html;
+}
+
+// ─── Filter UI ────────────────────────────────────────────────────────────────
+function populateMonthSelect() {
+    const sel=document.getElementById('progressMonthSelect');
+    if(!sel) return;
+    sel.innerHTML='';
+    targetMonthsKeys.forEach(m=>{
+        let opt=document.createElement('option'); opt.value=m; opt.text=m.replace('-','/'); sel.appendChild(opt);
+    });
+    if(targetMonthsKeys.length>0) sel.value=targetMonthsKeys[targetMonthsKeys.length-1];
+}
+
+function buildFilterUI() {
+    let sel='<option value="">كل الأقاليم</option>';
+    let supSel='<option value="">جميع القطاعات / الأقاليم</option>';
+    let checks='';
+    Array.from(globalData.regionsSet).sort().forEach(reg=>{
+        sel+=`<option value="${reg}">${reg}</option>`;
+        supSel+=`<option value="${reg}">${reg}</option>`;
+        checks+=`<label class="region-check-label"><input type="checkbox" checked value="${reg}" onchange="toggleRegionExclusion(this)" class="accent-indigo-500"><span>${reg}</span></label>`;
+    });
+    document.getElementById('filterRegion').innerHTML=sel;
+    document.getElementById('supRegionFilter').innerHTML=supSel;
+    document.getElementById('regionExclusionContainer').innerHTML=checks;
+}
+
+function toggleRegionExclusion(checkbox) {
+    if(checkbox.checked) globalData.excludedRegions.delete(checkbox.value);
+    else globalData.excludedRegions.add(checkbox.value);
+    applyActiveFilters();
+}
+
+function applyActiveFilters() {
+    const sName=(document.getElementById('searchName')||{value:''}).value.toLowerCase();
+    const sReg=(document.getElementById('filterRegion')||{value:''}).value;
+    let filtered=globalData.allActive.filter(e=>{
+        let matchName=e.name.toLowerCase().includes(sName)||e.id.toLowerCase().includes(sName)||e.region.toLowerCase().includes(sName)||e.supervisor.toLowerCase().includes(sName);
+        let matchReg=sReg===''||e.region===sReg;
+        return matchName&&matchReg;
+    });
+    let t1=filtered.filter(e=>e.tenureMonths>=0&&e.tenureMonths<3);
+    let t2=filtered.filter(e=>e.tenureMonths>=3&&e.tenureMonths<=24);
+    let t3=filtered.filter(e=>e.tenureMonths>24);
+    renderTable('active',filtered);
+    renderTable('t1',t1);
+    renderTable('t2',t2);
+    renderTable('t3',t3);
+    renderNonCertTable(filtered);
+    renderEliteTable(filtered,globalData.excludedEmployees,globalData.missingEmployees);
+    renderComparisonTable(filtered);
+
+    const exBody=document.getElementById('excludedTableBody');
+    if(exBody) exBody.innerHTML=globalData.excludedEmployees.map(e=>`<tr><td class="font-bold text-slate-300">${e.id}</td><td class="text-slate-300">${e.name}</td><td><span class="badge badge-rose">${e.status}</span></td></tr>`).join('');
+    const miBody=document.getElementById('missingTableBody');
+    if(miBody) miBody.innerHTML=globalData.missingEmployees.map(e=>`<tr><td class="font-bold text-slate-300">${e.id}</td><td class="text-slate-300">${e.name}</td><td><span class="badge badge-indigo">${e.totalCerts}</span></td></tr>`).join('');
+    const exC=document.getElementById('excludedCount'); if(exC) exC.innerText=globalData.excludedEmployees.length;
+    const miC=document.getElementById('missingCount'); if(miC) miC.innerText=globalData.missingEmployees.length;
+    updateAnalysisUI();
+    updateSupervisorsTab();
+}
+
+// ─── Render Tables ────────────────────────────────────────────────────────────
+function renderTable(prefix, dataArray) {
+    let headerHtml='';
+    const cols=[
+        {label:'الرقم الوظيفي'},{label:'الاسم'},{label:'التعيين'},{label:'المشرف'},{label:'الإقليم'},
+        {label:'إجمالي الشهادات',accent:'indigo'}
+    ];
+    cols.forEach(c=>{
+        headerHtml+=`<th${c.accent?` style="color:#a5b4fc"`:''}>${c.label}</th>`;
+    });
+    targetMonthsKeys.forEach(m=>headerHtml+=`<th style="color:#67e8f9;font-size:11px;">${m.replace('-','/')}</th>`);
+
+    const hId=prefix==='active'?'activeTableHeader':`${prefix}Header`;
+    const hEl=document.getElementById(hId); if(hEl) hEl.innerHTML=headerHtml;
+
+    let bodyHtml=dataArray.map(emp=>{
+        let monthsHtml=targetMonthsKeys.map(k=>{
+            let val=emp.monthsData[k];
+            let cls=val>0?'style="color:#6ee7b7;font-weight:700;background:rgba(16,185,129,0.08);"':'style="color:#475569;"';
+            return `<td class="text-center" ${cls}>${val}</td>`;
+        }).join('');
+        let certBadge=emp.totalCerts>=20?'badge-emerald':emp.totalCerts>0?'badge-indigo':'badge-rose';
+        return `<tr>
+            <td class="font-bold text-slate-300">${emp.id}</td>
+            <td class="text-slate-200" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${emp.name}">${emp.name}</td>
+            <td class="text-slate-500 text-xs" dir="ltr">${formatDateDisplay(emp.hireDate)}</td>
+            <td class="text-slate-400 text-xs">${emp.supervisor}</td>
+            <td><span class="badge badge-slate">${emp.region}</span></td>
+            <td class="text-center"><span class="badge ${certBadge}">${emp.totalCerts}</span></td>
+            ${monthsHtml}
+        </tr>`;
+    }).join('');
+
+    const bId=prefix==='active'?'activeTableBody':`${prefix}Body`;
+    const cId=prefix==='active'?'activeCount':`${prefix}Count`;
+    const bEl=document.getElementById(bId); if(bEl) bEl.innerHTML=bodyHtml;
+    const cEl=document.getElementById(cId); if(cEl) cEl.innerText=dataArray.length;
+}
+
+function renderNonCertTable(dataArray) {
+    let headerHtml='<th>الرقم الوظيفي</th><th>الاسم</th><th>الإقليم</th>';
+    nonCertCoursesKeys.forEach(c=>headerHtml+=`<th style="color:#67e8f9;font-size:11px;">${c}</th>`);
+    const hEl=document.getElementById('nonCertHeader'); if(hEl) hEl.innerHTML=headerHtml;
+    let bodyHtml=dataArray.map(emp=>{
+        let coursesHtml=nonCertCoursesKeys.map(c=>{
+            let val=emp.nonCertProgress[c];
+            if(val===null) return `<td class="text-center text-slate-600">-</td>`;
+            let badge=val===100?'badge-emerald':val>=50?'badge-cyan':val>0?'badge-amber':'badge-rose';
+            return `<td class="text-center"><span class="badge ${badge}">${val}%</span></td>`;
+        }).join('');
+        return `<tr><td class="font-bold text-slate-300">${emp.id}</td><td class="text-slate-200" style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${emp.name}">${emp.name}</td><td><span class="badge badge-slate">${emp.region}</span></td>${coursesHtml}</tr>`;
+    }).join('');
+    const bEl=document.getElementById('nonCertTableBody'); if(bEl) bEl.innerHTML=bodyHtml;
+    const cEl=document.getElementById('nonCertCount'); if(cEl) cEl.innerText=dataArray.length;
+}
+
+function renderEliteTable(dataArray, excludedArray, missingArray) {
+    let c1Key=eliteCoursesKeys[0], c2Key=eliteCoursesKeys[1];
+    let eliteTargets=dataArray.filter(e=>e.isEliteTarget);
+    let fc1=0,fc2=0,fb=0;
+    eliteTargets.forEach(emp=>{
+        let h1=c1Key?emp.eliteProgress[c1Key]:false, h2=c2Key?emp.eliteProgress[c2Key]:false;
+        if(h1)fc1++; if(h2)fc2++; if(h1&&h2)fb++;
+    });
+    const s=i=>document.getElementById(i);
+    if(s('eliteStatTotal'))s('eliteStatTotal').innerText=eliteTargets.length;
+    if(s('eliteStatC1'))s('eliteStatC1').innerText=fc1;
+    if(s('eliteStatC2'))s('eliteStatC2').innerText=fc2;
+    if(s('eliteStatBoth'))s('eliteStatBoth').innerText=fb;
+
+    let bodyHtml=eliteTargets.map(emp=>{
+        let h1=c1Key?emp.eliteProgress[c1Key]:false, h2=c2Key?emp.eliteProgress[c2Key]:false;
+        let cnt=(h1?1:0)+(h2?1:0);
+        let statusHtml=cnt===2?`<span class="badge badge-emerald"><i class="fas fa-check-double"></i> استكمل (2)</span>`:cnt===1?`<span class="badge badge-amber"><i class="fas fa-minus"></i> جزء (1)</span>`:`<span class="badge badge-rose"><i class="fas fa-times"></i> لم يستكمل</span>`;
+        return `<tr>
+            <td class="font-bold text-slate-300">${emp.id}</td>
+            <td class="text-slate-200" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;" title="${emp.name}">${emp.name}</td>
+            <td><span class="badge badge-slate">${emp.region}</span></td>
+            <td class="text-center text-xl">${h1?'<span style="color:#6ee7b7;">✓</span>':'<span style="color:#334155;">-</span>'}</td>
+            <td class="text-center text-xl">${h2?'<span style="color:#6ee7b7;">✓</span>':'<span style="color:#334155;">-</span>'}</td>
+            <td>${statusHtml}</td>
+        </tr>`;
+    }).join('');
+    if(!eliteTargets.length) bodyHtml=`<tr><td colspan="6" class="text-center py-8 text-slate-500">لا توجد بيانات لموظفي النخبة في هذا الفلتر.</td></tr>`;
+    const bEl=document.getElementById('eliteTableBody'); if(bEl) bEl.innerHTML=bodyHtml;
+
+    let sName=(document.getElementById('searchName')||{value:''}).value.toLowerCase();
+    let sReg=(document.getElementById('filterRegion')||{value:''}).value;
+    let offTargetMissing=missingArray.filter(e=>e.isEliteTarget&&(e.name.toLowerCase().includes(sName)||e.id.toLowerCase().includes(sName))).map(e=>({...e,offReason:'غير مدرج بقائمة القوى'}));
+    let offTargetExcluded=excludedArray.filter(e=>e.isEliteTarget&&(e.name.toLowerCase().includes(sName)||e.id.toLowerCase().includes(sName))&&(sReg===''||e.region===sReg)).map(e=>({...e,offReason:`مستبعد (${e.status})`}));
+    let combined=[...offTargetExcluded,...offTargetMissing];
+    let offHtml=combined.map(emp=>{
+        let h1=c1Key?emp.eliteProgress[c1Key]:false, h2=c2Key?emp.eliteProgress[c2Key]:false;
+        return `<tr><td class="font-bold text-slate-300">${emp.id}</td><td class="text-slate-200">${emp.name}</td><td><span class="badge badge-rose">${emp.offReason}</span></td><td class="text-center text-xl">${h1?'<span style="color:#6ee7b7;">✓</span>':'<span style="color:#334155;">-</span>'}</td><td class="text-center text-xl">${h2?'<span style="color:#6ee7b7;">✓</span>':'<span style="color:#334155;">-</span>'}</td></tr>`;
+    }).join('');
+    if(!combined.length) offHtml=`<tr><td colspan="5" class="text-center py-8 text-slate-500">لا يوجد مستبعدين أو مفقودين.</td></tr>`;
+    const oEl=document.getElementById('eliteOffTargetTableBody'); if(oEl) oEl.innerHTML=offHtml;
+    const ocEl=document.getElementById('eliteOffTargetCount'); if(ocEl) ocEl.innerText=combined.length;
+}
+
+function renderComparisonTable(dataArray) {
+    const container=document.getElementById('comparisonContent');
+    if(!container) return;
+    if(!globalData.hasOldData) {
+        container.innerHTML=`<div class="text-center py-12"><i class="fas fa-info-circle text-5xl text-purple-800 mb-4"></i><h3 class="text-lg font-bold text-slate-400">برجاء رفع ملف التقرير القديم لعرض المقارنة</h3><p class="text-slate-500 mt-2">يتم إرفاقه من الواجهة الرئيسية في الخانة رقم 3</p></div>`;
+        return;
+    }
+    let regionStats={};
+    dataArray.forEach(emp=>{
+        if(globalData.excludedRegions.has(emp.region)) return;
+        if(!regionStats[emp.region]) regionStats[emp.region]={total:0,oldOver20:0,newOver20:0};
+        let s=regionStats[emp.region]; s.total++;
+        if(emp.oldTotalCerts>=20) s.oldOver20++;
+        if(emp.totalCerts>=20) s.newOver20++;
+    });
+    let html=`<table><thead><tr><th>الإقليم</th><th>إجمالي الموظفين</th><th style="color:#d8b4fe">التقرير السابق (أكملوا 20)</th><th style="color:#6ee7b7">التقرير الحالي (أكملوا 20)</th><th>نسبة التحسن</th></tr></thead><tbody>`;
+    let sortedRegs=Object.keys(regionStats).sort();
+    sortedRegs.forEach(reg=>{
+        let s=regionStats[reg];
+        let oldPct=s.total>0?(s.oldOver20/s.total)*100:0, newPct=s.total>0?(s.newOver20/s.total)*100:0, diff=newPct-oldPct;
+        let diffHtml=diff>0?`<span class="badge badge-emerald"><i class="fas fa-arrow-up"></i> ${diff.toFixed(1)}% (+${s.newOver20-s.oldOver20})</span>`:diff<0?`<span class="badge badge-rose"><i class="fas fa-arrow-down"></i> ${Math.abs(diff).toFixed(1)}% (${s.newOver20-s.oldOver20})</span>`:`<span class="badge badge-slate">= 0%</span>`;
+        html+=`<tr><td class="font-bold text-slate-200">${reg}</td><td class="font-bold text-slate-300">${s.total}</td><td><span class="badge badge-purple">${s.oldOver20} (${oldPct.toFixed(1)}%)</span></td><td><span class="badge badge-emerald">${s.newOver20} (${newPct.toFixed(1)}%)</span></td><td>${diffHtml}</td></tr>`;
+    });
+    if(!sortedRegs.length) html+=`<tr><td colspan="5" class="text-center py-8 text-slate-500">تم استبعاد كافة الأقاليم.</td></tr>`;
+    html+=`</tbody></table>`;
+    container.innerHTML=html;
+}
+
+// ─── Supervisors Tab ──────────────────────────────────────────────────────────
+let currentSupervisorsData=[], currentModalSupData=null;
+
+function updateSupervisorsTab() {
+    let supRegion=(document.getElementById('supRegionFilter')||{value:''}).value;
+    let supSearch=((document.getElementById('supSearchFilter')||{value:''}).value).toLowerCase();
+    let supStats={};
+    globalData.allActive.forEach(emp=>{
+        if(globalData.excludedRegions.has(emp.region)) return;
+        if(supRegion&&emp.region!==supRegion) return;
+        let sn=cleanString(emp.supervisor)||'بدون مشرف';
+        if(supSearch&&!sn.toLowerCase().includes(supSearch)) return;
+        if(!supStats[sn]) supStats[sn]={name:sn,region:emp.region,total:0,over20:0,less20:0,zero:0,oldOver20:0,employees:[]};
+        let s=supStats[sn]; s.total++; s.employees.push(emp);
+        if(emp.totalCerts>=20)s.over20++; else if(emp.totalCerts>0)s.less20++; else s.zero++;
+        if(emp.oldTotalCerts>=20)s.oldOver20++;
+    });
+    currentSupervisorsData=Object.values(supStats).sort((a,b)=>b.total-a.total);
+    let html='';
+    currentSupervisorsData.forEach(s=>{
+        let diff=s.over20-s.oldOver20, diffHtml='-';
+        if(globalData.hasOldData) {
+            if(diff>0) diffHtml=`<span class="badge badge-emerald"><i class="fas fa-arrow-up"></i> +${diff}</span>`;
+            else if(diff<0) diffHtml=`<span class="badge badge-rose"><i class="fas fa-arrow-down"></i> ${diff}</span>`;
+            else diffHtml=`<span class="badge badge-slate">= 0</span>`;
+        } else { diffHtml=`<span class="text-slate-600 text-xs">لا يوجد قديم</span>`; }
+        let overPct=s.total>0?Math.round((s.over20/s.total)*100):0;
+        html+=`<tr style="cursor:pointer;" onclick="showSupervisorDetails('${s.name.replace(/'/g,"\\'")}','${s.region.replace(/'/g,"\\'")}')">
+            <td class="font-bold text-indigo-300">${s.name}</td>
+            <td><span class="badge badge-slate">${s.region}</span></td>
+            <td class="font-bold text-slate-200 text-base">${s.total}</td>
+            <td>
+                <div class="flex items-center gap-3">
+                    <span class="badge badge-emerald">${s.over20}</span>
+                    <div class="progress-bar-outer" style="width:80px;"><div class="progress-bar-inner" style="width:${overPct}%;background:linear-gradient(90deg,#10b981,#6ee7b7);"></div></div>
+                    <span class="text-xs text-slate-500">${overPct}%</span>
+                </div>
+            </td>
+            <td><span class="badge badge-amber">${s.less20}</span></td>
+            <td><span class="badge badge-rose">${s.zero}</span></td>
+            <td>${diffHtml}</td>
+        </tr>`;
+    });
+    if(!currentSupervisorsData.length) html=`<tr><td colspan="7" class="text-center py-8 text-slate-500">لا يوجد مشرفين مطابقين.</td></tr>`;
+    document.getElementById('supervisorsTableBody').innerHTML=html;
+}
+
+function showSupervisorDetails(supName, regionName) {
+    let supData=currentSupervisorsData.find(s=>s.name===supName&&s.region===regionName);
+    if(!supData) return;
+    currentModalSupData=supData;
+    document.getElementById('modalSupName').innerText=supName;
+    document.getElementById('modalSupRegion').innerHTML=`<i class="fas fa-map-marker-alt text-indigo-400 ml-1"></i> ${regionName}`;
+    document.getElementById('mTotal').innerText=supData.total;
+    document.getElementById('mOver20').innerText=supData.over20;
+    document.getElementById('mLess20').innerText=supData.less20;
+    document.getElementById('mZero').innerText=supData.zero;
+    let html=supData.employees.map(emp=>{
+        let b=emp.totalCerts>=20?'badge-emerald':emp.totalCerts>0?'badge-amber':'badge-rose';
+        return `<tr><td class="font-bold text-slate-300">${emp.id}</td><td class="text-slate-200">${emp.name}</td><td class="text-slate-500 text-xs" dir="ltr">${formatDateDisplay(emp.hireDate)}</td><td><span class="badge ${b}">${emp.totalCerts}</span></td><td class="text-slate-500 font-bold">${globalData.hasOldData?emp.oldTotalCerts:'-'}</td></tr>`;
+    }).join('');
+    document.getElementById('modalEmpTableBody').innerHTML=html;
+    document.getElementById('supervisorModal').style.display='flex';
+}
+
+function closeSupervisorDetails() { document.getElementById('supervisorModal').style.display='none'; }
+
+// ─── Monthly Progress Tab ─────────────────────────────────────────────────────
+function updateMonthlyProgressTab() {
+    const selectedMonth=document.getElementById('progressMonthSelect').value;
+    if(!selectedMonth) return;
+    let [selM,selY]=selectedMonth.split('-').map(Number);
+    let selectedTotalMonths=selY*12+selM;
+    let monthsToInclude=[];
+    for(let m of targetMonthsKeys){monthsToInclude.push(m); if(m===selectedMonth) break;}
+    let maxCerts=0, employeeProgress={}, employeeExcludedState={};
+    globalData.allActive.forEach(emp=>{
+        if(globalData.excludedRegions.has(emp.region)) return;
+        let isExcludedByDate=false;
+        let empDate=parseExcelDate(emp.hireDate);
+        if(empDate&&!isNaN(empDate)){
+            let hM=empDate.getMonth()+1, hY=empDate.getFullYear();
+            if((hY*12+hM)>selectedTotalMonths) isExcludedByDate=true;
+        }
+        employeeExcludedState[emp.id]=isExcludedByDate;
+        if(!isExcludedByDate){
+            let sum=0; monthsToInclude.forEach(m=>sum+=(emp.monthsData[m]||0));
+            employeeProgress[emp.id]=sum;
+            if(sum>maxCerts) maxCerts=sum;
+        }
+    });
+    if(maxCerts>20) maxCerts=20;
+    document.getElementById('monthlyTargetCerts').innerText=maxCerts;
+    let regionStats={}, overallStats={valid:0,excluded:0,achieved:0,failed:0};
+    globalData.allActive.forEach(emp=>{
+        if(globalData.excludedRegions.has(emp.region)) return;
+        if(!regionStats[emp.region]) regionStats[emp.region]={valid:0,excludedNew:0,achieved:0,failed:0};
+        if(employeeExcludedState[emp.id]){regionStats[emp.region].excludedNew++;overallStats.excluded++;}
+        else {
+            regionStats[emp.region].valid++;overallStats.valid++;
+            if(employeeProgress[emp.id]>=maxCerts&&maxCerts>0){regionStats[emp.region].achieved++;overallStats.achieved++;}
+            else if(maxCerts===0&&employeeProgress[emp.id]===0){regionStats[emp.region].achieved++;overallStats.achieved++;}
+            else{regionStats[emp.region].failed++;overallStats.failed++;}
+        }
+    });
+    document.getElementById('monthlyOverallValid').innerText=overallStats.valid;
+    document.getElementById('monthlyOverallExcluded').innerText=overallStats.excluded;
+    let achPct=overallStats.valid>0?Math.round((overallStats.achieved/overallStats.valid)*100):0;
+    let failPct=overallStats.valid>0?Math.round((overallStats.failed/overallStats.valid)*100):0;
+    document.getElementById('monthlyOverallAchieved').innerText=overallStats.achieved;
+    document.getElementById('monthlyOverallAchievedPct').innerText=achPct+'%';
+    document.getElementById('monthlyOverallFailed').innerText=overallStats.failed;
+    document.getElementById('monthlyOverallFailedPct').innerText=failPct+'%';
+    let html='';
+    Object.keys(regionStats).sort().forEach(reg=>{
+        let s=regionStats[reg];
+        let pA=s.valid>0?Math.round((s.achieved/s.valid)*100):0, pF=s.valid>0?Math.round((s.failed/s.valid)*100):0;
+        html+=`<tr>
+            <td class="font-bold text-slate-200">${reg}</td>
+            <td class="font-bold text-slate-300">${s.valid}</td>
+            <td><span class="badge badge-emerald">${s.achieved}</span></td>
+            <td>
+                <div class="flex items-center gap-2">
+                    <div class="progress-bar-outer" style="width:80px;"><div class="progress-bar-inner" style="width:${pA}%;background:#10b981;"></div></div>
+                    <span class="text-xs text-emerald-400 font-bold">${pA}%</span>
+                </div>
+            </td>
+            <td><span class="badge badge-amber">${s.failed}</span></td>
+            <td><span class="text-amber-400 font-bold text-sm">${pF}%</span></td>
+            <td class="font-bold text-slate-500">${s.excludedNew>0?s.excludedNew:'-'}</td>
+        </tr>`;
+    });
+    if(!Object.keys(regionStats).length) html=`<tr><td colspan="7" class="text-center py-8 text-slate-500">لا توجد بيانات.</td></tr>`;
+    const tbody=document.getElementById('monthlyProgressTableBody'); if(tbody) tbody.innerHTML=html;
+}
+
+// ─── Analysis UI ──────────────────────────────────────────────────────────────
+function updateAnalysisUI() {
+    let analysis={active:0,tenure:{less3:0,between3and24:0,over24:0},certs:{over20:0,less20:0,zero:0},regions:{},nonCerts:{}};
+    nonCertCoursesKeys.forEach(c=>analysis.nonCerts[c]={totalTaken:0,p100:0,p50to99:0,pLess50:0,p0:0,pNull:0});
+    globalData.allActive.forEach(emp=>{
+        if(globalData.excludedRegions.has(emp.region)) return;
+        analysis.active++;
+        if(emp.tenureMonths>=0){if(emp.tenureMonths<3)analysis.tenure.less3++;else if(emp.tenureMonths<=24)analysis.tenure.between3and24++;else analysis.tenure.over24++;}
+        if(emp.totalCerts>=20)analysis.certs.over20++;else if(emp.totalCerts>0)analysis.certs.less20++;else analysis.certs.zero++;
+        if(!analysis.regions[emp.region]) analysis.regions[emp.region]={total:0,over20:0,less20:0,zero:0};
+        let rs=analysis.regions[emp.region]; rs.total++;
+        if(emp.totalCerts>=20)rs.over20++;else if(emp.totalCerts>0)rs.less20++;else rs.zero++;
+        nonCertCoursesKeys.forEach(c=>{
+            let p=emp.nonCertProgress[c], s=analysis.nonCerts[c];
+            if(p!==null)s.totalTaken++;
+            if(p===100)s.p100++;else if(p>=50&&p<100)s.p50to99++;else if(p>0&&p<50)s.pLess50++;else if(p===0)s.p0++;else s.pNull++;
+        });
+    });
+    const g=id=>document.getElementById(id);
+    if(g('statActive'))g('statActive').innerText=analysis.active;
+    if(g('statExcluded'))g('statExcluded').innerText=globalData.excludedEmployees.length;
+    if(g('statMissing'))g('statMissing').innerText=globalData.missingEmployees.length;
+    if(g('statLess3'))g('statLess3').innerText=analysis.tenure.less3;
+    if(g('stat3to2'))g('stat3to2').innerText=analysis.tenure.between3and24;
+    if(g('statOver2'))g('statOver2').innerText=analysis.tenure.over24;
+    if(g('statCert20'))g('statCert20').innerText=analysis.certs.over20;
+    if(g('statCertLess20'))g('statCertLess20').innerText=analysis.certs.less20;
+    if(g('statCert0'))g('statCert0').innerText=analysis.certs.zero;
+
+    let regHtml='', exportBtnsHtml='';
+    Object.keys(analysis.regions).sort().forEach(reg=>{
+        let s=analysis.regions[reg];
+        let p20=s.total>0?Math.round((s.over20/s.total)*100):0;
+        let pL=s.total>0?Math.round((s.less20/s.total)*100):0;
+        let p0=s.total>0?Math.round((s.zero/s.total)*100):0;
+        regHtml+=`<tr>
+            <td class="font-bold text-slate-200">${reg}</td>
+            <td class="font-bold text-slate-300 text-base">${s.total}</td>
+            <td><span class="badge badge-emerald">${s.over20}</span></td>
+            <td>
+                <div class="flex items-center gap-2">
+                    <div class="progress-bar-outer" style="width:70px;"><div class="progress-bar-inner" style="width:${p20}%;background:#10b981;"></div></div>
+                    <span class="text-emerald-400 text-xs font-bold">${p20}%</span>
+                </div>
+            </td>
+            <td><span class="badge badge-amber">${s.less20}</span></td>
+            <td class="text-amber-400 text-xs font-bold">${pL}%</td>
+            <td><span class="badge badge-rose">${s.zero}</span></td>
+            <td class="text-rose-400 text-xs font-bold">${p0}%</td>
+        </tr>`;
+        exportBtnsHtml+=`<button onclick="exportRegion('${reg}')" class="btn btn-ghost text-xs"><i class="fas fa-download"></i> ${reg}</button>`;
+    });
+    if(!Object.keys(analysis.regions).length) regHtml=`<tr><td colspan="8" class="text-center py-8 text-slate-500">تم استبعاد كافة الأقاليم.</td></tr>`;
+    const rb=document.getElementById('regionAnalysisTableBody'); if(rb) rb.innerHTML=regHtml;
+
+    let ncHtml='';
+    nonCertCoursesKeys.forEach(c=>{
+        let s=analysis.nonCerts[c];
+        ncHtml+=`<tr><td class="font-bold text-slate-300">${c}</td><td class="font-bold text-slate-300">${s.totalTaken}</td><td><span class="badge badge-emerald">${s.p100}</span></td><td><span class="badge badge-cyan">${s.p50to99}</span></td><td><span class="badge badge-amber">${s.pLess50}</span></td><td><span class="badge badge-rose">${s.p0}</span></td><td class="text-slate-500 font-bold">${s.pNull}</td></tr>`;
+    });
+    const ncb=document.getElementById('nonCertAnalysisTableBody'); if(ncb) ncb.innerHTML=ncHtml;
+
+    let downloadAllBtn=`<button onclick="exportAllData()" class="btn btn-emerald"><i class="fas fa-file-excel"></i> تحميل الكل (مجمع)</button>`;
+    const ec=document.getElementById('exportButtonsContainer'); if(ec) ec.innerHTML=downloadAllBtn+exportBtnsHtml;
+    updateMonthlyProgressTab();
+}
+
+// ─── Export Functions ─────────────────────────────────────────────────────────
+function generateEmployeeAOA(emps) {
+    let aoa=[];
+    let header=["الرقم الوظيفي","الاسم","تاريخ التعيين","المشرف","مدير الإقليم","الإقليم","المدة (أشهر)","إجمالي الشهادات"];
+    targetMonthsKeys.forEach(m=>header.push(m.replace('-','/')));
+    aoa.push(header);
+    emps.forEach(emp=>{
+        let row=[emp.id,emp.name,formatDateDisplay(emp.hireDate),emp.supervisor,emp.manager,emp.region,emp.tenureMonths,emp.totalCerts];
+        targetMonthsKeys.forEach(m=>row.push(emp.monthsData[m]));
+        aoa.push(row);
+    });
+    return aoa;
+}
+
+function exportEliteData() {
+    let wb=XLSX.utils.book_new();
+    let valid=globalData.allActive.filter(e=>!globalData.excludedRegions.has(e.region)&&e.isEliteTarget);
+    let c1Key=eliteCoursesKeys[0]||'دورة 1', c2Key=eliteCoursesKeys[1]||'دورة 2';
+    let aoa=[[  "الرقم الوظيفي","الاسم","الإيميل","الإقليم",c1Key,c2Key,"مجموع المستكمل","الحالة"]];
+    valid.forEach(emp=>{
+        let h1=eliteCoursesKeys[0]?emp.eliteProgress[eliteCoursesKeys[0]]:false;
+        let h2=eliteCoursesKeys[1]?emp.eliteProgress[eliteCoursesKeys[1]]:false;
+        let cnt=(h1?1:0)+(h2?1:0);
+        let desc=cnt===2?'استكمل بالكامل':cnt===1?'جزء':'لم يستكمل';
+        aoa.push([emp.id,emp.name,emp.email||'',emp.region,h1?'نعم':'لا',h2?'نعم':'لا',cnt,desc]);
+    });
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(aoa),'تقرير دورات النخبة');
+    XLSX.writeFile(wb,'تقرير_دورات_النخبة.xlsx');
+}
+
+function exportAllData() {
+    let wb=XLSX.utils.book_new();
+    let valid=globalData.allActive.filter(e=>!globalData.excludedRegions.has(e.region));
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(generateEmployeeAOA(valid)),'جميع البائعين المعتمدين');
+    let t1=valid.filter(e=>e.tenureMonths>=0&&e.tenureMonths<3);
+    let t2=valid.filter(e=>e.tenureMonths>=3&&e.tenureMonths<=24);
+    let t3=valid.filter(e=>e.tenureMonths>24);
+    if(t1.length) XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(generateEmployeeAOA(t1)),'أقل من 3 شهور');
+    if(t2.length) XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(generateEmployeeAOA(t2)),'من 3 لسنتين');
+    if(t3.length) XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(generateEmployeeAOA(t3)),'أكثر من سنتين');
+    let ncAOA=[["الرقم الوظيفي","الاسم","الإقليم",...nonCertCoursesKeys]];
+    valid.forEach(emp=>{let row=[emp.id,emp.name,emp.region];nonCertCoursesKeys.forEach(c=>{let p=emp.nonCertProgress[c];row.push(p!==null?p+'%':'-');});ncAOA.push(row);});
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(ncAOA),'دورات بدون شهادات');
+    let aAOA=[["الإقليم","إجمالي الموظفين","20 شهادة فأكثر","النسبة %","أقل من 20","النسبة %","0 شهادة","النسبة %"]];
+    let tmpR={};
+    valid.forEach(emp=>{if(!tmpR[emp.region])tmpR[emp.region]={total:0,over20:0,less20:0,zero:0};let r=tmpR[emp.region];r.total++;if(emp.totalCerts>=20)r.over20++;else if(emp.totalCerts>0)r.less20++;else r.zero++;});
+    for(let reg in tmpR){let s=tmpR[reg];aAOA.push([reg,s.total,s.over20,(s.total?Math.round((s.over20/s.total)*100):0)+'%',s.less20,(s.total?Math.round((s.less20/s.total)*100):0)+'%',s.zero,(s.total?Math.round((s.zero/s.total)*100):0)+'%']);}
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(aAOA),'تحليل الأقاليم المعتمدة');
+    let exAOA=[["الرقم الوظيفي","الاسم","الحالة"]];
+    globalData.excludedEmployees.forEach(e=>exAOA.push([e.id,e.name,e.status]));
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(exAOA),'المستبعدين');
+    let misAOA=[["الرقم الوظيفي","الاسم بالاكاديمية","عدد الشهادات"]];
+    globalData.missingEmployees.forEach(e=>misAOA.push([e.id,e.name,e.totalCerts]));
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(misAOA),'بالأكاديمية فقط');
+    XLSX.writeFile(wb,'التحليل_الشامل.xlsx');
+}
+
+function exportRegion(regionName) {
+    let emps=globalData.allActive.filter(e=>e.region===regionName); if(!emps.length) return;
+    let wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(generateEmployeeAOA(emps)),'بائعين '+regionName.substring(0,20));
+    let ncAOA=[["الرقم الوظيفي","الاسم","الإقليم",...nonCertCoursesKeys]];
+    emps.forEach(emp=>{let row=[emp.id,emp.name,emp.region];nonCertCoursesKeys.forEach(c=>{let p=emp.nonCertProgress[c];row.push(p!==null?p+'%':'-');});ncAOA.push(row);});
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(ncAOA),'دورات بدون شهادات');
+    let tot=emps.length,o=0,l=0,z=0;
+    emps.forEach(e=>{if(e.totalCerts>=20)o++;else if(e.totalCerts>0)l++;else z++;});
+    let stAOA=[["البيان","العدد","النسبة المئوية"],["إجمالي الموظفين",tot,'100%'],["حاصلون على 20+",o,(tot?Math.round((o/tot)*100):0)+'%'],["أقل من 20",l,(tot?Math.round((l/tot)*100):0)+'%'],["بدون شهادات",z,(tot?Math.round((z/tot)*100):0)+'%']];
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(stAOA),'إحصائيات الإقليم');
+    XLSX.writeFile(wb,`تقرير_${regionName}.xlsx`);
+}
+
+function exportSupervisorsData() {
+    if(!currentSupervisorsData.length) return;
+    let wb=XLSX.utils.book_new();
+    let aoa=[["اسم المشرف","القطاع / الإقليم","إجمالي البائعين","أكملوا (20+)","أقل من 20","أصفار (بدون)"]];
+    if(globalData.hasOldData) aoa[0].push('المكملين في السابق','مقدار التقدم');
+    currentSupervisorsData.forEach(s=>{
+        let row=[s.name,s.region,s.total,s.over20,s.less20,s.zero];
+        if(globalData.hasOldData) row.push(s.oldOver20,s.over20-s.oldOver20);
+        aoa.push(row);
+    });
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(aoa),'تقييم المشرفين');
+    XLSX.writeFile(wb,'تقرير_تقييم_المشرفين.xlsx');
+}
+
+function exportCurrentSupervisorModal() {
+    if(!currentModalSupData) return;
+    let wb=XLSX.utils.book_new();
+    let aoa=[["الرقم الوظيفي","اسم الموظف","تاريخ التعيين","الشهادات الحالية","الشهادات (سابقاً)"]];
+    currentModalSupData.employees.forEach(emp=>aoa.push([emp.id,emp.name,formatDateDisplay(emp.hireDate),emp.totalCerts,globalData.hasOldData?emp.oldTotalCerts:'-']));
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(aoa),currentModalSupData.name.substring(0,25));
+    XLSX.writeFile(wb,`تقرير_${currentModalSupData.name}.xlsx`);
+}
+
+// Close modal on outside click
+document.getElementById('supervisorModal').addEventListener('click', function(e){
+    if(e.target===this) closeSupervisorDetails();
+});
+
+// Init drag scrolls after DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+    initAllDragScrolls();
+});
+</script>
+</body>
+</html>
