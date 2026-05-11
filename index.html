@@ -189,7 +189,7 @@
                     <i class="fas fa-user-times ml-2"></i> المستبعدين
                 </button>
                 <button class="tab-btn px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'missingTab')">
-                    <i class="fas fa-user-secret ml-2"></i> بالأكاديمية فقط
+                    <i class="fas fa-user-secret ml-2"></i> عدم التطابق (مفقودين)
                 </button>
                 <button class="tab-btn px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'nonCertTab')">
                     <i class="fas fa-book-open ml-2"></i> دورات بدون شهادات
@@ -209,7 +209,6 @@
                 <button class="tab-btn px-5 py-4 text-purple-700 font-bold bg-purple-50 border-r border-purple-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'comparisonTab')">
                     <i class="fas fa-balance-scale ml-2"></i> مقارنة الفترات
                 </button>
-                <!-- التابة الجديدة الخاصة بأوقات الذروة -->
                 <button class="tab-btn px-5 py-4 text-pink-700 font-bold bg-pink-50 border-r border-pink-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'timelineTab')">
                     <i class="fas fa-clock ml-2"></i> أوقات الذروة (التوقيت)
                 </button>
@@ -297,22 +296,64 @@
                     </div>
                 </div>
 
+                <!-- التبويب المعدل للمفقودين / عدم التطابق -->
                 <div id="missingTab" class="tab-content">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-slate-800">أرقام وظيفية بالأكاديمية وغير موجودة بالقوى</h2>
-                        <span id="missingCount" class="bg-yellow-100 text-yellow-800 text-sm font-bold px-3 py-1 rounded-full">0</span>
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-800 flex items-center">
+                                <i class="fas fa-user-secret text-indigo-500 ml-2"></i> بيانات عدم التطابق بين المنظومتين
+                            </h2>
+                            <p class="text-slate-500 text-sm mt-1">يُظهر الموظفين المتواجدين في ملف وغير موجودين في الآخر.</p>
+                        </div>
+                        <button onclick="exportMissingData()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-6 rounded-lg shadow transition transform hover:-translate-y-0.5 flex items-center">
+                            <i class="fas fa-file-excel ml-2"></i> تصدير إكسيل للمفقودين
+                        </button>
                     </div>
-                    <div class="table-container border border-slate-200 rounded-xl shadow-sm">
-                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
-                            <thead class="bg-slate-100 text-slate-800">
-                                <tr>
-                                    <th class="px-6 py-4 font-semibold uppercase tracking-wider">الرقم الوظيفي</th>
-                                    <th class="px-6 py-4 font-semibold uppercase tracking-wider">الاسم في الأكاديمية (إن وجد)</th>
-                                    <th class="px-6 py-4 font-semibold uppercase tracking-wider">عدد الشهادات</th>
-                                </tr>
-                            </thead>
-                            <tbody id="missingTableBody" class="bg-white divide-y divide-slate-100"></tbody>
-                        </table>
+
+                    <div class="flex border-b border-slate-200 mb-6 bg-slate-50 rounded-t-xl overflow-hidden">
+                        <button class="missing-sub-tab-btn active px-6 py-3 font-bold text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50 transition focus:outline-none" onclick="switchMissingSubTab(event, 'missingInWfSection')">
+                            في الأكاديمية فقط (غير مدرج بالقوى) <span id="missingCount" class="ml-2 bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded-full font-bold">0</span>
+                        </button>
+                        <button class="missing-sub-tab-btn px-6 py-3 font-semibold text-slate-500 border-b-2 border-transparent hover:bg-slate-100 transition focus:outline-none" onclick="switchMissingSubTab(event, 'missingInAcSection')">
+                            في القوى فقط (غير مدرج بالأكاديمية) <span id="missingFromAcCount" class="ml-2 bg-slate-200 text-slate-700 text-xs px-2 py-1 rounded-full font-bold">0</span>
+                        </button>
+                    </div>
+
+                    <!-- القسم الأول: في الأكاديمية فقط -->
+                    <div id="missingInWfSection">
+                        <div class="table-container border border-slate-200 rounded-xl shadow-sm">
+                            <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
+                                <thead class="bg-slate-100 text-slate-800">
+                                    <tr>
+                                        <th class="px-6 py-4 font-semibold uppercase tracking-wider">الرقم الوظيفي</th>
+                                        <th class="px-6 py-4 font-semibold uppercase tracking-wider">الاسم في الأكاديمية (إن وجد)</th>
+                                        <th class="px-6 py-4 font-semibold uppercase tracking-wider">عدد الشهادات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="missingTableBody" class="bg-white divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- القسم الثاني: في القوى فقط -->
+                    <div id="missingInAcSection" style="display: none;">
+                        <p class="text-sm text-slate-500 mb-4 bg-slate-50 p-3 border border-slate-200 rounded-lg">
+                            <i class="fas fa-info-circle text-indigo-500 ml-1"></i> هذه القائمة تعرض الأشخاص المدرجين في شيت القوى (التقسيم) <b>وليس لديهم أي سجل أو حساب</b> في شيت الأكاديمية إطلاقاً. (تتأثر هذه القائمة بفلتر البحث والإقليم الموجود بالأعلى).
+                        </p>
+                        <div class="table-container border border-slate-200 rounded-xl shadow-sm">
+                            <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
+                                <thead class="bg-slate-100 text-slate-800">
+                                    <tr>
+                                        <th class="px-6 py-4 font-semibold uppercase tracking-wider">الرقم الوظيفي</th>
+                                        <th class="px-6 py-4 font-semibold uppercase tracking-wider">الاسم في القوى</th>
+                                        <th class="px-6 py-4 font-semibold uppercase tracking-wider">الإقليم</th>
+                                        <th class="px-6 py-4 font-semibold uppercase tracking-wider">المشرف</th>
+                                        <th class="px-6 py-4 font-semibold uppercase tracking-wider">الحالة</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="missingFromAcTableBody" class="bg-white divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
@@ -564,7 +605,7 @@
                         </button>
                     </div>
 
-                    <!-- إحصائيات النخبة (الجديدة) -->
+                    <!-- إحصائيات النخبة -->
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                         <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl text-center shadow-sm">
                             <p class="text-slate-600 text-xs md:text-sm font-bold">إجمالي المستهدفين (بالعمل)</p>
@@ -600,7 +641,7 @@
                         </table>
                     </div>
 
-                    <!-- المستبعدين والمفقودين من النخبة (الجديدة) -->
+                    <!-- المستبعدين والمفقودين من النخبة -->
                     <div class="mt-8 bg-red-50/30 p-6 rounded-2xl border border-red-100">
                         <h3 class="text-xl font-bold text-red-800 mb-2 flex items-center">
                             <i class="fas fa-exclamation-triangle ml-2 text-red-500"></i> مستهدفون في النخبة (لكنهم مستبعدون أو غير موجودين بالقوى)
@@ -639,7 +680,6 @@
                         </div>
                 </div>
 
-                <!-- محتوى تابة أوقات الذروة الجديد -->
                 <div id="timelineTab" class="tab-content">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 bg-pink-50 p-6 rounded-2xl border border-pink-100">
                         <div>
@@ -702,7 +742,6 @@
     </div>
 
     <script>
-        // --- متغيرات Chart.js لتفريغها عند المعالجة مجدداً ---
         let hourlyChartInstance = null;
         let dailyChartInstance = null;
 
@@ -790,15 +829,13 @@
         let targetMonthsKeys = ["10-2025", "11-2025", "12-2025", "01-2026", "02-2026", "03-2026", "04-2026", "05-2026", "06-2026"];
         const nonCertCoursesKeys = ["1+2 Offer", "delivery order software", "Updates and New Circulars", "Deraah Seminars", "Deraah's new products", "Deraah campaigns"];
         
-        // --- تحديث أسماء دورات النخبة ---
         const eliteCoursesKeys = [
             "Sales Scenarios for Deraah Oud's Top Products", 
             "Sales Scenarios for DERAAH's Top Products"
         ];
 
         let globalData = {
-            allActive: [], excludedEmployees: [], missingEmployees: [], regionsSet: new Set(), excludedRegions: new Set(), allExtractedMonths: new Set(), hasOldData: false,
-            // بيانات تحليل الوقت الجديدة
+            allActive: [], excludedEmployees: [], missingEmployees: [], missingFromAcademy: [], regionsSet: new Set(), excludedRegions: new Set(), allExtractedMonths: new Set(), hasOldData: false,
             timeline: {
                 hourly: Array(24).fill(0),
                 daily: {},
@@ -814,6 +851,22 @@
             if(event && event.currentTarget) event.currentTarget.classList.add('active');
             const targetTab = document.getElementById(tabId);
             if(targetTab) targetTab.classList.add('active');
+        }
+
+        function switchMissingSubTab(event, sectionId) {
+            document.querySelectorAll('.missing-sub-tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'text-indigo-600', 'border-indigo-600', 'bg-indigo-50', 'font-bold');
+                btn.classList.add('text-slate-500', 'border-transparent', 'font-semibold');
+            });
+            if(event && event.currentTarget) {
+                const btn = event.currentTarget;
+                btn.classList.remove('text-slate-500', 'border-transparent', 'font-semibold');
+                btn.classList.add('active', 'text-indigo-600', 'border-indigo-600', 'bg-indigo-50', 'font-bold');
+            }
+            document.getElementById('missingInWfSection').style.display = 'none';
+            document.getElementById('missingInAcSection').style.display = 'none';
+            const targetSec = document.getElementById(sectionId);
+            if(targetSec) targetSec.style.display = 'block';
         }
 
         function switchAnalysisSubTab(event, sectionId) {
@@ -868,7 +921,6 @@
             return null;
         }
 
-        // --- دالة للحصول على رقم الأسبوع ---
         function getWeekNumber(d) {
             d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
             d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
@@ -957,11 +1009,12 @@
 
         function analyzeData(wfRows, acRows, oldAcRows) {
             globalData = { 
-                allActive: [], excludedEmployees: [], missingEmployees: [], regionsSet: new Set(), excludedRegions: new Set(), allExtractedMonths: new Set(), hasOldData: !!oldAcRows,
+                allActive: [], excludedEmployees: [], missingEmployees: [], missingFromAcademy: [], regionsSet: new Set(), excludedRegions: new Set(), allExtractedMonths: new Set(), hasOldData: !!oldAcRows,
                 timeline: { hourly: Array(24).fill(0), daily: {}, weekly: {} }
             };
             let employeeMap = {};
             let allWfIds = new Set();
+            let allAcIds = new Set(); // جديد: لجمع كل آيديهات الأكاديمية
 
             // 1. قراءة شيت القوى بالكامل
             for (let i = 1; i < wfRows.length; i++) {
@@ -974,7 +1027,6 @@
                 let supervisor = row.length > 13 ? cleanString(row[13]) : "بدون مشرف";
                 let manager = row.length > 15 ? cleanString(row[15]) : "";
                 
-                // تجهيز الموظف بالبيانات الأساسية (سواء كان على رأس العمل أم مستبعد)
                 let emp = { id, name, hireDate, status, supervisor, manager, region: determineRegion(manager), email: "", totalCerts: 0, oldTotalCerts: 0, monthsData: {}, nonCertProgress: {}, eliteProgress: {}, isEliteTarget: false };
                 targetMonthsKeys.forEach(m => emp.monthsData[m] = 0);
                 nonCertCoursesKeys.forEach(c => emp.nonCertProgress[c] = null);
@@ -997,7 +1049,8 @@
                 let row = acRows[i];
                 if (!row || row.length < 15) continue;
                 let id = cleanString(row[14]); if (!id) continue;
-                // استخراج الإيميل من عمود G (index 6)
+                allAcIds.add(id); // تسجيل الآيدي من الأكاديمية
+                
                 let rowEmail = row.length > 6 ? cleanString(row[6]) : "";
                 if (rowEmail && employeeMap[id] && !employeeMap[id].email) {
                     employeeMap[id].email = rowEmail;
@@ -1008,9 +1061,7 @@
                 let progressRaw = row.length > 26 ? row[26] : null;
                 let certInfo = parseCertificateDate(certValue);
 
-                // --- استخراج تواريخ وأوقات الشهادات لتكوين التايم لاين ---
                 if (certValue !== "-") {
-                    // Regex للبحث عن جميع التواريخ بالأوقات حتى لو تواجدت أكثر من شهادة في الخلية
                     let timeRegex = /(\d{2})\/(\d{2})\/(\d{4})[\s\r\n]+(\d{1,2}):(\d{2}):(\d{2})[\s\r\n]*(am|pm)/gi;
                     let match;
                     while ((match = timeRegex.exec(certValue)) !== null) {
@@ -1018,15 +1069,12 @@
                         let hour = parseInt(match[4], 10);
                         let ampm = match[7].toLowerCase();
 
-                        // تحويل لنظام 24 ساعة للرسم البياني
                         if (ampm === 'pm' && hour < 12) hour += 12;
                         if (ampm === 'am' && hour === 12) hour = 0;
 
                         globalData.timeline.hourly[hour]++;
-
-                        let dateKey = `${year}-${month}-${day}`; // YYYY-MM-DD
+                        let dateKey = `${year}-${month}-${day}`; 
                         globalData.timeline.daily[dateKey] = (globalData.timeline.daily[dateKey] || 0) + 1;
-
                         let d = new Date(year, parseInt(month)-1, day);
                         let weekNum = getWeekNumber(d);
                         let weekKey = `الأسبوع ${weekNum} - ${year}`;
@@ -1035,7 +1083,6 @@
                 }
 
                 if (employeeMap[id]) {
-                    // الموظف موجود في القوى (إما على رأس العمل أو مستبعد)
                     let matchedElite = eliteCoursesKeys.find(c => courseLower.includes(c.toLowerCase()));
                     if (matchedElite) {
                         employeeMap[id].isEliteTarget = true;
@@ -1057,7 +1104,6 @@
                         employeeMap[id].monthsData[certInfo.key]++;
                     }
                 } else if (!allWfIds.has(id)) {
-                    // الموظف غير موجود إطلاقاً في القوى (بالأكاديمية فقط)
                     if (!missingMap[id]) {
                         missingMap[id] = { 
                             id, 
@@ -1086,6 +1132,13 @@
             }
             globalData.missingEmployees = Object.values(missingMap);
 
+            // 3. التحقق من من هم في القوى وغير متواجدين في الأكاديمية إطلاقاً
+            for (let id in employeeMap) {
+                if (!allAcIds.has(id)) {
+                    globalData.missingFromAcademy.push(employeeMap[id]);
+                }
+            }
+
             if (oldAcRows) {
                 let oldCertMap = {};
                 for (let i = 1; i < oldAcRows.length; i++) {
@@ -1109,7 +1162,6 @@
                 globalData.allActive.forEach(emp => { targetMonthsKeys.forEach(m => { if (emp.monthsData[m] === undefined) emp.monthsData[m] = 0; }); });
             }
 
-            // تحديث رؤوس الأعمدة لجدول النخبة والجداول الجديدة
             let e1 = document.getElementById('eliteCourse1Head'); let e2 = document.getElementById('eliteCourse2Head');
             let oe1 = document.getElementById('eliteOffCourse1Head'); let oe2 = document.getElementById('eliteOffCourse2Head');
             if (e1 && eliteCoursesKeys[0]) e1.innerText = eliteCoursesKeys[0];
@@ -1120,11 +1172,10 @@
             populateMonthSelect();
             buildFilterUI();
             applyActiveFilters();
-            renderTimelineDashboard(); // رسم تابة أوقات الذروة
+            renderTimelineDashboard(); 
         }
 
         function renderTimelineDashboard() {
-            // حساب أكثر يوم
             let maxDay = "-", maxDayCount = 0;
             for(let date in globalData.timeline.daily) {
                 if(globalData.timeline.daily[date] > maxDayCount) {
@@ -1133,7 +1184,6 @@
                 }
             }
 
-            // حساب أكثر أسبوع
             let maxWeek = "-", maxWeekCount = 0;
             for(let week in globalData.timeline.weekly) {
                 if(globalData.timeline.weekly[week] > maxWeekCount) {
@@ -1142,7 +1192,6 @@
                 }
             }
 
-            // حساب ساعة الذروة
             let peakHour = 0, peakHourCount = 0;
             globalData.timeline.hourly.forEach((count, hour) => {
                 if(count > peakHourCount) {
@@ -1151,10 +1200,8 @@
                 }
             });
 
-            // تنسيق ساعة الذروة (12 ص/م)
             let formattedPeakHour = `${peakHour % 12 || 12}:00 ${peakHour < 12 ? 'ص' : 'م'}`;
 
-            // تحديث واجهة الكروت
             document.getElementById('topActiveDayDate').innerText = maxDay !== "-" ? maxDay : "لا توجد بيانات";
             document.getElementById('topActiveDayCount').innerText = maxDayCount;
             document.getElementById('topActiveWeek').innerText = maxWeek !== "-" ? maxWeek : "لا توجد بيانات";
@@ -1162,7 +1209,6 @@
             document.getElementById('peakHourTime').innerText = peakHourCount > 0 ? formattedPeakHour : "لا توجد بيانات";
             document.getElementById('peakHourCount').innerText = peakHourCount;
 
-            // ---- رسم Chart الساعات (Bar Chart) ----
             const hourlyLabels = Array.from({length: 24}, (_, i) => `${i % 12 || 12} ${i < 12 ? 'ص' : 'م'}`);
             
             if (hourlyChartInstance) hourlyChartInstance.destroy();
@@ -1187,8 +1233,6 @@
                 }
             });
 
-            // ---- رسم Chart الأيام (Line Chart) ----
-            // ترتيب الأيام تصاعدياً
             let sortedDates = Object.keys(globalData.timeline.daily).sort();
             let dailyDataCounts = sortedDates.map(date => globalData.timeline.daily[date]);
 
@@ -1340,6 +1384,13 @@
                 return matchName && matchReg;
             });
 
+            // فلترة قسم (في القوى فقط) - الذين لم يظهروا في الأكاديمية إطلاقاً
+            let filteredMissingFromAc = globalData.missingFromAcademy.filter(e => {
+                let matchName = e.name.toLowerCase().includes(sName) || e.id.toLowerCase().includes(sName);
+                let matchReg = sReg === "" || e.region === sReg;
+                return matchName && matchReg;
+            });
+
             let t1 = filtered.filter(e => e.tenureMonths >= 0 && e.tenureMonths < 3);
             let t2 = filtered.filter(e => e.tenureMonths >= 3 && e.tenureMonths <= 24);
             let t3 = filtered.filter(e => e.tenureMonths > 24);
@@ -1349,20 +1400,38 @@
             renderTable('t2', t2);
             renderTable('t3', t3);
             renderNonCertTable(filtered);
-            
-            // تمرير البيانات المفلترة إضافة إلى المفقودين والمستبعدين لدالة النخبة الجديدة
             renderEliteTable(filtered, globalData.excludedEmployees, globalData.missingEmployees);
-            
             renderComparisonTable(filtered);
 
             const excludedBody = document.getElementById('excludedTableBody');
             if(excludedBody) excludedBody.innerHTML = globalData.excludedEmployees.map(e => `<tr><td class="px-6 py-4">${e.id}</td><td class="px-6 py-4">${e.name}</td><td class="px-6 py-4"><span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs">${e.status}</span></td></tr>`).join('');
             
+            // تحديث جداول عدم التطابق
             const missingBody = document.getElementById('missingTableBody');
             if(missingBody) missingBody.innerHTML = globalData.missingEmployees.map(e => `<tr><td class="px-6 py-4 font-bold">${e.id}</td><td class="px-6 py-4">${e.name}</td><td class="px-6 py-4 font-bold text-indigo-600">${e.totalCerts}</td></tr>`).join('');
             
+            const missingFromAcBody = document.getElementById('missingFromAcTableBody');
+            if(missingFromAcBody) {
+                missingFromAcBody.innerHTML = filteredMissingFromAc.map(e => {
+                    let statusCls = isExcluded(e.status) ? "bg-red-50 text-red-700 font-bold" : "bg-emerald-50 text-emerald-700 font-bold";
+                    return `
+                        <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                            <td class="px-6 py-4 font-bold text-slate-700">${e.id}</td>
+                            <td class="px-6 py-4">${e.name}</td>
+                            <td class="px-6 py-4"><span class="px-2 py-1 bg-slate-100 rounded text-xs whitespace-nowrap">${e.region}</span></td>
+                            <td class="px-6 py-4 text-xs text-slate-500">${e.supervisor}</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 rounded-full text-xs ${statusCls}">${e.status}</span></td>
+                        </tr>
+                    `;
+                }).join('');
+                if(filteredMissingFromAc.length === 0) {
+                    missingFromAcBody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-500">لا يوجد بيانات غير متطابقة حسب البحث الحالي.</td></tr>`;
+                }
+            }
+
             const excludedCount = document.getElementById('excludedCount'); if(excludedCount) excludedCount.innerText = globalData.excludedEmployees.length;
             const missingCount = document.getElementById('missingCount'); if(missingCount) missingCount.innerText = globalData.missingEmployees.length;
+            const missingFromAcCount = document.getElementById('missingFromAcCount'); if(missingFromAcCount) missingFromAcCount.innerText = filteredMissingFromAc.length;
 
             updateAnalysisUI();
             updateSupervisorsTab(); 
@@ -1588,7 +1657,6 @@
         function renderEliteTable(dataArray, excludedArray, missingArray) {
             let c1Key = eliteCoursesKeys[0]; let c2Key = eliteCoursesKeys[1];
             
-            // --- 1. إحصائيات الموظفين المستهدفين في النخبة (على رأس العمل) ---
             let eliteTargets = dataArray.filter(emp => emp.isEliteTarget);
             
             let finishedC1 = 0;
@@ -1608,7 +1676,6 @@
             const statC2El = document.getElementById('eliteStatC2'); if (statC2El) statC2El.innerText = finishedC2;
             const statBothEl = document.getElementById('eliteStatBoth'); if (statBothEl) statBothEl.innerText = finishedBoth;
 
-            // --- 2. رسم الجدول الأساسي للنخبة (على رأس العمل) ---
             let bodyHtml = eliteTargets.map(emp => {
                 let hasC1 = c1Key ? emp.eliteProgress[c1Key] : false;
                 let hasC2 = c2Key ? emp.eliteProgress[c2Key] : false;
@@ -1637,16 +1704,13 @@
             
             const bodyEl = document.getElementById('eliteTableBody'); if (bodyEl) bodyEl.innerHTML = bodyHtml;
 
-            // --- 3. البحث عن المستبعدين أو غير المدرجين (المفقودين) من مستهدفي النخبة ---
             let sName = document.getElementById('searchName') ? document.getElementById('searchName').value.toLowerCase() : "";
             let sReg = document.getElementById('filterRegion') ? document.getElementById('filterRegion').value : "";
 
-            // المفقودون (لا يملكون إقليم في شيت القوى لأنهم غير موجودين فيه)
             let offTargetMissing = missingArray.filter(emp => emp.isEliteTarget && 
                 (emp.name.toLowerCase().includes(sName) || emp.id.toLowerCase().includes(sName))
             ).map(emp => ({ ...emp, offReason: 'غير مدرج بقائمة القوى (بالأكاديمية فقط)' }));
 
-            // المستبعدون (لهم إقليم وحالة استبعاد في شيت القوى)
             let offTargetExcluded = excludedArray.filter(emp => emp.isEliteTarget && 
                 (emp.name.toLowerCase().includes(sName) || emp.id.toLowerCase().includes(sName)) &&
                 (sReg === "" || emp.region === sReg)
@@ -1862,6 +1926,32 @@
             return aoa;
         }
 
+        // دالة جديدة لتصدير بيانات عدم التطابق (المفقودين)
+        function exportMissingData() {
+            let wb = XLSX.utils.book_new();
+
+            // الشيت الأول: في الأكاديمية فقط
+            let misAOA = [["الرقم الوظيفي", "الاسم بالاكاديمية", "عدد الشهادات"]];
+            globalData.missingEmployees.forEach(e => misAOA.push([e.id, e.name, e.totalCerts]));
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(misAOA), "في الأكاديمية فقط");
+
+            // الشيت الثاني: في القوى فقط
+            let searchInput = document.getElementById('searchName') ? document.getElementById('searchName').value.toLowerCase() : "";
+            let sReg = document.getElementById('filterRegion') ? document.getElementById('filterRegion').value : "";
+
+            let filteredMissingFromAc = globalData.missingFromAcademy.filter(e => {
+                let matchName = e.name.toLowerCase().includes(searchInput) || e.id.toLowerCase().includes(searchInput);
+                let matchReg = sReg === "" || e.region === sReg;
+                return matchName && matchReg;
+            });
+
+            let missingAcAOA = [["الرقم الوظيفي", "الاسم بالقوى", "الإقليم", "المشرف", "حالة الموظف"]];
+            filteredMissingFromAc.forEach(e => missingAcAOA.push([e.id, e.name, e.region, e.supervisor, e.status]));
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(missingAcAOA), "في القوى فقط");
+
+            XLSX.writeFile(wb, "تقرير_عدم_التطابق_بين_الأنظمة.xlsx");
+        }
+
         function exportEliteData() {
             let wb = XLSX.utils.book_new();
             
@@ -1923,6 +2013,11 @@
             let misAOA = [["الرقم الوظيفي", "الاسم بالاكاديمية", "عدد الشهادات"]];
             globalData.missingEmployees.forEach(e => misAOA.push([e.id, e.name, e.totalCerts]));
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(misAOA), "بالأكاديمية فقط");
+
+            // تم إضافة الشيت الجديد للتصدير الشامل
+            let missingAcAOA = [["الرقم الوظيفي", "الاسم بالقوى", "الإقليم", "المشرف", "حالة الموظف"]];
+            globalData.missingFromAcademy.forEach(e => missingAcAOA.push([e.id, e.name, e.region, e.supervisor, e.status]));
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(missingAcAOA), "بالقوى فقط");
 
             XLSX.writeFile(wb, "التحليل_الشامل_الحديث.xlsx");
         }
