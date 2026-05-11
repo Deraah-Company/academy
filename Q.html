@@ -315,6 +315,7 @@
         <div class="tabs">
             <button class="tab-btn active" onclick="openTab(event, 'tab-changed')">تحولوا لاستقالة (تم التعديل)</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-mismatch-no-trans')">موجود بالقوى وتمت إضافته للتقسيم</button>
+            <button class="tab-btn" style="color: #d32f2f;" onclick="openTab(event, 'tab-excluded')">مستبعد (بيانات غير صالحة)</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-already')">استقالة من قبل (لهم معاملة)</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-mismatch-trans')">غير مطابق (له معاملة استقالة)</button>
         </div>
@@ -332,6 +333,16 @@
             </div>
             <table id="table-mismatch-no-trans">
                 <thead><tr><th>الرقم</th><th>الاسم</th><th>الحالة في القوى</th><th>ملاحظة الإضافة</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="tab-excluded" class="tab-content">
+            <div style="background-color: #ffebee; padding: 10px; border-radius: 5px; margin-bottom: 15px; color: #c62828; font-weight: bold;">
+                ملاحظة: هؤلاء الموظفين موجودين في القوى ولكن تم استبعادهم من الإضافة للتقسيم لوجود بيانات غير صالحة (0، N/A، #NAME) في أعمدة الإدارة.
+            </div>
+            <table id="table-excluded">
+                <thead><tr><th>الرقم</th><th>الاسم</th><th>العمود N (من Z)</th><th>العمود O (من Y)</th><th>العمود P (من X)</th></tr></thead>
                 <tbody></tbody>
             </table>
         </div>
@@ -356,8 +367,16 @@
 
 <script>
     let finalDivisionData = [];
-    let processedLogs = { changed: [], already: [], mismatchTrans: [], mismatchNoTrans: [] };
+    let processedLogs = { changed: [], already: [], mismatchTrans: [], mismatchNoTrans: [], excluded: [] };
     let allStaffDict = {};
+
+    // دالة للتحقق من البيانات غير الصالحة
+    function isInvalidData(val) {
+        if (val === null || val === undefined || String(val).trim() === "") return true;
+        let strVal = String(val).trim().toUpperCase();
+        if (strVal === "0" || strVal === "N/A" || strVal === "NA" || strVal.startsWith("#")) return true;
+        return false;
+    }
 
     // إعداد واجهة السحب والإفلات
     document.querySelectorAll('.drop-zone input[type="file"]').forEach(input => {
@@ -417,6 +436,12 @@
                 if (!row) continue;
                 let id = row[0] ? String(row[0]).trim() : null;
                 let name = row[1] ? String(row[1]).trim() : "غير معروف";
+                
+                // جلب بيانات الأعمدة X(23) , Y(24) , Z(25)
+                let colX = row[23]; 
+                let colY = row[24]; 
+                let colZ = row[25]; 
+
                 let transNo = row[27]; // العمود AB
                 let transType = row[28]; // العمود AC
                 
@@ -425,7 +450,10 @@
                         name: name,
                         trans: transNo || null, 
                         type: transType || null,
-                        isActive: !transNo 
+                        isActive: !transNo,
+                        colX: colX,
+                        colY: colY,
+                        colZ: colZ
                     };
                 }
             }
@@ -464,7 +492,7 @@
 
             let currentDivisionIds = new Set();
             let currentResignedMap = new Map();
-            processedLogs = { changed: [], already: [], mismatchTrans: [], mismatchNoTrans: [] };
+            processedLogs = { changed: [], already: [], mismatchTrans: [], mismatchNoTrans: [], excluded: [] };
 
             let stats = { oldTotal: 0, oldActive: 0, newTotal: 0, newActive: 0, newResigned: 0 };
 
@@ -504,23 +532,42 @@
             for (let id in allStaffDict) {
                 if (!currentDivisionIds.has(id)) {
                     if (allStaffDict[id].isActive) {
-                        let empName = allStaffDict[id].name;
+                        let emp = allStaffDict[id];
                         
-                        processedLogs.mismatchNoTrans.push({
-                            id: id, 
-                            name: empName,
-                            status: 'على رأس العمل', 
-                            note: 'موجود في القوى ومفقود من التقسيم! (تمت الإضافة)'
-                        });
-                        
-                        // إضافة الموظف لبيانات التقسيم لكي يتم تصديره
-                        let newRow = new Array(17).fill(null);
-                        newRow[0] = id;
-                        newRow[1] = empName;
-                        newRow[8] = "Active"; // عمود I - الوظيفة أو الحالة النشطة
-                        newRow[9] = "على راس العمل"; // عمود J - الاستقالة
-                        
-                        finalDivisionData.push(newRow);
+                        // تعيين القيم الجديدة للأعمدة
+                        let valN = emp.colZ; // N يأخذ من Z
+                        let valO = emp.colY; // O يأخذ من Y
+                        let valP = emp.colX; // P يأخذ من X
+
+                        // التحقق من صلاحية البيانات
+                        if (isInvalidData(valN) || isInvalidData(valO) || isInvalidData(valP)) {
+                            processedLogs.excluded.push({
+                                id: id,
+                                name: emp.name,
+                                valN: valN !== undefined ? valN : "فارغ",
+                                valO: valO !== undefined ? valO : "فارغ",
+                                valP: valP !== undefined ? valP : "فارغ"
+                            });
+                        } else {
+                            processedLogs.mismatchNoTrans.push({
+                                id: id, 
+                                name: emp.name,
+                                status: 'على رأس العمل', 
+                                note: 'تمت الإضافة بنجاح وتطابق الإدارات'
+                            });
+                            
+                            // إضافة الموظف لبيانات التقسيم لكي يتم تصديره
+                            let newRow = new Array(17).fill(null);
+                            newRow[0] = id;
+                            newRow[1] = emp.name;
+                            newRow[8] = "Active"; // عمود I
+                            newRow[9] = "على راس العمل"; // عمود J
+                            newRow[13] = valN; // العمود N (index 13)
+                            newRow[14] = valO; // العمود O (index 14)
+                            newRow[15] = valP; // العمود P (index 15)
+                            
+                            finalDivisionData.push(newRow);
+                        }
 
                     } else {
                         processedLogs.mismatchTrans.push({id: id, trans: allStaffDict[id].trans, note: 'محذوف من التقسيم (بسبب وجود استقالة)'});
@@ -607,6 +654,9 @@
 
         let mismatchNoTransBody = document.querySelector("#table-mismatch-no-trans tbody");
         mismatchNoTransBody.innerHTML = processedLogs.mismatchNoTrans.map(i => `<tr style="background:#e8f5e9"><td>${i.id}</td><td>${i.name}</td><td>${i.status}</td><td style="color:green; font-weight:bold;">${i.note}</td></tr>`).join('');
+
+        let excludedBody = document.querySelector("#table-excluded tbody");
+        excludedBody.innerHTML = processedLogs.excluded.map(i => `<tr><td>${i.id}</td><td>${i.name}</td><td style="color:red;">${i.valN}</td><td style="color:red;">${i.valO}</td><td style="color:red;">${i.valP}</td></tr>`).join('');
     }
 
     function manualResign() {
@@ -663,7 +713,7 @@
         const newWs = XLSX.utils.aoa_to_sheet(exportData);
         XLSX.utils.book_append_sheet(newWb, newWs, "ارقام جوالات البائعين");
 
-        XLSX.writeFile(newWb, "ارقام_جوالات_البائعين_المحدثة.xlsx");
+        XLSX.writeFile(newWb, "التقسيم_المحدثة.xlsx");
     }
 
     function openTab(evt, tabName) {
