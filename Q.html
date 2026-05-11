@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام مطابقة البائعين الذكي</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4e54c8;
+            --secondary: #8f94fb;
+            --danger: #ff4b2b;
+            --success: #11998e;
+            --text-dark: #2d3436;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            min-height: 100vh;
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: auto;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--glass-shadow);
+        }
+
+        h1, h2, h3 { text-align: center; color: #1a1a1a; }
+        
+        /* Drag & Drop Zones */
+        .upload-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .drop-zone {
+            background: rgba(255, 255, 255, 0.5);
+            border: 2px dashed var(--primary);
+            border-radius: 15px;
+            padding: 30px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .drop-zone:hover, .drop-zone.dragover {
+            background: rgba(78, 84, 200, 0.1);
+            border-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .drop-zone input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .drop-zone p { margin: 10px 0 0; font-weight: bold; color: var(--primary); }
+        .file-name { font-size: 0.9em; color: #555; margin-top: 10px; display: block; }
+
+        .btn-main {
+            display: block;
+            width: 300px;
+            margin: 0 auto 30px;
+            background: linear-gradient(to right, var(--success), #38ef7d);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
+            transition: 0.3s;
+        }
+
+        .btn-main:hover { transform: scale(1.05); }
+
+        /* Statistics Section */
+        .stats-container {
+            display: none;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-box {
+            flex: 1;
+            min-width: 250px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid #e1e1e1;
+            text-align: center;
+        }
+
+        .stat-box h3 {
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        
+        .stat-value {
+            color: var(--primary);
+            font-size: 1.3rem;
+        }
+
+        /* Comparison Section */
+        .comparison-container {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .compare-box {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid #e1e1e1;
+        }
+
+        .compare-box h3 {
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 20px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.5);
+            border: none;
+            padding: 12px 25px;
+            cursor: pointer;
+            border-radius: 10px 10px 0 0;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: bold;
+            color: #555;
+            transition: 0.3s;
+        }
+
+        .tab-btn:hover { background: rgba(255, 255, 255, 0.8); }
+        .tab-btn.active {
+            background: white;
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: white;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .tab-content.active { display: block; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        th, td { border: 1px solid #eee; padding: 10px; text-align: center; }
+        th { background-color: var(--primary); color: white; position: sticky; top: 0; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #f1f1f1; }
+
+        /* Manual Section */
+        .manual-section {
+            background: rgba(255, 235, 153, 0.3);
+            border: 1px solid rgba(255, 204, 0, 0.5);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .manual-section input {
+            padding: 12px;
+            width: 250px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        .btn-danger {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-family: 'Tajawal'; font-weight: bold;
+        }
+
+        .btn-export {
+            display: block; width: 100%; max-width: 400px; margin: 30px auto 0;
+            background: linear-gradient(to right, #0052D4, #4364F7, #6FB1FC);
+            color: white; border: none; padding: 15px; font-size: 18px; border-radius: 50px; cursor: pointer; font-family: 'Tajawal'; font-weight: bold; box-shadow: 0 4px 15px rgba(0, 82, 212, 0.4);
+        }
+
+        #results-area { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>نظام مطابقة وتقسيم القوى العاملة المتقدم</h1>
+    
+    <div class="upload-section">
+        <div class="drop-zone" id="dz-matching">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+            <p>1. ملف مطابقة القوى</p>
+            <span class="file-name" id="fn-matching">لم يتم اختيار ملف</span>
+            <input type="file" id="fileMatching" accept=".xlsx, .xls">
+        </div>
+        
+        <div class="drop-zone" id="dz-division">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+            <p>2. التقسيم الحالي</p>
+            <span class="file-name" id="fn-division">لم يتم اختيار ملف</span>
+            <input type="file" id="fileDivision" accept=".xlsx, .xls">
+        </div>
+
+        <div class="drop-zone" id="dz-old">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            <p>3. التقسيم القديم (اختياري)</p>
+            <span class="file-name" id="fn-old">لم يتم اختيار ملف للمقارنة</span>
+            <input type="file" id="fileOldDivision" accept=".xlsx, .xls">
+        </div>
+    </div>
+
+    <button class="btn-main" onclick="processFiles()">معالجة ومطابقة البيانات</button>
+
+    <div id="results-area">
+        
+        <!-- قسم الإحصائيات الجديد -->
+        <div class="stats-container" id="stats-section">
+            <div class="stat-box">
+                <h3>حالة التقسيم (قبل المعالجة)</h3>
+                <div class="stat-item"><span>إجمالي الموظفين بالملف:</span> <span class="stat-value" id="stat-old-total">0</span></div>
+                <div class="stat-item"><span>على رأس العمل:</span> <span class="stat-value" style="color:var(--success)" id="stat-old-active">0</span></div>
+            </div>
+            <div class="stat-box">
+                <h3>حالة التقسيم (بعد المعالجة والإضافات)</h3>
+                <div class="stat-item"><span>إجمالي الموظفين النهائي:</span> <span class="stat-value" id="stat-new-total">0</span></div>
+                <div class="stat-item"><span>على رأس العمل:</span> <span class="stat-value" style="color:var(--success)" id="stat-new-active">0</span></div>
+                <div class="stat-item"><span>عدد المستقيلين:</span> <span class="stat-value" style="color:var(--danger)" id="stat-new-resigned">0</span></div>
+            </div>
+        </div>
+
+        <!-- Comparison Boxes (Old vs New) -->
+        <div class="comparison-container" id="comparison-section">
+            <div class="compare-box">
+                <h3 style="color: var(--danger)">استقالة في التقسيم الحالي وليس في القديم</h3>
+                <table id="table-curr-not-old"><thead><tr><th>الرقم</th><th>الاسم</th></tr></thead><tbody></tbody></table>
+            </div>
+            <div class="compare-box">
+                <h3 style="color: var(--primary)">استقالة في التقسيم القديم وليس في الحالي</h3>
+                <table id="table-old-not-curr"><thead><tr><th>الرقم</th><th>الاسم</th></tr></thead><tbody></tbody></table>
+            </div>
+        </div>
+
+        <div class="manual-section">
+            <div>
+                <h3 style="margin:0 0 10px 0; color:#b08d00;">تعديل يدوي قبل التصدير</h3>
+                <p style="margin:0; font-size: 14px;">أدخل الرقم الوظيفي لتحويل الموظف إلى "استقالة" يدوياً.</p>
+            </div>
+            <div>
+                <input type="text" id="manualEmpId" placeholder="رقم الموظف...">
+                <button class="btn-danger" onclick="manualResign()">تأكيد الاستقالة</button>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab(event, 'tab-changed')">تحولوا لاستقالة (تم التعديل)</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-mismatch-no-trans')">موجود بالقوى وتمت إضافته للتقسيم</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-already')">استقالة من قبل (لهم معاملة)</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-mismatch-trans')">غير مطابق (له معاملة استقالة)</button>
+        </div>
+
+        <div id="tab-changed" class="tab-content active">
+            <table id="table-changed">
+                <thead><tr><th>الرقم</th><th>الاسم</th><th>الحالة القديمة</th><th>رقم المعاملة</th><th>نوع المعاملة</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="tab-mismatch-no-trans" class="tab-content">
+            <div style="background-color: #e8f5e9; padding: 10px; border-radius: 5px; margin-bottom: 15px; color: #2e7d32; font-weight: bold;">
+                ملاحظة: هؤلاء الموظفين تم إضافتهم تلقائياً إلى بيانات التقسيم وسيتم تصديرهم في ملف الإكسل.
+            </div>
+            <table id="table-mismatch-no-trans">
+                <thead><tr><th>الرقم</th><th>الاسم</th><th>الحالة في القوى</th><th>ملاحظة الإضافة</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="tab-already" class="tab-content">
+            <table id="table-already">
+                <thead><tr><th>الرقم</th><th>الاسم</th><th>الحالة</th><th>رقم المعاملة</th><th>نوع المعاملة</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="tab-mismatch-trans" class="tab-content">
+            <table id="table-mismatch-trans">
+                <thead><tr><th>الرقم</th><th>رقم المعاملة</th><th>ملاحظة</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <button class="btn-export" onclick="exportExcel()">تصدير شيت أرقام الجوالات (A إلى Q)</button>
+    </div>
+</div>
+
+<script>
+    let finalDivisionData = [];
+    let processedLogs = { changed: [], already: [], mismatchTrans: [], mismatchNoTrans: [] };
+    let allStaffDict = {};
+
+    // إعداد واجهة السحب والإفلات
+    document.querySelectorAll('.drop-zone input[type="file"]').forEach(input => {
+        let zone = input.parentElement;
+        let nameSpan = zone.querySelector('.file-name');
+
+        input.addEventListener('change', (e) => {
+            if(input.files.length > 0) nameSpan.textContent = input.files[0].name;
+        });
+
+        zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
+        zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+        zone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            zone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                input.files = e.dataTransfer.files;
+                nameSpan.textContent = input.files[0].name;
+            }
+        });
+    });
+
+    async function readExcelFile(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const data = new Uint8Array(e.target.result);
+                resolve(XLSX.read(data, { type: 'array' }));
+            };
+            reader.onerror = reject;
+            reader.readAsArrayBuffer(file);
+        });
+    }
+
+    async function processFiles() {
+        const fileMatch = document.getElementById('fileMatching').files[0];
+        const fileDiv = document.getElementById('fileDivision').files[0];
+        const fileOld = document.getElementById('fileOldDivision').files[0];
+
+        if (!fileMatch || !fileDiv) {
+            alert("يرجى رفع ملف 'مطابقة القوى' وملف 'التقسيم الحالي' كحد أدنى!");
+            return;
+        }
+
+        try {
+            const wbMatch = await readExcelFile(fileMatch);
+            const wbDiv = await readExcelFile(fileDiv);
+            
+            allStaffDict = {};
+            
+            // 1. قراءة بيانات القوى العاملة
+            let wsMatchName = wbMatch.SheetNames.includes("بيانات البائعين 2026") ? "بيانات البائعين 2026" : wbMatch.SheetNames[2];
+            let wsMatchData = XLSX.utils.sheet_to_json(wbMatch.Sheets[wsMatchName], {header: 1});
+            
+            for (let i = 1; i < wsMatchData.length; i++) {
+                let row = wsMatchData[i];
+                if (!row) continue;
+                let id = row[0] ? String(row[0]).trim() : null;
+                let name = row[1] ? String(row[1]).trim() : "غير معروف";
+                let transNo = row[27]; // العمود AB
+                let transType = row[28]; // العمود AC
+                
+                if (id) {
+                    allStaffDict[id] = { 
+                        name: name,
+                        trans: transNo || null, 
+                        type: transType || null,
+                        isActive: !transNo 
+                    };
+                }
+            }
+
+            if (wbMatch.SheetNames.includes("خاص بالموارد ( انهاءات )")) {
+                let wsHRData = XLSX.utils.sheet_to_json(wbMatch.Sheets["خاص بالموارد ( انهاءات )"], {header: 1});
+                for (let i = 1; i < wsHRData.length; i++) {
+                    let row = wsHRData[i];
+                    if (!row) continue;
+                    let id = row[0] ? String(row[0]).trim() : null;
+                    let transNo = row[1];
+                    let transType = row[2];
+                    if (id && transNo) {
+                        if(!allStaffDict[id]) allStaffDict[id] = {name: "غير معروف"};
+                        allStaffDict[id].trans = transNo;
+                        allStaffDict[id].type = transType;
+                        allStaffDict[id].isActive = false;
+                    }
+                }
+            }
+
+            // 2. معالجة ملف التقسيم الحالي
+            let wsDivName = wbDiv.SheetNames.includes("ارقام جوالات البائعين") ? "ارقام جوالات البائعين" : wbDiv.SheetNames[2];
+            finalDivisionData = XLSX.utils.sheet_to_json(wbDiv.Sheets[wsDivName], {header: 1, defval: null});
+
+            // === تنظيف الصفوف الفارغة في البداية (لحل مشكلة الصف 1 الفارغ عند التصدير) ===
+            while(finalDivisionData.length > 0) {
+                let firstRow = finalDivisionData[0];
+                let isRowEmpty = !firstRow || firstRow.every(val => val === null || val === "" || val === undefined);
+                if (isRowEmpty) {
+                    finalDivisionData.shift(); // مسح الصف الفارغ
+                } else {
+                    break; // التوقف عند العثور على صف العناوين
+                }
+            }
+
+            let currentDivisionIds = new Set();
+            let currentResignedMap = new Map();
+            processedLogs = { changed: [], already: [], mismatchTrans: [], mismatchNoTrans: [] };
+
+            let stats = { oldTotal: 0, oldActive: 0, newTotal: 0, newActive: 0, newResigned: 0 };
+
+            // نبدأ اللوب من 1 (بافتراض أن index 0 أصبح هو العناوين بعد التنظيف)
+            for (let i = 1; i < finalDivisionData.length; i++) {
+                let row = finalDivisionData[i];
+                if (!row || !row[0] || String(row[0]).trim() === "") continue;
+
+                stats.oldTotal++;
+                
+                let id = String(row[0]).trim();
+                let name = row[1] || "غير معروف";
+                let status = row[9] ? String(row[9]).trim() : "";
+                
+                if (!status.includes("استقال")) {
+                    stats.oldActive++;
+                }
+
+                currentDivisionIds.add(id);
+
+                let isResignedInText = status.includes("استقال");
+                if (isResignedInText) currentResignedMap.set(id, name);
+
+                if (allStaffDict[id] && !allStaffDict[id].isActive) {
+                    let resData = allStaffDict[id];
+                    if (isResignedInText) {
+                        processedLogs.already.push({id, name, status, trans: resData.trans, type: resData.type});
+                    } else {
+                        processedLogs.changed.push({id, name, oldStatus: status, trans: resData.trans, type: resData.type});
+                        finalDivisionData[i][9] = "استقالة";
+                        currentResignedMap.set(id, name);
+                    }
+                }
+            }
+
+            // 3. فحص من هو في القوى ومفقود من التقسيم
+            for (let id in allStaffDict) {
+                if (!currentDivisionIds.has(id)) {
+                    if (allStaffDict[id].isActive) {
+                        let empName = allStaffDict[id].name;
+                        
+                        processedLogs.mismatchNoTrans.push({
+                            id: id, 
+                            name: empName,
+                            status: 'على رأس العمل', 
+                            note: 'موجود في القوى ومفقود من التقسيم! (تمت الإضافة)'
+                        });
+                        
+                        // إضافة الموظف لبيانات التقسيم لكي يتم تصديره
+                        let newRow = new Array(17).fill(null);
+                        newRow[0] = id;
+                        newRow[1] = empName;
+                        newRow[8] = "Active"; // عمود I - الوظيفة أو الحالة النشطة
+                        newRow[9] = "على راس العمل"; // عمود J - الاستقالة
+                        
+                        finalDivisionData.push(newRow);
+
+                    } else {
+                        processedLogs.mismatchTrans.push({id: id, trans: allStaffDict[id].trans, note: 'محذوف من التقسيم (بسبب وجود استقالة)'});
+                    }
+                }
+            }
+
+            // 4. مقارنة التقسيم القديم (إن وجد)
+            if (fileOld) {
+                const wbOld = await readExcelFile(fileOld);
+                let wsOldName = wbOld.SheetNames.includes("ارقام جوالات البائعين") ? "ارقام جوالات البائعين" : wbOld.SheetNames[2];
+                let oldDivData = XLSX.utils.sheet_to_json(wbOld.Sheets[wsOldName], {header: 1});
+                
+                let oldResignedMap = new Map();
+                for (let i = 1; i < oldDivData.length; i++) {
+                    let row = oldDivData[i];
+                    if (!row || !row[0]) continue;
+                    let id = String(row[0]).trim();
+                    let name = row[1] || "غير معروف";
+                    let status = row[9] ? String(row[9]).trim() : "";
+                    if (status.includes("استقال")) {
+                        oldResignedMap.set(id, name);
+                    }
+                }
+
+                let currNotOld = [];
+                let oldNotCurr = [];
+                currentResignedMap.forEach((name, id) => { if (!oldResignedMap.has(id)) currNotOld.push({id, name}); });
+                oldResignedMap.forEach((name, id) => { if (!currentResignedMap.has(id)) oldNotCurr.push({id, name}); });
+                renderComparison(currNotOld, oldNotCurr);
+                document.getElementById('comparison-section').style.display = 'grid';
+            } else {
+                document.getElementById('comparison-section').style.display = 'none';
+            }
+
+            // 5. حساب الإحصائيات النهائية بعد التعديل والإضافة
+            for (let i = 1; i < finalDivisionData.length; i++) {
+                let row = finalDivisionData[i];
+                if (!row || !row[0] || String(row[0]).trim() === "") continue;
+                stats.newTotal++;
+                let status = row[9] ? String(row[9]).trim() : "";
+                if (status.includes("استقال")) {
+                    stats.newResigned++;
+                } else {
+                    stats.newActive++;
+                }
+            }
+
+            // تحديث أرقام الإحصائيات في الشاشة
+            document.getElementById('stat-old-total').innerText = stats.oldTotal;
+            document.getElementById('stat-old-active').innerText = stats.oldActive;
+            document.getElementById('stat-new-total').innerText = stats.newTotal;
+            document.getElementById('stat-new-active').innerText = stats.newActive;
+            document.getElementById('stat-new-resigned').innerText = stats.newResigned;
+            document.getElementById('stats-section').style.display = 'flex';
+
+            // عرض الجداول
+            renderTables();
+            document.getElementById('results-area').style.display = 'block';
+
+        } catch (error) {
+            console.error(error);
+            alert("حدث خطأ! تأكد من صحة الملفات وصيغتها وأن الشيتات المطلوبة موجودة.");
+        }
+    }
+
+    function renderComparison(currNotOld, oldNotCurr) {
+        let t1 = document.querySelector("#table-curr-not-old tbody");
+        t1.innerHTML = currNotOld.map(i => `<tr><td>${i.id}</td><td>${i.name}</td></tr>`).join('') || '<tr><td colspan="2">لا يوجد</td></tr>';
+        
+        let t2 = document.querySelector("#table-old-not-curr tbody");
+        t2.innerHTML = oldNotCurr.map(i => `<tr><td>${i.id}</td><td>${i.name}</td></tr>`).join('') || '<tr><td colspan="2">لا يوجد</td></tr>';
+    }
+
+    function renderTables() {
+        let changedBody = document.querySelector("#table-changed tbody");
+        changedBody.innerHTML = processedLogs.changed.map(i => `<tr><td>${i.id}</td><td>${i.name}</td><td>${i.oldStatus}</td><td>${i.trans}</td><td>${i.type||'-'}</td></tr>`).join('');
+
+        let alreadyBody = document.querySelector("#table-already tbody");
+        alreadyBody.innerHTML = processedLogs.already.map(i => `<tr><td>${i.id}</td><td>${i.name}</td><td>${i.status}</td><td>${i.trans}</td><td>${i.type||'-'}</td></tr>`).join('');
+
+        let mismatchTransBody = document.querySelector("#table-mismatch-trans tbody");
+        mismatchTransBody.innerHTML = processedLogs.mismatchTrans.map(i => `<tr><td>${i.id}</td><td>${i.trans}</td><td>${i.note}</td></tr>`).join('');
+
+        let mismatchNoTransBody = document.querySelector("#table-mismatch-no-trans tbody");
+        mismatchNoTransBody.innerHTML = processedLogs.mismatchNoTrans.map(i => `<tr style="background:#e8f5e9"><td>${i.id}</td><td>${i.name}</td><td>${i.status}</td><td style="color:green; font-weight:bold;">${i.note}</td></tr>`).join('');
+    }
+
+    function manualResign() {
+        let targetId = document.getElementById('manualEmpId').value.trim();
+        if(!targetId) return alert("الرجاء إدخال الرقم الوظيفي");
+
+        let foundIndex = -1;
+        let empName = "";
+        
+        for (let i = 1; i < finalDivisionData.length; i++) {
+            let row = finalDivisionData[i];
+            if (row && row[0] && String(row[0]).trim() === targetId) {
+                foundIndex = i;
+                empName = row[1];
+                break;
+            }
+        }
+
+        if (foundIndex !== -1) {
+            let confirmMsg = `تأكيد تحويل (${empName}) رقم (${targetId}) إلى استقالة؟`;
+            if(confirm(confirmMsg)) {
+                let oldStat = finalDivisionData[foundIndex][9] || "غير محدد";
+                finalDivisionData[foundIndex][9] = "استقالة";
+                processedLogs.changed.push({id: targetId, name: empName, oldStatus: oldStat, trans: "تعديل يدوي", type: "-"});
+                renderTables();
+                
+                // تحديث الإحصائيات في الشاشة
+                let currentActive = parseInt(document.getElementById('stat-new-active').innerText);
+                let currentResigned = parseInt(document.getElementById('stat-new-resigned').innerText);
+                document.getElementById('stat-new-active').innerText = currentActive - 1;
+                document.getElementById('stat-new-resigned').innerText = currentResigned + 1;
+
+                alert("تم التعديل بنجاح!");
+                document.getElementById('manualEmpId').value = "";
+            }
+        } else {
+            alert("هذا الرقم غير موجود في ملف التقسيم الحالي!");
+        }
+    }
+
+    function exportExcel() {
+        if(finalDivisionData.length === 0) return alert("لا يوجد بيانات لتصديرها!");
+
+        // استخراج الأعمدة من A إلى Q فقط (0 إلى 16) 
+        let exportData = finalDivisionData.map(row => {
+            let newRow = [];
+            for(let c = 0; c <= 16; c++) {
+                newRow.push(row[c] !== undefined ? row[c] : null);
+            }
+            return newRow;
+        });
+
+        const newWb = XLSX.utils.book_new();
+        const newWs = XLSX.utils.aoa_to_sheet(exportData);
+        XLSX.utils.book_append_sheet(newWb, newWs, "ارقام جوالات البائعين");
+
+        XLSX.writeFile(newWb, "ارقام_جوالات_البائعين_المحدثة.xlsx");
+    }
+
+    function openTab(evt, tabName) {
+        document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+        document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
+</script>
+
+</body>
+</html>
