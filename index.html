@@ -6,7 +6,6 @@
     <title>منظومة مطابقة القوى والأكاديمية - المطور</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- تم إضافة مكتبة Chart.js للرسوم البيانية -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -76,12 +75,12 @@
                         <p class="text-3xl font-extrabold text-indigo-800 mt-1" id="mTotal">0</p>
                     </div>
                     <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-xl text-center">
-                        <p class="text-emerald-600 text-sm font-bold">20 شهادة فأكثر</p>
-                        <p class="text-3xl font-extrabold text-emerald-800 mt-1" id="mOver20">0</p>
+                        <p class="text-emerald-600 text-sm font-bold" id="lblModalOverTarget">21 شهادة فأكثر</p>
+                        <p class="text-3xl font-extrabold text-emerald-800 mt-1" id="mOverTarget">0</p>
                     </div>
                     <div class="bg-orange-50 border border-orange-100 p-4 rounded-xl text-center">
-                        <p class="text-orange-600 text-sm font-bold">أقل من 20</p>
-                        <p class="text-3xl font-extrabold text-orange-800 mt-1" id="mLess20">0</p>
+                        <p class="text-orange-600 text-sm font-bold" id="lblModalLessTarget">أقل من 21</p>
+                        <p class="text-3xl font-extrabold text-orange-800 mt-1" id="mLessTarget">0</p>
                     </div>
                     <div class="bg-red-50 border border-red-100 p-4 rounded-xl text-center">
                         <p class="text-red-600 text-sm font-bold">بدون شهادات (0)</p>
@@ -100,7 +99,7 @@
                             </tr>
                         </thead>
                         <tbody id="modalEmpTableBody" class="bg-white divide-y divide-slate-100">
-                            </tbody>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -109,7 +108,7 @@
 
     <div class="max-w-screen-2xl mx-auto px-4 py-8">
         
-        <header class="bg-white shadow-sm rounded-2xl p-8 mb-8 border border-slate-100 flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
+        <header class="bg-white shadow-sm rounded-2xl p-8 mb-6 border border-slate-100 flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
             <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full -mr-10 -mt-10 blur-2xl"></div>
             <div class="absolute bottom-0 left-0 w-24 h-24 bg-blue-50 rounded-full -ml-8 -mb-8 blur-xl"></div>
             
@@ -122,6 +121,19 @@
                 <span id="currentDateDisplay">يتم حساب التعيين بناءً على تاريخ اليوم</span>
             </div>
         </header>
+
+        <!-- إعدادات المستهدف -->
+        <div class="bg-white shadow-sm rounded-2xl p-6 mb-8 border border-slate-100 flex flex-col md:flex-row items-center justify-between">
+            <div class="mb-4 md:mb-0">
+                <h3 class="font-bold text-slate-800 text-lg"><i class="fas fa-bullseye text-indigo-500 ml-2"></i> إعدادات المستهدف</h3>
+                <p class="text-sm text-slate-500">حدد عدد الشهادات المطلوب لتقييم الموظفين (سيتم حفظه تلقائياً)</p>
+            </div>
+            <div class="flex items-center gap-3 bg-indigo-50 p-2 rounded-xl border border-indigo-100">
+                <label for="targetCertsInput" class="font-bold text-indigo-900 pr-2">العدد المستهدف:</label>
+                <input type="number" id="targetCertsInput" min="1" max="100" value="21" class="w-24 px-3 py-2 border border-indigo-200 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-extrabold text-center text-indigo-700 bg-white" oninput="changeTargetCerts(this.value)" onchange="changeTargetCerts(this.value, true)">
+                <span class="text-indigo-700 font-bold pl-2">شهادة</span>
+            </div>
+        </div>
 
         <div class="bg-white shadow-sm rounded-2xl p-8 mb-8 border border-slate-100">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -210,7 +222,7 @@
                     <i class="fas fa-balance-scale ml-2"></i> مقارنة الفترات
                 </button>
                 <button class="tab-btn px-5 py-4 text-pink-700 font-bold bg-pink-50 border-r border-pink-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'timelineTab')">
-                    <i class="fas fa-clock ml-2"></i> أوقات الذروة (التوقيت)
+                    <i class="fas fa-clock ml-2"></i> أوقات الذروة
                 </button>
             </div>
 
@@ -296,7 +308,7 @@
                     </div>
                 </div>
 
-                <!-- التبويب المعدل للمفقودين / عدم التطابق -->
+                <!-- التبويب للمفقودين / عدم التطابق -->
                 <div id="missingTab" class="tab-content">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                         <div>
@@ -409,8 +421,8 @@
                                     <th class="px-5 py-4 font-semibold tracking-wider">اسم المشرف</th>
                                     <th class="px-5 py-4 font-semibold tracking-wider">مدير القطاع / الإقليم</th>
                                     <th class="px-5 py-4 font-semibold tracking-wider">إجمالي البائعين</th>
-                                    <th class="px-5 py-4 font-semibold text-emerald-600">أكملوا المستهدف (20+)</th>
-                                    <th class="px-5 py-4 font-semibold text-orange-600">أقل من 20 (عجز)</th>
+                                    <th class="px-5 py-4 font-semibold text-emerald-600" id="thSupOver">أكملوا المستهدف (21+)</th>
+                                    <th class="px-5 py-4 font-semibold text-orange-600" id="thSupLess">أقل من 21 (عجز)</th>
                                     <th class="px-5 py-4 font-semibold text-red-600">أصفار (بدون)</th>
                                     <th class="px-5 py-4 font-semibold text-purple-600" title="بناءً على التقرير السابق">مقدار التقدم</th>
                                 </tr>
@@ -427,7 +439,7 @@
                             <h2 class="text-2xl font-bold text-indigo-900 flex items-center mb-2">
                                 <i class="fas fa-calendar-check text-indigo-500 ml-2"></i> نسبة التقدم الشهري التراكمي
                             </h2>
-                            <p class="text-indigo-700 text-sm">يقوم النظام بحساب الإنجاز التراكمي. <span class="font-bold text-red-600">ملاحظة:</span> الحد الأقصى للمستهدف لا يتجاوز 20 شهادة.</p>
+                            <p class="text-indigo-700 text-sm">يقوم النظام بحساب الإنجاز التراكمي. <span class="font-bold text-red-600" id="lblMonthlyTargetDesc">الحد الأقصى للمستهدف لا يتجاوز 21 شهادة.</span></p>
                         </div>
                         
                         <div class="flex items-center gap-3 bg-white p-2 rounded-xl shadow-sm border border-indigo-100">
@@ -530,8 +542,8 @@
                             <div class="absolute -left-6 -top-6 text-emerald-50 opacity-50 group-hover:opacity-100 transition"><i class="fas fa-award text-9xl"></i></div>
                             <h3 class="font-bold text-xl border-b border-slate-100 pb-3 mb-4 relative z-10 text-slate-700">الشهادات (مفلتر)</h3>
                             <ul class="space-y-4 relative z-10 text-base">
-                                <li class="flex justify-between items-center"><span>أكملوا 20 فأكثر:</span> <span id="statCert20" class="font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-lg">0</span></li>
-                                <li class="flex justify-between items-center"><span>أقل من 20 شهادة:</span> <span id="statCertLess20" class="font-bold text-orange-600 bg-orange-50 px-3 py-1 rounded-lg">0</span></li>
+                                <li class="flex justify-between items-center"><span id="lblStatOver">أكملوا 21 فأكثر:</span> <span id="statCertTarget" class="font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-lg">0</span></li>
+                                <li class="flex justify-between items-center"><span id="lblStatLess">أقل من 21 شهادة:</span> <span id="statCertLessTarget" class="font-bold text-orange-600 bg-orange-50 px-3 py-1 rounded-lg">0</span></li>
                                 <li class="flex justify-between items-center"><span>بدون شهادات (0):</span> <span id="statCert0" class="font-bold text-red-600 bg-red-50 px-3 py-1 rounded-lg">0</span></li>
                             </ul>
                         </div>
@@ -548,7 +560,7 @@
 
                     <div id="certAnalysisSection">
                         <h3 class="text-2xl font-bold text-slate-800 mb-4 flex items-center">
-                            <i class="fas fa-map-marker-alt text-indigo-500 ml-2"></i> تحليل الأقاليم للشهادات (مبني على 20 شهادة)
+                            <i class="fas fa-map-marker-alt text-indigo-500 ml-2"></i> تحليل الأقاليم للشهادات
                         </h3>
                         <div class="table-container border border-slate-200 rounded-xl shadow-sm mb-8">
                             <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
@@ -556,9 +568,9 @@
                                     <tr>
                                         <th class="px-5 py-4 font-semibold tracking-wider">الإقليم</th>
                                         <th class="px-5 py-4 font-semibold tracking-wider">إجمالي الموظفين</th>
-                                        <th class="px-5 py-4 font-semibold text-emerald-600">20 شهادة فأكثر</th>
+                                        <th class="px-5 py-4 font-semibold text-emerald-600" id="thRegOver">21 شهادة فأكثر</th>
                                         <th class="px-5 py-4 font-semibold text-emerald-600">النسبة %</th>
-                                        <th class="px-5 py-4 font-semibold text-orange-600">أقل من 20</th>
+                                        <th class="px-5 py-4 font-semibold text-orange-600" id="thRegLess">أقل من 21</th>
                                         <th class="px-5 py-4 font-semibold text-orange-600">النسبة %</th>
                                         <th class="px-5 py-4 font-semibold text-red-600">0 شهادة</th>
                                         <th class="px-5 py-4 font-semibold text-red-600">النسبة %</th>
@@ -598,7 +610,7 @@
                             <h2 class="text-2xl font-bold text-slate-800 flex items-center">
                                 <i class="fas fa-star text-yellow-500 ml-2"></i> دورات النخبة
                             </h2>
-                            <p class="text-slate-500 text-sm mt-1">يعرض حالة إنجاز دورتي النخبة للموظفين المستهدفين فقط (الذين لديهم بيانات بالدورتين في الأكاديمية).</p>
+                            <p class="text-slate-500 text-sm mt-1">يعرض حالة إنجاز دورات النخبة للموظفين المستهدفين فقط (الذين لديهم بيانات بالدورات في الأكاديمية).</p>
                         </div>
                         <button onclick="exportEliteData()" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2.5 px-6 rounded-lg shadow transition transform hover:-translate-y-0.5">
                             <i class="fas fa-file-excel ml-2"></i> تصدير إكسيل (النخبة)
@@ -606,21 +618,25 @@
                     </div>
 
                     <!-- إحصائيات النخبة -->
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
                         <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl text-center shadow-sm">
                             <p class="text-slate-600 text-xs md:text-sm font-bold">إجمالي المستهدفين (بالعمل)</p>
                             <p class="text-3xl font-extrabold text-slate-800 mt-1" id="eliteStatTotal">0</p>
                         </div>
                         <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl text-center shadow-sm">
-                            <p class="text-blue-600 text-xs md:text-sm font-bold">أكملوا الدورة الأولى</p>
+                            <p class="text-blue-600 text-xs md:text-sm font-bold">أكملوا الأولى</p>
                             <p class="text-3xl font-extrabold text-blue-800 mt-1" id="eliteStatC1">0</p>
                         </div>
                         <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-xl text-center shadow-sm">
-                            <p class="text-indigo-600 text-xs md:text-sm font-bold">أكملوا الدورة الثانية</p>
+                            <p class="text-indigo-600 text-xs md:text-sm font-bold">أكملوا الثانية</p>
                             <p class="text-3xl font-extrabold text-indigo-800 mt-1" id="eliteStatC2">0</p>
                         </div>
+                        <div class="bg-purple-50 border border-purple-200 p-4 rounded-xl text-center shadow-sm">
+                            <p class="text-purple-600 text-xs md:text-sm font-bold">أكملوا الثالثة</p>
+                            <p class="text-3xl font-extrabold text-purple-800 mt-1" id="eliteStatC3">0</p>
+                        </div>
                         <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-center shadow-sm">
-                            <p class="text-emerald-600 text-xs md:text-sm font-bold">أكملوا الدورتين (الـ 2)</p>
+                            <p class="text-emerald-600 text-xs md:text-sm font-bold">أكملوا (الـ 3) كاملة</p>
                             <p class="text-3xl font-extrabold text-emerald-800 mt-1" id="eliteStatBoth">0</p>
                         </div>
                     </div>
@@ -632,8 +648,9 @@
                                     <th class="px-5 py-4 font-semibold tracking-wider">الرقم الوظيفي</th>
                                     <th class="px-5 py-4 font-semibold tracking-wider">الاسم</th>
                                     <th class="px-5 py-4 font-semibold tracking-wider">الإقليم</th>
-                                    <th class="px-5 py-4 font-semibold tracking-wider" id="eliteCourse1Head">دورة النخبة 1</th>
-                                    <th class="px-5 py-4 font-semibold tracking-wider" id="eliteCourse2Head">دورة النخبة 2</th>
+                                    <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteCourse1Head">دورة النخبة 1</th>
+                                    <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteCourse2Head">دورة النخبة 2</th>
+                                    <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteCourse3Head">دورة النخبة 3</th>
                                     <th class="px-5 py-4 font-semibold tracking-wider">حالة الاستكمال</th>
                                 </tr>
                             </thead>
@@ -656,8 +673,9 @@
                                         <th class="px-5 py-4 font-semibold tracking-wider">الرقم الوظيفي</th>
                                         <th class="px-5 py-4 font-semibold tracking-wider">الاسم</th>
                                         <th class="px-5 py-4 font-semibold tracking-wider">سبب الاستبعاد / الحالة</th>
-                                        <th class="px-5 py-4 font-semibold tracking-wider" id="eliteOffCourse1Head">دورة النخبة 1</th>
-                                        <th class="px-5 py-4 font-semibold tracking-wider" id="eliteOffCourse2Head">دورة النخبة 2</th>
+                                        <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteOffCourse1Head">دورة النخبة 1</th>
+                                        <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteOffCourse2Head">دورة النخبة 2</th>
+                                        <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteOffCourse3Head">دورة النخبة 3</th>
                                     </tr>
                                 </thead>
                                 <tbody id="eliteOffTargetTableBody" class="bg-white divide-y divide-slate-100"></tbody>
@@ -672,12 +690,12 @@
                             <h2 class="text-2xl font-bold text-purple-900 flex items-center mb-2">
                                 <i class="fas fa-balance-scale text-purple-500 ml-2"></i> مقارنة الفترات (الأقاليم)
                             </h2>
-                            <p class="text-purple-700 text-sm">يقارن عدد ونسبة الموظفين الحاصلين على <span class="font-bold">20 شهادة فأكثر</span> بين التقرير الحالي والتقرير السابق.</p>
+                            <p class="text-purple-700 text-sm" id="lblCmpDesc">يقارن عدد ونسبة الموظفين الحاصلين على <span class="font-bold">21 شهادة فأكثر</span> بين التقرير الحالي والتقرير السابق.</p>
                         </div>
                     </div>
                     
                     <div id="comparisonContent" class="table-container border border-slate-200 rounded-xl shadow-sm">
-                        </div>
+                    </div>
                 </div>
 
                 <div id="timelineTab" class="tab-content">
@@ -744,6 +762,49 @@
     <script>
         let hourlyChartInstance = null;
         let dailyChartInstance = null;
+
+        // --- Target Certs Logic ---
+        let targetCertsCount = parseInt(localStorage.getItem('targetCertsCount')) || 21;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('targetCertsInput').value = targetCertsCount;
+            updateDynamicLabels();
+        });
+
+        function changeTargetCerts(val, forceNormalize = false) {
+            if (val === "" || val === null || val === undefined) {
+                if (forceNormalize) document.getElementById('targetCertsInput').value = targetCertsCount;
+                return;
+            }
+            val = parseInt(val, 10);
+            if(isNaN(val) || val < 1) {
+                if (forceNormalize) document.getElementById('targetCertsInput').value = targetCertsCount;
+                return;
+            }
+            targetCertsCount = val;
+            localStorage.setItem('targetCertsCount', targetCertsCount);
+            const input = document.getElementById('targetCertsInput');
+            if (input && input.value !== String(targetCertsCount)) input.value = targetCertsCount;
+            updateDynamicLabels();
+            
+            // Re-render tables and charts if data is already loaded
+            if (globalData.allActive && globalData.allActive.length > 0) {
+                applyActiveFilters();
+            }
+        }
+
+        function updateDynamicLabels() {
+            const mOver = document.getElementById('lblModalOverTarget'); if(mOver) mOver.innerText = `${targetCertsCount} شهادة فأكثر`;
+            const mLess = document.getElementById('lblModalLessTarget'); if(mLess) mLess.innerText = `أقل من ${targetCertsCount}`;
+            const supThOver = document.getElementById('thSupOver'); if(supThOver) supThOver.innerText = `أكملوا المستهدف (${targetCertsCount}+)`;
+            const supThLess = document.getElementById('thSupLess'); if(supThLess) supThLess.innerText = `أقل من ${targetCertsCount} (عجز)`;
+            const mthTargetDesc = document.getElementById('lblMonthlyTargetDesc'); if(mthTargetDesc) mthTargetDesc.innerText = `الحد الأقصى للمستهدف لا يتجاوز ${targetCertsCount} شهادة.`;
+            const statOverLbl = document.getElementById('lblStatOver'); if(statOverLbl) statOverLbl.innerText = `أكملوا ${targetCertsCount} فأكثر:`;
+            const statLessLbl = document.getElementById('lblStatLess'); if(statLessLbl) statLessLbl.innerText = `أقل من ${targetCertsCount} شهادة:`;
+            const thRegOver = document.getElementById('thRegOver'); if(thRegOver) thRegOver.innerText = `${targetCertsCount} شهادة فأكثر`;
+            const thRegLess = document.getElementById('thRegLess'); if(thRegLess) thRegLess.innerText = `أقل من ${targetCertsCount}`;
+            const cmpDesc = document.getElementById('lblCmpDesc'); if(cmpDesc) cmpDesc.innerHTML = `يقارن عدد ونسبة الموظفين الحاصلين على <span class="font-bold">${targetCertsCount} شهادة فأكثر</span> بين التقرير الحالي والتقرير السابق.`;
+        }
 
         // --- Setup Drag and Drop ---
         ['Wf', 'Ac', 'OldAc'].forEach(type => {
@@ -827,11 +888,15 @@
 
         const excludedStatuses = ['استقالة', 'استقاله', 'إنهاء خدمة', 'انهاء خدمة', 'انهاء خدمه', 'انقطاع', 'انتقل إلى', 'انتقل الي', 'نقل'];
         let targetMonthsKeys = ["10-2025", "11-2025", "12-2025", "01-2026", "02-2026", "03-2026", "04-2026", "05-2026", "06-2026"];
-        const nonCertCoursesKeys = ["1+2 Offer", "delivery order software", "Updates and New Circulars", "Deraah Seminars", "Deraah's new products", "Deraah campaigns"];
         
+        // تم تحديث الدورات بدون شهادات وإضافة 2 جديدة
+        const nonCertCoursesKeys = ["1+2 Offer", "delivery order software", "Updates and New Circulars", "Deraah Seminars", "Deraah's new products", "Deraah campaigns", "Capsule", "Sales Scenario By English"];
+        
+        // تم تحديث دورات النخبة لتصبح 3
         const eliteCoursesKeys = [
             "Sales Scenarios for Deraah Oud's Top Products", 
-            "Sales Scenarios for DERAAH's Top Products"
+            "Sales Scenarios for DERAAH's Top Products",
+            "Time Management and Organization"
         ];
 
         let globalData = {
@@ -1014,9 +1079,8 @@
             };
             let employeeMap = {};
             let allWfIds = new Set();
-            let allAcIds = new Set(); // جديد: لجمع كل آيديهات الأكاديمية
+            let allAcIds = new Set();
 
-            // 1. قراءة شيت القوى بالكامل
             for (let i = 1; i < wfRows.length; i++) {
                 let row = wfRows[i];
                 if (!row || row.length < 2) continue;
@@ -1044,12 +1108,11 @@
             }
 
             let missingMap = {};
-            // 2. قراءة شيت الأكاديمية
             for (let i = 1; i < acRows.length; i++) {
                 let row = acRows[i];
                 if (!row || row.length < 15) continue;
                 let id = cleanString(row[14]); if (!id) continue;
-                allAcIds.add(id); // تسجيل الآيدي من الأكاديمية
+                allAcIds.add(id);
                 
                 let rowEmail = row.length > 6 ? cleanString(row[6]) : "";
                 if (rowEmail && employeeMap[id] && !employeeMap[id].email) {
@@ -1132,7 +1195,6 @@
             }
             globalData.missingEmployees = Object.values(missingMap);
 
-            // 3. التحقق من من هم في القوى وغير متواجدين في الأكاديمية إطلاقاً
             for (let id in employeeMap) {
                 if (!allAcIds.has(id)) {
                     globalData.missingFromAcademy.push(employeeMap[id]);
@@ -1162,12 +1224,15 @@
                 globalData.allActive.forEach(emp => { targetMonthsKeys.forEach(m => { if (emp.monthsData[m] === undefined) emp.monthsData[m] = 0; }); });
             }
 
-            let e1 = document.getElementById('eliteCourse1Head'); let e2 = document.getElementById('eliteCourse2Head');
-            let oe1 = document.getElementById('eliteOffCourse1Head'); let oe2 = document.getElementById('eliteOffCourse2Head');
+            // تحديث رؤوس أعمدة النخبة بناءً على المسميات
+            let e1 = document.getElementById('eliteCourse1Head'); let e2 = document.getElementById('eliteCourse2Head'); let e3 = document.getElementById('eliteCourse3Head');
+            let oe1 = document.getElementById('eliteOffCourse1Head'); let oe2 = document.getElementById('eliteOffCourse2Head'); let oe3 = document.getElementById('eliteOffCourse3Head');
             if (e1 && eliteCoursesKeys[0]) e1.innerText = eliteCoursesKeys[0];
             if (e2 && eliteCoursesKeys[1]) e2.innerText = eliteCoursesKeys[1];
+            if (e3 && eliteCoursesKeys[2]) e3.innerText = eliteCoursesKeys[2];
             if (oe1 && eliteCoursesKeys[0]) oe1.innerText = eliteCoursesKeys[0];
             if (oe2 && eliteCoursesKeys[1]) oe2.innerText = eliteCoursesKeys[1];
+            if (oe3 && eliteCoursesKeys[2]) oe3.innerText = eliteCoursesKeys[2];
 
             populateMonthSelect();
             buildFilterUI();
@@ -1299,7 +1364,8 @@
                 }
             });
 
-            if (maxCerts > 20) maxCerts = 20;
+            // الاعتماد على المستهدف الديناميكي
+            if (maxCerts > targetCertsCount) maxCerts = targetCertsCount;
             document.getElementById('monthlyTargetCerts').innerText = maxCerts;
 
             let regionStats = {}; let overallStats = { valid: 0, excluded: 0, achieved: 0, failed: 0 };
@@ -1384,7 +1450,6 @@
                 return matchName && matchReg;
             });
 
-            // فلترة قسم (في القوى فقط) - الذين لم يظهروا في الأكاديمية إطلاقاً
             let filteredMissingFromAc = globalData.missingFromAcademy.filter(e => {
                 let matchName = e.name.toLowerCase().includes(sName) || e.id.toLowerCase().includes(sName);
                 let matchReg = sReg === "" || e.region === sReg;
@@ -1406,7 +1471,6 @@
             const excludedBody = document.getElementById('excludedTableBody');
             if(excludedBody) excludedBody.innerHTML = globalData.excludedEmployees.map(e => `<tr><td class="px-6 py-4">${e.id}</td><td class="px-6 py-4">${e.name}</td><td class="px-6 py-4"><span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs">${e.status}</span></td></tr>`).join('');
             
-            // تحديث جداول عدم التطابق
             const missingBody = document.getElementById('missingTableBody');
             if(missingBody) missingBody.innerHTML = globalData.missingEmployees.map(e => `<tr><td class="px-6 py-4 font-bold">${e.id}</td><td class="px-6 py-4">${e.name}</td><td class="px-6 py-4 font-bold text-indigo-600">${e.totalCerts}</td></tr>`).join('');
             
@@ -1458,7 +1522,7 @@
                 if (!supStats[supName]) {
                     supStats[supName] = { 
                         name: supName, region: emp.region, total: 0, 
-                        over20: 0, less20: 0, zero: 0, oldOver20: 0, employees: [] 
+                        overTarget: 0, lessTarget: 0, zero: 0, oldOverTarget: 0, employees: [] 
                     };
                 }
 
@@ -1466,18 +1530,18 @@
                 s.total++;
                 s.employees.push(emp);
 
-                if (emp.totalCerts >= 20) s.over20++;
-                else if (emp.totalCerts > 0) s.less20++;
+                if (emp.totalCerts >= targetCertsCount) s.overTarget++;
+                else if (emp.totalCerts > 0) s.lessTarget++;
                 else s.zero++;
 
-                if (emp.oldTotalCerts >= 20) s.oldOver20++;
+                if (emp.oldTotalCerts >= targetCertsCount) s.oldOverTarget++;
             });
 
             currentSupervisorsData = Object.values(supStats).sort((a, b) => b.total - a.total);
 
             let html = '';
             currentSupervisorsData.forEach(s => {
-                let diff = s.over20 - s.oldOver20;
+                let diff = s.overTarget - s.oldOverTarget;
                 let diffHtml = '-';
                 if (globalData.hasOldData) {
                     if (diff > 0) diffHtml = `<span class="text-emerald-600 font-bold"><i class="fas fa-arrow-up"></i> +${diff}</span>`;
@@ -1492,8 +1556,8 @@
                         <td class="px-5 py-4 font-bold text-blue-700 group-hover:text-blue-900">${s.name}</td>
                         <td class="px-5 py-4 text-slate-500">${s.region}</td>
                         <td class="px-5 py-4 font-bold text-lg">${s.total}</td>
-                        <td class="px-5 py-4 text-emerald-600 font-bold">${s.over20}</td>
-                        <td class="px-5 py-4 text-orange-600 font-bold">${s.less20}</td>
+                        <td class="px-5 py-4 text-emerald-600 font-bold">${s.overTarget}</td>
+                        <td class="px-5 py-4 text-orange-600 font-bold">${s.lessTarget}</td>
                         <td class="px-5 py-4 text-red-600 font-bold">${s.zero}</td>
                         <td class="px-5 py-4">${diffHtml}</td>
                     </tr>
@@ -1514,12 +1578,12 @@
             document.getElementById('modalSupRegion').innerHTML = `<i class="fas fa-map-marker-alt text-indigo-400"></i> ${regionName}`;
             
             document.getElementById('mTotal').innerText = supData.total;
-            document.getElementById('mOver20').innerText = supData.over20;
-            document.getElementById('mLess20').innerText = supData.less20;
+            document.getElementById('mOverTarget').innerText = supData.overTarget;
+            document.getElementById('mLessTarget').innerText = supData.lessTarget;
             document.getElementById('mZero').innerText = supData.zero;
 
             let html = supData.employees.map(emp => {
-                let certCls = emp.totalCerts >= 20 ? "text-emerald-600 font-bold" : (emp.totalCerts > 0 ? "text-orange-600 font-bold" : "text-red-600 font-bold");
+                let certCls = emp.totalCerts >= targetCertsCount ? "text-emerald-600 font-bold" : (emp.totalCerts > 0 ? "text-orange-600 font-bold" : "text-red-600 font-bold");
                 return `
                     <tr class="hover:bg-slate-50 border-b border-slate-100">
                         <td class="px-4 py-3 text-slate-600 font-bold">${emp.id}</td>
@@ -1560,13 +1624,13 @@
         function exportSupervisorsData() {
             if (currentSupervisorsData.length === 0) return;
             let wb = XLSX.utils.book_new();
-            let aoa = [["اسم المشرف", "القطاع / الإقليم", "إجمالي البائعين", "أكملوا (20+)", "أقل من 20", "أصفار (بدون)"]];
+            let aoa = [["اسم المشرف", "القطاع / الإقليم", "إجمالي البائعين", `أكملوا (${targetCertsCount}+)`, `أقل من ${targetCertsCount}`, "أصفار (بدون)"]];
             if(globalData.hasOldData) aoa[0].push("المكملين في السابق", "مقدار التقدم");
 
             currentSupervisorsData.forEach(s => {
-                let row = [s.name, s.region, s.total, s.over20, s.less20, s.zero];
+                let row = [s.name, s.region, s.total, s.overTarget, s.lessTarget, s.zero];
                 if(globalData.hasOldData) {
-                    row.push(s.oldOver20, s.over20 - s.oldOver20);
+                    row.push(s.oldOverTarget, s.overTarget - s.oldOverTarget);
                 }
                 aoa.push(row);
             });
@@ -1596,7 +1660,7 @@
                     return `<td class="px-2 py-3 whitespace-nowrap text-center ${cls}">${val}</td>`;
                 }).join('');
                 
-                let certCls = emp.totalCerts >= 20 ? "bg-emerald-100 text-emerald-800" : (emp.totalCerts > 0 ? "bg-blue-100 text-blue-800" : "bg-red-100 text-red-800");
+                let certCls = emp.totalCerts >= targetCertsCount ? "bg-emerald-100 text-emerald-800" : (emp.totalCerts > 0 ? "bg-blue-100 text-blue-800" : "bg-red-100 text-red-800");
 
                 return `
                     <tr class="hover:bg-slate-50 transition border-b border-slate-100">
@@ -1655,35 +1719,40 @@
         }
 
         function renderEliteTable(dataArray, excludedArray, missingArray) {
-            let c1Key = eliteCoursesKeys[0]; let c2Key = eliteCoursesKeys[1];
+            let c1Key = eliteCoursesKeys[0]; 
+            let c2Key = eliteCoursesKeys[1];
+            let c3Key = eliteCoursesKeys[2];
             
             let eliteTargets = dataArray.filter(emp => emp.isEliteTarget);
             
-            let finishedC1 = 0;
-            let finishedC2 = 0;
-            let finishedBoth = 0;
+            let finishedC1 = 0, finishedC2 = 0, finishedC3 = 0, finishedBoth = 0;
 
             eliteTargets.forEach(emp => {
                 let hasC1 = c1Key ? emp.eliteProgress[c1Key] : false;
                 let hasC2 = c2Key ? emp.eliteProgress[c2Key] : false;
+                let hasC3 = c3Key ? emp.eliteProgress[c3Key] : false;
+                
                 if (hasC1) finishedC1++;
                 if (hasC2) finishedC2++;
-                if (hasC1 && hasC2) finishedBoth++;
+                if (hasC3) finishedC3++;
+                if (hasC1 && hasC2 && hasC3) finishedBoth++;
             });
 
             const statTotalEl = document.getElementById('eliteStatTotal'); if (statTotalEl) statTotalEl.innerText = eliteTargets.length;
             const statC1El = document.getElementById('eliteStatC1'); if (statC1El) statC1El.innerText = finishedC1;
             const statC2El = document.getElementById('eliteStatC2'); if (statC2El) statC2El.innerText = finishedC2;
+            const statC3El = document.getElementById('eliteStatC3'); if (statC3El) statC3El.innerText = finishedC3;
             const statBothEl = document.getElementById('eliteStatBoth'); if (statBothEl) statBothEl.innerText = finishedBoth;
 
             let bodyHtml = eliteTargets.map(emp => {
                 let hasC1 = c1Key ? emp.eliteProgress[c1Key] : false;
                 let hasC2 = c2Key ? emp.eliteProgress[c2Key] : false;
-                let completedCount = (hasC1 ? 1 : 0) + (hasC2 ? 1 : 0);
+                let hasC3 = c3Key ? emp.eliteProgress[c3Key] : false;
+                let completedCount = (hasC1 ? 1 : 0) + (hasC2 ? 1 : 0) + (hasC3 ? 1 : 0);
                 
                 let statusHtml = '';
-                if (completedCount === 2) statusHtml = `<span class="bg-emerald-100 text-emerald-700 font-bold px-3 py-1 rounded-full text-xs"><i class="fas fa-check-double ml-1"></i> استكمل بالكامل (2)</span>`;
-                else if (completedCount === 1) statusHtml = `<span class="bg-orange-100 text-orange-700 font-bold px-3 py-1 rounded-full text-xs"><i class="fas fa-exclamation-circle ml-1"></i> جزء (1)</span>`;
+                if (completedCount === 3) statusHtml = `<span class="bg-emerald-100 text-emerald-700 font-bold px-3 py-1 rounded-full text-xs"><i class="fas fa-check-double ml-1"></i> استكمل بالكامل (3)</span>`;
+                else if (completedCount > 0) statusHtml = `<span class="bg-orange-100 text-orange-700 font-bold px-3 py-1 rounded-full text-xs"><i class="fas fa-exclamation-circle ml-1"></i> جزء (${completedCount})</span>`;
                 else statusHtml = `<span class="bg-red-100 text-red-700 font-bold px-3 py-1 rounded-full text-xs"><i class="fas fa-times-circle ml-1"></i> لم يستكمل (0)</span>`;
 
                 return `
@@ -1693,13 +1762,14 @@
                         <td class="px-5 py-4"><span class="px-2 py-1 bg-slate-100 rounded border border-slate-200 text-xs whitespace-nowrap">${emp.region}</span></td>
                         <td class="px-5 py-4 font-bold ${hasC1 ? 'text-emerald-500' : 'text-slate-300'}">${hasC1 ? '<i class="fas fa-check text-lg"></i>' : '-'}</td>
                         <td class="px-5 py-4 font-bold ${hasC2 ? 'text-emerald-500' : 'text-slate-300'}">${hasC2 ? '<i class="fas fa-check text-lg"></i>' : '-'}</td>
+                        <td class="px-5 py-4 font-bold ${hasC3 ? 'text-emerald-500' : 'text-slate-300'}">${hasC3 ? '<i class="fas fa-check text-lg"></i>' : '-'}</td>
                         <td class="px-5 py-4">${statusHtml}</td>
                     </tr>
                 `;
             }).join('');
             
             if (eliteTargets.length === 0) {
-                bodyHtml = `<tr><td colspan="6" class="text-center py-8 text-slate-500">لا توجد بيانات لموظفي النخبة في هذا الفلتر.</td></tr>`;
+                bodyHtml = `<tr><td colspan="7" class="text-center py-8 text-slate-500">لا توجد بيانات لموظفي النخبة في هذا الفلتر.</td></tr>`;
             }
             
             const bodyEl = document.getElementById('eliteTableBody'); if (bodyEl) bodyEl.innerHTML = bodyHtml;
@@ -1721,6 +1791,7 @@
             let offBodyHtml = combinedOffTargets.map(emp => {
                 let hasC1 = c1Key ? emp.eliteProgress[c1Key] : false;
                 let hasC2 = c2Key ? emp.eliteProgress[c2Key] : false;
+                let hasC3 = c3Key ? emp.eliteProgress[c3Key] : false;
 
                 return `
                     <tr class="hover:bg-red-50 transition border-b border-red-100">
@@ -1729,12 +1800,13 @@
                         <td class="px-5 py-4"><span class="px-2 py-1 bg-red-100 text-red-800 rounded text-xs font-bold whitespace-nowrap">${emp.offReason}</span></td>
                         <td class="px-5 py-4 font-bold ${hasC1 ? 'text-emerald-500' : 'text-slate-300'}">${hasC1 ? '<i class="fas fa-check text-lg"></i>' : '-'}</td>
                         <td class="px-5 py-4 font-bold ${hasC2 ? 'text-emerald-500' : 'text-slate-300'}">${hasC2 ? '<i class="fas fa-check text-lg"></i>' : '-'}</td>
+                        <td class="px-5 py-4 font-bold ${hasC3 ? 'text-emerald-500' : 'text-slate-300'}">${hasC3 ? '<i class="fas fa-check text-lg"></i>' : '-'}</td>
                     </tr>
                 `;
             }).join('');
 
             if (combinedOffTargets.length === 0) {
-                offBodyHtml = `<tr><td colspan="5" class="text-center py-8 text-slate-500">لا يوجد مستبعدين أو مفقودين مستهدفين في النخبة.</td></tr>`;
+                offBodyHtml = `<tr><td colspan="6" class="text-center py-8 text-slate-500">لا يوجد مستبعدين أو مفقودين مستهدفين في النخبة.</td></tr>`;
             }
 
             const offBodyEl = document.getElementById('eliteOffTargetTableBody'); if (offBodyEl) offBodyEl.innerHTML = offBodyHtml;
@@ -1758,11 +1830,11 @@
             let regionStats = {};
             dataArray.forEach(emp => {
                 if (globalData.excludedRegions.has(emp.region)) return;
-                if (!regionStats[emp.region]) regionStats[emp.region] = { total: 0, oldOver20: 0, newOver20: 0 };
+                if (!regionStats[emp.region]) regionStats[emp.region] = { total: 0, oldOverTarget: 0, newOverTarget: 0 };
                 let stats = regionStats[emp.region];
                 stats.total++;
-                if (emp.oldTotalCerts >= 20) stats.oldOver20++;
-                if (emp.totalCerts >= 20) stats.newOver20++;
+                if (emp.oldTotalCerts >= targetCertsCount) stats.oldOverTarget++;
+                if (emp.totalCerts >= targetCertsCount) stats.newOverTarget++;
             });
 
             let html = `
@@ -1771,8 +1843,8 @@
                         <tr>
                             <th class="px-5 py-4 font-semibold tracking-wider">الإقليم</th>
                             <th class="px-5 py-4 font-semibold tracking-wider">إجمالي الموظفين المعتمدين</th>
-                            <th class="px-5 py-4 font-semibold text-purple-600">التقرير السابق (أكملوا 20)</th>
-                            <th class="px-5 py-4 font-semibold text-emerald-600">التقرير الحالي (أكملوا 20)</th>
+                            <th class="px-5 py-4 font-semibold text-purple-600">التقرير السابق (أكملوا المستهدف)</th>
+                            <th class="px-5 py-4 font-semibold text-emerald-600">التقرير الحالي (أكملوا المستهدف)</th>
                             <th class="px-5 py-4 font-semibold">نسبة التحسن (بناءً على النسبة)</th>
                         </tr>
                     </thead>
@@ -1782,10 +1854,10 @@
             let sortedRegions = Object.keys(regionStats).sort();
             sortedRegions.forEach(reg => {
                 let s = regionStats[reg];
-                let oldPct = s.total > 0 ? (s.oldOver20 / s.total) * 100 : 0;
-                let newPct = s.total > 0 ? (s.newOver20 / s.total) * 100 : 0;
+                let oldPct = s.total > 0 ? (s.oldOverTarget / s.total) * 100 : 0;
+                let newPct = s.total > 0 ? (s.newOverTarget / s.total) * 100 : 0;
                 let diffPct = newPct - oldPct;
-                let diffCount = s.newOver20 - s.oldOver20;
+                let diffCount = s.newOverTarget - s.oldOverTarget;
 
                 let diffHtml = '';
                 if (diffPct > 0) diffHtml = `<span class="text-emerald-600 font-bold bg-emerald-50 px-2 py-1 rounded"><i class="fas fa-arrow-up ml-1"></i> ${diffPct.toFixed(1)}% (+${diffCount} موظف)</span>`;
@@ -1796,8 +1868,8 @@
                     <tr class="hover:bg-purple-50 transition border-b border-slate-100">
                         <td class="px-5 py-4 font-bold text-slate-700">${reg}</td>
                         <td class="px-5 py-4 font-bold text-lg text-slate-500">${s.total}</td>
-                        <td class="px-5 py-4 text-purple-600 font-bold bg-purple-50/50">${s.oldOver20} <span class="text-xs font-normal">(${oldPct.toFixed(1)}%)</span></td>
-                        <td class="px-5 py-4 text-emerald-600 font-bold bg-emerald-50/50">${s.newOver20} <span class="text-xs font-normal">(${newPct.toFixed(1)}%)</span></td>
+                        <td class="px-5 py-4 text-purple-600 font-bold bg-purple-50/50">${s.oldOverTarget} <span class="text-xs font-normal">(${oldPct.toFixed(1)}%)</span></td>
+                        <td class="px-5 py-4 text-emerald-600 font-bold bg-emerald-50/50">${s.newOverTarget} <span class="text-xs font-normal">(${newPct.toFixed(1)}%)</span></td>
                         <td class="px-5 py-4">${diffHtml}</td>
                     </tr>
                 `;
@@ -1809,7 +1881,7 @@
         }
 
         function updateAnalysisUI() {
-            let analysis = { active: 0, tenure: { less3: 0, between3and24: 0, over24: 0 }, certs: { over20: 0, less20: 0, zero: 0 }, regions: {}, nonCerts: {} };
+            let analysis = { active: 0, tenure: { less3: 0, between3and24: 0, over24: 0 }, certs: { overTarget: 0, lessTarget: 0, zero: 0 }, regions: {}, nonCerts: {} };
             nonCertCoursesKeys.forEach(c => analysis.nonCerts[c] = { totalTaken: 0, p100: 0, p50to99: 0, pLess50: 0, p0: 0, pNull: 0 });
 
             globalData.allActive.forEach(emp => {
@@ -1822,17 +1894,17 @@
                     else analysis.tenure.over24++;
                 }
 
-                if (emp.totalCerts >= 20) analysis.certs.over20++;
-                else if (emp.totalCerts > 0) analysis.certs.less20++;
+                if (emp.totalCerts >= targetCertsCount) analysis.certs.overTarget++;
+                else if (emp.totalCerts > 0) analysis.certs.lessTarget++;
                 else analysis.certs.zero++;
 
-                if (!analysis.regions[emp.region]) analysis.regions[emp.region] = { total: 0, over20: 0, less20: 0, zero: 0, employees: [] };
+                if (!analysis.regions[emp.region]) analysis.regions[emp.region] = { total: 0, overTarget: 0, lessTarget: 0, zero: 0, employees: [] };
                 
                 let regStats = analysis.regions[emp.region];
                 regStats.total++; regStats.employees.push(emp);
                 
-                if (emp.totalCerts >= 20) regStats.over20++;
-                else if (emp.totalCerts > 0) regStats.less20++;
+                if (emp.totalCerts >= targetCertsCount) regStats.overTarget++;
+                else if (emp.totalCerts > 0) regStats.lessTarget++;
                 else regStats.zero++;
 
                 nonCertCoursesKeys.forEach(c => {
@@ -1852,8 +1924,8 @@
             document.getElementById('statLess3').innerText = analysis.tenure.less3;
             document.getElementById('stat3to2').innerText = analysis.tenure.between3and24;
             document.getElementById('statOver2').innerText = analysis.tenure.over24;
-            document.getElementById('statCert20').innerText = analysis.certs.over20;
-            document.getElementById('statCertLess20').innerText = analysis.certs.less20;
+            document.getElementById('statCertTarget').innerText = analysis.certs.overTarget;
+            document.getElementById('statCertLessTarget').innerText = analysis.certs.lessTarget;
             document.getElementById('statCert0').innerText = analysis.certs.zero;
 
             let regHtml = ''; let exportBtnsHtml = '';
@@ -1861,17 +1933,17 @@
             
             sortedRegions.forEach(reg => {
                 let stats = analysis.regions[reg];
-                let p20 = stats.total > 0 ? Math.round((stats.over20 / stats.total) * 100) : 0;
-                let pLess = stats.total > 0 ? Math.round((stats.less20 / stats.total) * 100) : 0;
+                let pOver = stats.total > 0 ? Math.round((stats.overTarget / stats.total) * 100) : 0;
+                let pLess = stats.total > 0 ? Math.round((stats.lessTarget / stats.total) * 100) : 0;
                 let p0 = stats.total > 0 ? Math.round((stats.zero / stats.total) * 100) : 0;
 
                 regHtml += `
                     <tr class="hover:bg-slate-50">
                         <td class="px-5 py-4 font-bold text-slate-700">${reg}</td>
                         <td class="px-5 py-4 font-bold text-lg">${stats.total}</td>
-                        <td class="px-5 py-4 text-emerald-600 font-bold">${stats.over20}</td>
-                        <td class="px-5 py-4 text-sm text-slate-400">${p20}%</td>
-                        <td class="px-5 py-4 text-orange-600 font-bold">${stats.less20}</td>
+                        <td class="px-5 py-4 text-emerald-600 font-bold">${stats.overTarget}</td>
+                        <td class="px-5 py-4 text-sm text-slate-400">${pOver}%</td>
+                        <td class="px-5 py-4 text-orange-600 font-bold">${stats.lessTarget}</td>
                         <td class="px-5 py-4 text-sm text-slate-400">${pLess}%</td>
                         <td class="px-5 py-4 text-red-600 font-bold">${stats.zero}</td>
                         <td class="px-5 py-4 text-sm text-slate-400">${p0}%</td>
@@ -1926,16 +1998,13 @@
             return aoa;
         }
 
-        // دالة جديدة لتصدير بيانات عدم التطابق (المفقودين)
         function exportMissingData() {
             let wb = XLSX.utils.book_new();
 
-            // الشيت الأول: في الأكاديمية فقط
             let misAOA = [["الرقم الوظيفي", "الاسم بالاكاديمية", "عدد الشهادات"]];
             globalData.missingEmployees.forEach(e => misAOA.push([e.id, e.name, e.totalCerts]));
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(misAOA), "في الأكاديمية فقط");
 
-            // الشيت الثاني: في القوى فقط
             let searchInput = document.getElementById('searchName') ? document.getElementById('searchName').value.toLowerCase() : "";
             let sReg = document.getElementById('filterRegion') ? document.getElementById('filterRegion').value : "";
 
@@ -1954,18 +2023,21 @@
 
         function exportEliteData() {
             let wb = XLSX.utils.book_new();
-            
             let validActive = globalData.allActive.filter(e => !globalData.excludedRegions.has(e.region) && e.isEliteTarget);
             
-            let c1Key = eliteCoursesKeys[0] || "دورة 1"; let c2Key = eliteCoursesKeys[1] || "دورة 2";
-            let aoa = [["الرقم الوظيفي", "الاسم", "الإيميل", "الإقليم", c1Key, c2Key, "مجموع المستكمل", "الحالة الوصفية"]];
+            let c1Key = eliteCoursesKeys[0] || "دورة 1"; 
+            let c2Key = eliteCoursesKeys[1] || "دورة 2";
+            let c3Key = eliteCoursesKeys[2] || "دورة 3";
+
+            let aoa = [["الرقم الوظيفي", "الاسم", "الإيميل", "الإقليم", c1Key, c2Key, c3Key, "مجموع المستكمل", "الحالة الوصفية"]];
             
             validActive.forEach(emp => {
                 let hasC1 = eliteCoursesKeys[0] ? emp.eliteProgress[eliteCoursesKeys[0]] : false;
                 let hasC2 = eliteCoursesKeys[1] ? emp.eliteProgress[eliteCoursesKeys[1]] : false;
-                let count = (hasC1 ? 1 : 0) + (hasC2 ? 1 : 0);
-                let desc = count === 2 ? "استكمل بالكامل" : (count === 1 ? "جزء" : "لم يستكمل");
-                aoa.push([emp.id, emp.name, emp.email || "", emp.region, hasC1 ? "نعم" : "لا", hasC2 ? "نعم" : "لا", count, desc]);
+                let hasC3 = eliteCoursesKeys[2] ? emp.eliteProgress[eliteCoursesKeys[2]] : false;
+                let count = (hasC1 ? 1 : 0) + (hasC2 ? 1 : 0) + (hasC3 ? 1 : 0);
+                let desc = count === 3 ? "استكمل بالكامل" : (count > 0 ? "جزء" : "لم يستكمل");
+                aoa.push([emp.id, emp.name, emp.email || "", emp.region, hasC1 ? "نعم" : "لا", hasC2 ? "نعم" : "لا", hasC3 ? "نعم" : "لا", count, desc]);
             });
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), "تقرير دورات النخبة");
             XLSX.writeFile(wb, "تقرير_دورات_النخبة.xlsx");
@@ -1992,17 +2064,17 @@
             if(t2.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(generateEmployeeAOA(t2)), "من 3 لسنتين");
             if(t3.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(generateEmployeeAOA(t3)), "أكثر من سنتين");
 
-            let analysisAOA = [["الإقليم", "إجمالي الموظفين", "20 شهادة فأكثر", "النسبة %", "أقل من 20", "النسبة %", "0 شهادة", "النسبة %"]];
+            let analysisAOA = [["الإقليم", "إجمالي الموظفين", `${targetCertsCount} شهادة فأكثر`, "النسبة %", `أقل من ${targetCertsCount}`, "النسبة %", "0 شهادة", "النسبة %"]];
             let tempRegions = {};
             validActive.forEach(emp => {
-                if (!tempRegions[emp.region]) tempRegions[emp.region] = { total: 0, over20: 0, less20: 0, zero: 0 };
+                if (!tempRegions[emp.region]) tempRegions[emp.region] = { total: 0, overTarget: 0, lessTarget: 0, zero: 0 };
                 let r = tempRegions[emp.region];
-                r.total++; if (emp.totalCerts >= 20) r.over20++; else if (emp.totalCerts > 0) r.less20++; else r.zero++;
+                r.total++; if (emp.totalCerts >= targetCertsCount) r.overTarget++; else if (emp.totalCerts > 0) r.lessTarget++; else r.zero++;
             });
             
             for (let reg in tempRegions) {
                 let s = tempRegions[reg];
-                analysisAOA.push([reg, s.total, s.over20, (s.total?Math.round((s.over20/s.total)*100):0)+'%', s.less20, (s.total?Math.round((s.less20/s.total)*100):0)+'%', s.zero, (s.total?Math.round((s.zero/s.total)*100):0)+'%']);
+                analysisAOA.push([reg, s.total, s.overTarget, (s.total?Math.round((s.overTarget/s.total)*100):0)+'%', s.lessTarget, (s.total?Math.round((s.lessTarget/s.total)*100):0)+'%', s.zero, (s.total?Math.round((s.zero/s.total)*100):0)+'%']);
             }
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(analysisAOA), "تحليل الأقاليم المعتمدة");
 
@@ -2014,7 +2086,6 @@
             globalData.missingEmployees.forEach(e => misAOA.push([e.id, e.name, e.totalCerts]));
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(misAOA), "بالأكاديمية فقط");
 
-            // تم إضافة الشيت الجديد للتصدير الشامل
             let missingAcAOA = [["الرقم الوظيفي", "الاسم بالقوى", "الإقليم", "المشرف", "حالة الموظف"]];
             globalData.missingFromAcademy.forEach(e => missingAcAOA.push([e.id, e.name, e.region, e.supervisor, e.status]));
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(missingAcAOA), "بالقوى فقط");
@@ -2037,14 +2108,14 @@
             });
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(nonCertAOA), "دورات بدون شهادات");
 
-            let total = employees.length, over20 = 0, less20 = 0, zero = 0;
-            employees.forEach(e => { if (e.totalCerts >= 20) over20++; else if (e.totalCerts > 0) less20++; else zero++; });
+            let total = employees.length, overTarget = 0, lessTarget = 0, zero = 0;
+            employees.forEach(e => { if (e.totalCerts >= targetCertsCount) overTarget++; else if (e.totalCerts > 0) lessTarget++; else zero++; });
 
             let statAOA = [
                 ["البيان", "العدد", "النسبة المئوية"],
                 ["إجمالي الموظفين بالإقليم", total, "100%"],
-                ["حاصلون على 20 شهادة فأكثر", over20, (total?Math.round((over20/total)*100):0) + "%"],
-                ["حاصلون على أقل من 20 شهادة", less20, (total?Math.round((less20/total)*100):0) + "%"],
+                [`حاصلون على ${targetCertsCount} شهادة فأكثر`, overTarget, (total?Math.round((overTarget/total)*100):0) + "%"],
+                [`حاصلون على أقل من ${targetCertsCount} شهادة`, lessTarget, (total?Math.round((lessTarget/total)*100):0) + "%"],
                 ["لم يحصلوا على أي شهادة (0)", zero, (total?Math.round((zero/total)*100):0) + "%"]
             ];
             
