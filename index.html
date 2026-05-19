@@ -25,9 +25,14 @@
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        .table-container { max-height: 65vh; overflow-y: auto; scrollbar-width: thin; }
+        .table-container { max-height: 65vh; overflow-y: auto; overflow-x: auto; scrollbar-width: thin; }
         thead th { position: sticky; top: 0; z-index: 10; box-shadow: 0 1px 2px rgba(0,0,0,0.05); backdrop-filter: blur(8px); background-color: #f1f5f9; }
         
+        /* Sticky columns fixing for horizontal scroll */
+        .sticky-id { position: sticky; right: 0; z-index: 11; background-color: #f8fafc; min-width: 90px; max-width: 90px; }
+        .sticky-name { position: sticky; right: 90px; z-index: 11; background-color: #f8fafc; min-width: 180px; max-width: 180px; border-left: 1px solid #e2e8f0; box-shadow: -4px 0 6px -2px rgba(0,0,0,0.05); }
+        thead .sticky-id, thead .sticky-name { z-index: 12; background-color: #f1f5f9; }
+
         /* Drag & Drop Styles */
         .drop-zone { transition: all 0.3s ease; border: 2px dashed #cbd5e1; }
         .drop-zone.dragover { background-color: #eef2ff; border-color: #4f46e5; transform: scale(1.02); }
@@ -52,6 +57,7 @@
         </div>
     </div>
 
+    <!-- Supervisor Modal -->
     <div class="modal-overlay" id="supervisorModal">
         <div class="modal-content overflow-hidden">
             <div class="flex justify-between items-center p-6 border-b border-slate-200 bg-slate-50 rounded-t-2xl">
@@ -206,6 +212,11 @@
                 <button class="tab-btn px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'nonCertTab')">
                     <i class="fas fa-book-open ml-2"></i> دورات بدون شهادات
                 </button>
+                <!-- التبويب الجديد -->
+                <button class="tab-btn px-5 py-4 text-orange-700 font-bold bg-orange-50 border-r border-orange-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'trainingPathTab')">
+                    <i class="fas fa-route ml-2"></i> مسار التدريب (الوقوف)
+                </button>
+
                 <button class="tab-btn px-5 py-4 text-blue-700 font-bold bg-blue-50 border-r border-blue-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'supervisorsTab')">
                     <i class="fas fa-sitemap ml-2"></i> تقييم المشرفين
                 </button>
@@ -259,6 +270,7 @@
                     </div>
                 </div>
 
+                <!-- التبويبات الأخرى كما هي... -->
                 <div id="tenure1Tab" class="tab-content">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-slate-800">موظفون فترة عملهم <span class="text-orange-500">أقل من 3 شهور</span></h2>
@@ -308,7 +320,6 @@
                     </div>
                 </div>
 
-                <!-- التبويب للمفقودين / عدم التطابق -->
                 <div id="missingTab" class="tab-content">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                         <div>
@@ -350,7 +361,7 @@
                     <!-- القسم الثاني: في القوى فقط -->
                     <div id="missingInAcSection" style="display: none;">
                         <p class="text-sm text-slate-500 mb-4 bg-slate-50 p-3 border border-slate-200 rounded-lg">
-                            <i class="fas fa-info-circle text-indigo-500 ml-1"></i> هذه القائمة تعرض الأشخاص المدرجين في شيت القوى (التقسيم) <b>وليس لديهم أي سجل أو حساب</b> في شيت الأكاديمية إطلاقاً. (تتأثر هذه القائمة بفلتر البحث والإقليم الموجود بالأعلى).
+                            <i class="fas fa-info-circle text-indigo-500 ml-1"></i> هذه القائمة تعرض الأشخاص المدرجين في شيت القوى (التقسيم) <b>وليس لديهم أي سجل أو حساب</b> في شيت الأكاديمية إطلاقاً.
                         </p>
                         <div class="table-container border border-slate-200 rounded-xl shadow-sm">
                             <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
@@ -372,7 +383,7 @@
                 <div id="nonCertTab" class="tab-content">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                         <h2 class="text-2xl font-bold text-slate-800 flex items-center">
-                            <i class="fas fa-book-open text-indigo-500 ml-2"></i> الدورات بدون شهادات (نسبة التقدم)
+                            <i class="fas fa-book-open text-indigo-500 ml-2"></i> الدورات بدون شهادات (نسبة التقدم القديمة)
                             <span id="nonCertCount" class="mr-3 bg-indigo-100 text-indigo-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
                         </h2>
                     </div>
@@ -386,6 +397,82 @@
                     </div>
                 </div>
 
+                <!-- ================= تبويب مسار التدريب الجديد ================= -->
+                <div id="trainingPathTab" class="tab-content">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 bg-orange-50 p-6 rounded-2xl border border-orange-100">
+                        <div>
+                            <h2 class="text-2xl font-bold text-orange-900 flex items-center mb-2">
+                                <i class="fas fa-route text-orange-500 ml-2"></i> مسار التدريب (نقطة الوقوف)
+                            </h2>
+                            <p class="text-orange-700 text-sm">يعرض تسلسل الدورات الـ 29، ويوضح الدورة الحالية التي تتطلب إنجاز (نقطة التوقف للموظف). <br>
+                                <span class="inline-block mt-2">
+                                    <span class="text-emerald-500 font-bold mr-1">✔ منجز</span>
+                                    <span class="text-orange-500 font-bold text-lg mr-1 ml-2">• واقف عليها</span>
+                                    <span class="text-slate-400 font-bold">✗ لم يصلها</span>
+                                </span>
+                            </p>
+                        </div>
+                        
+                        <!-- فلاتر خاصة بتبويب مسار التدريب -->
+                        <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                            <div class="relative bg-white rounded-xl shadow-sm border border-orange-100 p-1 w-full md:w-auto flex">
+                                <span class="text-slate-500 p-2 pr-3"><i class="fas fa-filter"></i></span>
+                                <select id="pathRegionFilter" onchange="renderTrainingPathTable()" class="pl-4 pr-2 py-2 focus:outline-none w-full bg-transparent font-bold text-orange-800 cursor-pointer min-w-[200px]">
+                                    <option value="">جميع الأقاليم</option>
+                                </select>
+                            </div>
+                            
+                            <div class="relative bg-white rounded-xl shadow-sm border border-orange-100 p-1 w-full md:w-auto flex">
+                                <span class="text-slate-500 p-2 pr-3"><i class="fas fa-search"></i></span>
+                                <input type="text" id="pathSearchFilter" onkeyup="renderTrainingPathTable()" placeholder="بحث باسم الموظف أو رقمه..." class="pl-4 pr-2 py-2 focus:outline-none w-full bg-transparent text-slate-700">
+                            </div>
+
+                            <button onclick="exportTrainingPath()" class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 px-6 rounded-xl shadow transition transform hover:-translate-y-0.5 whitespace-nowrap h-full flex items-center">
+                                <i class="fas fa-file-excel ml-2"></i> تصدير إكسيل
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex border-b border-slate-200 mb-6 bg-slate-50 rounded-t-xl overflow-hidden">
+                        <button class="path-sub-tab-btn active px-6 py-3 font-bold text-orange-600 border-b-2 border-orange-600 bg-orange-50 transition focus:outline-none" onclick="switchPathSubTab(event, 'pathCertSection')">
+                            <i class="fas fa-certificate ml-2"></i> الدورات الأساسية (بشهادة وتوقف - 21 دورة)
+                        </button>
+                        <button class="path-sub-tab-btn px-6 py-3 font-semibold text-slate-500 border-b-2 border-transparent hover:bg-slate-100 transition focus:outline-none" onclick="switchPathSubTab(event, 'pathNonCertSection')">
+                            <i class="fas fa-plus-circle ml-2"></i> الدورات الداعمة (بدون شهادة - 8 دورات)
+                        </button>
+                    </div>
+
+                    <div id="pathCertSection">
+                        <div class="table-container border border-slate-200 rounded-xl shadow-sm mb-8" style="max-height: 70vh;">
+                            <table class="min-w-full divide-y divide-slate-200 text-sm text-right whitespace-nowrap">
+                                <thead class="bg-slate-100 text-slate-800 border-b border-slate-200" id="pathCertHeader">
+                                    <!-- يتم توليده بالجاڤاسكربت -->
+                                </thead>
+                                <tbody id="pathCertTableBody" class="bg-white divide-y divide-slate-200">
+                                    <!-- يتم توليده بالجاڤاسكربت -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="pathNonCertSection" style="display: none;">
+                        <div class="table-container border border-slate-200 rounded-xl shadow-sm mb-8" style="max-height: 70vh;">
+                            <table class="min-w-full divide-y divide-slate-200 text-sm text-right whitespace-nowrap">
+                                <thead class="bg-slate-100 text-slate-800 border-b border-slate-200" id="pathNonCertHeader">
+                                    <!-- يتم توليده بالجاڤاسكربت -->
+                                </thead>
+                                <tbody id="pathNonCertTableBody" class="bg-white divide-y divide-slate-200">
+                                    <!-- يتم توليده بالجاڤاسكربت -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- ========================================================================= -->
+
+
+                <!-- بقية التبويبات ... -->
                 <div id="supervisorsTab" class="tab-content">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 bg-blue-50 p-6 rounded-2xl border border-blue-100">
                         <div>
@@ -448,7 +535,6 @@
                             </select>
                         </div>
                     </div>
-
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center border-b-4 border-b-indigo-500">
                             <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xl ml-3 shrink-0"><i class="fas fa-bullseye"></i></div>
@@ -479,7 +565,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="table-container border border-slate-200 rounded-xl shadow-sm">
                         <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
                             <thead class="bg-slate-100 text-slate-800 border-b border-slate-200">
@@ -610,14 +695,11 @@
                             <h2 class="text-2xl font-bold text-slate-800 flex items-center">
                                 <i class="fas fa-star text-yellow-500 ml-2"></i> دورات النخبة
                             </h2>
-                            <p class="text-slate-500 text-sm mt-1">يعرض حالة إنجاز دورات النخبة للموظفين المستهدفين فقط (الذين لديهم بيانات بالدورات في الأكاديمية).</p>
                         </div>
                         <button onclick="exportEliteData()" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2.5 px-6 rounded-lg shadow transition transform hover:-translate-y-0.5">
                             <i class="fas fa-file-excel ml-2"></i> تصدير إكسيل (النخبة)
                         </button>
                     </div>
-
-                    <!-- إحصائيات النخبة -->
                     <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
                         <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl text-center shadow-sm">
                             <p class="text-slate-600 text-xs md:text-sm font-bold">إجمالي المستهدفين (بالعمل)</p>
@@ -640,7 +722,6 @@
                             <p class="text-3xl font-extrabold text-emerald-800 mt-1" id="eliteStatBoth">0</p>
                         </div>
                     </div>
-                    
                     <div class="table-container border border-slate-200 rounded-xl shadow-sm mb-8">
                         <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
                             <thead class="bg-slate-100 text-slate-800 border-b border-slate-200">
@@ -657,15 +738,11 @@
                             <tbody id="eliteTableBody" class="bg-white divide-y divide-slate-100"></tbody>
                         </table>
                     </div>
-
-                    <!-- المستبعدين والمفقودين من النخبة -->
                     <div class="mt-8 bg-red-50/30 p-6 rounded-2xl border border-red-100">
                         <h3 class="text-xl font-bold text-red-800 mb-2 flex items-center">
                             <i class="fas fa-exclamation-triangle ml-2 text-red-500"></i> مستهدفون في النخبة (لكنهم مستبعدون أو غير موجودين بالقوى)
                             <span id="eliteOffTargetCount" class="mr-3 bg-red-100 text-red-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
                         </h3>
-                        <p class="text-sm text-slate-600 mb-6">هؤلاء الموظفون ظهرت أسماؤهم في دورات النخبة داخل الأكاديمية، لكنهم إما (مستبعدون، استقالة، إلخ) أو أرقامهم الوظيفية غير مدرجة في شيت القوى الأساسي. (مما يفسر نقص العدد عن الإجمالي).</p>
-                        
                         <div class="table-container border border-red-200 rounded-xl shadow-sm bg-white">
                             <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
                                 <thead class="bg-red-50 text-red-800 border-b border-red-200">
@@ -704,11 +781,8 @@
                             <h2 class="text-2xl font-bold text-pink-900 flex items-center mb-2">
                                 <i class="fas fa-clock text-pink-500 ml-2"></i> أوقات الذروة ونشاط الحصول على الشهادات
                             </h2>
-                            <p class="text-pink-700 text-sm">يتم تحليل وقت وتاريخ الحصول على جميع الشهادات من الأكاديمية لمعرفة أكثر الأوقات والأيام نشاطاً (Rush Hours).</p>
                         </div>
                     </div>
-
-                    <!-- كروت داشبورد تحليل الوقت -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center">
                             <div class="w-14 h-14 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-2xl ml-4 shrink-0"><i class="fas fa-calendar-day"></i></div>
@@ -718,7 +792,6 @@
                                 <p class="text-xs text-indigo-600 mt-1 font-bold">بمجموع <span id="topActiveDayCount">0</span> شهادة</p>
                             </div>
                         </div>
-
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center">
                             <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-2xl ml-4 shrink-0"><i class="fas fa-calendar-week"></i></div>
                             <div>
@@ -727,7 +800,6 @@
                                 <p class="text-xs text-emerald-600 mt-1 font-bold">بمجموع <span id="topActiveWeekCount">0</span> شهادة</p>
                             </div>
                         </div>
-
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center">
                             <div class="w-14 h-14 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-2xl ml-4 shrink-0"><i class="fas fa-hourglass-half"></i></div>
                             <div>
@@ -737,20 +809,14 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- الرسوم البيانية -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
                             <h3 class="font-bold text-slate-700 mb-4 border-b border-slate-100 pb-2"><i class="fas fa-chart-bar text-indigo-500 ml-2"></i> إجمالي الشهادات المكتسبة حسب ساعة اليوم (مجمع)</h3>
-                            <div class="relative h-72 w-full">
-                                <canvas id="hourlyChart"></canvas>
-                            </div>
+                            <div class="relative h-72 w-full"><canvas id="hourlyChart"></canvas></div>
                         </div>
                         <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
                             <h3 class="font-bold text-slate-700 mb-4 border-b border-slate-100 pb-2"><i class="fas fa-chart-line text-emerald-500 ml-2"></i> المعدل اليومي للحصول على الشهادات</h3>
-                            <div class="relative h-72 w-full">
-                                <canvas id="dailyChart"></canvas>
-                            </div>
+                            <div class="relative h-72 w-full"><canvas id="dailyChart"></canvas></div>
                         </div>
                     </div>
                 </div>
@@ -787,7 +853,6 @@
             if (input && input.value !== String(targetCertsCount)) input.value = targetCertsCount;
             updateDynamicLabels();
             
-            // Re-render tables and charts if data is already loaded
             if (globalData.allActive && globalData.allActive.length > 0) {
                 applyActiveFilters();
             }
@@ -889,14 +954,45 @@
         const excludedStatuses = ['استقالة', 'استقاله', 'إنهاء خدمة', 'انهاء خدمة', 'انهاء خدمه', 'انقطاع', 'انتقل إلى', 'انتقل الي', 'نقل'];
         let targetMonthsKeys = ["10-2025", "11-2025", "12-2025", "01-2026", "02-2026", "03-2026", "04-2026", "05-2026", "06-2026"];
         
-        // تم تحديث الدورات بدون شهادات وإضافة 2 جديدة
         const nonCertCoursesKeys = ["1+2 Offer", "delivery order software", "Updates and New Circulars", "Deraah Seminars", "Deraah's new products", "Deraah campaigns", "Capsule", "Sales Scenario By English"];
         
-        // تم تحديث دورات النخبة لتصبح 3
         const eliteCoursesKeys = [
             "Sales Scenarios for Deraah Oud's Top Products", 
             "Sales Scenarios for DERAAH's Top Products",
             "Time Management and Organization"
+        ];
+
+        // --- بيانات مسار التدريب (نقطة الوقوف) مع الترقيم المنفصل ---
+        const trainingPathDef = [
+            { certId: 1, ar: "تاريخ درعه", en: "Deraah History", hasCert: true },
+            { certId: 2, ar: "العطور", en: "Perfumes", hasCert: true },
+            { certId: 3, ar: "العود", en: "EL OUD", hasCert: true },
+            { certId: 4, ar: "الاكسسوار الرجالي", en: "Deraah Men Accessories", hasCert: true },
+            { certId: 5, ar: "الاكسسوار النسائي", en: "Women’s Accessories", hasCert: true },
+            { certId: 6, ar: "الهدايا", en: "Gifts", hasCert: true },
+            { certId: 7, ar: "اجهزة التعطير", en: "Air fresheners", hasCert: true },
+            { certId: 8, ar: "انظمة التشغيل", en: "Systems", hasCert: true },
+            { certId: 9, ar: "بيع كمحترف", en: "Sell Like A Pro", hasCert: true },
+            { certId: 10, ar: "تجربة العملاء", en: "Customer Experience", hasCert: true },
+            { ar: "حملات درعه الدعائية", en: "Deraah campaigns", hasCert: false },
+            { ar: "ندوات درعه", en: "Deraah Seminars", hasCert: false },
+            { ar: "التحديثات والتعميمات الجديدة", en: "Updates and New Circulars", hasCert: false },
+            { certId: 11, ar: "العناية بالشعر", en: "Hair care", hasCert: true },
+            { certId: 12, ar: "التفاوض وحل النزاعات", en: "Negotiation and Conflict Resolution", hasCert: true },
+            { certId: 13, ar: "منتجات العطور الاستراتيجية", en: "Key strategic perfume products", hasCert: true },
+            { certId: 14, ar: "منتجات العود الاستراتيجية", en: "Key strategic Oud products", hasCert: true },
+            { certId: 15, ar: "مهارات التواصل", en: "Communication Skills", hasCert: true },
+            { certId: 16, ar: "السياسات والاجراءات", en: "Company policies", hasCert: true },
+            { ar: "جديد درعه من المنتجات", en: "Deraah's new products", hasCert: false },
+            { certId: 17, ar: "التعامل تحت الضغط", en: "Working under pressure", hasCert: true },
+            { certId: 18, ar: "فن البيع المتقدم", en: "Advanced Sales Skills", hasCert: true },
+            { certId: 19, ar: "قراءة احتياجات العملاء", en: "Understanding Customer Needs", hasCert: true },
+            { certId: 20, ar: "اكثر الاسئلة شيوعاً بين العملاء", en: "Frequently Asked Questions and Answers", hasCert: true },
+            { ar: "عرض رمضان 1+2", en: "1+2 Offer", hasCert: false },
+            { ar: "تطبيقات التوصيل", en: "delivery order software", hasCert: false },
+            { certId: 21, ar: "الاستعداد لموسم الحج", en: "Preparations for the Hajj season", hasCert: true },
+            { ar: "سيناريوهات بيعية باللغة الانجليزية", en: "Sales Scenario By English", hasCert: false },
+            { ar: "الكبسولة", en: "Capsule", hasCert: false }
         ];
 
         let globalData = {
@@ -916,6 +1012,10 @@
             if(event && event.currentTarget) event.currentTarget.classList.add('active');
             const targetTab = document.getElementById(tabId);
             if(targetTab) targetTab.classList.add('active');
+            
+            if (tabId === 'trainingPathTab') {
+                renderTrainingPathTable();
+            }
         }
 
         function switchMissingSubTab(event, sectionId) {
@@ -946,6 +1046,22 @@
             }
             document.getElementById('certAnalysisSection').style.display = 'none';
             document.getElementById('nonCertAnalysisSection').style.display = 'none';
+            const targetSec = document.getElementById(sectionId);
+            if(targetSec) targetSec.style.display = 'block';
+        }
+
+        function switchPathSubTab(event, sectionId) {
+            document.querySelectorAll('.path-sub-tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'text-orange-600', 'border-orange-600', 'bg-orange-50', 'font-bold');
+                btn.classList.add('text-slate-500', 'border-transparent', 'font-semibold');
+            });
+            if(event && event.currentTarget) {
+                const btn = event.currentTarget;
+                btn.classList.remove('text-slate-500', 'border-transparent', 'font-semibold');
+                btn.classList.add('active', 'text-orange-600', 'border-orange-600', 'bg-orange-50', 'font-bold');
+            }
+            document.getElementById('pathCertSection').style.display = 'none';
+            document.getElementById('pathNonCertSection').style.display = 'none';
             const targetSec = document.getElementById(sectionId);
             if(targetSec) targetSec.style.display = 'block';
         }
@@ -1045,16 +1161,23 @@
             }
             
             try {
-                const wfData = await readExcel(wfFile);
-                const acData = await readExcel(acFile);
-                let oldAcData = null;
-                if (oldAcFile) oldAcData = await readExcel(oldAcFile);
-                
-                analyzeData(wfData, acData, oldAcData);
-                
-                const resultsSec = document.getElementById('resultsSection');
-                if(resultsSec) resultsSec.classList.remove('hidden');
-                if(loadingOverlay) loadingOverlay.style.display = 'none';
+                // Read with small delay to allow UI to update
+                setTimeout(async () => {
+                    try {
+                        const wfData = await readExcel(wfFile);
+                        const acData = await readExcel(acFile);
+                        let oldAcData = null;
+                        if (oldAcFile) oldAcData = await readExcel(oldAcFile);
+                        
+                        analyzeData(wfData, acData, oldAcData);
+                        
+                        const resultsSec = document.getElementById('resultsSection');
+                        if(resultsSec) resultsSec.classList.remove('hidden');
+                        if(loadingOverlay) loadingOverlay.style.display = 'none';
+                    } catch(err) {
+                        showFatalError(err);
+                    }
+                }, 100);
             } catch (error) { showFatalError(error); }
         }
 
@@ -1091,12 +1214,19 @@
                 let supervisor = row.length > 13 ? cleanString(row[13]) : "بدون مشرف";
                 let manager = row.length > 15 ? cleanString(row[15]) : "";
                 
-                let emp = { id, name, hireDate, status, supervisor, manager, region: determineRegion(manager), email: "", totalCerts: 0, oldTotalCerts: 0, monthsData: {}, nonCertProgress: {}, eliteProgress: {}, isEliteTarget: false };
+                let emp = { 
+                    id, name, hireDate, status, supervisor, manager, 
+                    region: determineRegion(manager), email: "", totalCerts: 0, oldTotalCerts: 0, 
+                    monthsData: {}, nonCertProgress: {}, eliteProgress: {}, isEliteTarget: false,
+                    pathProgress: {} 
+                };
+                
                 targetMonthsKeys.forEach(m => emp.monthsData[m] = 0);
                 nonCertCoursesKeys.forEach(c => emp.nonCertProgress[c] = null);
                 eliteCoursesKeys.forEach(c => emp.eliteProgress[c] = false);
-                emp.tenureMonths = calculateTenureMonths(hireDate);
+                trainingPathDef.forEach(c => emp.pathProgress[c.en] = false); 
                 
+                emp.tenureMonths = calculateTenureMonths(hireDate);
                 employeeMap[id] = emp;
 
                 if (isExcluded(status)) {
@@ -1166,6 +1296,14 @@
                         if (employeeMap[id].monthsData[certInfo.key] === undefined) employeeMap[id].monthsData[certInfo.key] = 0;
                         employeeMap[id].monthsData[certInfo.key]++;
                     }
+
+                    let matchedPathCourse = trainingPathDef.find(c => courseLower.includes(c.en.toLowerCase()));
+                    if (matchedPathCourse) {
+                        if (certValue !== "-" || parseProgress(progressRaw) === 100) {
+                            employeeMap[id].pathProgress[matchedPathCourse.en] = true;
+                        }
+                    }
+
                 } else if (!allWfIds.has(id)) {
                     if (!missingMap[id]) {
                         missingMap[id] = { 
@@ -1174,9 +1312,11 @@
                             email: rowEmail || "",
                             totalCerts: 0, 
                             eliteProgress: {}, 
-                            isEliteTarget: false 
+                            isEliteTarget: false,
+                            pathProgress: {}
                         };
                         eliteCoursesKeys.forEach(c => missingMap[id].eliteProgress[c] = false);
+                        trainingPathDef.forEach(c => missingMap[id].pathProgress[c.en] = false);
                     }
 
                     let matchedElite = eliteCoursesKeys.find(c => courseLower.includes(c.toLowerCase()));
@@ -1184,6 +1324,13 @@
                         missingMap[id].isEliteTarget = true;
                         if (certValue !== "-" || parseProgress(progressRaw) === 100) {
                             missingMap[id].eliteProgress[matchedElite] = true;
+                        }
+                    }
+
+                    let matchedPathCourse = trainingPathDef.find(c => courseLower.includes(c.en.toLowerCase()));
+                    if (matchedPathCourse) {
+                        if (certValue !== "-" || parseProgress(progressRaw) === 100) {
+                            missingMap[id].pathProgress[matchedPathCourse.en] = true;
                         }
                     }
 
@@ -1224,7 +1371,6 @@
                 globalData.allActive.forEach(emp => { targetMonthsKeys.forEach(m => { if (emp.monthsData[m] === undefined) emp.monthsData[m] = 0; }); });
             }
 
-            // تحديث رؤوس أعمدة النخبة بناءً على المسميات
             let e1 = document.getElementById('eliteCourse1Head'); let e2 = document.getElementById('eliteCourse2Head'); let e3 = document.getElementById('eliteCourse3Head');
             let oe1 = document.getElementById('eliteOffCourse1Head'); let oe2 = document.getElementById('eliteOffCourse2Head'); let oe3 = document.getElementById('eliteOffCourse3Head');
             if (e1 && eliteCoursesKeys[0]) e1.innerText = eliteCoursesKeys[0];
@@ -1238,7 +1384,200 @@
             buildFilterUI();
             applyActiveFilters();
             renderTimelineDashboard(); 
+            buildTrainingPathHeaders(); 
+            renderTrainingPathTable();  
         }
+
+        // =========================================================================
+        // دوال مسار التدريب (نقطة الوقوف)
+        // =========================================================================
+        
+        function buildTrainingPathHeaders() {
+            let certCourses = trainingPathDef.filter(c => c.hasCert);
+            let nonCertCourses = trainingPathDef.filter(c => !c.hasCert);
+
+            let certHeaderHtml = `
+                <tr>
+                    <th class="px-4 py-4 font-semibold uppercase sticky-id text-right">الرقم الوظيفي</th>
+                    <th class="px-4 py-4 font-semibold uppercase sticky-name text-right">الاسم</th>
+                    <th class="px-4 py-4 font-semibold uppercase whitespace-nowrap">الإقليم</th>
+                    <th class="px-4 py-4 font-semibold uppercase whitespace-nowrap border-l border-slate-200">المسار الحالي 📍</th>
+            `;
+            certCourses.forEach(c => certHeaderHtml += `<th class="px-2 py-4 font-medium text-xs whitespace-normal min-w-[80px] border-l border-slate-200" title="${c.ar}">${c.certId}- ${c.ar}</th>`);
+            certHeaderHtml += `</tr>`;
+            document.getElementById('pathCertHeader').innerHTML = certHeaderHtml;
+
+            let nonCertHeaderHtml = `
+                <tr>
+                    <th class="px-4 py-4 font-semibold uppercase sticky-id text-right">الرقم الوظيفي</th>
+                    <th class="px-4 py-4 font-semibold uppercase sticky-name text-right">الاسم</th>
+                    <th class="px-4 py-4 font-semibold uppercase whitespace-nowrap">الإقليم</th>
+                    <th class="px-4 py-4 font-semibold uppercase text-center border-l border-slate-200">إجمالي المنجز</th>
+            `;
+            nonCertCourses.forEach(c => nonCertHeaderHtml += `<th class="px-2 py-4 font-medium text-xs whitespace-normal min-w-[120px] border-l border-slate-200" title="${c.ar}">${c.ar}</th>`);
+            nonCertHeaderHtml += `</tr>`;
+            document.getElementById('pathNonCertHeader').innerHTML = nonCertHeaderHtml;
+        }
+
+        function renderTrainingPathTable() {
+            if (globalData.allActive.length === 0) return;
+
+            const pathRegion = document.getElementById('pathRegionFilter').value;
+            const pathSearch = document.getElementById('pathSearchFilter').value.toLowerCase();
+
+            let certCourses = trainingPathDef.filter(c => c.hasCert);
+            let nonCertCourses = trainingPathDef.filter(c => !c.hasCert);
+
+            let filteredEmployees = globalData.allActive.filter(emp => {
+                let matchReg = pathRegion === "" || emp.region === pathRegion;
+                let matchSearch = pathSearch === "" || emp.name.toLowerCase().includes(pathSearch) || emp.id.toString().includes(pathSearch);
+                let notGloballyExcluded = !globalData.excludedRegions.has(emp.region);
+                return matchReg && matchSearch && notGloballyExcluded;
+            });
+
+            let certBodyHtml = '';
+            let nonCertBodyHtml = '';
+
+            filteredEmployees.forEach(emp => {
+                // حساب مكان الوقوف للدورات الأساسية
+                let stopperCourse = null;
+                for (let i = 0; i < certCourses.length; i++) {
+                    if (!emp.pathProgress[certCourses[i].en]) {
+                        stopperCourse = certCourses[i];
+                        break;
+                    }
+                }
+
+                let stopperDisplay = stopperCourse ? `<span class="text-orange-600 font-bold whitespace-nowrap" title="${stopperCourse.ar}">${stopperCourse.certId}. ${stopperCourse.ar}</span>` : `<span class="text-emerald-600 font-bold whitespace-nowrap">✔ أتم المسار</span>`;
+
+                certBodyHtml += `<tr class="hover:bg-slate-50 transition border-b border-slate-100">`;
+                certBodyHtml += `<td class="px-4 py-3 font-bold text-slate-700 sticky-id">${emp.id}</td>`;
+                certBodyHtml += `<td class="px-4 py-3 font-bold text-slate-700 sticky-name truncate max-w-[180px]" title="${emp.name}">${emp.name}</td>`;
+                certBodyHtml += `<td class="px-4 py-3 text-slate-600 text-xs whitespace-nowrap">${emp.region}</td>`;
+                certBodyHtml += `<td class="px-4 py-3 text-right border-l border-slate-200">${stopperDisplay}</td>`;
+                
+                certCourses.forEach(c => {
+                    let isDone = emp.pathProgress[c.en];
+                    let isStopper = (stopperCourse && c.en === stopperCourse.en);
+                    let cellHtml = '';
+                    let bgClass = '';
+                    
+                    if (isDone) {
+                        cellHtml = `✔`;
+                        bgClass = 'bg-emerald-50/30 text-emerald-500 font-bold text-lg';
+                    } else if (isStopper) {
+                        cellHtml = `•`;
+                        bgClass = 'bg-orange-50/30 text-orange-500 font-bold text-2xl leading-none';
+                    } else {
+                        cellHtml = `✗`;
+                        bgClass = 'text-slate-200 font-medium text-sm';
+                    }
+
+                    certBodyHtml += `<td class="px-2 py-3 text-center border-l border-slate-50 ${bgClass}">${cellHtml}</td>`;
+                });
+                certBodyHtml += `</tr>`;
+
+
+                // بناء جدول الدورات الداعمة
+                let nonCertDoneCount = 0;
+                nonCertCourses.forEach(c => { if(emp.pathProgress[c.en]) nonCertDoneCount++; });
+                
+                nonCertBodyHtml += `<tr class="hover:bg-slate-50 transition border-b border-slate-100">`;
+                nonCertBodyHtml += `<td class="px-4 py-3 font-bold text-slate-700 sticky-id">${emp.id}</td>`;
+                nonCertBodyHtml += `<td class="px-4 py-3 font-bold text-slate-700 sticky-name truncate max-w-[180px]" title="${emp.name}">${emp.name}</td>`;
+                nonCertBodyHtml += `<td class="px-4 py-3 text-slate-600 text-xs whitespace-nowrap">${emp.region}</td>`;
+                nonCertBodyHtml += `<td class="px-4 py-3 text-center font-bold text-indigo-600 border-l border-slate-200">${nonCertDoneCount} / ${nonCertCourses.length}</td>`;
+                
+                nonCertCourses.forEach(c => {
+                    let isDone = emp.pathProgress[c.en];
+                    let cellHtml = '';
+                    let bgClass = '';
+                    if (isDone) {
+                        cellHtml = `✔`;
+                        bgClass = 'bg-emerald-50/30 text-emerald-500 font-bold text-lg';
+                    } else {
+                        cellHtml = `-`;
+                        bgClass = 'text-slate-300 font-medium text-lg leading-none';
+                    }
+                    nonCertBodyHtml += `<td class="px-2 py-3 text-center border-l border-slate-50 ${bgClass}">${cellHtml}</td>`;
+                });
+                nonCertBodyHtml += `</tr>`;
+            });
+
+            if (filteredEmployees.length === 0) {
+                let emptyMsg = `<tr><td colspan="30" class="text-center py-8 text-slate-500">لا توجد بيانات مطابقة للبحث.</td></tr>`;
+                certBodyHtml = emptyMsg;
+                nonCertBodyHtml = emptyMsg;
+            }
+
+            document.getElementById('pathCertTableBody').innerHTML = certBodyHtml;
+            document.getElementById('pathNonCertTableBody').innerHTML = nonCertBodyHtml;
+        }
+
+        function exportTrainingPath() {
+            const pathRegion = document.getElementById('pathRegionFilter').value;
+            const pathSearch = document.getElementById('pathSearchFilter').value.toLowerCase();
+            let certCourses = trainingPathDef.filter(c => c.hasCert);
+            let nonCertCourses = trainingPathDef.filter(c => !c.hasCert);
+
+            let filteredEmployees = globalData.allActive.filter(emp => {
+                let matchReg = pathRegion === "" || emp.region === pathRegion;
+                let matchSearch = pathSearch === "" || emp.name.toLowerCase().includes(pathSearch) || emp.id.toString().includes(pathSearch);
+                let notGloballyExcluded = !globalData.excludedRegions.has(emp.region);
+                return matchReg && matchSearch && notGloballyExcluded;
+            });
+
+            if(filteredEmployees.length === 0) return;
+
+            let wb = XLSX.utils.book_new();
+
+            // شيت الدورات الأساسية (الشهادات)
+            let certAOA = [];
+            let certHeaders = ["الرقم الوظيفي", "الاسم", "الإقليم", "المسار الحالي (نقطة التوقف)"];
+            certCourses.forEach(c => certHeaders.push(`${c.certId}- ${c.ar}`));
+            certAOA.push(certHeaders);
+
+            filteredEmployees.forEach(emp => {
+                let stopperCourse = null;
+                for (let i = 0; i < certCourses.length; i++) {
+                    if (!emp.pathProgress[certCourses[i].en]) { stopperCourse = certCourses[i]; break; }
+                }
+                let stopperName = stopperCourse ? `${stopperCourse.certId}. ${stopperCourse.ar}` : "أتم المسار بالكامل";
+                
+                let row = [emp.id, emp.name, emp.region, stopperName];
+                certCourses.forEach(c => {
+                    let isDone = emp.pathProgress[c.en];
+                    let isStopper = (stopperCourse && c.en === stopperCourse.en);
+                    if (isDone) row.push("منجز");
+                    else if (isStopper) row.push("واقف عليها");
+                    else row.push("لم يصلها");
+                });
+                certAOA.push(row);
+            });
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(certAOA), "مسار الشهادات الأساسي");
+
+            // شيت الدورات الداعمة
+            let nonCertAOA = [];
+            let nonCertHeaders = ["الرقم الوظيفي", "الاسم", "الإقليم", "إجمالي المنجز"];
+            nonCertCourses.forEach(c => nonCertHeaders.push(`${c.ar}`));
+            nonCertAOA.push(nonCertHeaders);
+
+            filteredEmployees.forEach(emp => {
+                let countDone = 0;
+                nonCertCourses.forEach(c => { if(emp.pathProgress[c.en]) countDone++; });
+                
+                let row = [emp.id, emp.name, emp.region, countDone];
+                nonCertCourses.forEach(c => {
+                    row.push(emp.pathProgress[c.en] ? "منجز" : "-");
+                });
+                nonCertAOA.push(row);
+            });
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(nonCertAOA), "الدورات الداعمة");
+
+            XLSX.writeFile(wb, "تقرير_مسار_التدريب_الجديد.xlsx");
+        }
+        // =========================================================================
+
 
         function renderTimelineDashboard() {
             let maxDay = "-", maxDayCount = 0;
@@ -1364,7 +1703,6 @@
                 }
             });
 
-            // الاعتماد على المستهدف الديناميكي
             if (maxCerts > targetCertsCount) maxCerts = targetCertsCount;
             document.getElementById('monthlyTargetCerts').innerText = maxCerts;
 
@@ -1415,10 +1753,12 @@
             let selectHtml = '<option value="">كل الأقاليم</option>';
             let checksHtml = '';
             let supFilterHtml = '<option value="">جميع القطاعات / الأقاليم</option>';
+            let pathFilterHtml = '<option value="">جميع الأقاليم</option>'; // للتبويب الجديد
             
             Array.from(globalData.regionsSet).sort().forEach(reg => {
                 selectHtml += `<option value="${reg}">${reg}</option>`;
                 supFilterHtml += `<option value="${reg}">${reg}</option>`;
+                pathFilterHtml += `<option value="${reg}">${reg}</option>`;
                 checksHtml += `
                     <label class="flex items-center space-x-2 space-x-reverse bg-white border rounded-lg px-4 py-2 cursor-pointer hover:bg-slate-50 transition shadow-sm">
                         <input type="checkbox" checked value="${reg}" onchange="toggleRegionExclusion(this)" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
@@ -1428,6 +1768,7 @@
             });
             document.getElementById('filterRegion').innerHTML = selectHtml;
             document.getElementById('supRegionFilter').innerHTML = supFilterHtml;
+            document.getElementById('pathRegionFilter').innerHTML = pathFilterHtml;
             document.getElementById('regionExclusionContainer').innerHTML = checksHtml;
         }
 
@@ -1435,6 +1776,7 @@
             if (checkbox.checked) globalData.excludedRegions.delete(checkbox.value);
             else globalData.excludedRegions.add(checkbox.value);
             applyActiveFilters(); 
+            renderTrainingPathTable(); // Refresh the new tab as well
         }
 
         function applyActiveFilters() {
