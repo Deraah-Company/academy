@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مستخرج ومصفي بيانات أكاديمية درعه</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Cairo) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+        }
+        /* Custom Scrollbar for modern look */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-900 to-indigo-950 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-5 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-white/10 p-2.5 rounded-lg border border-white/20">
+                    <i class="fa-solid fa-graduation-cap text-3xl text-amber-400"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight">أكاديمية درعه | Deraah Academy</h1>
+                    <p class="text-xs text-blue-200 mt-0.5">منصة تجميع البيانات وتصدير تقارير الإكسل الذكية</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-5 rounded-lg shadow transition duration-150 flex items-center gap-2 text-sm">
+                    <i class="fa-solid fa-file-excel text-lg"></i>
+                    <span>تصدير إلى إكسل (Excel)</span>
+                </button>
+                <a href="#parser-section" class="bg-white/10 hover:bg-white/20 text-white py-2.5 px-4 rounded-lg text-sm font-semibold transition border border-white/10 flex items-center gap-2">
+                    <i class="fa-solid fa-plus-circle text-amber-400"></i>
+                    <span>إضافة صفحات جديدة</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-8">
+
+        <!-- Informational Notice Banner -->
+        <div class="bg-blue-50 border-r-4 border-blue-600 p-4 rounded-lg shadow-sm mb-6 flex items-start gap-3">
+            <i class="fa-solid fa-circle-info text-blue-600 text-xl mt-0.5"></i>
+            <div>
+                <h3 class="font-bold text-blue-950 text-sm md:text-base">توجيه ذكي لتجميع كل الصفحات بسهولة!</h3>
+                <p class="text-xs md:text-sm text-blue-800 mt-1 leading-relaxed">
+                    لقد قمنا بالفعل بإدراج الـ 50 صفاً الأولى من بياناتك أدناه. عندما تفتح الصفحات الأخرى في المتصفح الخاص بك، ببساطة قم بعمل <strong>نسخ (Copy) للموقع بأكمله (Ctrl+A ثم Ctrl+C)</strong> ثم توجه إلى قسم <span class="font-semibold text-blue-900">"معالج لصق البيانات الإضافية"</span> أسفل الصفحة والصق النص هناك، وسيقوم النظام بتنقية وتجميع البيانات تلقائياً وتحديث هذا الجدول!
+                </p>
+            </div>
+        </div>
+
+        <!-- Analytics / Stats Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4">
+                <div class="p-3 bg-blue-50 text-blue-600 rounded-lg">
+                    <i class="fa-solid fa-users text-2xl"></i>
+                </div>
+                <div>
+                    <span class="block text-xs text-slate-400 font-semibold">إجمالي السجلات</span>
+                    <span id="stat-total-records" class="text-2xl font-bold text-slate-800">0</span>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4">
+                <div class="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
+                    <i class="fa-solid fa-circle-check text-2xl"></i>
+                </div>
+                <div>
+                    <span class="block text-xs text-slate-400 font-semibold">المكتملة (100%)</span>
+                    <span id="stat-completed" class="text-2xl font-bold text-emerald-600">0</span>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4">
+                <div class="p-3 bg-amber-50 text-amber-600 rounded-lg">
+                    <i class="fa-solid fa-spinner text-2xl"></i>
+                </div>
+                <div>
+                    <span class="block text-xs text-slate-400 font-semibold">قيد التقدم</span>
+                    <span id="stat-in-progress" class="text-2xl font-bold text-amber-600">0</span>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4">
+                <div class="p-3 bg-rose-50 text-rose-600 rounded-lg">
+                    <i class="fa-solid fa-circle-xmark text-2xl"></i>
+                </div>
+                <div>
+                    <span class="block text-xs text-slate-400 font-semibold">لم يبدأ بعد (0%)</span>
+                    <span id="stat-not-started" class="text-2xl font-bold text-rose-600">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters & Search Bar -->
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 mb-6">
+            <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2 text-sm md:text-base">
+                <i class="fa-solid fa-sliders text-blue-600"></i>
+                <span>أدوات الفلترة والبحث السريع</span>
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- Search -->
+                <div class="relative">
+                    <label class="block text-xs font-semibold text-slate-500 mb-1.5">البحث العام</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" id="search-input" oninput="applyFilters()" placeholder="ابحث بالاسم، الدورة، الفرع..." class="w-full pl-3 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                    </div>
+                </div>
+                <!-- Filter by Course -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1.5">اسم الدورة التدريبية</label>
+                    <select id="filter-course" onchange="applyFilters()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                        <option value="all">كل الدورات</option>
+                    </select>
+                </div>
+                <!-- Filter by Region -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1.5">إقليم المنطقة</label>
+                    <select id="filter-region" onchange="applyFilters()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                        <option value="all">كل الأقاليم</option>
+                    </select>
+                </div>
+                <!-- Filter by Status -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1.5">حالة التقدم</label>
+                    <select id="filter-status" onchange="applyFilters()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                        <option value="all">كل الحالات</option>
+                        <option value="completed">مكتملة (100%)</option>
+                        <option value="in-progress">قيد التقدم (1% - 99%)</option>
+                        <option value="not-started">لم تبدأ (0%)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table View Wrapper -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden mb-8">
+            <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3 bg-slate-50/50">
+                <span class="text-sm font-semibold text-slate-500" id="table-results-count">عرض 0 من أصل 0 سجل</span>
+                <div class="flex items-center gap-2">
+                    <button onclick="clearAllData()" class="text-xs text-rose-600 hover:text-rose-700 font-bold px-3 py-1.5 rounded hover:bg-rose-50 transition">
+                        <i class="fa-solid fa-trash-can"></i> مسح كافة البيانات
+                    </button>
+                </div>
+            </div>
+
+            <!-- Responsive Table Container -->
+            <div class="overflow-x-auto max-h-[550px]">
+                <table class="w-full text-right border-collapse text-xs md:text-sm">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 sticky top-0 z-10 whitespace-nowrap">
+                            <th class="p-3 font-bold text-center w-12 bg-slate-100">م</th>
+                            <th class="p-3 font-bold">اسم المتدرب</th>
+                            <th class="p-3 font-bold">اسم الدورة</th>
+                            <th class="p-3 font-bold">تصنيف الدورة</th>
+                            <th class="p-3 font-bold">البريد الإلكتروني</th>
+                            <th class="p-3 font-bold">رقم الهاتف</th>
+                            <th class="p-3 font-bold text-center">نسبة الإنجاز</th>
+                            <th class="p-3 font-bold">الفرع / المتجر</th>
+                            <th class="p-3 font-bold">المنطقة</th>
+                            <th class="p-3 font-bold">الإقليم</th>
+                            <th class="p-3 font-bold">المدير المباشر</th>
+                            <th class="p-3 font-bold">الجنس</th>
+                            <th class="p-3 font-bold">الجنسية</th>
+                            <th class="p-3 font-bold">تاريخ التسجيل</th>
+                            <th class="p-3 font-bold">تاريخ الالتحاق</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data-table-body" class="divide-y divide-slate-100">
+                        <!-- Dynamic rows here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Magic Parser Section -->
+        <section id="parser-section" class="bg-slate-900 text-white rounded-2xl shadow-xl p-6 md:p-8">
+            <div class="flex items-start gap-4 mb-6">
+                <div class="bg-amber-500 text-slate-950 p-3 rounded-xl">
+                    <i class="fa-solid fa-wand-magic-sparkles text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl md:text-2xl font-bold text-white">معالج لصق البيانات الإضافية الذكي</h2>
+                    <p class="text-sm text-slate-300 mt-1">قم بنسخ الصفحة الكاملة لأي صفحة من موقع Classera / LeadXera والصقها هنا، وسوف نستخلص جدولها فوراً ونضمه للتقرير!</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <textarea id="raw-paste-area" rows="6" placeholder="الصق محتويات الصفحة الكاملة هنا (Ctrl+V) ثم اضغط على زر المعالجة بالأسفل..." class="w-full p-4 bg-slate-800 border border-slate-700 rounded-xl text-sm font-mono text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 placeholder-slate-500"></textarea>
+                
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <button onclick="parseAndAppendData()" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold px-8 py-3.5 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-gears text-lg"></i>
+                        <span>تحليل وإضافة البيانات للجدول</span>
+                    </button>
+                    <span id="parsing-feedback" class="text-sm font-semibold text-slate-400"></span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-100 border-t border-slate-200 py-6 mt-12 text-center text-xs md:text-sm text-slate-500">
+        <p>حقوق النشر © 2026 أكاديمية درعه. تم التطوير بذكاء ومصداقية لمساعدة فريق العمل.</p>
+    </footer>
+
+    <!-- Custom alert/toast element -->
+    <div id="toast" class="fixed bottom-5 left-5 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl transition-all duration-300 transform translate-y-20 opacity-0 z-50 flex items-center gap-3 text-sm font-semibold">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+        <span id="toast-message">تمت العملية بنجاح!</span>
+    </div>
+
+    <!-- JavaScript logic -->
+    <script>
+        // Primary Dataset containing 50 parsed records from user's pasted raw text
+        let primaryDataset = [
+            { id: 1, course: "Gifts", trainer: "Deraah Academy", name: "هاشم محمد عمر باقيس", email: "bagabishashim@gmail.com", category: "Product Knowledge", phone: "569741840", empId: "52954", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "جمال عبداللطيف عبدالجواد عيسى", managerEmail: "Test@Deraah.com.sa", hireDate: "02/02/2026", branch: "سوق طيبه جده", area: "الوزيريه جده", region: "إقليم جده وينبع", gender: "ذكر", nationality: "سعودي", progress: "10.00%", lastProgress: "24/05/2026 09:14:38 pm", enrollDate: "24/05/2026 09:09:08 pm", regDate: "17/02/2026 11:33:05 am" },
+            { id: 2, course: "Sell Like A Pro", trainer: "Deraah Academy", name: "عبدالعزيز هادي محمد شراحيلي", email: "mokalbash@icloud.com", category: "Personal Development", phone: "561388119", empId: "52977", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "احمد ابراهيم عبداللطيف ابو الحمد", managerEmail: "Test@Deraah.com.sa", hireDate: "12/02/2026", branch: "العثيم مول الدمام", area: "الدمام", region: "اقليم الشرقية", gender: "ذكر", nationality: "سعودي", progress: "100.00%", lastProgress: "24/05/2026 07:17:04 pm", enrollDate: "24/05/2026 05:09:42 pm", regDate: "27/04/2026 11:05:03 am" },
+            { id: 3, course: "Negotiation and Conflict Resolution", trainer: "Deraah Academy", name: "سعيد مرعي ظافر القرني", email: "s45131358@gmail.com", category: "Personal Development", phone: "538447636", empId: "52984", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "محمد طه عبدالله قيس", managerEmail: "Test@Deraah.com.sa", hireDate: "11/02/2026", branch: "حي طيبه - جده", area: "الحمدانية", region: "إقليم جده وينبع", gender: "ذكر", nationality: "سعودي", progress: "100.00%", lastProgress: "24/05/2026 06:01:05 pm", enrollDate: "24/05/2026 04:25:26 pm", regDate: "19/04/2026 11:08:09 am" },
+            { id: 4, course: "Hair care", trainer: "Deraah Academy", name: "عبدالحكيم ضيف الله زايد العصيمي", email: "glory3tp@gmail.com", category: "Product Knowledge", phone: "550913264", empId: "52825", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "احمد محمد محمد الجمل", managerEmail: "Test@Deraah.com.sa", hireDate: "05/01/2026", branch: "الإمام محمد بن سعود٢", area: "المنار", region: "اقليم الشرقية", gender: "ذكر", nationality: "سعودي", progress: "100.00%", lastProgress: "24/05/2026 06:50:10 pm", enrollDate: "24/05/2026 04:24:21 pm", regDate: "18/01/2026 02:03:00 pm" },
+            { id: 5, course: "Deraah campaigns", trainer: "Deraah Academy", name: "سعيد مرعي ظافر القرني", email: "s45131358@gmail.com", category: "Marketing Campaigns", phone: "538447636", empId: "52984", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "محمد طه عبدالله قيس", managerEmail: "Test@Deraah.com.sa", hireDate: "11/02/2026", branch: "حي طيبه - جده", area: "الحمدانية", region: "إقليم جده وينبع", gender: "ذكر", nationality: "سعودي", progress: "49.30%", lastProgress: "24/05/2026 07:22:00 pm", enrollDate: "24/05/2026 04:01:41 pm", regDate: "19/04/2026 11:08:09 am" },
+            { id: 6, course: "Deraah campaigns", trainer: "Deraah Academy", name: "نايف علي شمهان مجممي", email: "nayfalmjmmy@gmail.com", category: "Marketing Campaigns", phone: "502528783", empId: "53014", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "مصطفى سليمان سليمان الصافوري", managerEmail: "Test@Deraah.com.sa", hireDate: "20/02/2026", branch: "الجسر حي الجسر", area: "الخبر", region: "اقليم الشرقية", gender: "ذكر", nationality: "سعودي", progress: "64.79%", lastProgress: "24/05/2026 09:52:41 pm", enrollDate: "24/05/2026 02:36:22 pm", regDate: "22/04/2026 03:26:56 pm" },
+            { id: 7, course: "Negotiation and Conflict Resolution", trainer: "Deraah Academy", name: "بسمه احمد قنطاح", email: "bm.20.bm.20@gmail.com", category: "Personal Development", phone: "539307066", empId: "53177", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "احمد بكري", managerEmail: "w.hamed@deraah.com.sa", hireDate: "46139", branch: "القصر مول / السويدي", area: "الرياض", region: "اقليم جنوب الرياض والمولات", gender: "أنثي", nationality: "السعودية", progress: "5.26%", lastProgress: "24/05/2026 02:44:49 pm", enrollDate: "24/05/2026 02:25:10 pm", regDate: "12/05/2026 08:47:37 am" },
+            { id: 8, course: "Negotiation and Conflict Resolution", trainer: "Deraah Academy", name: "نايف علي شمهان مجممي", email: "nayfalmjmmy@gmail.com", category: "Personal Development", phone: "502528783", empId: "53014", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "مصطفى سليمان سليمان الصافوري", managerEmail: "Test@Deraah.com.sa", hireDate: "20/02/2026", branch: "الجسر حي الجسر", area: "الخبر", region: "اقليم الشرقية", gender: "ذكر", nationality: "سعودي", progress: "100.00%", lastProgress: "24/05/2026 02:32:15 pm", enrollDate: "24/05/2026 01:36:38 pm", regDate: "22/04/2026 03:26:56 pm" },
+            { id: 9, course: "Deraah Seminars", trainer: "Deraah Academy", name: "عيسى محمد رباح المطيري", email: "almtyryyssy@gmail.com", category: "Deraah Seminars", phone: "535659485", empId: "80276", job: "بائع", dept: "مبيعات", admin: "مبيعات", manager: "محمد رجب محمد عفيفي", managerEmail: "M.Afifi@deraah.com.sa", hireDate: "46162", branch: "م 1220 السوق التجاري - الرس", area: "منطقة بريده 1", region: "الشمالية", gender: "ذكر", nationality: "سعودي", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 01:25:33 pm", regDate: "22/05/2026 04:38:26 pm" },
+            { id: 10, course: "Hair care", trainer: "Deraah Academy", name: "بسمه احمد قنطاح", email: "bm.20.bm.20@gmail.com", category: "Product Knowledge", phone: "539307066", empId: "53177", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "احمد بكري", managerEmail: "w.hamed@deraah.com.sa", hireDate: "46139", branch: "القصر مول / السويدي", area: "الرياض", region: "اقليم جنوب الرياض والمولات", gender: "أنثي", nationality: "السعودية", progress: "100.00%", lastProgress: "24/05/2026 02:23:08 pm", enrollDate: "24/05/2026 12:31:28 pm", regDate: "12/05/2026 08:47:37 am" },
+            { id: 11, course: "Deraah Seminars", trainer: "Deraah Academy", name: "نايف علي شمهان مجممي", email: "nayfalmjmmy@gmail.com", category: "Deraah Seminars", phone: "502528783", empId: "53014", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "مصطفى سليمان سليمان الصافوري", managerEmail: "Test@Deraah.com.sa", hireDate: "20/02/2026", branch: "الجسر حي الجسر", area: "الخبر", region: "اقليم الشرقية", gender: "ذكر", nationality: "سعودي", progress: "100.00%", lastProgress: "24/05/2026 01:02:23 pm", enrollDate: "24/05/2026 12:26:03 pm", regDate: "22/04/2026 03:26:56 pm" },
+            { id: 12, course: "Deraah campaigns", trainer: "Deraah Academy", name: "بسمه احمد قنطاح", email: "bm.20.bm.20@gmail.com", category: "Marketing Campaigns", phone: "539307066", empId: "53177", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "احمد بكري", managerEmail: "w.hamed@deraah.com.sa", hireDate: "46139", branch: "القصر مول / السويدي", area: "الرياض", region: "اقليم جنوب الرياض والمولات", gender: "أنثي", nationality: "السعودية", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 12:24:11 pm", regDate: "12/05/2026 08:47:37 am" },
+            { id: 13, course: "Deraah's new products", trainer: "Deraah Academy", name: "داود عبدالرزاق سلام عابد", email: "dawod2031@gmail.com", category: "Product Knowledge", phone: "557915178", empId: "53139", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "انس حميد", managerEmail: "a.hamid@deraah.com.sa", hireDate: "46161", branch: "الملك عبدالعزيز نجران", area: "نجران1", region: "اقليم الساحل", gender: "ذكر", nationality: "اليمن", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:43:55 am", regDate: "24/05/2026 09:37:58 am" },
+            { id: 14, course: "Deraah's new products", trainer: "Deraah Academy", name: "ياسر محمد سلام", email: "ghdyalansary51@gmail.com", category: "Product Knowledge", phone: "599091409", empId: "53190", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "احمد عبد المالك", managerEmail: "maloka80.am@gmail.com", hireDate: "46142", branch: "م 936 البحيرات 2 -مكه المكرمه", area: "مكة المكرمة", region: "اقليم مكة والطائف", gender: "ذكر", nationality: "سعودى", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:43:55 am", regDate: "24/05/2026 09:37:58 am" },
+            { id: 15, course: "Sales Scenario By English", trainer: "Deraah Academy", name: "داود عبدالرزاق سلام عابد", email: "dawod2031@gmail.com", category: "Personal Development", phone: "557915178", empId: "53139", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "انس حميد", managerEmail: "a.hamid@deraah.com.sa", hireDate: "46161", branch: "الملك عبدالعزيز نجران", area: "نجران1", region: "اقليم الساحل", gender: "ذكر", nationality: "اليمن", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:43:48 am", regDate: "24/05/2026 09:37:58 am" },
+            { id: 16, course: "Sales Scenario By English", trainer: "Deraah Academy", name: "ياسر محمد سلام", email: "ghdyalansary51@gmail.com", category: "Personal Development", phone: "599091409", empId: "53190", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "احمد عبد المالك", managerEmail: "maloka80.am@gmail.com", hireDate: "46142", branch: "م 936 البحيرات 2 -مكه المكرمه", area: "مكة المكرمة", region: "اقليم مكة والطائف", gender: "ذكر", nationality: "سعودى", progress: "100.00%", lastProgress: "24/05/2026 03:27:10 pm", enrollDate: "24/05/2026 09:43:48 am", regDate: "24/05/2026 09:37:58 am" },
+            { id: 17, course: "Preparations for the Hajj season", trainer: "Deraah Academy", name: "داود عبدالرزاق سلام عابد", email: "dawod2031@gmail.com", category: "Personal Development", phone: "557915178", empId: "53139", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "انس حميد", managerEmail: "a.hamid@deraah.com.sa", hireDate: "46161", branch: "الملك عبدالعزيز نجران", area: "نجران1", region: "اقليم الساحل", gender: "ذكر", nationality: "اليمن", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:43:39 am", regDate: "24/05/2026 09:37:58 am" },
+            { id: 18, course: "Preparations for the Hajj season", trainer: "Deraah Academy", name: "ياسر محمد سلام", email: "ghdyalansary51@gmail.com", category: "Personal Development", phone: "599091409", empId: "53190", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "احمد عبد المالك", managerEmail: "maloka80.am@gmail.com", hireDate: "46142", branch: "م 936 البحيرات 2 -مكه المكرمه", area: "مكة المكرمة", region: "اقليم مكة والطائف", gender: "ذكر", nationality: "سعودى", progress: "100.00%", lastProgress: "24/05/2026 03:25:08 pm", enrollDate: "24/05/2026 09:43:39 am", regDate: "24/05/2026 09:37:58 am" },
+            { id: 19, course: "Capsule", trainer: "Deraah Academy", name: "داود عبدالرزاق سلام عابد", email: "dawod2031@gmail.com", category: "Personal Development", phone: "557915178", empId: "53139", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "انس حميد", managerEmail: "a.hamid@deraah.com.sa", hireDate: "46161", branch: "الملك عبدالعزيز نجران", area: "نجران1", region: "اقليم الساحل", gender: "ذكر", nationality: "اليمن", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:43:28 am", regDate: "24/05/2026 09:37:58 am" },
+            { id: 20, course: "Capsule", trainer: "Deraah Academy", name: "ياسر محمد سلام", email: "ghdyalansary51@gmail.com", category: "Personal Development", phone: "599091409", empId: "53190", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "احمد عبد المالك", managerEmail: "maloka80.am@gmail.com", hireDate: "46142", branch: "م 936 البحيرات 2 -مكه المكرمه", area: "مكة المكرمة", region: "اقليم مكة والطائف", gender: "ذكر", nationality: "سعودى", progress: "100.00%", lastProgress: "24/05/2026 02:29:46 pm", enrollDate: "24/05/2026 09:43:28 am", regDate: "24/05/2026 09:37:58 am" },
+            { id: 21, course: "delivery order software", trainer: "Deraah Academy", name: "داود عبدالرزاق سلام عابد", email: "dawod2031@gmail.com", category: "Others", phone: "557915178", empId: "53139", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "انس حميد", managerEmail: "a.hamid@deraah.com.sa", hireDate: "46161", branch: "الملك عبدالعزيز نجران", area: "نجران1", region: "اقليم الساحل", gender: "ذكر", nationality: "اليمن", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:43:25 am", regDate: "24/05/2026 09:37:58 am" },
+            { id: 22, course: "delivery order software", trainer: "Deraah Academy", name: "ياسر محمد سلام", email: "ghdyalansary51@gmail.com", category: "Others", phone: "599091409", empId: "53190", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "احمد عبد المالك", managerEmail: "maloka80.am@gmail.com", hireDate: "46142", branch: "م 936 البحيرات 2 -مكه المكرمه", area: "مكة المكرمة", region: "اقليم مكة والطائف", gender: "ذكر", nationality: "سعودى", progress: "100.00%", lastProgress: "24/05/2026 03:53:16 pm", enrollDate: "24/05/2026 09:43:25 am", regDate: "24/05/2026 09:37:58 am" },
+            { id: 23, course: "Deraah History", trainer: "Deraah Academy", name: "داود عبدالرزاق سلام عابد", email: "dawod2031@gmail.com", category: "Product Knowledge", phone: "557915178", empId: "53139", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "انس حميد", managerEmail: "a.hamid@deraah.com.sa", hireDate: "46161", branch: "الملك عبدالعزيز نجران", area: "نجران1", region: "اقليم الساحل", gender: "ذكر", nationality: "اليمن", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:43:18 am", regDate: "24/05/2026 09:37:58 am" },
+            { id: 24, course: "Deraah History", trainer: "Deraah Academy", name: "ياسر محمد سلام", email: "ghdyalansary51@gmail.com", category: "Product Knowledge", phone: "599091409", empId: "53190", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "احمد عبد المالك", managerEmail: "maloka80.am@gmail.com", hireDate: "46142", branch: "م 936 البحيرات 2 -مكه المكرمه", area: "مكة المكرمة", region: "اقليم مكة والطائف", gender: "ذكر", nationality: "سعودى", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:43:18 am", regDate: "24/05/2026 09:37:58 am" },
+            { id: 25, course: "1+2 Offer", trainer: "Deraah Academy", name: "داود عبدالرزاق سلام عابد", email: "dawod2031@gmail.com", category: "Product Knowledge", phone: "557915178", empId: "53139", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "انس حميد", managerEmail: "a.hamid@deraah.com.sa", hireDate: "46161", branch: "الملك عبدالعزيز نجران", area: "نجران1", region: "اقليم الساحل", gender: "ذكر", nationality: "اليمن", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:43:16 am", regDate: "24/05/2026 09:37:58 am" },
+            { id: 26, course: "1+2 Offer", trainer: "Deraah Academy", name: "ياسر محمد سلام", email: "ghdyalansary51@gmail.com", category: "Product Knowledge", phone: "599091409", empId: "53190", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "احمد عبد المالك", managerEmail: "maloka80.am@gmail.com", hireDate: "46142", branch: "م 936 البحيرات 2 -مكه المكرمه", area: "مكة المكرمة", region: "اقليم مكة والطائف", gender: "ذكر", nationality: "سعودى", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:43:16 am", regDate: "24/05/2026 09:37:58 am" },
+            { id: 27, course: "Frequently Asked Questions and Answers", trainer: "Deraah Academy", name: "داود عبدالرزاق سلام عابد", email: "dawod2031@gmail.com", category: "Product Knowledge", phone: "557915178", empId: "53139", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "انس حميد", managerEmail: "a.hamid@deraah.com.sa", hireDate: "46161", branch: "الملك عبدالعزيز نجران", area: "نجران1", region: "اقليم الساحل", gender: "ذكر", nationality: "اليمن", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:43:13 am", regDate: "24/05/2026 09:37:58 am" },
+            { id: 28, course: "Frequently Asked Questions and Answers", trainer: "Deraah Academy", name: "ياسر محمد سلام", email: "ghdyalansary51@gmail.com", category: "Product Knowledge", phone: "599091409", empId: "53190", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "احمد عبد المالك", managerEmail: "maloka80.am@gmail.com", hireDate: "46142", branch: "م 936 البحيرات 2 -مكه المكرمه", area: "مكة المكرمة", region: "اقليم مكة والطائف", gender: "ذكر", nationality: "سعودى", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:43:13 am", regDate: "24/05/2026 09:37:58 am" },
+            { id: 29, course: "Updates and New Circulars", trainer: "Deraah Academy", name: "داود عبدالرزاق سلام عابد", email: "dawod2031@gmail.com", category: "Product Knowledge", phone: "557915178", empId: "53139", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "انس حميد", managerEmail: "a.hamid@deraah.com.sa", hireDate: "46161", branch: "الملك عبدالعزيز نجران", area: "نجران1", region: "اقليم الساحل", gender: "ذكر", nationality: "اليمن", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:43:10 am", regDate: "24/05/2026 09:37:58 am" },
+            { id: 30, course: "Updates and New Circulars", trainer: "Deraah Academy", name: "ياسر محمد سلام", email: "ghdyalansary51@gmail.com", category: "Product Knowledge", phone: "599091409", empId: "53190", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "احمد عبد المالك", managerEmail: "maloka80.am@gmail.com", hireDate: "46142", branch: "م 936 البحيرات 2 -مكه المكرمه", area: "مكة المكرمة", region: "اقليم مكة والطائف", gender: "ذكر", nationality: "سعودى", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:43:10 am", regDate: "24/05/2026 09:37:58 am" },
+            { id: 31, course: "Hair care", trainer: "Deraah Academy", name: "سعيد مرعي ظافر القرني", email: "s45131358@gmail.com", category: "Product Knowledge", phone: "538447636", empId: "52984", job: "بائع", dept: "مبيعات", admin: "إدارة المبيعات", manager: "محمد طه عبدالله قيس", managerEmail: "Test@Deraah.com.sa", hireDate: "11/02/2026", branch: "حي طيبه - جده", area: "الحمدانية", region: "إقليم جده وينبع", gender: "ذكر", nationality: "سعودي", progress: "100.00%", lastProgress: "24/05/2026 03:58:20 pm", enrollDate: "24/05/2026 09:21:03 am", regDate: "19/04/2026 11:08:09 am" },
+            { id: 32, course: "Gifts", trainer: "Deraah Academy", name: "ريان عايض مشفي المطيري", email: "rayanoog1@gmail.com", category: "Product Knowledge", phone: "501770929", empId: "80109", job: "بائع", dept: "مبيعات", admin: "مبيعات", manager: "رضوان سيف الدين", managerEmail: "radwanseif10@gamil.com", hireDate: "46160", branch: "م 361 الصويان التجاري - عنيزة", area: "منطقة بريده 2", region: "الشمالية", gender: "ذكر", nationality: "سعودي", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:01:31 am", regDate: "24/05/2026 08:56:30 am" },
+            { id: 33, course: "Gifts", trainer: "Deraah Academy", name: "عبدالعزيز منصور المنصور", email: "jzt1198@gmail.com", category: "Product Knowledge", phone: "551071600", empId: "80100", job: "بائع", dept: "مبيعات", admin: "مبيعات", manager: "H.gamal@deraah.com.sa", managerEmail: "H.gamal@deraah.com.sa", hireDate: "46162", branch: "م 979 طريق الامير عبد الاله - سكاكا", area: "سكاكا وطبرجل", region: "الشمالية", gender: "ذكر", nationality: "سعودي", progress: "100.00%", lastProgress: "24/05/2026 08:57:08 pm", enrollDate: "24/05/2026 09:01:31 am", regDate: "24/05/2026 08:56:30 am" },
+            { id: 34, course: "Gifts", trainer: "Deraah Academy", name: "مهند نزال مبارك العتيبي", email: "alrooqi.ma@gmail.com", category: "Product Knowledge", phone: "537529835", empId: "80092", job: "بائع", dept: "مبيعات", admin: "مبيعات", manager: "محمد رجب محمد عفيفي", managerEmail: "M.Afifi@deraah.com.sa", hireDate: "46159", branch: "م 1125 حي البساتين - بريده", area: "منطقة بريده 1", region: "الشمالية", gender: "ذكر", nationality: "سعودي", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:01:31 am", regDate: "24/05/2026 08:56:29 am" },
+            { id: 35, course: "Customer Experience", trainer: "Deraah Academy", name: "ريان عايض مشفي المطيري", email: "rayanoog1@gmail.com", category: "Personal Development", phone: "501770929", empId: "80109", job: "بائع", dept: "مبيعات", admin: "مبيعات", manager: "رضوان سيف الدين", managerEmail: "radwanseif10@gamil.com", hireDate: "46160", branch: "م 361 الصويان التجاري - عنيزة", area: "منطقة بريده 2", region: "الشمالية", gender: "ذكر", nationality: "سعودي", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:01:21 am", regDate: "24/05/2026 08:56:30 am" },
+            { id: 36, course: "Customer Experience", trainer: "Deraah Academy", name: "عبدالعزيز منصور المنصور", email: "jzt1198@gmail.com", category: "Personal Development", phone: "551071600", empId: "80100", job: "بائع", dept: "مبيعات", admin: "مبيعات", manager: "H.gamal@deraah.com.sa", managerEmail: "H.gamal@deraah.com.sa", hireDate: "46162", branch: "م 979 طريق الامير عبد الاله - سكاكا", area: "سكاكا وطبرجل", region: "الشمالية", gender: "ذكر", nationality: "سعودي", progress: "100.00%", lastProgress: "24/05/2026 11:42:50 pm", enrollDate: "24/05/2026 09:01:21 am", regDate: "24/05/2026 08:56:30 am" },
+            { id: 37, course: "Customer Experience", trainer: "Deraah Academy", name: "مهند نزال مبارك العتيبي", email: "alrooqi.ma@gmail.com", category: "Personal Development", phone: "537529835", empId: "80092", job: "بائع", dept: "مبيعات", admin: "مبيعات", manager: "محمد رجب محمد عفيفي", managerEmail: "M.Afifi@deraah.com.sa", hireDate: "46159", branch: "م 1125 حي البساتين - بريده", area: "منطقة بريده 1", region: "الشمالية", gender: "ذكر", nationality: "سعودي", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:01:21 am", regDate: "24/05/2026 08:56:29 am" },
+            { id: 38, course: "Perfumes", trainer: "Deraah Academy", name: "ريان عايض مشفي المطيري", email: "rayanoog1@gmail.com", category: "Product Knowledge", phone: "501770929", empId: "80109", job: "بائع", dept: "مبيعات", admin: "مبيعات", manager: "رضوان سيف الدين", managerEmail: "radwanseif10@gamil.com", hireDate: "46160", branch: "م 361 الصويان التجاري - عنيزة", area: "منطقة بريده 2", region: "الشمالية", gender: "ذكر", nationality: "سعودي", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:01:08 am", regDate: "24/05/2026 08:56:30 am" },
+            { id: 39, course: "Perfumes", trainer: "Deraah Academy", name: "عبدالعزيز منصور المنصور", email: "jzt1198@gmail.com", category: "Product Knowledge", phone: "551071600", empId: "80100", job: "بائع", dept: "مبيعات", admin: "مبيعات", manager: "H.gamal@deraah.com.sa", managerEmail: "H.gamal@deraah.com.sa", hireDate: "46162", branch: "م 979 طريق الامير عبد الاله - سكاكا", area: "سكاكا وطبرجل", region: "الشمالية", gender: "ذكر", nationality: "سعودي", progress: "100.00%", lastProgress: "24/05/2026 09:53:48 pm", enrollDate: "24/05/2026 09:01:08 am", regDate: "24/05/2026 08:56:30 am" },
+            { id: 40, course: "Perfumes", trainer: "Deraah Academy", name: "مهند نزال مبارك العتيبي", email: "alrooqi.ma@gmail.com", category: "Product Knowledge", phone: "537529835", empId: "80092", job: "بائع", dept: "مبيعات", admin: "مبيعات", manager: "محمد رجب محمد عفيفي", managerEmail: "M.Afifi@deraah.com.sa", hireDate: "46159", branch: "م 1125 حي البساتين - بريده", area: "منطقة بريده 1", region: "الشمالية", gender: "ذكر", nationality: "سعودي", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:01:08 am", regDate: "24/05/2026 08:56:29 am" },
+            { id: 41, course: "Sell Like A Pro", trainer: "Deraah Academy", name: "ريان عايض مشفي المطيري", email: "rayanoog1@gmail.com", category: "Personal Development", phone: "501770929", empId: "80109", job: "بائع", dept: "مبيعات", admin: "مبيعات", manager: "رضوان سيف الدين", managerEmail: "radwanseif10@gamil.com", hireDate: "46160", branch: "م 361 الصويان التجاري - عنيزة", area: "منطقة بريده 2", region: "الشمالية", gender: "ذكر", nationality: "سعودي", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:01:04 am", regDate: "24/05/2026 08:56:30 am" },
+            { id: 42, course: "Sell Like A Pro", trainer: "Deraah Academy", name: "عبدالعزيز منصور المنصور", email: "jzt1198@gmail.com", category: "Personal Development", phone: "551071600", empId: "80100", job: "بائع", dept: "مبيعات", admin: "مبيعات", manager: "H.gamal@deraah.com.sa", managerEmail: "H.gamal@deraah.com.sa", hireDate: "46162", branch: "م 979 طريق الامير عبد الاله - سكاكا", area: "سكاكا وطبرجل", region: "الشمالية", gender: "ذكر", nationality: "سعودي", progress: "62.50%", lastProgress: "25/05/2026 12:11:25 am", enrollDate: "24/05/2026 09:01:04 am", regDate: "24/05/2026 08:56:30 am" },
+            { id: 43, course: "Sell Like A Pro", trainer: "Deraah Academy", name: "مهند نزال مبارك العتيبي", email: "alrooqi.ma@gmail.com", category: "Personal Development", phone: "537529835", empId: "80092", job: "بائع", dept: "مبيعات", admin: "مبيعات", manager: "محمد رجب محمد عفيفي", managerEmail: "M.Afifi@deraah.com.sa", hireDate: "46159", branch: "م 1125 حي البساتين - بريده", area: "منطقة بريده 1", region: "الشمالية", gender: "ذكر", nationality: "سعودي", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:01:04 am", regDate: "24/05/2026 08:56:29 am" },
+            { id: 44, course: "EL OUD", trainer: "Deraah Academy", name: "ريان عايض مشفي المطيري", email: "rayanoog1@gmail.com", category: "Product Knowledge", phone: "501770929", empId: "80109", job: "بائع", dept: "مبيعات", admin: "مبيعات", manager: "رضوان سيف الدين", managerEmail: "radwanseif10@gamil.com", hireDate: "46160", branch: "م 361 الصويان التجاري - عنيزة", area: "منطقة بريده 2", region: "الشمالية", gender: "ذكر", nationality: "سعودي", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:01:01 am", regDate: "24/05/2026 08:56:30 am" },
+            { id: 45, course: "EL OUD", trainer: "Deraah Academy", name: "عبدالعزيز منصور المنصور", email: "jzt1198@gmail.com", category: "Product Knowledge", phone: "551071600", empId: "80100", job: "بائع", dept: "مبيعات", admin: "مبيعات", manager: "H.gamal@deraah.com.sa", managerEmail: "H.gamal@deraah.com.sa", hireDate: "46162", branch: "م 979 طريق الامير عبد الاله - سكاكا", area: "سكاكا وطبرجل", region: "الشمالية", gender: "ذكر", nationality: "سعودي", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:01:00 am", regDate: "24/05/2026 08:56:30 am" },
+            { id: 46, course: "EL OUD", trainer: "Deraah Academy", name: "مهند نزال مبارك العتيبي", email: "alrooqi.ma@gmail.com", category: "Product Knowledge", phone: "537529835", empId: "80092", job: "بائع", dept: "مبيعات", admin: "مبيعات", manager: "محمد رجب محمد عفيفي", managerEmail: "M.Afifi@deraah.com.sa", hireDate: "46159", branch: "م 1125 حي البساتين - بريده", area: "منطقة بريده 1", region: "الشمالية", gender: "ذكر", nationality: "سعودي", progress: "100.00%", lastProgress: "24/05/2026 06:16:27 pm", enrollDate: "24/05/2026 09:01:00 am", regDate: "24/05/2026 08:56:29 am" },
+            { id: 47, course: "Hair care", trainer: "Deraah Academy", name: "ريان عايض مشفي المطيري", email: "rayanoog1@gmail.com", category: "Product Knowledge", phone: "501770929", empId: "80109", job: "بائع", dept: "مبيعات", admin: "مبيعات", manager: "رضوان سيف الدين", managerEmail: "radwanseif10@gamil.com", hireDate: "46160", branch: "م 361 الصويان التجاري - عنيزة", area: "منطقة بريده 2", region: "الشمالية", gender: "ذكر", nationality: "سعودي", progress: "85.71%", lastProgress: "24/05/2026 07:42:55 pm", enrollDate: "24/05/2026 09:00:56 am", regDate: "24/05/2026 08:56:30 am" },
+            { id: 48, course: "Hair care", trainer: "Deraah Academy", name: "عبدالعزيز منصور المنصور", email: "jzt1198@gmail.com", category: "Product Knowledge", phone: "551071600", empId: "80100", job: "بائع", dept: "مبيعات", admin: "مبيعات", manager: "H.gamal@deraah.com.sa", managerEmail: "H.gamal@deraah.com.sa", hireDate: "46162", branch: "م 979 طريق الامير عبد الاله - سكاكا", area: "سكاكا وطبرجل", region: "الشمالية", gender: "ذكر", nationality: "سعودي", progress: "100.00%", lastProgress: "24/05/2026 04:43:06 pm", enrollDate: "24/05/2026 09:00:56 am", regDate: "24/05/2026 08:56:30 am" },
+            { id: 49, course: "Hair care", trainer: "Deraah Academy", name: "مهند نزال مبارك العتيبي", email: "alrooqi.ma@gmail.com", category: "Product Knowledge", phone: "537529835", empId: "80092", job: "بائع", dept: "مبيعات", admin: "مبيعات", manager: "محمد رجب محمد عفيفي", managerEmail: "M.Afifi@deraah.com.sa", hireDate: "46159", branch: "م 1125 حي البساتين - بريده", area: "منطقة بريده 1", region: "الشمالية", gender: "ذكر", nationality: "سعودي", progress: "0.00%", lastProgress: "-", enrollDate: "24/05/2026 09:00:56 am", regDate: "24/05/2026 08:56:29 am" },
+            { id: 50, course: "Negotiation and Conflict Resolution", trainer: "Deraah Academy", name: "تركي خويتم ساجي البعاج", email: "turkyalbaaj@gmail.com", category: "Personal Development", phone: "535447174", empId: "80090", job: "بائع", dept: "مبيعات", admin: "مبيعات", manager: "عماد شاكر", managerEmail: "e.shaker@deraah.com.sa", hireDate: "46159", branch: "م 1070 طريق الملك عبدالله - عرعر", area: "منطقة عرعر والقريات", region: "الشمالية", gender: "ذكر", nationality: "سعودي", progress: "100.00%", lastProgress: "24/05/2026 07:53:57 am", enrollDate: "24/05/2026 06:38:52 am", regDate: "22/05/2026 04:38:25 pm" }
+        ];
+
+        // On document load
+        window.onload = function() {
+            // Check if user has saved data in localStorage to prevent loss of progress
+            const savedData = localStorage.getItem('deraah_academy_dataset');
+            if (savedData) {
+                primaryDataset = JSON.parse(savedData);
+                showToast("تم استعادة البيانات المحفوظة تلقائياً!");
+            }
+            
+            rebuildTable();
+        };
+
+        // Utility to show beautiful popup notifications
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3500);
+        }
+
+        // Rebuild dropdown menus and table statistics
+        function updateUIMetadata() {
+            // Count unique items for dropdowns
+            const courses = new Set();
+            const regions = new Set();
+            
+            let total = primaryDataset.length;
+            let completed = 0;
+            let inProgress = 0;
+            let notStarted = 0;
+
+            primaryDataset.forEach(row => {
+                if (row.course) courses.add(row.course);
+                if (row.region) regions.add(row.region);
+
+                // calculate progress types
+                let progVal = parseFloat(row.progress) || 0;
+                if (progVal === 100) {
+                    completed++;
+                } else if (progVal > 0) {
+                    inProgress++;
+                } else {
+                    notStarted++;
+                }
+            });
+
+            // Update Stats Display
+            document.getElementById('stat-total-records').innerText = total;
+            document.getElementById('stat-completed').innerText = completed;
+            document.getElementById('stat-in-progress').innerText = inProgress;
+            document.getElementById('stat-not-started').innerText = notStarted;
+
+            // Populate Course Filter Dropdown
+            const courseSelect = document.getElementById('filter-course');
+            const selectedCourse = courseSelect.value;
+            courseSelect.innerHTML = '<option value="all">كل الدورات</option>';
+            Array.from(courses).sort().forEach(c => {
+                courseSelect.innerHTML += `<option value="${c}">${c}</option>`;
+            });
+            courseSelect.value = selectedCourse;
+
+            // Populate Region Filter Dropdown
+            const regionSelect = document.getElementById('filter-region');
+            const selectedRegion = regionSelect.value;
+            regionSelect.innerHTML = '<option value="all">كل الأقاليم</option>';
+            Array.from(regions).sort().forEach(r => {
+                regionSelect.innerHTML += `<option value="${r}">${r}</option>`;
+            });
+            regionSelect.value = selectedRegion;
+        }
+
+        // Renders table based on filters
+        function rebuildTable(filteredData = null) {
+            updateUIMetadata();
+            
+            const dataToRender = filteredData || primaryDataset;
+            const tableBody = document.getElementById('data-table-body');
+            tableBody.innerHTML = '';
+
+            if (dataToRender.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="15" class="p-8 text-center text-slate-400 font-semibold bg-white">
+                            <i class="fa-solid fa-folder-open text-4xl block mb-2"></i>
+                            لا توجد سجلات مطابقة للبحث الحالي.
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('table-results-count').innerText = `عرض 0 من أصل ${primaryDataset.length} سجل`;
+                return;
+            }
+
+            dataToRender.forEach((row, index) => {
+                let progressColorClass = "bg-rose-100 text-rose-700";
+                let progVal = parseFloat(row.progress) || 0;
+                if (progVal === 100) {
+                    progressColorClass = "bg-emerald-100 text-emerald-700 font-bold";
+                } else if (progVal > 0) {
+                    progressColorClass = "bg-amber-100 text-amber-700 font-semibold";
+                }
+
+                tableBody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition duration-150 whitespace-nowrap">
+                        <td class="p-3 text-center text-slate-500 font-mono bg-slate-50 border-l border-slate-100">${index + 1}</td>
+                        <td class="p-3 font-semibold text-slate-900">${row.name || '-'}</td>
+                        <td class="p-3 text-blue-900 font-medium">${row.course || '-'}</td>
+                        <td class="p-3 text-slate-500">${row.category || '-'}</td>
+                        <td class="p-3 font-mono text-slate-600">${row.email || '-'}</td>
+                        <td class="p-3 font-mono text-slate-600">${row.phone || '-'}</td>
+                        <td class="p-3 text-center">
+                            <span class="px-2.5 py-1 rounded-full text-xs ${progressColorClass}">
+                                ${row.progress || '0.00%'}
+                            </span>
+                        </td>
+                        <td class="p-3 text-slate-600">${row.branch || '-'}</td>
+                        <td class="p-3 text-slate-600">${row.area || '-'}</td>
+                        <td class="p-3 text-slate-600">${row.region || '-'}</td>
+                        <td class="p-3 text-slate-600">${row.manager || '-'}</td>
+                        <td class="p-3 text-slate-500">${row.gender || '-'}</td>
+                        <td class="p-3 text-slate-500">${row.nationality || '-'}</td>
+                        <td class="p-3 text-slate-400 text-xs">${row.regDate || '-'}</td>
+                        <td class="p-3 text-slate-400 text-xs">${row.enrollDate || '-'}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('table-results-count').innerText = `عرض ${dataToRender.length} من أصل ${primaryDataset.length} سجل`;
+        }
+
+        // Apply search query and filters
+        function applyFilters() {
+            const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
+            const courseFilter = document.getElementById('filter-course').value;
+            const regionFilter = document.getElementById('filter-region').value;
+            const statusFilter = document.getElementById('filter-status').value;
+
+            const filtered = primaryDataset.filter(row => {
+                // Search condition
+                const searchMatch = !searchQuery || 
+                    (row.name && row.name.toLowerCase().includes(searchQuery)) ||
+                    (row.course && row.course.toLowerCase().includes(searchQuery)) ||
+                    (row.email && row.email.toLowerCase().includes(searchQuery)) ||
+                    (row.phone && row.phone.includes(searchQuery)) ||
+                    (row.branch && row.branch.toLowerCase().includes(searchQuery)) ||
+                    (row.manager && row.manager.toLowerCase().includes(searchQuery));
+
+                // Course filter
+                const courseMatch = courseFilter === 'all' || row.course === courseFilter;
+
+                // Region filter
+                const regionMatch = regionFilter === 'all' || row.region === regionFilter;
+
+                // Status Filter
+                let statusMatch = true;
+                let progVal = parseFloat(row.progress) || 0;
+                if (statusFilter === 'completed') {
+                    statusMatch = progVal === 100;
+                } else if (statusFilter === 'in-progress') {
+                    statusMatch = progVal > 0 && progVal < 100;
+                } else if (statusFilter === 'not-started') {
+                    statusMatch = progVal === 0;
+                }
+
+                return searchMatch && courseMatch && regionMatch && statusMatch;
+            });
+
+            rebuildTable(filtered);
+        }
+
+        // Export data directly to UTF-8 BOM CSV (Perfect Excel Support)
+        function exportToCSV() {
+            if (primaryDataset.length === 0) {
+                showToast("لا توجد بيانات لتصديرها!");
+                return;
+            }
+
+            const headers = [
+                "م", "اسم المتدرب", "اسم الدورة", "تصنيف الدورة", "البريد الإلكتروني", 
+                "رقم الهاتف", "الرقم الوظيفي", "المسمى الوظيفي", "القسم", "الإدارة", 
+                "المدير المباشر", "بريد المدير", "تاريخ التعيين", "اسم الفرع", 
+                "المنطقة", "الإقليم", "الجنس", "الجنسية", "نسبة الإنجاز", 
+                "آخر تحديث للتقدم", "تاريخ التسجيل", "تاريخ الالتحاق"
+            ];
+
+            let csvContent = "\uFEFF"; // UTF-8 BOM indicator so Excel opens it with correct Arabic characters
+            csvContent += headers.map(h => `"${h}"`).join(",") + "\r\n";
+
+            primaryDataset.forEach((row, idx) => {
+                const rowData = [
+                    idx + 1,
+                    row.name || "",
+                    row.course || "",
+                    row.category || "",
+                    row.email || "",
+                    row.phone || "",
+                    row.empId || "",
+                    row.job || "",
+                    row.dept || "",
+                    row.admin || "",
+                    row.manager || "",
+                    row.managerEmail || "",
+                    row.hireDate || "",
+                    row.branch || "",
+                    row.area || "",
+                    row.region || "",
+                    row.gender || "",
+                    row.nationality || "",
+                    row.progress || "0.00%",
+                    row.lastProgress || "",
+                    row.regDate || "",
+                    row.enrollDate || ""
+                ];
+                
+                csvContent += rowData.map(val => `"${String(val).replace(/"/g, '""')}"`).join(",") + "\r\n";
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute("href", url);
+            link.setAttribute("download", `تقرير_أكاديمية_درعه_تجميعي_${new Date().toISOString().slice(0,10)}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showToast("تم تصدير ملف إكسل بنجاح!");
+        }
+
+        // Clean Storage
+        function clearAllData() {
+            if (confirm("هل أنت متأكد من رغبتك في مسح كافة السجلات الحالية؟ لا يمكن التراجع عن هذه الخطوة.")) {
+                primaryDataset = [];
+                localStorage.removeItem('deraah_academy_dataset');
+                rebuildTable();
+                showToast("تم مسح كافة البيانات.");
+            }
+        }
+
+        // Pure JS parser to automatically extract data block copied from consecutive webpages
+        function parseAndAppendData() {
+            const rawText = document.getElementById('raw-paste-area').value.trim();
+            const feedbackEl = document.getElementById('parsing-feedback');
+            
+            if (!rawText) {
+                feedbackEl.innerHTML = '<span class="text-rose-400">الرجاء لصق بعض البيانات أولاً!</span>';
+                return;
+            }
+
+            feedbackEl.innerHTML = '<span class="text-amber-400">جاري تحليل البيانات...</span>';
+
+            try {
+                // Split pasted data into blocks using double lines or numbers as markers
+                // Our target structure is to find repeated blocks of text.
+                // We'll search for common indicators: "Deraah Academy" followed by name, email, progress etc.
+                const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                
+                let addedCount = 0;
+                let currentId = primaryDataset.length > 0 ? Math.max(...primaryDataset.map(d => d.id)) + 1 : 1;
+
+                // Let's iterate and extract patterns
+                // We'll search for lines containing 'Deraah Academy' and map fields before & after
+                for (let i = 0; i < lines.length; i++) {
+                    if (lines[i] === "Deraah Academy") {
+                        // Let's attempt safe indexing to parse the surround fields
+                        // Typical pattern from raw text:
+                        // Index i-2 or i-1: Course Title (e.g. "Gifts", "Sell Like A Pro")
+                        // Index i: "Deraah Academy"
+                        // Index i+1: Trainee Name (e.g. "هاشم محمد عمر باقيس")
+                        // Index i+2: Trainee Email
+                        
+                        let courseCandidate = "";
+                        // Go back to find the course title (skip numbers)
+                        let lookupIdx = i - 1;
+                        while (lookupIdx >= 0) {
+                            if (!isNaN(lines[lookupIdx])) {
+                                // If it's a number, the course title is usually right after it
+                                break;
+                            }
+                            courseCandidate = lines[lookupIdx];
+                            lookupIdx--;
+                        }
+                        
+                        // Let's parse forward carefully:
+                        let name = lines[i + 1] || "";
+                        let email = lines[i + 2] || "";
+                        
+                        // Search for elements: Category, Phone Number, empId, Job Title, Dept, Admin, Manager, Branch, Region, Gender, Nationality, Progress, Dates...
+                        // We will look ahead up to 45 lines to find key indicators
+                        let phone = "";
+                        let empId = "";
+                        let job = "بائع";
+                        let dept = "مبيعات";
+                        let admin = "إدارة المبيعات";
+                        let manager = "";
+                        let managerEmail = "";
+                        let hireDate = "";
+                        let branch = "";
+                        let area = "";
+                        let region = "";
+                        let gender = "";
+                        let nationality = "";
+                        let progress = "0.00%";
+                        let regDate = "";
+                        let enrollDate = "";
+                        let category = "";
+
+                        // Quick scanning of the block ahead
+                        const scanLimit = Math.min(i + 50, lines.length);
+                        for (let j = i + 3; j < scanLimit; j++) {
+                            const val = lines[j];
+                            
+                            // Category detection (Known static list or typical formats)
+                            if (["Product Knowledge", "Personal Development", "Marketing Campaigns", "Deraah Seminars", "Others"].includes(val)) {
+                                category = val;
+                            }
+                            // Email pattern for manager
+                            if (val.includes('@') && val.toLowerCase().includes('deraah.com') && !managerEmail) {
+                                managerEmail = val;
+                                if (j > 0 && isNaN(lines[j-1]) && !lines[j-1].includes('@')) {
+                                    manager = lines[j-1]; // Name of manager is usually before email
+                                }
+                            }
+                            // Phone number detection (usually starts with 5 for Saudi mobile)
+                            if (/^5\d{8}$/.test(val) && !phone) {
+                                phone = val;
+                                if (j > 0 && !isNaN(lines[j-1])) {
+                                    empId = lines[j-1]; // Job ID is usually before phone number
+                                }
+                            }
+                            // Date formatting detection: DD/MM/YYYY
+                            if (/^\d{2}\/\d{2}\/\d{4}$/.test(val)) {
+                                if (!hireDate) hireDate = val;
+                            }
+                            // Progress % detection
+                            if (/^\d+(\.\d+)?%$/.test(val)) {
+                                if (val !== "100.00%" && val !== "0.00%" && !val.includes('.')) {
+                                    // Just a safety check
+                                } else if (progress === "0.00%" || progress === "0%") {
+                                    progress = val;
+                                }
+                            }
+                            // Date and Time: Enrollment Date and Reg Date
+                            if (/^\d{2}\/\d{2}\/\d{4}\s\d{2}:\d{2}:\d{2}\s(am|pm)$/i.test(val)) {
+                                if (!enrollDate) enrollDate = val;
+                                else if (!regDate) regDate = val;
+                            }
+                            // Region match
+                            if (val.includes("إقليم") || val.includes("اقليم") || val.includes("الشمالية") || val.includes("الجنوبية")) {
+                                region = val;
+                                if (j > 0) area = lines[j-1];
+                                if (j > 1) branch = lines[j-2];
+                            }
+                            // Nationality/Gender detection
+                            if (val === "ذكر" || val === "أنثي" || val === "أنثى") {
+                                gender = val;
+                                if (j > 0 && lines[j-1] !== "ذكر" && lines[j-1] !== "أنثى") {
+                                    nationality = lines[j-1];
+                                }
+                            }
+                        }
+
+                        // Verify we have a solid entry
+                        if (name && name.length > 2 && !name.includes('@')) {
+                            // Check if duplicate already exists to avoid duplication
+                            const isDuplicate = primaryDataset.some(row => 
+                                row.name === name && row.course === courseCandidate
+                            );
+
+                            if (!isDuplicate) {
+                                primaryDataset.push({
+                                    id: currentId++,
+                                    course: courseCandidate || "دورة عامة",
+                                    trainer: "Deraah Academy",
+                                    name: name,
+                                    email: email,
+                                    category: category || "عام",
+                                    phone: phone,
+                                    empId: empId,
+                                    job: job,
+                                    dept: dept,
+                                    admin: admin,
+                                    manager: manager || "إدارة المبيعات",
+                                    managerEmail: managerEmail,
+                                    hireDate: hireDate,
+                                    branch: branch,
+                                    area: area,
+                                    region: region || "غير محدد",
+                                    gender: gender || "ذكر",
+                                    nationality: nationality || "سعودي",
+                                    progress: progress,
+                                    lastProgress: "-",
+                                    regDate: regDate,
+                                    enrollDate: enrollDate
+                                });
+                                addedCount++;
+                            }
+                        }
+                    }
+                }
+
+                if (addedCount > 0) {
+                    // Save to localstorage so user doesn't lose data on page refresh
+                    localStorage.setItem('deraah_academy_dataset', JSON.stringify(primaryDataset));
+                    
+                    feedbackEl.innerHTML = `<span class="text-emerald-400 font-bold">تم بنجاح! تم استخراج وإضافة ${addedCount} سجلاً جديداً للجدول.</span>`;
+                    showToast(`تم إضافة ${addedCount} سجلاً جديداً!`);
+                    document.getElementById('raw-paste-area').value = ''; // Clean box
+                    rebuildTable();
+                } else {
+                    feedbackEl.innerHTML = '<span class="text-rose-400">لم يتم العثور على سجلات جديدة فريدة. تأكد من نسخ الصفحة بالكامل بشكل صحيح.</span>';
+                }
+
+            } catch (err) {
+                console.error(err);
+                feedbackEl.innerHTML = '<span class="text-rose-400">حدث خطأ أثناء تحليل النص المنسوخ. يرجى مراجعة التنسيق واللصق مجدداً.</span>';
+            }
+        }
+    </script>
+</body>
+</html>
