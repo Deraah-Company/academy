@@ -42,6 +42,11 @@
         /* Modal Styles */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 10000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
         .modal-content { background: white; width: 90%; max-width: 1000px; max-height: 90vh; border-radius: 1rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); display: flex; flex-direction: column; animation: fadeIn 0.3s ease-out; }
+
+        /* KPI Custom Styles */
+        .kpi-box { transition: all 0.2s ease-in-out; }
+        .kpi-box:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .kpi-box.active { border-color: #0d9488; background-color: #f0fdfa; }
     </style>
 </head>
 <body class="text-slate-800">
@@ -128,7 +133,6 @@
             </div>
         </header>
 
-        <!-- إعدادات المستهدف -->
         <div class="bg-white shadow-sm rounded-2xl p-6 mb-8 border border-slate-100 flex flex-col md:flex-row items-center justify-between">
             <div class="mb-4 md:mb-0">
                 <h3 class="font-bold text-slate-800 text-lg"><i class="fas fa-bullseye text-indigo-500 ml-2"></i> إعدادات المستهدف</h3>
@@ -207,14 +211,18 @@
                     <i class="fas fa-user-times ml-2"></i> المستبعدين
                 </button>
                 <button class="tab-btn px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'missingTab')">
-                    <i class="fas fa-user-secret ml-2"></i> عدم التطابق (مفقودين)
+                    <i class="fas fa-user-secret ml-2"></i> عدم التطابق
                 </button>
                 <button class="tab-btn px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'nonCertTab')">
                     <i class="fas fa-book-open ml-2"></i> دورات بدون شهادات
                 </button>
-                <!-- التبويب الجديد -->
                 <button class="tab-btn px-5 py-4 text-orange-700 font-bold bg-orange-50 border-r border-orange-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'trainingPathTab')">
-                    <i class="fas fa-route ml-2"></i> مسار التدريب (الوقوف)
+                    <i class="fas fa-route ml-2"></i> مسار التدريب
+                </button>
+
+                <!-- التبويب الجديد KPI -->
+                <button class="tab-btn px-5 py-4 text-teal-700 font-bold bg-teal-50 border-r border-teal-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'kpiTab')">
+                    <i class="fas fa-tachometer-alt ml-2"></i> KPI (مؤشرات الأداء)
                 </button>
 
                 <button class="tab-btn px-5 py-4 text-blue-700 font-bold bg-blue-50 border-r border-blue-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'supervisorsTab')">
@@ -270,7 +278,120 @@
                     </div>
                 </div>
 
-                <!-- التبويبات الأخرى كما هي... -->
+                <!-- ================= تبويب KPI الجديد ================= -->
+                <div id="kpiTab" class="tab-content">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 bg-teal-50 p-6 rounded-2xl border border-teal-100">
+                        <div>
+                            <h2 class="text-2xl font-bold text-teal-900 flex items-center mb-2">
+                                <i class="fas fa-tachometer-alt text-teal-500 ml-2"></i> مؤشرات الأداء (KPI)
+                            </h2>
+                            <p class="text-teal-700 text-sm">اختر مدير الإقليم لعرض المشرفين التابعين له وتقييم محاور الأداء للموظفين تحت إدارتهم.</p>
+                        </div>
+                        <button onclick="exportKPIToExcel()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 px-6 rounded-xl shadow transition transform hover:-translate-y-0.5 whitespace-nowrap flex items-center">
+                            <i class="fas fa-file-excel ml-2"></i> تصدير تقرير KPI
+                        </button>
+                    </div>
+
+                    <!-- فلتر المديرين الذكي (Smart Filter) -->
+                    <div class="mb-8">
+                        <h3 class="font-bold text-slate-700 mb-4 flex items-center text-lg">
+                            <i class="fas fa-user-tie text-teal-500 ml-2"></i> 1. اختر مدير الإقليم
+                        </h3>
+                        <div id="kpiManagersContainer" class="flex flex-wrap gap-3">
+                            <!-- سيتم توليده بالجاڤاسكربت -->
+                        </div>
+                    </div>
+
+                    <!-- حاوية المشرفين (Level 2) -->
+                    <div id="kpiSupervisorsSection" class="mb-8 hidden">
+                        <div class="border-t border-slate-200 pt-6">
+                            <h3 class="font-bold text-slate-700 mb-4 flex items-center text-lg">
+                                <i class="fas fa-users-cog text-teal-500 ml-2"></i> 2. المشرفين التابعين (اضغط على المشرف للتفاصيل)
+                            </h3>
+                            <div id="kpiSupervisorsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                <!-- سيتم توليده بالجاڤاسكربت -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- حاوية محاور التقييم للمشرف المختار (Level 3) -->
+                    <div id="kpiAxesSection" class="mb-8 hidden bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-slate-800 text-xl flex items-center">
+                                <i class="fas fa-chart-line text-teal-500 ml-2"></i> 3. تحليل المحاور للمشرف: <span id="selectedKpiSupName" class="text-teal-700 mr-2"></span>
+                            </h3>
+                            <div class="bg-teal-100 text-teal-800 font-bold px-4 py-2 rounded-lg border border-teal-200 shadow-sm">
+                                متوسط الإنجاز: <span id="kpiOverallAvg" class="text-xl mx-1">0%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <!-- مسار النخبة -->
+                            <div class="kpi-axis-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-yellow-400 hover:shadow-md transition" onclick="showKPIEmployees('elite')">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="w-10 h-10 bg-yellow-100 text-yellow-600 rounded-lg flex items-center justify-center text-lg"><i class="fas fa-star"></i></div>
+                                    <span class="text-2xl font-extrabold text-slate-800" id="kpiEliteVal">NA</span>
+                                </div>
+                                <h4 class="font-bold text-slate-700">الانجاز في مسار النخبة</h4>
+                                <p class="text-xs text-slate-500 mt-1" id="kpiEliteDesc">المستهدفين</p>
+                            </div>
+
+                            <!-- أقل من 3 شهور -->
+                            <div class="kpi-axis-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-orange-400 hover:shadow-md transition" onclick="showKPIEmployees('less3')">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="w-10 h-10 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center text-lg"><i class="fas fa-hourglass-start"></i></div>
+                                    <span class="text-2xl font-extrabold text-slate-800" id="kpiLess3Val">NA</span>
+                                </div>
+                                <h4 class="font-bold text-slate-700">أقل من 3 شهور</h4>
+                                <p class="text-xs text-slate-500 mt-1" id="kpiLess3Desc">إجمالي الموظفين</p>
+                            </div>
+
+                            <!-- 3 شهور فأكثر -->
+                            <div class="kpi-axis-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 hover:shadow-md transition" onclick="showKPIEmployees('more3')">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center text-lg"><i class="fas fa-hourglass-half"></i></div>
+                                    <span class="text-2xl font-extrabold text-slate-800" id="kpiMore3Val">NA</span>
+                                </div>
+                                <h4 class="font-bold text-slate-700">من 3 شهور فأكثر</h4>
+                                <p class="text-xs text-slate-500 mt-1" id="kpiMore3Desc">إجمالي الموظفين</p>
+                            </div>
+
+                            <!-- مسار التحسين -->
+                            <div class="kpi-axis-card bg-slate-100 p-5 rounded-xl border border-slate-200 shadow-sm cursor-pointer opacity-70">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="w-10 h-10 bg-slate-200 text-slate-500 rounded-lg flex items-center justify-center text-lg"><i class="fas fa-level-up-alt"></i></div>
+                                    <span class="text-2xl font-extrabold text-slate-500">NA</span>
+                                </div>
+                                <h4 class="font-bold text-slate-600">مسار التحسين</h4>
+                                <p class="text-xs text-slate-400 mt-1">غير متوفر حالياً بالبيانات</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- جدول الموظفين للمحور المختار (Level 4) -->
+                    <div id="kpiEmployeesSection" class="hidden">
+                        <h3 class="font-bold text-slate-700 mb-4 flex items-center text-lg" id="kpiEmpTableTitle">
+                            <i class="fas fa-list text-teal-500 ml-2"></i> 4. تفاصيل البائعين للمحور
+                        </h3>
+                        <div class="table-container border border-slate-200 rounded-xl shadow-sm">
+                            <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
+                                <thead class="bg-slate-100 text-slate-800 border-b border-slate-200">
+                                    <tr>
+                                        <th class="px-5 py-4 font-semibold tracking-wider">اليوزر (الرقم الوظيفي)</th>
+                                        <th class="px-5 py-4 font-semibold tracking-wider">اسم البائع</th>
+                                        <th class="px-5 py-4 font-semibold tracking-wider text-teal-700">الدورات المنجزة</th>
+                                        <th class="px-5 py-4 font-semibold tracking-wider">حالة المستهدف</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="kpiEmployeesTableBody" class="bg-white divide-y divide-slate-200">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- ========================================================================= -->
+
                 <div id="tenure1Tab" class="tab-content">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-slate-800">موظفون فترة عملهم <span class="text-orange-500">أقل من 3 شهور</span></h2>
@@ -342,7 +463,6 @@
                         </button>
                     </div>
 
-                    <!-- القسم الأول: في الأكاديمية فقط -->
                     <div id="missingInWfSection">
                         <div class="table-container border border-slate-200 rounded-xl shadow-sm">
                             <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
@@ -358,7 +478,6 @@
                         </div>
                     </div>
 
-                    <!-- القسم الثاني: في القوى فقط -->
                     <div id="missingInAcSection" style="display: none;">
                         <p class="text-sm text-slate-500 mb-4 bg-slate-50 p-3 border border-slate-200 rounded-lg">
                             <i class="fas fa-info-circle text-indigo-500 ml-1"></i> هذه القائمة تعرض الأشخاص المدرجين في شيت القوى (التقسيم) <b>وليس لديهم أي سجل أو حساب</b> في شيت الأكاديمية إطلاقاً.
@@ -397,7 +516,6 @@
                     </div>
                 </div>
 
-                <!-- ================= تبويب مسار التدريب الجديد ================= -->
                 <div id="trainingPathTab" class="tab-content">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 bg-orange-50 p-6 rounded-2xl border border-orange-100">
                         <div>
@@ -413,7 +531,6 @@
                             </p>
                         </div>
                         
-                        <!-- فلاتر خاصة بتبويب مسار التدريب -->
                         <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
                             <div class="relative bg-white rounded-xl shadow-sm border border-orange-100 p-1 w-full md:w-auto flex">
                                 <span class="text-slate-500 p-2 pr-3"><i class="fas fa-filter"></i></span>
@@ -446,10 +563,8 @@
                         <div class="table-container border border-slate-200 rounded-xl shadow-sm mb-8" style="max-height: 70vh;">
                             <table class="min-w-full divide-y divide-slate-200 text-sm text-right whitespace-nowrap">
                                 <thead class="bg-slate-100 text-slate-800 border-b border-slate-200" id="pathCertHeader">
-                                    <!-- يتم توليده بالجاڤاسكربت -->
                                 </thead>
                                 <tbody id="pathCertTableBody" class="bg-white divide-y divide-slate-200">
-                                    <!-- يتم توليده بالجاڤاسكربت -->
                                 </tbody>
                             </table>
                         </div>
@@ -459,20 +574,15 @@
                         <div class="table-container border border-slate-200 rounded-xl shadow-sm mb-8" style="max-height: 70vh;">
                             <table class="min-w-full divide-y divide-slate-200 text-sm text-right whitespace-nowrap">
                                 <thead class="bg-slate-100 text-slate-800 border-b border-slate-200" id="pathNonCertHeader">
-                                    <!-- يتم توليده بالجاڤاسكربت -->
                                 </thead>
                                 <tbody id="pathNonCertTableBody" class="bg-white divide-y divide-slate-200">
-                                    <!-- يتم توليده بالجاڤاسكربت -->
                                 </tbody>
                             </table>
                         </div>
                     </div>
 
                 </div>
-                <!-- ========================================================================= -->
 
-
-                <!-- بقية التبويبات ... -->
                 <div id="supervisorsTab" class="tab-content">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 bg-blue-50 p-6 rounded-2xl border border-blue-100">
                         <div>
@@ -855,6 +965,7 @@
             
             if (globalData.allActive && globalData.allActive.length > 0) {
                 applyActiveFilters();
+                renderKPITab(); // Update KPI tab on target change
             }
         }
 
@@ -962,7 +1073,6 @@
             "Time Management and Organization"
         ];
 
-        // --- بيانات مسار التدريب (نقطة الوقوف) مع الترقيم المنفصل ---
         const trainingPathDef = [
             { certId: 1, ar: "تاريخ درعه", en: "Deraah History", hasCert: true },
             { certId: 2, ar: "العطور", en: "Perfumes", hasCert: true },
@@ -997,12 +1107,13 @@
 
         let globalData = {
             allActive: [], excludedEmployees: [], missingEmployees: [], missingFromAcademy: [], regionsSet: new Set(), excludedRegions: new Set(), allExtractedMonths: new Set(), hasOldData: false,
-            timeline: {
-                hourly: Array(24).fill(0),
-                daily: {},
-                weekly: {}
-            }
+            timeline: { hourly: Array(24).fill(0), daily: {}, weekly: {} }
         };
+
+        // KPI Specific Variables
+        let currentKpiManager = null;
+        let currentKpiSupervisor = null;
+        let kpiManagersData = {};
 
         document.getElementById('currentDateDisplay').innerText = `تاريخ اليوم: ${new Date().toLocaleDateString('ar-EG')}`;
 
@@ -1013,8 +1124,10 @@
             const targetTab = document.getElementById(tabId);
             if(targetTab) targetTab.classList.add('active');
             
-            if (tabId === 'trainingPathTab') {
-                renderTrainingPathTable();
+            if (tabId === 'trainingPathTab') renderTrainingPathTable();
+            if (tabId === 'kpiTab') {
+                // Ensure KPI view is reset when opened if not initialized
+                if(Object.keys(kpiManagersData).length === 0) renderKPITab();
             }
         }
 
@@ -1161,7 +1274,6 @@
             }
             
             try {
-                // Read with small delay to allow UI to update
                 setTimeout(async () => {
                     try {
                         const wfData = await readExcel(wfFile);
@@ -1386,12 +1498,291 @@
             renderTimelineDashboard(); 
             buildTrainingPathHeaders(); 
             renderTrainingPathTable();  
+            renderKPITab(); // Initialize KPI Data after extraction
         }
 
-        // =========================================================================
-        // دوال مسار التدريب (نقطة الوقوف)
-        // =========================================================================
-        
+        function renderKPITab() {
+            if (globalData.allActive.length === 0) return;
+
+            // Reset UI
+            document.getElementById('kpiSupervisorsSection').classList.add('hidden');
+            document.getElementById('kpiAxesSection').classList.add('hidden');
+            document.getElementById('kpiEmployeesSection').classList.add('hidden');
+            currentKpiManager = null;
+            currentKpiSupervisor = null;
+
+            // Group Data hierarchically
+            kpiManagersData = {};
+            
+            globalData.allActive.forEach(emp => {
+                if (globalData.excludedRegions.has(emp.region)) return;
+                
+                let mngName = emp.region; // Group by Region representing Regional Manager
+                let supName = cleanString(emp.supervisor) || "بدون مشرف";
+
+                if (!kpiManagersData[mngName]) {
+                    kpiManagersData[mngName] = { totalEmp: 0, achievedEmp: 0, supervisors: {} };
+                }
+                
+                let mng = kpiManagersData[mngName];
+                mng.totalEmp++;
+                if (emp.totalCerts >= targetCertsCount) mng.achievedEmp++;
+
+                if (!mng.supervisors[supName]) {
+                    mng.supervisors[supName] = { 
+                        totalEmp: 0, achievedEmp: 0, 
+                        employees: [] 
+                    };
+                }
+                
+                let sup = mng.supervisors[supName];
+                sup.totalEmp++;
+                if (emp.totalCerts >= targetCertsCount) sup.achievedEmp++;
+                sup.employees.push(emp);
+            });
+
+            // Build Smart Filter Boxes for Managers
+            let managersHtml = '';
+            Object.keys(kpiManagersData).sort().forEach(mngName => {
+                let mng = kpiManagersData[mngName];
+                let pct = mng.totalEmp > 0 ? Math.round((mng.achievedEmp / mng.totalEmp) * 100) : 0;
+                
+                managersHtml += `
+                    <label class="cursor-pointer">
+                        <input type="radio" class="peer hidden" name="kpiManagerFilter" value="${mngName}" onchange="selectKPIManager('${mngName}')">
+                        <div class="kpi-box w-48 h-full bg-white border-2 border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center text-center peer-checked:border-teal-600 peer-checked:bg-teal-50 peer-checked:shadow-inner">
+                            <span class="text-sm font-bold text-slate-700 peer-checked:text-teal-800 mb-2">${mngName}</span>
+                            <div class="flex items-baseline gap-1">
+                                <span class="text-2xl font-extrabold text-teal-600">${pct}%</span>
+                            </div>
+                            <span class="text-xs text-slate-400 mt-1">الإنجاز الكلي</span>
+                        </div>
+                    </label>
+                `;
+            });
+
+            if (Object.keys(kpiManagersData).length === 0) {
+                managersHtml = `<div class="text-slate-500 italic p-4">لا يوجد بيانات متاحة بناءً على الفلاتر الحالية.</div>`;
+            }
+
+            document.getElementById('kpiManagersContainer').innerHTML = managersHtml;
+        }
+
+        function selectKPIManager(mngName) {
+            currentKpiManager = mngName;
+            currentKpiSupervisor = null; // reset lower levels
+            document.getElementById('kpiAxesSection').classList.add('hidden');
+            document.getElementById('kpiEmployeesSection').classList.add('hidden');
+            
+            let mngData = kpiManagersData[mngName];
+            if (!mngData) return;
+
+            let supsHtml = '';
+            Object.keys(mngData.supervisors).sort().forEach(supName => {
+                let sup = mngData.supervisors[supName];
+                let pct = sup.totalEmp > 0 ? Math.round((sup.achievedEmp / sup.totalEmp) * 100) : 0;
+                
+                supsHtml += `
+                    <div onclick="selectKPISupervisor('${supName}')" class="kpi-sup-card bg-white border border-slate-200 rounded-xl p-4 cursor-pointer hover:border-blue-400 hover:shadow-md transition group">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-slate-800 group-hover:text-blue-700 transition">${supName}</h4>
+                            <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded">${pct}%</span>
+                        </div>
+                        <p class="text-xs text-slate-500">إجمالي الموظفين: <span class="font-bold">${sup.totalEmp}</span></p>
+                    </div>
+                `;
+            });
+
+            document.getElementById('kpiSupervisorsContainer').innerHTML = supsHtml;
+            document.getElementById('kpiSupervisorsSection').classList.remove('hidden');
+            
+            // Highlight active supervisor card logic
+            setTimeout(() => {
+                document.querySelectorAll('.kpi-sup-card').forEach(card => card.classList.remove('ring-2', 'ring-blue-500', 'bg-blue-50'));
+            }, 50);
+        }
+
+        function selectKPISupervisor(supName) {
+            currentKpiSupervisor = supName;
+            document.getElementById('kpiEmployeesSection').classList.add('hidden');
+            
+            // Highlight selected card
+            document.querySelectorAll('.kpi-sup-card').forEach(card => {
+                if (card.querySelector('h4').innerText === supName) {
+                    card.classList.add('ring-2', 'ring-blue-500', 'bg-blue-50');
+                } else {
+                    card.classList.remove('ring-2', 'ring-blue-500', 'bg-blue-50');
+                }
+            });
+
+            let supData = kpiManagersData[currentKpiManager].supervisors[supName];
+            document.getElementById('selectedKpiSupName').innerText = supName;
+
+            // Calculate Axes
+            let eliteEmps = supData.employees.filter(e => e.isEliteTarget);
+            let less3Emps = supData.employees.filter(e => e.tenureMonths >= 0 && e.tenureMonths < 3);
+            let more3Emps = supData.employees.filter(e => e.tenureMonths >= 3);
+
+            let eliteAchieved = eliteEmps.filter(e => {
+                let hasC1 = eliteCoursesKeys[0] ? e.eliteProgress[eliteCoursesKeys[0]] : false;
+                let hasC2 = eliteCoursesKeys[1] ? e.eliteProgress[eliteCoursesKeys[1]] : false;
+                let hasC3 = eliteCoursesKeys[2] ? e.eliteProgress[eliteCoursesKeys[2]] : false;
+                return hasC1 && hasC2 && hasC3;
+            }).length;
+            
+            let less3Achieved = less3Emps.filter(e => e.totalCerts >= 10).length;
+            let more3Achieved = more3Emps.filter(e => e.totalCerts >= targetCertsCount).length;
+
+            let elitePct = eliteEmps.length > 0 ? Math.round((eliteAchieved / eliteEmps.length) * 100) : 'NA';
+            let less3Pct = less3Emps.length > 0 ? Math.round((less3Achieved / less3Emps.length) * 100) : 'NA';
+            let more3Pct = more3Emps.length > 0 ? Math.round((more3Achieved / more3Emps.length) * 100) : 'NA';
+            
+            // Render Axis Values
+            document.getElementById('kpiEliteVal').innerText = elitePct !== 'NA' ? elitePct + '%' : 'NA';
+            document.getElementById('kpiEliteDesc').innerText = eliteEmps.length > 0 ? `العدد: ${eliteEmps.length} (المستهدف 3/3)` : 'لا يوجد مستهدفين';
+            
+            document.getElementById('kpiLess3Val').innerText = less3Pct !== 'NA' ? less3Pct + '%' : 'NA';
+            document.getElementById('kpiLess3Desc').innerText = less3Emps.length > 0 ? `العدد: ${less3Emps.length} (المستهدف 10)` : 'لا يوجد';
+            
+            document.getElementById('kpiMore3Val').innerText = more3Pct !== 'NA' ? more3Pct + '%' : 'NA';
+            document.getElementById('kpiMore3Desc').innerText = more3Emps.length > 0 ? `العدد: ${more3Emps.length} (المستهدف ${targetCertsCount})` : 'لا يوجد';
+
+            // Calculate Overall Average (ignoring NAs)
+            let sumPct = 0;
+            let countAxes = 0;
+            if (elitePct !== 'NA') { sumPct += elitePct; countAxes++; }
+            if (less3Pct !== 'NA') { sumPct += less3Pct; countAxes++; }
+            if (more3Pct !== 'NA') { sumPct += more3Pct; countAxes++; }
+            
+            let avg = countAxes > 0 ? Math.round(sumPct / countAxes) : 0;
+            document.getElementById('kpiOverallAvg').innerText = avg + '%';
+
+            document.getElementById('kpiAxesSection').classList.remove('hidden');
+        }
+
+        function showKPIEmployees(axis) {
+            if (!currentKpiManager || !currentKpiSupervisor) return;
+            
+            let supData = kpiManagersData[currentKpiManager].supervisors[currentKpiSupervisor];
+            let emps = [];
+            let axisTitle = '';
+
+            // Reset card highlighting
+            document.querySelectorAll('.kpi-axis-card').forEach(c => c.classList.remove('ring-2', 'ring-teal-500', 'bg-teal-50'));
+            event.currentTarget.classList.add('ring-2', 'ring-teal-500', 'bg-teal-50');
+
+            if (axis === 'elite') {
+                emps = supData.employees.filter(e => e.isEliteTarget);
+                axisTitle = 'تفاصيل مسار النخبة';
+            } else if (axis === 'less3') {
+                emps = supData.employees.filter(e => e.tenureMonths >= 0 && e.tenureMonths < 3);
+                axisTitle = 'تفاصيل أقل من 3 شهور';
+            } else if (axis === 'more3') {
+                emps = supData.employees.filter(e => e.tenureMonths >= 3);
+                axisTitle = 'تفاصيل 3 شهور فأكثر';
+            }
+
+            document.getElementById('kpiEmpTableTitle').innerHTML = `<i class="fas fa-list text-teal-500 ml-2"></i> 4. ${axisTitle}`;
+
+            let html = '';
+            emps.forEach(e => {
+                let isAchieved = false;
+                let displayProgress = e.totalCerts;
+                
+                if (axis === 'elite') {
+                    let hasC1 = eliteCoursesKeys[0] ? e.eliteProgress[eliteCoursesKeys[0]] : false;
+                    let hasC2 = eliteCoursesKeys[1] ? e.eliteProgress[eliteCoursesKeys[1]] : false;
+                    let hasC3 = eliteCoursesKeys[2] ? e.eliteProgress[eliteCoursesKeys[2]] : false;
+                    isAchieved = hasC1 && hasC2 && hasC3;
+                    let count = (hasC1 ? 1 : 0) + (hasC2 ? 1 : 0) + (hasC3 ? 1 : 0);
+                    displayProgress = `${count} / 3 دورات`;
+                } else if (axis === 'less3') {
+                    isAchieved = e.totalCerts >= 10;
+                } else if (axis === 'more3') {
+                    isAchieved = e.totalCerts >= targetCertsCount;
+                }
+
+                let statusHtml = isAchieved 
+                    ? `<span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full"><i class="fas fa-check mr-1"></i> مكتمل</span>`
+                    : `<span class="bg-orange-100 text-orange-800 text-xs font-bold px-3 py-1 rounded-full"><i class="fas fa-times mr-1"></i> غير مكتمل</span>`;
+                
+                html += `
+                    <tr class="hover:bg-slate-50 border-b border-slate-100 transition">
+                        <td class="px-5 py-4 font-bold text-slate-700">${e.id}</td>
+                        <td class="px-5 py-4 font-medium text-slate-800">${e.name}</td>
+                        <td class="px-5 py-4 font-bold text-teal-700 text-lg">${displayProgress}</td>
+                        <td class="px-5 py-4">${statusHtml}</td>
+                    </tr>
+                `;
+            });
+
+            if (emps.length === 0) {
+                html = `<tr><td colspan="4" class="text-center py-8 text-slate-500">لا يوجد موظفين في هذا المحور</td></tr>`;
+            }
+
+            document.getElementById('kpiEmployeesTableBody').innerHTML = html;
+            document.getElementById('kpiEmployeesSection').classList.remove('hidden');
+        }
+
+        function exportKPIToExcel() {
+            if (Object.keys(kpiManagersData).length === 0) {
+                alert("لا توجد بيانات للتصدير.");
+                return;
+            }
+
+            let wb = XLSX.utils.book_new();
+            let aoa = [
+                ["مدير الإقليم", "المشرف", "مسار النخبة (%)", "أقل من 3 شهور (%)", "3 شهور فأكثر (%)", "مسار التحسين (%)", "متوسط الإنجاز الكلي للمشرف (%)"]
+            ];
+
+            Object.keys(kpiManagersData).sort().forEach(mngName => {
+                let mngData = kpiManagersData[mngName];
+                
+                Object.keys(mngData.supervisors).sort().forEach(supName => {
+                    let sup = mngData.supervisors[supName];
+                    
+                    let eliteEmps = sup.employees.filter(e => e.isEliteTarget);
+                    let less3Emps = sup.employees.filter(e => e.tenureMonths >= 0 && e.tenureMonths < 3);
+                    let more3Emps = sup.employees.filter(e => e.tenureMonths >= 3);
+
+                    let eliteAchievedCount = eliteEmps.filter(e => {
+                        let hasC1 = eliteCoursesKeys[0] ? e.eliteProgress[eliteCoursesKeys[0]] : false;
+                        let hasC2 = eliteCoursesKeys[1] ? e.eliteProgress[eliteCoursesKeys[1]] : false;
+                        let hasC3 = eliteCoursesKeys[2] ? e.eliteProgress[eliteCoursesKeys[2]] : false;
+                        return hasC1 && hasC2 && hasC3;
+                    }).length;
+                    
+                    let less3AchievedCount = less3Emps.filter(e => e.totalCerts >= 10).length;
+                    let more3AchievedCount = more3Emps.filter(e => e.totalCerts >= targetCertsCount).length;
+
+                    let elitePct = eliteEmps.length > 0 ? Math.round((eliteAchievedCount / eliteEmps.length) * 100) : 'NA';
+                    let less3Pct = less3Emps.length > 0 ? Math.round((less3AchievedCount / less3Emps.length) * 100) : 'NA';
+                    let more3Pct = more3Emps.length > 0 ? Math.round((more3AchievedCount / more3Emps.length) * 100) : 'NA';
+                    let impPct = 'NA'; // مسار التحسين
+
+                    let sumPct = 0; let countAxes = 0;
+                    if (elitePct !== 'NA') { sumPct += elitePct; countAxes++; }
+                    if (less3Pct !== 'NA') { sumPct += less3Pct; countAxes++; }
+                    if (more3Pct !== 'NA') { sumPct += more3Pct; countAxes++; }
+                    
+                    let avg = countAxes > 0 ? Math.round(sumPct / countAxes) : 0;
+
+                    aoa.push([
+                        mngName,
+                        supName,
+                        elitePct !== 'NA' ? elitePct + '%' : 'NA',
+                        less3Pct !== 'NA' ? less3Pct + '%' : 'NA',
+                        more3Pct !== 'NA' ? more3Pct + '%' : 'NA',
+                        impPct,
+                        avg + '%'
+                    ]);
+                });
+            });
+
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), "تقرير KPI الشامل");
+            XLSX.writeFile(wb, "تقرير_مؤشرات_الأداء_KPI.xlsx");
+        }
+
         function buildTrainingPathHeaders() {
             let certCourses = trainingPathDef.filter(c => c.hasCert);
             let nonCertCourses = trainingPathDef.filter(c => !c.hasCert);
@@ -1439,7 +1830,6 @@
             let nonCertBodyHtml = '';
 
             filteredEmployees.forEach(emp => {
-                // حساب مكان الوقوف للدورات الأساسية
                 let stopperCourse = null;
                 for (let i = 0; i < certCourses.length; i++) {
                     if (!emp.pathProgress[certCourses[i].en]) {
@@ -1478,7 +1868,6 @@
                 certBodyHtml += `</tr>`;
 
 
-                // بناء جدول الدورات الداعمة
                 let nonCertDoneCount = 0;
                 nonCertCourses.forEach(c => { if(emp.pathProgress[c.en]) nonCertDoneCount++; });
                 
@@ -1531,7 +1920,6 @@
 
             let wb = XLSX.utils.book_new();
 
-            // شيت الدورات الأساسية (الشهادات)
             let certAOA = [];
             let certHeaders = ["الرقم الوظيفي", "الاسم", "الإقليم", "المسار الحالي (نقطة التوقف)"];
             certCourses.forEach(c => certHeaders.push(`${c.certId}- ${c.ar}`));
@@ -1556,7 +1944,6 @@
             });
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(certAOA), "مسار الشهادات الأساسي");
 
-            // شيت الدورات الداعمة
             let nonCertAOA = [];
             let nonCertHeaders = ["الرقم الوظيفي", "الاسم", "الإقليم", "إجمالي المنجز"];
             nonCertCourses.forEach(c => nonCertHeaders.push(`${c.ar}`));
@@ -1576,8 +1963,6 @@
 
             XLSX.writeFile(wb, "تقرير_مسار_التدريب_الجديد.xlsx");
         }
-        // =========================================================================
-
 
         function renderTimelineDashboard() {
             let maxDay = "-", maxDayCount = 0;
@@ -1753,7 +2138,7 @@
             let selectHtml = '<option value="">كل الأقاليم</option>';
             let checksHtml = '';
             let supFilterHtml = '<option value="">جميع القطاعات / الأقاليم</option>';
-            let pathFilterHtml = '<option value="">جميع الأقاليم</option>'; // للتبويب الجديد
+            let pathFilterHtml = '<option value="">جميع الأقاليم</option>';
             
             Array.from(globalData.regionsSet).sort().forEach(reg => {
                 selectHtml += `<option value="${reg}">${reg}</option>`;
@@ -1776,7 +2161,8 @@
             if (checkbox.checked) globalData.excludedRegions.delete(checkbox.value);
             else globalData.excludedRegions.add(checkbox.value);
             applyActiveFilters(); 
-            renderTrainingPathTable(); // Refresh the new tab as well
+            renderTrainingPathTable(); 
+            renderKPITab(); // Refresh KPI when regions are excluded
         }
 
         function applyActiveFilters() {
