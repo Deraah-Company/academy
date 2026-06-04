@@ -12,6 +12,7 @@
             --secondary: #8f94fb;
             --danger: #ff4b2b;
             --success: #11998e;
+            --warning: #f39c12;
             --text-dark: #2d3436;
             --glass-bg: rgba(255, 255, 255, 0.85);
             --glass-border: rgba(255, 255, 255, 0.4);
@@ -232,6 +233,11 @@
             background: linear-gradient(to right, #ff416c, #ff4b2b);
             color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-family: 'Tajawal'; font-weight: bold;
         }
+        
+        .btn-delete {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+            color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-family: 'Tajawal'; font-size: 12px; font-weight: bold;
+        }
 
         .btn-export {
             display: block; width: 100%; max-width: 400px; margin: 30px auto 0;
@@ -313,11 +319,12 @@
         </div>
 
         <div class="tabs">
-            <button class="tab-btn active" onclick="openTab(event, 'tab-changed')">تحولوا لاستقالة (تم التعديل)</button>
-            <button class="tab-btn" onclick="openTab(event, 'tab-mismatch-no-trans')">موجود بالقوى وتمت إضافته للتقسيم</button>
+            <button class="tab-btn active" onclick="openTab(event, 'tab-changed')">تحولوا لاستقالة</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-mismatch-no-trans')">موجود بالقوى وتمت إضافته</button>
+            <button class="tab-btn" style="color: #f39c12;" onclick="openTab(event, 'tab-missing-date')">بدون تاريخ تعيين بالتقسيم</button>
             <button class="tab-btn" style="color: #d32f2f;" onclick="openTab(event, 'tab-excluded')">مستبعد (بيانات غير صالحة)</button>
-            <button class="tab-btn" onclick="openTab(event, 'tab-already')">استقالة من قبل (لهم معاملة)</button>
-            <button class="tab-btn" onclick="openTab(event, 'tab-mismatch-trans')">غير مطابق (له معاملة استقالة)</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-already')">استقالة من قبل</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-mismatch-trans')">غير مطابق ومستقيل</button>
         </div>
 
         <div id="tab-changed" class="tab-content active">
@@ -329,20 +336,31 @@
 
         <div id="tab-mismatch-no-trans" class="tab-content">
             <div style="background-color: #e8f5e9; padding: 10px; border-radius: 5px; margin-bottom: 15px; color: #2e7d32; font-weight: bold;">
-                ملاحظة: هؤلاء الموظفين تم إضافتهم تلقائياً إلى بيانات التقسيم وسيتم تصديرهم في ملف الإكسل.
+                ملاحظة: هؤلاء الموظفين تم إضافتهم تلقائياً إلى بيانات التقسيم وسيتم تصديرهم في ملف الإكسل. تم سحب تاريخ التعيين أيضاً.
             </div>
             <table id="table-mismatch-no-trans">
-                <thead><tr><th>الرقم</th><th>الاسم</th><th>الحالة في القوى</th><th>ملاحظة الإضافة</th></tr></thead>
+                <thead><tr><th>الرقم</th><th>الاسم</th><th>تاريخ التعيين</th><th>ملاحظة الإضافة</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- التاب الجديد للموظفين بدون تاريخ تعيين -->
+        <div id="tab-missing-date" class="tab-content">
+            <div style="background-color: #fff3e0; padding: 10px; border-radius: 5px; margin-bottom: 15px; color: #e65100; font-weight: bold;">
+                ملاحظة: هؤلاء الموظفون مسجلون في التقسيم النهائي ولكن لا يوجد لهم "تاريخ تعيين" (العمود E فارغ). يمكنك مسحهم من التقسيم نهائياً من هنا.
+            </div>
+            <table id="table-missing-date">
+                <thead><tr><th>الرقم</th><th>الاسم</th><th>إجراء مسح</th></tr></thead>
                 <tbody></tbody>
             </table>
         </div>
 
         <div id="tab-excluded" class="tab-content">
             <div style="background-color: #ffebee; padding: 10px; border-radius: 5px; margin-bottom: 15px; color: #c62828; font-weight: bold;">
-                ملاحظة: هؤلاء الموظفين موجودين في القوى ولكن تم استبعادهم من الإضافة للتقسيم لوجود بيانات غير صالحة (0، N/A، #NAME) في أعمدة الإدارة.
+                ملاحظة: تم استبعادهم من الإضافة للتقسيم لوجود بيانات غير صالحة في أعمدة الإدارة.
             </div>
             <table id="table-excluded">
-                <thead><tr><th>الرقم</th><th>الاسم</th><th>العمود N (من Z)</th><th>العمود O (من Y)</th><th>العمود P (من X)</th></tr></thead>
+                <thead><tr><th>الرقم</th><th>الاسم</th><th>العمود N</th><th>العمود O</th><th>العمود P</th></tr></thead>
                 <tbody></tbody>
             </table>
         </div>
@@ -367,7 +385,7 @@
 
 <script>
     let finalDivisionData = [];
-    let processedLogs = { changed: [], already: [], mismatchTrans: [], mismatchNoTrans: [], excluded: [] };
+    let processedLogs = { changed: [], already: [], mismatchTrans: [], mismatchNoTrans: [], excluded: [], missingDates: [] };
     let allStaffDict = {};
 
     // دالة للتحقق من البيانات غير الصالحة
@@ -437,6 +455,8 @@
                 let id = row[0] ? String(row[0]).trim() : null;
                 let name = row[1] ? String(row[1]).trim() : "غير معروف";
                 
+                let hireDate = row[5]; // العمود F (تاريخ التعيين)
+
                 // جلب بيانات الأعمدة X(23) , Y(24) , Z(25)
                 let colX = row[23]; 
                 let colY = row[24]; 
@@ -448,6 +468,7 @@
                 if (id) {
                     allStaffDict[id] = { 
                         name: name,
+                        hireDate: hireDate, // تخزين تاريخ التعيين
                         trans: transNo || null, 
                         type: transType || null,
                         isActive: !transNo,
@@ -479,24 +500,23 @@
             let wsDivName = wbDiv.SheetNames.includes("ارقام جوالات البائعين") ? "ارقام جوالات البائعين" : wbDiv.SheetNames[2];
             finalDivisionData = XLSX.utils.sheet_to_json(wbDiv.Sheets[wsDivName], {header: 1, defval: null});
 
-            // === تنظيف الصفوف الفارغة في البداية (لحل مشكلة الصف 1 الفارغ عند التصدير) ===
+            // === تنظيف الصفوف الفارغة في البداية ===
             while(finalDivisionData.length > 0) {
                 let firstRow = finalDivisionData[0];
                 let isRowEmpty = !firstRow || firstRow.every(val => val === null || val === "" || val === undefined);
                 if (isRowEmpty) {
-                    finalDivisionData.shift(); // مسح الصف الفارغ
+                    finalDivisionData.shift(); 
                 } else {
-                    break; // التوقف عند العثور على صف العناوين
+                    break; 
                 }
             }
 
             let currentDivisionIds = new Set();
             let currentResignedMap = new Map();
-            processedLogs = { changed: [], already: [], mismatchTrans: [], mismatchNoTrans: [], excluded: [] };
+            processedLogs = { changed: [], already: [], mismatchTrans: [], mismatchNoTrans: [], excluded: [], missingDates: [] };
 
             let stats = { oldTotal: 0, oldActive: 0, newTotal: 0, newActive: 0, newResigned: 0 };
 
-            // نبدأ اللوب من 1 (بافتراض أن index 0 أصبح هو العناوين بعد التنظيف)
             for (let i = 1; i < finalDivisionData.length; i++) {
                 let row = finalDivisionData[i];
                 if (!row || !row[0] || String(row[0]).trim() === "") continue;
@@ -534,12 +554,10 @@
                     if (allStaffDict[id].isActive) {
                         let emp = allStaffDict[id];
                         
-                        // تعيين القيم الجديدة للأعمدة
-                        let valN = emp.colZ; // N يأخذ من Z
-                        let valO = emp.colY; // O يأخذ من Y
-                        let valP = emp.colX; // P يأخذ من X
+                        let valN = emp.colZ; 
+                        let valO = emp.colY; 
+                        let valP = emp.colX; 
 
-                        // التحقق من صلاحية البيانات
                         if (isInvalidData(valN) || isInvalidData(valO) || isInvalidData(valP)) {
                             processedLogs.excluded.push({
                                 id: id,
@@ -549,22 +567,26 @@
                                 valP: valP !== undefined ? valP : "فارغ"
                             });
                         } else {
+                            // تحويل تاريخ التعيين (سواء رقم او نص) للعرض
+                            let displayDate = emp.hireDate !== undefined && emp.hireDate !== null ? emp.hireDate : "غير متوفر";
+
                             processedLogs.mismatchNoTrans.push({
                                 id: id, 
                                 name: emp.name,
-                                status: 'على رأس العمل', 
-                                note: 'تمت الإضافة بنجاح وتطابق الإدارات'
+                                hireDate: displayDate,
+                                note: 'تمت الإضافة وتطابق الإدارات'
                             });
                             
-                            // إضافة الموظف لبيانات التقسيم لكي يتم تصديره
+                            // إضافة الموظف لبيانات التقسيم
                             let newRow = new Array(17).fill(null);
                             newRow[0] = id;
                             newRow[1] = emp.name;
-                            newRow[8] = "Active"; // عمود I
-                            newRow[9] = "على راس العمل"; // عمود J
-                            newRow[13] = valN; // العمود N (index 13)
-                            newRow[14] = valO; // العمود O (index 14)
-                            newRow[15] = valP; // العمود P (index 15)
+                            newRow[4] = emp.hireDate; // العمود E (تاريخ التعيين)
+                            newRow[8] = "Active"; 
+                            newRow[9] = "على راس العمل"; 
+                            newRow[13] = valN; 
+                            newRow[14] = valO; 
+                            newRow[15] = valP; 
                             
                             finalDivisionData.push(newRow);
                         }
@@ -603,16 +625,23 @@
                 document.getElementById('comparison-section').style.display = 'none';
             }
 
-            // 5. حساب الإحصائيات النهائية بعد التعديل والإضافة
+            // 5. حساب الإحصائيات النهائية واستخراج من لا يملكون تاريخ تعيين
             for (let i = 1; i < finalDivisionData.length; i++) {
                 let row = finalDivisionData[i];
                 if (!row || !row[0] || String(row[0]).trim() === "") continue;
                 stats.newTotal++;
+                
                 let status = row[9] ? String(row[9]).trim() : "";
                 if (status.includes("استقال")) {
                     stats.newResigned++;
                 } else {
                     stats.newActive++;
+                }
+
+                // فحص عمود E (index 4) لمعرفة إذا كان تاريخ التعيين فارغاً
+                let hDate = row[4];
+                if (isInvalidData(hDate)) {
+                    processedLogs.missingDates.push({id: String(row[0]).trim(), name: row[1] || "غير معروف"});
                 }
             }
 
@@ -653,10 +682,14 @@
         mismatchTransBody.innerHTML = processedLogs.mismatchTrans.map(i => `<tr><td>${i.id}</td><td>${i.trans}</td><td>${i.note}</td></tr>`).join('');
 
         let mismatchNoTransBody = document.querySelector("#table-mismatch-no-trans tbody");
-        mismatchNoTransBody.innerHTML = processedLogs.mismatchNoTrans.map(i => `<tr style="background:#e8f5e9"><td>${i.id}</td><td>${i.name}</td><td>${i.status}</td><td style="color:green; font-weight:bold;">${i.note}</td></tr>`).join('');
+        mismatchNoTransBody.innerHTML = processedLogs.mismatchNoTrans.map(i => `<tr style="background:#e8f5e9"><td>${i.id}</td><td>${i.name}</td><td>${i.hireDate}</td><td style="color:green; font-weight:bold;">${i.note}</td></tr>`).join('');
 
         let excludedBody = document.querySelector("#table-excluded tbody");
         excludedBody.innerHTML = processedLogs.excluded.map(i => `<tr><td>${i.id}</td><td>${i.name}</td><td style="color:red;">${i.valN}</td><td style="color:red;">${i.valO}</td><td style="color:red;">${i.valP}</td></tr>`).join('');
+
+        // جدول الموظفين بدون تاريخ تعيين
+        let missingDateBody = document.querySelector("#table-missing-date tbody");
+        missingDateBody.innerHTML = processedLogs.missingDates.map(i => `<tr><td>${i.id}</td><td>${i.name}</td><td><button class="btn-delete" onclick="deleteEmployee('${i.id}')">مسح من التقسيم</button></td></tr>`).join('');
     }
 
     function manualResign() {
@@ -683,7 +716,7 @@
                 processedLogs.changed.push({id: targetId, name: empName, oldStatus: oldStat, trans: "تعديل يدوي", type: "-"});
                 renderTables();
                 
-                // تحديث الإحصائيات في الشاشة
+                // تحديث الإحصائيات
                 let currentActive = parseInt(document.getElementById('stat-new-active').innerText);
                 let currentResigned = parseInt(document.getElementById('stat-new-resigned').innerText);
                 document.getElementById('stat-new-active').innerText = currentActive - 1;
@@ -694,6 +727,42 @@
             }
         } else {
             alert("هذا الرقم غير موجود في ملف التقسيم الحالي!");
+        }
+    }
+
+    function deleteEmployee(empId) {
+        if(!confirm(`هل أنت متأكد أنك تريد مسح الموظف رقم ${empId} نهائياً من التقسيم؟`)) return;
+
+        // البحث عن الموظف في المصفوفة النهائية
+        let rowIndex = finalDivisionData.findIndex(row => row && String(row[0]).trim() === String(empId));
+        
+        if (rowIndex !== -1) {
+            let status = finalDivisionData[rowIndex][9] ? String(finalDivisionData[rowIndex][9]).trim() : "";
+            
+            // خصم من الإحصائيات قبل المسح
+            let currentTotal = parseInt(document.getElementById('stat-new-total').innerText);
+            document.getElementById('stat-new-total').innerText = currentTotal - 1;
+            
+            if (status.includes("استقال")) {
+                let currentResigned = parseInt(document.getElementById('stat-new-resigned').innerText);
+                document.getElementById('stat-new-resigned').innerText = currentResigned - 1;
+            } else {
+                let currentActive = parseInt(document.getElementById('stat-new-active').innerText);
+                document.getElementById('stat-new-active').innerText = currentActive - 1;
+            }
+
+            // مسح الموظف من المصفوفة النهائية
+            finalDivisionData.splice(rowIndex, 1);
+            
+            // مسحه من قائمة (بدون تاريخ) في اللوجز
+            processedLogs.missingDates = processedLogs.missingDates.filter(emp => String(emp.id) !== String(empId));
+            
+            // إعادة رسم الجداول لتحديث العرض
+            renderTables();
+            
+            alert("تم مسح الموظف من التقسيم بنجاح!");
+        } else {
+            alert("حدث خطأ! لم يتم العثور على الموظف في البيانات النهائية.");
         }
     }
 
