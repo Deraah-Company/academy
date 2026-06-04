@@ -47,6 +47,9 @@
         .kpi-box { transition: all 0.2s ease-in-out; }
         .kpi-box:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
         .kpi-box.active { border-color: #0d9488; background-color: #f0fdfa; }
+        
+        .collapsible-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .collapsible-content.expanded { max-height: 500px; /* Adjust as needed */ }
     </style>
 </head>
 <body class="text-slate-800">
@@ -202,11 +205,22 @@
                     <i class="fas fa-hourglass-start ml-2"></i> أقل من 3 شهور
                 </button>
                 <button class="tab-btn px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'tenure2Tab')">
-                    <i class="fas fa-hourglass-half ml-2"></i> من 3 إلى سنتين
+                    <i class="fas fa-hourglass-half ml-2"></i> من 3 لسنتين
                 </button>
                 <button class="tab-btn px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'tenure3Tab')">
                     <i class="fas fa-hourglass-end ml-2"></i> أكثر من سنتين
                 </button>
+                <button class="tab-btn px-5 py-4 text-slate-600 font-bold bg-slate-100 border-r border-slate-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'tenure4Tab')">
+                    <i class="fas fa-calendar-plus ml-2"></i> 3 شهور فأكثر (مجمع)
+                </button>
+                
+                <button class="tab-btn px-5 py-4 text-teal-700 font-bold bg-teal-50 border-r border-teal-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'kpiTab')">
+                    <i class="fas fa-tachometer-alt ml-2"></i> KPI (مؤشرات الأداء)
+                </button>
+                <button class="tab-btn px-5 py-4 text-cyan-700 font-bold bg-cyan-50 border-r border-cyan-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'dashboardTab')">
+                    <i class="fas fa-chart-line ml-2"></i> DASHBOARD (لوحة القيادة)
+                </button>
+                
                 <button class="tab-btn px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'excludedTab')">
                     <i class="fas fa-user-times ml-2"></i> المستبعدين
                 </button>
@@ -218,11 +232,6 @@
                 </button>
                 <button class="tab-btn px-5 py-4 text-orange-700 font-bold bg-orange-50 border-r border-orange-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'trainingPathTab')">
                     <i class="fas fa-route ml-2"></i> مسار التدريب
-                </button>
-
-                <!-- التبويب الجديد KPI -->
-                <button class="tab-btn px-5 py-4 text-teal-700 font-bold bg-teal-50 border-r border-teal-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'kpiTab')">
-                    <i class="fas fa-tachometer-alt ml-2"></i> KPI (مؤشرات الأداء)
                 </button>
 
                 <button class="tab-btn px-5 py-4 text-blue-700 font-bold bg-blue-50 border-r border-blue-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'supervisorsTab')">
@@ -278,49 +287,134 @@
                     </div>
                 </div>
 
-                <!-- ================= تبويب KPI الجديد ================= -->
+                <!-- ================= تبويبات فترات العمل ================= -->
+                
+                <!-- أقل من 3 شهور -->
+                <div id="tenure1Tab" class="tab-content">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="text-2xl font-bold text-slate-800">موظفون فترة عملهم <span class="text-orange-500">أقل من 3 شهور</span>
+                            <span id="t1Count" class="mr-2 bg-orange-100 text-orange-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
+                        </h2>
+                        <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+                            <input type="text" id="t1Search" onkeyup="updateTenureUI('t1')" placeholder="بحث..." class="pl-4 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-1 focus:ring-indigo-500">
+                            <select id="t1Region" onchange="updateTenureUI('t1')" class="px-4 py-2 border border-slate-300 rounded-lg bg-white">
+                                <option value="">كل الأقاليم</option>
+                            </select>
+                            <button onclick="exportTenureData('t1')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-lg shadow whitespace-nowrap"><i class="fas fa-file-excel ml-1"></i> تصدير إكسيل</button>
+                        </div>
+                    </div>
+                    <div class="table-container border border-slate-200 rounded-xl shadow-sm">
+                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right"><thead class="bg-slate-100 text-slate-800"><tr id="t1Header"></tr></thead><tbody id="t1Body" class="bg-white divide-y divide-slate-100"></tbody></table>
+                    </div>
+                </div>
+
+                <!-- من 3 إلى سنتين -->
+                <div id="tenure2Tab" class="tab-content">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="text-2xl font-bold text-slate-800">موظفون فترة عملهم <span class="text-blue-500">من 3 شهور إلى سنتين</span>
+                            <span id="t2Count" class="mr-2 bg-blue-100 text-blue-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
+                        </h2>
+                        <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+                            <input type="text" id="t2Search" onkeyup="updateTenureUI('t2')" placeholder="بحث..." class="pl-4 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-1 focus:ring-indigo-500">
+                            <select id="t2Region" onchange="updateTenureUI('t2')" class="px-4 py-2 border border-slate-300 rounded-lg bg-white">
+                                <option value="">كل الأقاليم</option>
+                            </select>
+                            <button onclick="exportTenureData('t2')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-lg shadow whitespace-nowrap"><i class="fas fa-file-excel ml-1"></i> تصدير إكسيل</button>
+                        </div>
+                    </div>
+                    <div class="table-container border border-slate-200 rounded-xl shadow-sm">
+                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right"><thead class="bg-slate-100 text-slate-800"><tr id="t2Header"></tr></thead><tbody id="t2Body" class="bg-white divide-y divide-slate-100"></tbody></table>
+                    </div>
+                </div>
+
+                <!-- أكثر من سنتين -->
+                <div id="tenure3Tab" class="tab-content">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="text-2xl font-bold text-slate-800">موظفون فترة عملهم <span class="text-emerald-500">أكثر من سنتين</span>
+                            <span id="t3Count" class="mr-2 bg-emerald-100 text-emerald-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
+                        </h2>
+                        <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+                            <input type="text" id="t3Search" onkeyup="updateTenureUI('t3')" placeholder="بحث..." class="pl-4 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-1 focus:ring-indigo-500">
+                            <select id="t3Region" onchange="updateTenureUI('t3')" class="px-4 py-2 border border-slate-300 rounded-lg bg-white">
+                                <option value="">كل الأقاليم</option>
+                            </select>
+                            <button onclick="exportTenureData('t3')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-lg shadow whitespace-nowrap"><i class="fas fa-file-excel ml-1"></i> تصدير إكسيل</button>
+                        </div>
+                    </div>
+                    <div class="table-container border border-slate-200 rounded-xl shadow-sm">
+                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right"><thead class="bg-slate-100 text-slate-800"><tr id="t3Header"></tr></thead><tbody id="t3Body" class="bg-white divide-y divide-slate-100"></tbody></table>
+                    </div>
+                </div>
+
+                <!-- 3 شهور فأكثر (مجمع) -->
+                <div id="tenure4Tab" class="tab-content">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="text-2xl font-bold text-slate-800">موظفون فترة عملهم <span class="text-indigo-500">3 شهور فأكثر (مجمع)</span>
+                            <span id="t4Count" class="mr-2 bg-indigo-100 text-indigo-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
+                        </h2>
+                        <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+                            <input type="text" id="t4Search" onkeyup="updateTenureUI('t4')" placeholder="بحث..." class="pl-4 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-1 focus:ring-indigo-500">
+                            <select id="t4Region" onchange="updateTenureUI('t4')" class="px-4 py-2 border border-slate-300 rounded-lg bg-white">
+                                <option value="">كل الأقاليم</option>
+                            </select>
+                            <button onclick="exportTenureData('t4')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-lg shadow whitespace-nowrap"><i class="fas fa-file-excel ml-1"></i> تصدير إكسيل</button>
+                        </div>
+                    </div>
+                    <div class="table-container border border-slate-200 rounded-xl shadow-sm">
+                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right"><thead class="bg-slate-100 text-slate-800"><tr id="t4Header"></tr></thead><tbody id="t4Body" class="bg-white divide-y divide-slate-100"></tbody></table>
+                    </div>
+                </div>
+                <!-- ========================================================================= -->
+
+                <!-- ================= تبويب KPI المحدث ================= -->
                 <div id="kpiTab" class="tab-content">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 bg-teal-50 p-6 rounded-2xl border border-teal-100">
                         <div>
                             <h2 class="text-2xl font-bold text-teal-900 flex items-center mb-2">
                                 <i class="fas fa-tachometer-alt text-teal-500 ml-2"></i> مؤشرات الأداء (KPI)
                             </h2>
-                            <p class="text-teal-700 text-sm">اختر مدير الإقليم لعرض المشرفين التابعين له وتقييم محاور الأداء للموظفين تحت إدارتهم.</p>
+                            <p class="text-teal-700 text-sm">اختر المسار ثم مدير الإقليم لعرض المشرفين التابعين له وتقييم محاور الأداء للموظفين تحت إدارتهم.</p>
                         </div>
-                        <button onclick="exportKPIToExcel()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 px-6 rounded-xl shadow transition transform hover:-translate-y-0.5 whitespace-nowrap flex items-center">
-                            <i class="fas fa-file-excel ml-2"></i> تصدير تقرير KPI
-                        </button>
+                        
+                        <!-- فلتر المسار المضاف -->
+                        <div class="flex items-center gap-3 bg-white p-2 rounded-xl border border-teal-200 shadow-sm">
+                            <label class="font-bold text-teal-800 pr-2">تصفية حسب المسار:</label>
+                            <select id="kpiTrackFilter" onchange="renderKPITab()" class="pl-4 pr-8 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-teal-500 bg-white cursor-pointer font-bold text-teal-700 w-48 appearance-none">
+                                <option value="all">الكل (جميع المسارات)</option>
+                                <option value="elite">مسار النخبة</option>
+                                <option value="less3">مسار أقل من 3 شهور</option>
+                                <option value="more3">مسار 3 شهور فأكثر</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <!-- فلتر المديرين الذكي (Smart Filter) -->
                     <div class="mb-8">
                         <h3 class="font-bold text-slate-700 mb-4 flex items-center text-lg">
                             <i class="fas fa-user-tie text-teal-500 ml-2"></i> 1. اختر مدير الإقليم
                         </h3>
-                        <div id="kpiManagersContainer" class="flex flex-wrap gap-3">
-                            <!-- سيتم توليده بالجاڤاسكربت -->
-                        </div>
+                        <div id="kpiManagersContainer" class="flex flex-wrap gap-3"></div>
                     </div>
 
-                    <!-- حاوية المشرفين (Level 2) -->
                     <div id="kpiSupervisorsSection" class="mb-8 hidden">
                         <div class="border-t border-slate-200 pt-6">
                             <h3 class="font-bold text-slate-700 mb-4 flex items-center text-lg">
                                 <i class="fas fa-users-cog text-teal-500 ml-2"></i> 2. المشرفين التابعين (اضغط على المشرف للتفاصيل)
                             </h3>
-                            <div id="kpiSupervisorsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                <!-- سيتم توليده بالجاڤاسكربت -->
-                            </div>
+                            <div id="kpiSupervisorsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
                         </div>
                     </div>
 
-                    <!-- حاوية محاور التقييم للمشرف المختار (Level 3) -->
-                    <div id="kpiAxesSection" class="mb-8 hidden bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                        <div class="flex justify-between items-center mb-4">
+                    <div id="kpiAxesSection" class="mb-8 hidden bg-slate-50 p-6 rounded-2xl border border-slate-200 relative">
+                        <!-- زر التصدير الخاص بالمشرف المختار -->
+                        <button onclick="exportSingleSupervisorKPI()" class="absolute top-6 left-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-lg shadow transition flex items-center text-sm">
+                            <i class="fas fa-file-excel ml-2"></i> تصدير هذا المشرف
+                        </button>
+                        
+                        <div class="flex justify-between items-center mb-6">
                             <h3 class="font-bold text-slate-800 text-xl flex items-center">
                                 <i class="fas fa-chart-line text-teal-500 ml-2"></i> 3. تحليل المحاور للمشرف: <span id="selectedKpiSupName" class="text-teal-700 mr-2"></span>
                             </h3>
-                            <div class="bg-teal-100 text-teal-800 font-bold px-4 py-2 rounded-lg border border-teal-200 shadow-sm">
+                            <div class="bg-teal-100 text-teal-800 font-bold px-4 py-2 rounded-lg border border-teal-200 shadow-sm ml-32">
                                 متوسط الإنجاز: <span id="kpiOverallAvg" class="text-xl mx-1">0%</span>
                             </div>
                         </div>
@@ -368,7 +462,6 @@
                         </div>
                     </div>
 
-                    <!-- جدول الموظفين للمحور المختار (Level 4) -->
                     <div id="kpiEmployeesSection" class="hidden">
                         <h3 class="font-bold text-slate-700 mb-4 flex items-center text-lg" id="kpiEmpTableTitle">
                             <i class="fas fa-list text-teal-500 ml-2"></i> 4. تفاصيل البائعين للمحور
@@ -388,37 +481,54 @@
                             </table>
                         </div>
                     </div>
-
-                </div>
-                <!-- ========================================================================= -->
-
-                <div id="tenure1Tab" class="tab-content">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-slate-800">موظفون فترة عملهم <span class="text-orange-500">أقل من 3 شهور</span></h2>
-                        <span id="t1Count" class="bg-orange-100 text-orange-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
-                    </div>
-                    <div class="table-container border border-slate-200 rounded-xl shadow-sm">
-                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right"><thead class="bg-slate-100 text-slate-800"><tr id="t1Header"></tr></thead><tbody id="t1Body" class="bg-white divide-y divide-slate-100"></tbody></table>
-                    </div>
                 </div>
 
-                <div id="tenure2Tab" class="tab-content">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-slate-800">موظفون فترة عملهم <span class="text-blue-500">من 3 شهور إلى سنتين</span></h2>
-                        <span id="t2Count" class="bg-blue-100 text-blue-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
+                <!-- ================= تبويب لوحة القيادة (DASHBOARD) المضاف حديثاً ================= -->
+                <div id="dashboardTab" class="tab-content">
+                    <div class="bg-cyan-50 p-6 rounded-2xl border border-cyan-100 mb-6">
+                        <h2 class="text-2xl font-bold text-cyan-900 flex items-center mb-2">
+                            <i class="fas fa-chart-line text-cyan-500 ml-2"></i> لوحة القيادة والمقارنات (Dashboard)
+                        </h2>
+                        <p class="text-cyan-700 text-sm mb-4">يمكنك تحديد الأقاليم أو المشرفين للمقارنة بينهم في مختلف المحاور (أقل من 3 شهور، نسبة الإنجاز، التقدم مقارنة بالسابق).</p>
+                        
+                        <div class="flex flex-col md:flex-row gap-4 items-center bg-white p-4 rounded-xl border border-cyan-200 shadow-sm">
+                            <div class="flex items-center gap-2 border-l border-slate-200 pl-4">
+                                <label class="font-bold text-slate-700 whitespace-nowrap">نوع المقارنة:</label>
+                                <select id="dashCompareType" onchange="buildDashboardFilterUI()" class="p-2 border border-slate-300 rounded focus:outline-none focus:border-cyan-500 bg-slate-50">
+                                    <option value="regions">مقارنة الأقاليم</option>
+                                    <option value="supervisors">مقارنة المشرفين</option>
+                                </select>
+                            </div>
+                            <div class="w-full">
+                                <p class="text-xs text-slate-500 mb-1">اختر من 2 إلى 5 عناصر للمقارنة (اضغط للتحديد/الإلغاء):</p>
+                                <div id="dashChecksContainer" class="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+                                    <!-- سيتم توليده -->
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="table-container border border-slate-200 rounded-xl shadow-sm">
-                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right"><thead class="bg-slate-100 text-slate-800"><tr id="t2Header"></tr></thead><tbody id="t2Body" class="bg-white divide-y divide-slate-100"></tbody></table>
-                    </div>
-                </div>
 
-                <div id="tenure3Tab" class="tab-content">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-slate-800">موظفون فترة عملهم <span class="text-emerald-500">أكثر من سنتين</span></h2>
-                        <span id="t3Count" class="bg-emerald-100 text-emerald-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
+                    <div id="dashEmptyState" class="text-center py-12 hidden bg-slate-50 rounded-2xl border border-dashed border-slate-300">
+                        <i class="fas fa-exclamation-circle text-4xl text-slate-400 mb-3"></i>
+                        <p class="text-slate-600 font-bold">يرجى تحديد عنصر واحد على الأقل للمقارنة لرؤية الرسوم البيانية.</p>
                     </div>
-                    <div class="table-container border border-slate-200 rounded-xl shadow-sm">
-                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right"><thead class="bg-slate-100 text-slate-800"><tr id="t3Header"></tr></thead><tbody id="t3Body" class="bg-white divide-y divide-slate-100"></tbody></table>
+
+                    <div id="dashChartsSection" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Chart 1: أقل من 3 شهور -->
+                        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
+                            <h3 class="font-bold text-slate-700 mb-4 border-b border-slate-100 pb-2"><i class="fas fa-hourglass-start text-orange-500 ml-2"></i> الموظفون أقل من 3 شهور</h3>
+                            <div class="relative h-72 w-full"><canvas id="dashChart1"></canvas></div>
+                        </div>
+                        <!-- Chart 2: نسبة إنجاز المستهدف (21+) -->
+                        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
+                            <h3 class="font-bold text-slate-700 mb-4 border-b border-slate-100 pb-2"><i class="fas fa-bullseye text-emerald-500 ml-2"></i> الموظفون الذين أكملوا المستهدف</h3>
+                            <div class="relative h-72 w-full"><canvas id="dashChart2"></canvas></div>
+                        </div>
+                        <!-- Chart 3: التقدم عن الفترة السابقة -->
+                        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 lg:col-span-2 hidden" id="dashChart3Container">
+                            <h3 class="font-bold text-slate-700 mb-4 border-b border-slate-100 pb-2"><i class="fas fa-arrow-trend-up text-purple-500 ml-2"></i> مقارنة الإنجاز (الفترة الحالية مقارنة بالسابقة)</h3>
+                            <div class="relative h-80 w-full"><canvas id="dashChart3"></canvas></div>
+                        </div>
                     </div>
                 </div>
 
@@ -434,6 +544,7 @@
                                     <th class="px-6 py-4 font-semibold uppercase tracking-wider">الرقم الوظيفي</th>
                                     <th class="px-6 py-4 font-semibold uppercase tracking-wider">الاسم</th>
                                     <th class="px-6 py-4 font-semibold uppercase tracking-wider">حالة الاستبعاد</th>
+                                    <th class="px-6 py-4 font-semibold uppercase tracking-wider text-slate-500">توضيح</th>
                                 </tr>
                             </thead>
                             <tbody id="excludedTableBody" class="bg-white divide-y divide-slate-100"></tbody>
@@ -631,19 +742,37 @@
                 </div>
 
                 <div id="monthlyProgressTab" class="tab-content">
-                    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 bg-indigo-50 p-6 rounded-2xl border border-indigo-100">
-                        <div>
-                            <h2 class="text-2xl font-bold text-indigo-900 flex items-center mb-2">
-                                <i class="fas fa-calendar-check text-indigo-500 ml-2"></i> نسبة التقدم الشهري التراكمي
-                            </h2>
-                            <p class="text-indigo-700 text-sm">يقوم النظام بحساب الإنجاز التراكمي. <span class="font-bold text-red-600" id="lblMonthlyTargetDesc">الحد الأقصى للمستهدف لا يتجاوز 21 شهادة.</span></p>
+                    <div class="flex flex-col justify-between mb-8 gap-4 bg-indigo-50 p-6 rounded-2xl border border-indigo-100">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center w-full">
+                            <div>
+                                <h2 class="text-2xl font-bold text-indigo-900 flex items-center mb-2">
+                                    <i class="fas fa-calendar-check text-indigo-500 ml-2"></i> نسبة التقدم الشهري التراكمي
+                                </h2>
+                                <p class="text-indigo-700 text-sm">يقوم النظام بحساب الإنجاز التراكمي. <span class="font-bold text-red-600" id="lblMonthlyTargetDesc">الحد الأقصى للمستهدف لا يتجاوز 21 شهادة.</span></p>
+                            </div>
+                            
+                            <div class="flex flex-col sm:flex-row gap-3 mt-4 md:mt-0">
+                                <button onclick="toggleExclusionUI()" class="bg-white text-indigo-700 border border-indigo-200 hover:bg-indigo-100 font-bold py-2 px-4 rounded-xl shadow-sm transition flex items-center text-sm">
+                                    <i class="fas fa-filter ml-2"></i> إعدادات استبعاد التعيينات
+                                </button>
+                                <div class="flex items-center gap-3 bg-white p-2 rounded-xl shadow-sm border border-indigo-100">
+                                    <label for="progressMonthSelect" class="font-bold text-slate-700 whitespace-nowrap pl-2">اختر شهر التقرير:</label>
+                                    <select id="progressMonthSelect" onchange="updateMonthlyProgressTab()" class="pl-4 pr-8 py-1.5 border border-slate-300 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 appearance-none bg-white font-bold text-indigo-700 w-32 cursor-pointer">
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        
-                        <div class="flex items-center gap-3 bg-white p-2 rounded-xl shadow-sm border border-indigo-100">
-                            <label for="progressMonthSelect" class="font-bold text-slate-700 whitespace-nowrap pl-2">اختر الشهر:</label>
-                            <select id="progressMonthSelect" onchange="updateMonthlyProgressTab()" class="pl-4 pr-8 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 appearance-none bg-white font-medium text-indigo-700 w-32 cursor-pointer">
-                            </select>
+
+                        <!-- واجهة الاستبعاد المتقدمة (مخفية افتراضياً) -->
+                        <div id="exclusionUIWrapper" class="collapsible-content w-full">
+                            <div class="bg-white p-4 rounded-xl border border-indigo-200 shadow-inner mt-4">
+                                <h4 class="font-bold text-slate-700 mb-2 text-sm"><i class="fas fa-info-circle text-indigo-500 ml-1"></i> اختر الشهور التي تود استبعاد تعييناتها من الحسبة (سيتم إضافتهم للمستبعدين):</h4>
+                                <div id="exclusionYearsContainer" class="flex flex-wrap gap-4">
+                                    <!-- توليد السنوات والأشهر برمجياً -->
+                                </div>
+                            </div>
                         </div>
+
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center border-b-4 border-b-indigo-500">
@@ -657,7 +786,7 @@
                             <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl ml-3 shrink-0"><i class="fas fa-users"></i></div>
                             <div>
                                 <p class="text-slate-500 text-xs font-bold mb-1">إجمالي المعتمدين بالفترة</p>
-                                <div class="flex flex-col"><span id="monthlyOverallValid" class="text-2xl font-extrabold text-slate-800">0</span><span class="text-red-500 font-medium text-xs mt-1" title="تعيينهم جاء بعد الشهر المختار">تم استبعاد: <span id="monthlyOverallExcluded" class="font-bold">0</span></span></div>
+                                <div class="flex flex-col"><span id="monthlyOverallValid" class="text-2xl font-extrabold text-slate-800">0</span><span class="text-red-500 font-medium text-xs mt-1" title="تعيين مستبعد حسب الفلتر أو أحدث من التقرير">تم استبعاد: <span id="monthlyOverallExcluded" class="font-bold">0</span></span></div>
                             </div>
                         </div>
                         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center border-b-4 border-b-emerald-500">
@@ -685,7 +814,7 @@
                                     <th class="px-5 py-4 font-semibold text-emerald-600">نسبة الإنجاز %</th>
                                     <th class="px-5 py-4 font-semibold text-orange-600">عجز (لم يكملوا)</th>
                                     <th class="px-5 py-4 font-semibold text-orange-600">نسبة العجز %</th>
-                                    <th class="px-5 py-4 font-semibold text-slate-600 bg-slate-200" title="موظفون تعيينهم جاء بعد الشهر المختار ولن يتم حسابهم في نسب العجز والانجاز">مستبعد (تعيين أحدث)</th>
+                                    <th class="px-5 py-4 font-semibold text-slate-600 bg-slate-200" title="موظفون تعيينهم جاء بعد الشهر المختار ولن يتم حسابهم في نسب العجز والانجاز">مستبعد (تاريخ تعيين)</th>
                                 </tr>
                             </thead>
                             <tbody id="monthlyProgressTableBody" class="bg-white divide-y divide-slate-200"></tbody>
@@ -936,8 +1065,15 @@
     </div>
 
     <script>
+        // Chart instances
         let hourlyChartInstance = null;
         let dailyChartInstance = null;
+        let dashChart1 = null;
+        let dashChart2 = null;
+        let dashChart3 = null;
+
+        // Custom Exclusions for Monthly Tab
+        let explicitExcludedMonths = new Set(); // Store as "YYYY-MM"
 
         // --- Target Certs Logic ---
         let targetCertsCount = parseInt(localStorage.getItem('targetCertsCount')) || 21;
@@ -965,7 +1101,10 @@
             
             if (globalData.allActive && globalData.allActive.length > 0) {
                 applyActiveFilters();
-                renderKPITab(); // Update KPI tab on target change
+                renderKPITab(); 
+                if (document.getElementById('dashboardTab').classList.contains('active')) {
+                    updateDashboardCharts();
+                }
             }
         }
 
@@ -1107,7 +1246,8 @@
 
         let globalData = {
             allActive: [], excludedEmployees: [], missingEmployees: [], missingFromAcademy: [], regionsSet: new Set(), excludedRegions: new Set(), allExtractedMonths: new Set(), hasOldData: false,
-            timeline: { hourly: Array(24).fill(0), daily: {}, weekly: {} }
+            timeline: { hourly: Array(24).fill(0), daily: {}, weekly: {} },
+            hireYearsMonths: {} // To store unique hire years and their months
         };
 
         // KPI Specific Variables
@@ -1118,16 +1258,22 @@
         document.getElementById('currentDateDisplay').innerText = `تاريخ اليوم: ${new Date().toLocaleDateString('ar-EG')}`;
 
         function switchTab(event, tabId) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'bg-indigo-50', 'bg-slate-100'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            if(event && event.currentTarget) event.currentTarget.classList.add('active');
+            if(event && event.currentTarget) {
+                event.currentTarget.classList.add('active');
+                if (tabId.startsWith('tenure')) event.currentTarget.classList.add('bg-slate-100');
+            }
             const targetTab = document.getElementById(tabId);
             if(targetTab) targetTab.classList.add('active');
             
             if (tabId === 'trainingPathTab') renderTrainingPathTable();
             if (tabId === 'kpiTab') {
-                // Ensure KPI view is reset when opened if not initialized
                 if(Object.keys(kpiManagersData).length === 0) renderKPITab();
+            }
+            if (tabId === 'dashboardTab') {
+                buildDashboardFilterUI();
+                updateDashboardCharts();
             }
         }
 
@@ -1310,11 +1456,12 @@
         function analyzeData(wfRows, acRows, oldAcRows) {
             globalData = { 
                 allActive: [], excludedEmployees: [], missingEmployees: [], missingFromAcademy: [], regionsSet: new Set(), excludedRegions: new Set(), allExtractedMonths: new Set(), hasOldData: !!oldAcRows,
-                timeline: { hourly: Array(24).fill(0), daily: {}, weekly: {} }
+                timeline: { hourly: Array(24).fill(0), daily: {}, weekly: {} }, hireYearsMonths: {}
             };
             let employeeMap = {};
             let allWfIds = new Set();
             let allAcIds = new Set();
+            explicitExcludedMonths.clear(); // Reset explicit exclusions
 
             for (let i = 1; i < wfRows.length; i++) {
                 let row = wfRows[i];
@@ -1340,6 +1487,14 @@
                 
                 emp.tenureMonths = calculateTenureMonths(hireDate);
                 employeeMap[id] = emp;
+
+                let hDateParsed = parseExcelDate(hireDate);
+                if(hDateParsed && !isNaN(hDateParsed)) {
+                    let y = hDateParsed.getFullYear();
+                    let m = String(hDateParsed.getMonth() + 1).padStart(2, '0');
+                    if(!globalData.hireYearsMonths[y]) globalData.hireYearsMonths[y] = new Set();
+                    globalData.hireYearsMonths[y].add(m);
+                }
 
                 if (isExcluded(status)) {
                     globalData.excludedEmployees.push(emp);
@@ -1483,24 +1638,153 @@
                 globalData.allActive.forEach(emp => { targetMonthsKeys.forEach(m => { if (emp.monthsData[m] === undefined) emp.monthsData[m] = 0; }); });
             }
 
-            let e1 = document.getElementById('eliteCourse1Head'); let e2 = document.getElementById('eliteCourse2Head'); let e3 = document.getElementById('eliteCourse3Head');
-            let oe1 = document.getElementById('eliteOffCourse1Head'); let oe2 = document.getElementById('eliteOffCourse2Head'); let oe3 = document.getElementById('eliteOffCourse3Head');
-            if (e1 && eliteCoursesKeys[0]) e1.innerText = eliteCoursesKeys[0];
-            if (e2 && eliteCoursesKeys[1]) e2.innerText = eliteCoursesKeys[1];
-            if (e3 && eliteCoursesKeys[2]) e3.innerText = eliteCoursesKeys[2];
-            if (oe1 && eliteCoursesKeys[0]) oe1.innerText = eliteCoursesKeys[0];
-            if (oe2 && eliteCoursesKeys[1]) oe2.innerText = eliteCoursesKeys[1];
-            if (oe3 && eliteCoursesKeys[2]) oe3.innerText = eliteCoursesKeys[2];
-
-            populateMonthSelect();
             buildFilterUI();
+            buildExclusionUI(); // Build the new exclusion UI
             applyActiveFilters();
             renderTimelineDashboard(); 
             buildTrainingPathHeaders(); 
             renderTrainingPathTable();  
-            renderKPITab(); // Initialize KPI Data after extraction
+            renderKPITab(); 
+            
+            // Build Dashboard if active
+            if(document.getElementById('dashboardTab').classList.contains('active')) {
+                buildDashboardFilterUI();
+                updateDashboardCharts();
+            }
         }
 
+        // --- Monthly Progress Exclusion Logic ---
+        function buildExclusionUI() {
+            populateMonthSelect();
+            const container = document.getElementById('exclusionYearsContainer');
+            if(!container) return;
+            
+            let html = '';
+            let years = Object.keys(globalData.hireYearsMonths).sort((a,b) => b - a); // Descending
+            
+            years.forEach(year => {
+                let months = Array.from(globalData.hireYearsMonths[year]).sort();
+                let monthsHtml = months.map(m => {
+                    let val = `${year}-${m}`;
+                    return `
+                    <label class="flex items-center space-x-2 space-x-reverse bg-slate-50 border rounded-lg px-3 py-1 cursor-pointer hover:bg-slate-100 transition shadow-sm">
+                        <input type="checkbox" value="${val}" onchange="toggleExplicitExclusion(this)" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                        <span class="text-sm font-medium text-slate-700">شهر ${m}</span>
+                    </label>
+                    `;
+                }).join('');
+
+                html += `
+                    <div class="border border-indigo-100 rounded-lg p-3 bg-white w-full sm:w-auto flex-1 min-w-[200px]">
+                        <h5 class="font-bold text-indigo-800 mb-2 border-b border-indigo-50 pb-1">${year}</h5>
+                        <div class="flex flex-wrap gap-2">
+                            ${monthsHtml}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            if(years.length === 0) html = '<p class="text-slate-500 text-sm">لا توجد تواريخ تعيين واضحة لاستبعادها.</p>';
+            container.innerHTML = html;
+        }
+
+        function toggleExclusionUI() {
+            const wrapper = document.getElementById('exclusionUIWrapper');
+            wrapper.classList.toggle('expanded');
+        }
+
+        function toggleExplicitExclusion(checkbox) {
+            if (checkbox.checked) {
+                explicitExcludedMonths.add(checkbox.value);
+            } else {
+                explicitExcludedMonths.delete(checkbox.value);
+            }
+            updateMonthlyProgressTab();
+        }
+
+        function updateMonthlyProgressTab() {
+            const selectedMonth = document.getElementById('progressMonthSelect').value;
+            if (!selectedMonth) return;
+            let [selM, selY] = selectedMonth.split('-').map(Number);
+            let selectedTotalMonths = selY * 12 + selM;
+            let monthsToInclude = [];
+            for (let m of targetMonthsKeys) { monthsToInclude.push(m); if (m === selectedMonth) break; }
+
+            let maxCerts = 0;
+            let employeeProgress = {}; let employeeExcludedState = {}; 
+
+            globalData.allActive.forEach(emp => {
+                if (globalData.excludedRegions.has(emp.region)) return;
+                let isExcludedByDate = false;
+                let empDate = parseExcelDate(emp.hireDate);
+                
+                if (empDate && !isNaN(empDate)) {
+                    let hM = empDate.getMonth() + 1; 
+                    let hY = empDate.getFullYear();
+                    // 1. Exclude if hired AFTER the report month
+                    if ((hY * 12 + hM) > selectedTotalMonths) isExcludedByDate = true;
+                    
+                    // 2. Explicitly Excluded Months Logic
+                    let monthKey = `${hY}-${String(hM).padStart(2, '0')}`;
+                    if (explicitExcludedMonths.has(monthKey)) isExcludedByDate = true;
+                }
+                
+                employeeExcludedState[emp.id] = isExcludedByDate;
+
+                if (!isExcludedByDate) {
+                    let sum = 0; monthsToInclude.forEach(m => sum += (emp.monthsData[m] || 0));
+                    employeeProgress[emp.id] = sum;
+                    if (sum > maxCerts) maxCerts = sum;
+                }
+            });
+
+            if (maxCerts > targetCertsCount) maxCerts = targetCertsCount;
+            document.getElementById('monthlyTargetCerts').innerText = maxCerts;
+
+            let regionStats = {}; let overallStats = { valid: 0, excluded: 0, achieved: 0, failed: 0 };
+
+            globalData.allActive.forEach(emp => {
+                if (globalData.excludedRegions.has(emp.region)) return;
+                if (!regionStats[emp.region]) regionStats[emp.region] = { valid: 0, excludedNew: 0, achieved: 0, failed: 0 };
+                
+                if (employeeExcludedState[emp.id]) {
+                    regionStats[emp.region].excludedNew++; overallStats.excluded++;
+                } else {
+                    regionStats[emp.region].valid++; overallStats.valid++;
+                    if (employeeProgress[emp.id] >= maxCerts && maxCerts > 0) { regionStats[emp.region].achieved++; overallStats.achieved++; }
+                    else if (maxCerts === 0 && employeeProgress[emp.id] === 0) { regionStats[emp.region].achieved++; overallStats.achieved++; }
+                    else { regionStats[emp.region].failed++; overallStats.failed++; }
+                }
+            });
+
+            document.getElementById('monthlyOverallValid').innerText = overallStats.valid;
+            document.getElementById('monthlyOverallExcluded').innerText = overallStats.excluded;
+            let overallAchPct = overallStats.valid > 0 ? Math.round((overallStats.achieved / overallStats.valid) * 100) : 0;
+            let overallFailPct = overallStats.valid > 0 ? Math.round((overallStats.failed / overallStats.valid) * 100) : 0;
+            document.getElementById('monthlyOverallAchieved').innerText = overallStats.achieved; document.getElementById('monthlyOverallAchievedPct').innerText = overallAchPct + "%";
+            document.getElementById('monthlyOverallFailed').innerText = overallStats.failed; document.getElementById('monthlyOverallFailedPct').innerText = overallFailPct + "%";
+
+            let html = ''; let sortedRegions = Object.keys(regionStats).sort();
+            sortedRegions.forEach(reg => {
+                let stats = regionStats[reg];
+                let percentAchieved = stats.valid > 0 ? Math.round((stats.achieved / stats.valid) * 100) : 0;
+                let percentFailed = stats.valid > 0 ? Math.round((stats.failed / stats.valid) * 100) : 0;
+                html += `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                        <td class="px-5 py-4 font-bold text-slate-700">${reg}</td>
+                        <td class="px-5 py-4 font-bold text-lg text-blue-700 bg-blue-50/30">${stats.valid}</td>
+                        <td class="px-5 py-4 text-emerald-600 font-bold">${stats.achieved}</td>
+                        <td class="px-5 py-4 text-sm text-slate-500 font-medium">${percentAchieved}%</td>
+                        <td class="px-5 py-4 text-orange-600 font-bold">${stats.failed}</td>
+                        <td class="px-5 py-4 text-sm text-slate-500 font-medium">${percentFailed}%</td>
+                        <td class="px-5 py-4 font-bold text-red-500 bg-slate-50">${stats.excludedNew > 0 ? stats.excludedNew : '-'}</td>
+                    </tr>`;
+            });
+            if (sortedRegions.length === 0) html = `<tr><td colspan="7" class="text-center py-8 text-slate-500">لا توجد بيانات.</td></tr>`;
+            const tbody = document.getElementById('monthlyProgressTableBody'); if (tbody) tbody.innerHTML = html;
+        }
+
+        // --- KPI Implementation ---
         function renderKPITab() {
             if (globalData.allActive.length === 0) return;
 
@@ -1511,13 +1795,22 @@
             currentKpiManager = null;
             currentKpiSupervisor = null;
 
-            // Group Data hierarchically
+            // Group Data hierarchically based on selected TRACK
             kpiManagersData = {};
+            let trackFilter = document.getElementById('kpiTrackFilter') ? document.getElementById('kpiTrackFilter').value : 'all';
             
             globalData.allActive.forEach(emp => {
                 if (globalData.excludedRegions.has(emp.region)) return;
                 
-                let mngName = emp.region; // Group by Region representing Regional Manager
+                // Track Filter Logic
+                let includeEmp = true;
+                if(trackFilter === 'elite' && !emp.isEliteTarget) includeEmp = false;
+                if(trackFilter === 'less3' && (emp.tenureMonths < 0 || emp.tenureMonths >= 3)) includeEmp = false;
+                if(trackFilter === 'more3' && emp.tenureMonths < 3) includeEmp = false;
+                
+                if (!includeEmp) return;
+
+                let mngName = emp.region; 
                 let supName = cleanString(emp.supervisor) || "بدون مشرف";
 
                 if (!kpiManagersData[mngName]) {
@@ -1526,7 +1819,21 @@
                 
                 let mng = kpiManagersData[mngName];
                 mng.totalEmp++;
-                if (emp.totalCerts >= targetCertsCount) mng.achievedEmp++;
+                
+                // Track-specific target calculation for the high-level manager card
+                let isAchieved = false;
+                if(trackFilter === 'elite') {
+                    let hasC1 = eliteCoursesKeys[0] ? emp.eliteProgress[eliteCoursesKeys[0]] : false;
+                    let hasC2 = eliteCoursesKeys[1] ? emp.eliteProgress[eliteCoursesKeys[1]] : false;
+                    let hasC3 = eliteCoursesKeys[2] ? emp.eliteProgress[eliteCoursesKeys[2]] : false;
+                    isAchieved = hasC1 && hasC2 && hasC3;
+                } else if (trackFilter === 'less3') {
+                    isAchieved = emp.totalCerts >= 10;
+                } else {
+                    isAchieved = emp.totalCerts >= targetCertsCount;
+                }
+
+                if (isAchieved) mng.achievedEmp++;
 
                 if (!mng.supervisors[supName]) {
                     mng.supervisors[supName] = { 
@@ -1537,7 +1844,7 @@
                 
                 let sup = mng.supervisors[supName];
                 sup.totalEmp++;
-                if (emp.totalCerts >= targetCertsCount) sup.achievedEmp++;
+                if (isAchieved) sup.achievedEmp++;
                 sup.employees.push(emp);
             });
 
@@ -1555,14 +1862,14 @@
                             <div class="flex items-baseline gap-1">
                                 <span class="text-2xl font-extrabold text-teal-600">${pct}%</span>
                             </div>
-                            <span class="text-xs text-slate-400 mt-1">الإنجاز الكلي</span>
+                            <span class="text-xs text-slate-400 mt-1">الإنجاز (للمسار المختار)</span>
                         </div>
                     </label>
                 `;
             });
 
             if (Object.keys(kpiManagersData).length === 0) {
-                managersHtml = `<div class="text-slate-500 italic p-4">لا يوجد بيانات متاحة بناءً على الفلاتر الحالية.</div>`;
+                managersHtml = `<div class="text-slate-500 italic p-4 bg-slate-50 rounded-xl w-full text-center">لا يوجد بيانات متاحة بناءً على الفلاتر (المسار / الأقاليم المستبعدة).</div>`;
             }
 
             document.getElementById('kpiManagersContainer').innerHTML = managersHtml;
@@ -1570,7 +1877,7 @@
 
         function selectKPIManager(mngName) {
             currentKpiManager = mngName;
-            currentKpiSupervisor = null; // reset lower levels
+            currentKpiSupervisor = null; 
             document.getElementById('kpiAxesSection').classList.add('hidden');
             document.getElementById('kpiEmployeesSection').classList.add('hidden');
             
@@ -1588,25 +1895,19 @@
                             <h4 class="font-bold text-slate-800 group-hover:text-blue-700 transition">${supName}</h4>
                             <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded">${pct}%</span>
                         </div>
-                        <p class="text-xs text-slate-500">إجمالي الموظفين: <span class="font-bold">${sup.totalEmp}</span></p>
+                        <p class="text-xs text-slate-500">إجمالي الموظفين (في المسار): <span class="font-bold">${sup.totalEmp}</span></p>
                     </div>
                 `;
             });
 
             document.getElementById('kpiSupervisorsContainer').innerHTML = supsHtml;
             document.getElementById('kpiSupervisorsSection').classList.remove('hidden');
-            
-            // Highlight active supervisor card logic
-            setTimeout(() => {
-                document.querySelectorAll('.kpi-sup-card').forEach(card => card.classList.remove('ring-2', 'ring-blue-500', 'bg-blue-50'));
-            }, 50);
         }
 
         function selectKPISupervisor(supName) {
             currentKpiSupervisor = supName;
             document.getElementById('kpiEmployeesSection').classList.add('hidden');
             
-            // Highlight selected card
             document.querySelectorAll('.kpi-sup-card').forEach(card => {
                 if (card.querySelector('h4').innerText === supName) {
                     card.classList.add('ring-2', 'ring-blue-500', 'bg-blue-50');
@@ -1618,7 +1919,6 @@
             let supData = kpiManagersData[currentKpiManager].supervisors[supName];
             document.getElementById('selectedKpiSupName').innerText = supName;
 
-            // Calculate Axes
             let eliteEmps = supData.employees.filter(e => e.isEliteTarget);
             let less3Emps = supData.employees.filter(e => e.tenureMonths >= 0 && e.tenureMonths < 3);
             let more3Emps = supData.employees.filter(e => e.tenureMonths >= 3);
@@ -1637,9 +1937,8 @@
             let less3Pct = less3Emps.length > 0 ? Math.round((less3Achieved / less3Emps.length) * 100) : 'NA';
             let more3Pct = more3Emps.length > 0 ? Math.round((more3Achieved / more3Emps.length) * 100) : 'NA';
             
-            // Render Axis Values
             document.getElementById('kpiEliteVal').innerText = elitePct !== 'NA' ? elitePct + '%' : 'NA';
-            document.getElementById('kpiEliteDesc').innerText = eliteEmps.length > 0 ? `العدد: ${eliteEmps.length} (المستهدف 3/3)` : 'لا يوجد مستهدفين';
+            document.getElementById('kpiEliteDesc').innerText = eliteEmps.length > 0 ? `العدد: ${eliteEmps.length} (المستهدف 3/3)` : 'لا يوجد';
             
             document.getElementById('kpiLess3Val').innerText = less3Pct !== 'NA' ? less3Pct + '%' : 'NA';
             document.getElementById('kpiLess3Desc').innerText = less3Emps.length > 0 ? `العدد: ${less3Emps.length} (المستهدف 10)` : 'لا يوجد';
@@ -1647,7 +1946,6 @@
             document.getElementById('kpiMore3Val').innerText = more3Pct !== 'NA' ? more3Pct + '%' : 'NA';
             document.getElementById('kpiMore3Desc').innerText = more3Emps.length > 0 ? `العدد: ${more3Emps.length} (المستهدف ${targetCertsCount})` : 'لا يوجد';
 
-            // Calculate Overall Average (ignoring NAs)
             let sumPct = 0;
             let countAxes = 0;
             if (elitePct !== 'NA') { sumPct += elitePct; countAxes++; }
@@ -1667,7 +1965,6 @@
             let emps = [];
             let axisTitle = '';
 
-            // Reset card highlighting
             document.querySelectorAll('.kpi-axis-card').forEach(c => c.classList.remove('ring-2', 'ring-teal-500', 'bg-teal-50'));
             event.currentTarget.classList.add('ring-2', 'ring-teal-500', 'bg-teal-50');
 
@@ -1724,416 +2021,185 @@
             document.getElementById('kpiEmployeesSection').classList.remove('hidden');
         }
 
-        function exportKPIToExcel() {
-            if (Object.keys(kpiManagersData).length === 0) {
-                alert("لا توجد بيانات للتصدير.");
+        function exportSingleSupervisorKPI() {
+            if (!currentKpiManager || !currentKpiSupervisor) return;
+            
+            let supData = kpiManagersData[currentKpiManager].supervisors[currentKpiSupervisor];
+            let wb = XLSX.utils.book_new();
+
+            // All employees of this supervisor in the current filtered track
+            let aoa = [["الرقم الوظيفي", "الاسم", "الإقليم", "المسار", "الشهادات/الدورات المنجزة", "حالة الانجاز"]];
+            
+            supData.employees.forEach(e => {
+                let track = "";
+                let progress = "";
+                let isAch = false;
+
+                if (e.isEliteTarget) {
+                    track = "النخبة";
+                    let hasC1 = eliteCoursesKeys[0] ? e.eliteProgress[eliteCoursesKeys[0]] : false;
+                    let hasC2 = eliteCoursesKeys[1] ? e.eliteProgress[eliteCoursesKeys[1]] : false;
+                    let hasC3 = eliteCoursesKeys[2] ? e.eliteProgress[eliteCoursesKeys[2]] : false;
+                    isAch = hasC1 && hasC2 && hasC3;
+                    progress = `${(hasC1?1:0)+(hasC2?1:0)+(hasC3?1:0)} / 3`;
+                } else if (e.tenureMonths < 3) {
+                    track = "أقل من 3 شهور";
+                    progress = e.totalCerts;
+                    isAch = e.totalCerts >= 10;
+                } else {
+                    track = "3 شهور فأكثر";
+                    progress = e.totalCerts;
+                    isAch = e.totalCerts >= targetCertsCount;
+                }
+
+                aoa.push([e.id, e.name, e.region, track, progress, isAch ? "مكتمل" : "غير مكتمل"]);
+            });
+
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), "بيانات المشرف");
+            XLSX.writeFile(wb, `تقييم_المشرف_${currentKpiSupervisor.replace(/ /g, '_')}.xlsx`);
+        }
+
+        // --- DASHBOARD Logic ---
+        function buildDashboardFilterUI() {
+            const type = document.getElementById('dashCompareType').value;
+            const container = document.getElementById('dashChecksContainer');
+            
+            let items = new Set();
+            globalData.allActive.forEach(e => {
+                if(type === 'regions') items.add(e.region);
+                else if(type === 'supervisors' && cleanString(e.supervisor)) items.add(cleanString(e.supervisor));
+            });
+
+            let html = '';
+            Array.from(items).sort().forEach(item => {
+                html += `
+                    <label class="flex items-center space-x-2 space-x-reverse bg-slate-50 border rounded-lg px-3 py-1 cursor-pointer hover:bg-slate-100 transition shadow-sm">
+                        <input type="checkbox" value="${item}" onchange="updateDashboardCharts()" class="dash-checkbox w-4 h-4 text-cyan-600 rounded border-slate-300 focus:ring-cyan-500">
+                        <span class="text-sm font-medium text-slate-700">${item}</span>
+                    </label>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function updateDashboardCharts() {
+            const type = document.getElementById('dashCompareType').value;
+            const checkboxes = document.querySelectorAll('.dash-checkbox:checked');
+            const selectedItems = Array.from(checkboxes).map(cb => cb.value);
+
+            if(selectedItems.length === 0) {
+                document.getElementById('dashEmptyState').classList.remove('hidden');
+                document.getElementById('dashChartsSection').classList.add('hidden');
+                return;
+            }
+            if(selectedItems.length > 5) {
+                alert("يرجى اختيار 5 عناصر كحد أقصى للمقارنة الواضحة.");
+                checkboxes[checkboxes.length-1].checked = false; // uncheck the last one
                 return;
             }
 
-            let wb = XLSX.utils.book_new();
-            let aoa = [
-                ["مدير الإقليم", "المشرف", "مسار النخبة (%)", "أقل من 3 شهور (%)", "3 شهور فأكثر (%)", "مسار التحسين (%)", "متوسط الإنجاز الكلي للمشرف (%)"]
-            ];
+            document.getElementById('dashEmptyState').classList.add('hidden');
+            document.getElementById('dashChartsSection').classList.remove('hidden');
 
-            Object.keys(kpiManagersData).sort().forEach(mngName => {
-                let mngData = kpiManagersData[mngName];
+            let labels = [];
+            let less3Data = [];
+            let pctAchievedData = [];
+            let oldPctData = []; // for chart 3
+
+            selectedItems.forEach(item => {
+                labels.push(item);
                 
-                Object.keys(mngData.supervisors).sort().forEach(supName => {
-                    let sup = mngData.supervisors[supName];
-                    
-                    let eliteEmps = sup.employees.filter(e => e.isEliteTarget);
-                    let less3Emps = sup.employees.filter(e => e.tenureMonths >= 0 && e.tenureMonths < 3);
-                    let more3Emps = sup.employees.filter(e => e.tenureMonths >= 3);
-
-                    let eliteAchievedCount = eliteEmps.filter(e => {
-                        let hasC1 = eliteCoursesKeys[0] ? e.eliteProgress[eliteCoursesKeys[0]] : false;
-                        let hasC2 = eliteCoursesKeys[1] ? e.eliteProgress[eliteCoursesKeys[1]] : false;
-                        let hasC3 = eliteCoursesKeys[2] ? e.eliteProgress[eliteCoursesKeys[2]] : false;
-                        return hasC1 && hasC2 && hasC3;
-                    }).length;
-                    
-                    let less3AchievedCount = less3Emps.filter(e => e.totalCerts >= 10).length;
-                    let more3AchievedCount = more3Emps.filter(e => e.totalCerts >= targetCertsCount).length;
-
-                    let elitePct = eliteEmps.length > 0 ? Math.round((eliteAchievedCount / eliteEmps.length) * 100) : 'NA';
-                    let less3Pct = less3Emps.length > 0 ? Math.round((less3AchievedCount / less3Emps.length) * 100) : 'NA';
-                    let more3Pct = more3Emps.length > 0 ? Math.round((more3AchievedCount / more3Emps.length) * 100) : 'NA';
-                    let impPct = 'NA'; // مسار التحسين
-
-                    let sumPct = 0; let countAxes = 0;
-                    if (elitePct !== 'NA') { sumPct += elitePct; countAxes++; }
-                    if (less3Pct !== 'NA') { sumPct += less3Pct; countAxes++; }
-                    if (more3Pct !== 'NA') { sumPct += more3Pct; countAxes++; }
-                    
-                    let avg = countAxes > 0 ? Math.round(sumPct / countAxes) : 0;
-
-                    aoa.push([
-                        mngName,
-                        supName,
-                        elitePct !== 'NA' ? elitePct + '%' : 'NA',
-                        less3Pct !== 'NA' ? less3Pct + '%' : 'NA',
-                        more3Pct !== 'NA' ? more3Pct + '%' : 'NA',
-                        impPct,
-                        avg + '%'
-                    ]);
-                });
-            });
-
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), "تقرير KPI الشامل");
-            XLSX.writeFile(wb, "تقرير_مؤشرات_الأداء_KPI.xlsx");
-        }
-
-        function buildTrainingPathHeaders() {
-            let certCourses = trainingPathDef.filter(c => c.hasCert);
-            let nonCertCourses = trainingPathDef.filter(c => !c.hasCert);
-
-            let certHeaderHtml = `
-                <tr>
-                    <th class="px-4 py-4 font-semibold uppercase sticky-id text-right">الرقم الوظيفي</th>
-                    <th class="px-4 py-4 font-semibold uppercase sticky-name text-right">الاسم</th>
-                    <th class="px-4 py-4 font-semibold uppercase whitespace-nowrap">الإقليم</th>
-                    <th class="px-4 py-4 font-semibold uppercase whitespace-nowrap border-l border-slate-200">المسار الحالي 📍</th>
-            `;
-            certCourses.forEach(c => certHeaderHtml += `<th class="px-2 py-4 font-medium text-xs whitespace-normal min-w-[80px] border-l border-slate-200" title="${c.ar}">${c.certId}- ${c.ar}</th>`);
-            certHeaderHtml += `</tr>`;
-            document.getElementById('pathCertHeader').innerHTML = certHeaderHtml;
-
-            let nonCertHeaderHtml = `
-                <tr>
-                    <th class="px-4 py-4 font-semibold uppercase sticky-id text-right">الرقم الوظيفي</th>
-                    <th class="px-4 py-4 font-semibold uppercase sticky-name text-right">الاسم</th>
-                    <th class="px-4 py-4 font-semibold uppercase whitespace-nowrap">الإقليم</th>
-                    <th class="px-4 py-4 font-semibold uppercase text-center border-l border-slate-200">إجمالي المنجز</th>
-            `;
-            nonCertCourses.forEach(c => nonCertHeaderHtml += `<th class="px-2 py-4 font-medium text-xs whitespace-normal min-w-[120px] border-l border-slate-200" title="${c.ar}">${c.ar}</th>`);
-            nonCertHeaderHtml += `</tr>`;
-            document.getElementById('pathNonCertHeader').innerHTML = nonCertHeaderHtml;
-        }
-
-        function renderTrainingPathTable() {
-            if (globalData.allActive.length === 0) return;
-
-            const pathRegion = document.getElementById('pathRegionFilter').value;
-            const pathSearch = document.getElementById('pathSearchFilter').value.toLowerCase();
-
-            let certCourses = trainingPathDef.filter(c => c.hasCert);
-            let nonCertCourses = trainingPathDef.filter(c => !c.hasCert);
-
-            let filteredEmployees = globalData.allActive.filter(emp => {
-                let matchReg = pathRegion === "" || emp.region === pathRegion;
-                let matchSearch = pathSearch === "" || emp.name.toLowerCase().includes(pathSearch) || emp.id.toString().includes(pathSearch);
-                let notGloballyExcluded = !globalData.excludedRegions.has(emp.region);
-                return matchReg && matchSearch && notGloballyExcluded;
-            });
-
-            let certBodyHtml = '';
-            let nonCertBodyHtml = '';
-
-            filteredEmployees.forEach(emp => {
-                let stopperCourse = null;
-                for (let i = 0; i < certCourses.length; i++) {
-                    if (!emp.pathProgress[certCourses[i].en]) {
-                        stopperCourse = certCourses[i];
-                        break;
-                    }
-                }
-
-                let stopperDisplay = stopperCourse ? `<span class="text-orange-600 font-bold whitespace-nowrap" title="${stopperCourse.ar}">${stopperCourse.certId}. ${stopperCourse.ar}</span>` : `<span class="text-emerald-600 font-bold whitespace-nowrap">✔ أتم المسار</span>`;
-
-                certBodyHtml += `<tr class="hover:bg-slate-50 transition border-b border-slate-100">`;
-                certBodyHtml += `<td class="px-4 py-3 font-bold text-slate-700 sticky-id">${emp.id}</td>`;
-                certBodyHtml += `<td class="px-4 py-3 font-bold text-slate-700 sticky-name truncate max-w-[180px]" title="${emp.name}">${emp.name}</td>`;
-                certBodyHtml += `<td class="px-4 py-3 text-slate-600 text-xs whitespace-nowrap">${emp.region}</td>`;
-                certBodyHtml += `<td class="px-4 py-3 text-right border-l border-slate-200">${stopperDisplay}</td>`;
+                let emps = globalData.allActive.filter(e => type === 'regions' ? e.region === item : cleanString(e.supervisor) === item);
                 
-                certCourses.forEach(c => {
-                    let isDone = emp.pathProgress[c.en];
-                    let isStopper = (stopperCourse && c.en === stopperCourse.en);
-                    let cellHtml = '';
-                    let bgClass = '';
-                    
-                    if (isDone) {
-                        cellHtml = `✔`;
-                        bgClass = 'bg-emerald-50/30 text-emerald-500 font-bold text-lg';
-                    } else if (isStopper) {
-                        cellHtml = `•`;
-                        bgClass = 'bg-orange-50/30 text-orange-500 font-bold text-2xl leading-none';
-                    } else {
-                        cellHtml = `✗`;
-                        bgClass = 'text-slate-200 font-medium text-sm';
-                    }
+                let less3 = emps.filter(e => e.tenureMonths >= 0 && e.tenureMonths < 3).length;
+                less3Data.push(less3);
 
-                    certBodyHtml += `<td class="px-2 py-3 text-center border-l border-slate-50 ${bgClass}">${cellHtml}</td>`;
-                });
-                certBodyHtml += `</tr>`;
+                let overTarget = emps.filter(e => e.totalCerts >= targetCertsCount).length;
+                let pct = emps.length > 0 ? (overTarget / emps.length) * 100 : 0;
+                pctAchievedData.push(Math.round(pct));
 
-
-                let nonCertDoneCount = 0;
-                nonCertCourses.forEach(c => { if(emp.pathProgress[c.en]) nonCertDoneCount++; });
-                
-                nonCertBodyHtml += `<tr class="hover:bg-slate-50 transition border-b border-slate-100">`;
-                nonCertBodyHtml += `<td class="px-4 py-3 font-bold text-slate-700 sticky-id">${emp.id}</td>`;
-                nonCertBodyHtml += `<td class="px-4 py-3 font-bold text-slate-700 sticky-name truncate max-w-[180px]" title="${emp.name}">${emp.name}</td>`;
-                nonCertBodyHtml += `<td class="px-4 py-3 text-slate-600 text-xs whitespace-nowrap">${emp.region}</td>`;
-                nonCertBodyHtml += `<td class="px-4 py-3 text-center font-bold text-indigo-600 border-l border-slate-200">${nonCertDoneCount} / ${nonCertCourses.length}</td>`;
-                
-                nonCertCourses.forEach(c => {
-                    let isDone = emp.pathProgress[c.en];
-                    let cellHtml = '';
-                    let bgClass = '';
-                    if (isDone) {
-                        cellHtml = `✔`;
-                        bgClass = 'bg-emerald-50/30 text-emerald-500 font-bold text-lg';
-                    } else {
-                        cellHtml = `-`;
-                        bgClass = 'text-slate-300 font-medium text-lg leading-none';
-                    }
-                    nonCertBodyHtml += `<td class="px-2 py-3 text-center border-l border-slate-50 ${bgClass}">${cellHtml}</td>`;
-                });
-                nonCertBodyHtml += `</tr>`;
-            });
-
-            if (filteredEmployees.length === 0) {
-                let emptyMsg = `<tr><td colspan="30" class="text-center py-8 text-slate-500">لا توجد بيانات مطابقة للبحث.</td></tr>`;
-                certBodyHtml = emptyMsg;
-                nonCertBodyHtml = emptyMsg;
-            }
-
-            document.getElementById('pathCertTableBody').innerHTML = certBodyHtml;
-            document.getElementById('pathNonCertTableBody').innerHTML = nonCertBodyHtml;
-        }
-
-        function exportTrainingPath() {
-            const pathRegion = document.getElementById('pathRegionFilter').value;
-            const pathSearch = document.getElementById('pathSearchFilter').value.toLowerCase();
-            let certCourses = trainingPathDef.filter(c => c.hasCert);
-            let nonCertCourses = trainingPathDef.filter(c => !c.hasCert);
-
-            let filteredEmployees = globalData.allActive.filter(emp => {
-                let matchReg = pathRegion === "" || emp.region === pathRegion;
-                let matchSearch = pathSearch === "" || emp.name.toLowerCase().includes(pathSearch) || emp.id.toString().includes(pathSearch);
-                let notGloballyExcluded = !globalData.excludedRegions.has(emp.region);
-                return matchReg && matchSearch && notGloballyExcluded;
-            });
-
-            if(filteredEmployees.length === 0) return;
-
-            let wb = XLSX.utils.book_new();
-
-            let certAOA = [];
-            let certHeaders = ["الرقم الوظيفي", "الاسم", "الإقليم", "المسار الحالي (نقطة التوقف)"];
-            certCourses.forEach(c => certHeaders.push(`${c.certId}- ${c.ar}`));
-            certAOA.push(certHeaders);
-
-            filteredEmployees.forEach(emp => {
-                let stopperCourse = null;
-                for (let i = 0; i < certCourses.length; i++) {
-                    if (!emp.pathProgress[certCourses[i].en]) { stopperCourse = certCourses[i]; break; }
-                }
-                let stopperName = stopperCourse ? `${stopperCourse.certId}. ${stopperCourse.ar}` : "أتم المسار بالكامل";
-                
-                let row = [emp.id, emp.name, emp.region, stopperName];
-                certCourses.forEach(c => {
-                    let isDone = emp.pathProgress[c.en];
-                    let isStopper = (stopperCourse && c.en === stopperCourse.en);
-                    if (isDone) row.push("منجز");
-                    else if (isStopper) row.push("واقف عليها");
-                    else row.push("لم يصلها");
-                });
-                certAOA.push(row);
-            });
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(certAOA), "مسار الشهادات الأساسي");
-
-            let nonCertAOA = [];
-            let nonCertHeaders = ["الرقم الوظيفي", "الاسم", "الإقليم", "إجمالي المنجز"];
-            nonCertCourses.forEach(c => nonCertHeaders.push(`${c.ar}`));
-            nonCertAOA.push(nonCertHeaders);
-
-            filteredEmployees.forEach(emp => {
-                let countDone = 0;
-                nonCertCourses.forEach(c => { if(emp.pathProgress[c.en]) countDone++; });
-                
-                let row = [emp.id, emp.name, emp.region, countDone];
-                nonCertCourses.forEach(c => {
-                    row.push(emp.pathProgress[c.en] ? "منجز" : "-");
-                });
-                nonCertAOA.push(row);
-            });
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(nonCertAOA), "الدورات الداعمة");
-
-            XLSX.writeFile(wb, "تقرير_مسار_التدريب_الجديد.xlsx");
-        }
-
-        function renderTimelineDashboard() {
-            let maxDay = "-", maxDayCount = 0;
-            for(let date in globalData.timeline.daily) {
-                if(globalData.timeline.daily[date] > maxDayCount) {
-                    maxDayCount = globalData.timeline.daily[date];
-                    maxDay = date;
-                }
-            }
-
-            let maxWeek = "-", maxWeekCount = 0;
-            for(let week in globalData.timeline.weekly) {
-                if(globalData.timeline.weekly[week] > maxWeekCount) {
-                    maxWeekCount = globalData.timeline.weekly[week];
-                    maxWeek = week;
-                }
-            }
-
-            let peakHour = 0, peakHourCount = 0;
-            globalData.timeline.hourly.forEach((count, hour) => {
-                if(count > peakHourCount) {
-                    peakHourCount = count;
-                    peakHour = hour;
+                if (globalData.hasOldData) {
+                    let oldOver = emps.filter(e => e.oldTotalCerts >= targetCertsCount).length;
+                    let oldPct = emps.length > 0 ? (oldOver / emps.length) * 100 : 0;
+                    oldPctData.push(Math.round(oldPct));
                 }
             });
 
-            let formattedPeakHour = `${peakHour % 12 || 12}:00 ${peakHour < 12 ? 'ص' : 'م'}`;
-
-            document.getElementById('topActiveDayDate').innerText = maxDay !== "-" ? maxDay : "لا توجد بيانات";
-            document.getElementById('topActiveDayCount').innerText = maxDayCount;
-            document.getElementById('topActiveWeek').innerText = maxWeek !== "-" ? maxWeek : "لا توجد بيانات";
-            document.getElementById('topActiveWeekCount').innerText = maxWeekCount;
-            document.getElementById('peakHourTime').innerText = peakHourCount > 0 ? formattedPeakHour : "لا توجد بيانات";
-            document.getElementById('peakHourCount').innerText = peakHourCount;
-
-            const hourlyLabels = Array.from({length: 24}, (_, i) => `${i % 12 || 12} ${i < 12 ? 'ص' : 'م'}`);
-            
-            if (hourlyChartInstance) hourlyChartInstance.destroy();
-            const ctxHourly = document.getElementById('hourlyChart').getContext('2d');
-            hourlyChartInstance = new Chart(ctxHourly, {
+            // Draw Chart 1
+            if (dashChart1) dashChart1.destroy();
+            dashChart1 = new Chart(document.getElementById('dashChart1'), {
                 type: 'bar',
                 data: {
-                    labels: hourlyLabels,
+                    labels: labels,
                     datasets: [{
-                        label: 'عدد الشهادات المكتسبة',
-                        data: globalData.timeline.hourly,
-                        backgroundColor: 'rgba(99, 102, 241, 0.7)',
-                        borderColor: 'rgb(79, 70, 229)',
-                        borderWidth: 1,
-                        borderRadius: 4
+                        label: 'عدد الموظفين (أقل من 3 شهور)',
+                        data: less3Data,
+                        backgroundColor: 'rgba(249, 115, 22, 0.7)',
+                        borderColor: 'rgb(234, 88, 12)',
+                        borderWidth: 1, borderRadius: 4
                     }]
                 },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true } },
-                    plugins: { legend: { display: false } }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
 
-            let sortedDates = Object.keys(globalData.timeline.daily).sort();
-            let dailyDataCounts = sortedDates.map(date => globalData.timeline.daily[date]);
-
-            if (dailyChartInstance) dailyChartInstance.destroy();
-            const ctxDaily = document.getElementById('dailyChart').getContext('2d');
-            dailyChartInstance = new Chart(ctxDaily, {
-                type: 'line',
+            // Draw Chart 2
+            if (dashChart2) dashChart2.destroy();
+            dashChart2 = new Chart(document.getElementById('dashChart2'), {
+                type: 'bar',
                 data: {
-                    labels: sortedDates,
+                    labels: labels,
                     datasets: [{
-                        label: 'الشهادات المكتسبة',
-                        data: dailyDataCounts,
-                        fill: true,
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        borderColor: 'rgb(16, 185, 129)',
-                        tension: 0.3,
-                        pointBackgroundColor: 'rgb(16, 185, 129)',
-                        borderWidth: 2
+                        label: 'نسبة الإنجاز %',
+                        data: pctAchievedData,
+                        backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                        borderColor: 'rgb(5, 150, 105)',
+                        borderWidth: 1, borderRadius: 4
                     }]
                 },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true } },
-                    plugins: { legend: { display: false } }
+                options: { 
+                    responsive: true, maintainAspectRatio: false, 
+                    scales: { y: { beginAtZero: true, max: 100 } },
+                    plugins: { legend: { display: false } } 
                 }
             });
+
+            // Draw Chart 3
+            let chart3Container = document.getElementById('dashChart3Container');
+            if (globalData.hasOldData) {
+                chart3Container.classList.remove('hidden');
+                if (dashChart3) dashChart3.destroy();
+                dashChart3 = new Chart(document.getElementById('dashChart3'), {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'الإنجاز في التقرير السابق %',
+                                data: oldPctData,
+                                backgroundColor: 'rgba(168, 85, 247, 0.5)',
+                                borderColor: 'rgb(147, 51, 234)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'الإنجاز في التقرير الحالي %',
+                                data: pctAchievedData,
+                                backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                                borderColor: 'rgb(5, 150, 105)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: { 
+                        responsive: true, maintainAspectRatio: false, 
+                        scales: { y: { beginAtZero: true, max: 100 } }
+                    }
+                });
+            } else {
+                chart3Container.classList.add('hidden');
+            }
         }
 
-        function populateMonthSelect() {
-            const select = document.getElementById('progressMonthSelect');
-            if(!select) return;
-            select.innerHTML = '';
-            targetMonthsKeys.forEach(m => {
-                let opt = document.createElement('option'); opt.value = m; opt.text = m.replace('-', '/'); select.appendChild(opt);
-            });
-            if(targetMonthsKeys.length > 0) select.value = targetMonthsKeys[targetMonthsKeys.length - 1];
-        }
-
-        function updateMonthlyProgressTab() {
-            const selectedMonth = document.getElementById('progressMonthSelect').value;
-            if (!selectedMonth) return;
-            let [selM, selY] = selectedMonth.split('-').map(Number);
-            let selectedTotalMonths = selY * 12 + selM;
-            let monthsToInclude = [];
-            for (let m of targetMonthsKeys) { monthsToInclude.push(m); if (m === selectedMonth) break; }
-
-            let maxCerts = 0;
-            let employeeProgress = {}; let employeeExcludedState = {}; 
-
-            globalData.allActive.forEach(emp => {
-                if (globalData.excludedRegions.has(emp.region)) return;
-                let isExcludedByDate = false;
-                let empDate = parseExcelDate(emp.hireDate);
-                if (empDate && !isNaN(empDate)) {
-                    let hM = empDate.getMonth() + 1; let hY = empDate.getFullYear();
-                    if ((hY * 12 + hM) > selectedTotalMonths) isExcludedByDate = true;
-                }
-                employeeExcludedState[emp.id] = isExcludedByDate;
-
-                if (!isExcludedByDate) {
-                    let sum = 0; monthsToInclude.forEach(m => sum += (emp.monthsData[m] || 0));
-                    employeeProgress[emp.id] = sum;
-                    if (sum > maxCerts) maxCerts = sum;
-                }
-            });
-
-            if (maxCerts > targetCertsCount) maxCerts = targetCertsCount;
-            document.getElementById('monthlyTargetCerts').innerText = maxCerts;
-
-            let regionStats = {}; let overallStats = { valid: 0, excluded: 0, achieved: 0, failed: 0 };
-
-            globalData.allActive.forEach(emp => {
-                if (globalData.excludedRegions.has(emp.region)) return;
-                if (!regionStats[emp.region]) regionStats[emp.region] = { valid: 0, excludedNew: 0, achieved: 0, failed: 0 };
-                
-                if (employeeExcludedState[emp.id]) {
-                    regionStats[emp.region].excludedNew++; overallStats.excluded++;
-                } else {
-                    regionStats[emp.region].valid++; overallStats.valid++;
-                    if (employeeProgress[emp.id] >= maxCerts && maxCerts > 0) { regionStats[emp.region].achieved++; overallStats.achieved++; }
-                    else if (maxCerts === 0 && employeeProgress[emp.id] === 0) { regionStats[emp.region].achieved++; overallStats.achieved++; }
-                    else { regionStats[emp.region].failed++; overallStats.failed++; }
-                }
-            });
-
-            document.getElementById('monthlyOverallValid').innerText = overallStats.valid;
-            document.getElementById('monthlyOverallExcluded').innerText = overallStats.excluded;
-            let overallAchPct = overallStats.valid > 0 ? Math.round((overallStats.achieved / overallStats.valid) * 100) : 0;
-            let overallFailPct = overallStats.valid > 0 ? Math.round((overallStats.failed / overallStats.valid) * 100) : 0;
-            document.getElementById('monthlyOverallAchieved').innerText = overallStats.achieved; document.getElementById('monthlyOverallAchievedPct').innerText = overallAchPct + "%";
-            document.getElementById('monthlyOverallFailed').innerText = overallStats.failed; document.getElementById('monthlyOverallFailedPct').innerText = overallFailPct + "%";
-
-            let html = ''; let sortedRegions = Object.keys(regionStats).sort();
-            sortedRegions.forEach(reg => {
-                let stats = regionStats[reg];
-                let percentAchieved = stats.valid > 0 ? Math.round((stats.achieved / stats.valid) * 100) : 0;
-                let percentFailed = stats.valid > 0 ? Math.round((stats.failed / stats.valid) * 100) : 0;
-                html += `
-                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                        <td class="px-5 py-4 font-bold text-slate-700">${reg}</td>
-                        <td class="px-5 py-4 font-bold text-lg text-blue-700 bg-blue-50/30">${stats.valid}</td>
-                        <td class="px-5 py-4 text-emerald-600 font-bold">${stats.achieved}</td>
-                        <td class="px-5 py-4 text-sm text-slate-500 font-medium">${percentAchieved}%</td>
-                        <td class="px-5 py-4 text-orange-600 font-bold">${stats.failed}</td>
-                        <td class="px-5 py-4 text-sm text-slate-500 font-medium">${percentFailed}%</td>
-                        <td class="px-5 py-4 font-bold text-red-500 bg-slate-50">${stats.excludedNew > 0 ? stats.excludedNew : '-'}</td>
-                    </tr>`;
-            });
-            if (sortedRegions.length === 0) html = `<tr><td colspan="7" class="text-center py-8 text-slate-500">لا توجد بيانات.</td></tr>`;
-            const tbody = document.getElementById('monthlyProgressTableBody'); if (tbody) tbody.innerHTML = html;
-        }
-
+        // --- Filter Setup UI ---
         function buildFilterUI() {
             let selectHtml = '<option value="">كل الأقاليم</option>';
             let checksHtml = '';
@@ -2152,6 +2218,10 @@
                 `;
             });
             document.getElementById('filterRegion').innerHTML = selectHtml;
+            document.getElementById('t1Region').innerHTML = selectHtml;
+            document.getElementById('t2Region').innerHTML = selectHtml;
+            document.getElementById('t3Region').innerHTML = selectHtml;
+            document.getElementById('t4Region').innerHTML = selectHtml;
             document.getElementById('supRegionFilter').innerHTML = supFilterHtml;
             document.getElementById('pathRegionFilter').innerHTML = pathFilterHtml;
             document.getElementById('regionExclusionContainer').innerHTML = checksHtml;
@@ -2162,7 +2232,52 @@
             else globalData.excludedRegions.add(checkbox.value);
             applyActiveFilters(); 
             renderTrainingPathTable(); 
-            renderKPITab(); // Refresh KPI when regions are excluded
+            renderKPITab(); 
+            if(document.getElementById('dashboardTab').classList.contains('active')) updateDashboardCharts();
+        }
+
+        // --- Tenure UI Functions ---
+        function updateTenureUI(tabPrefix) {
+            let sName = document.getElementById(`${tabPrefix}Search`).value.toLowerCase();
+            let sReg = document.getElementById(`${tabPrefix}Region`).value;
+            
+            let filtered = globalData.allActive.filter(e => {
+                let matchName = e.name.toLowerCase().includes(sName) || e.id.toLowerCase().includes(sName);
+                let matchReg = sReg === "" || e.region === sReg;
+                return matchName && matchReg;
+            });
+
+            let tData = [];
+            if(tabPrefix === 't1') tData = filtered.filter(e => e.tenureMonths >= 0 && e.tenureMonths < 3);
+            if(tabPrefix === 't2') tData = filtered.filter(e => e.tenureMonths >= 3 && e.tenureMonths <= 24);
+            if(tabPrefix === 't3') tData = filtered.filter(e => e.tenureMonths > 24);
+            if(tabPrefix === 't4') tData = filtered.filter(e => e.tenureMonths >= 3);
+
+            renderTable(tabPrefix, tData);
+        }
+
+        function exportTenureData(tabPrefix) {
+            let sName = document.getElementById(`${tabPrefix}Search`).value.toLowerCase();
+            let sReg = document.getElementById(`${tabPrefix}Region`).value;
+            
+            let filtered = globalData.allActive.filter(e => {
+                let matchName = e.name.toLowerCase().includes(sName) || e.id.toLowerCase().includes(sName);
+                let matchReg = sReg === "" || e.region === sReg;
+                return matchName && matchReg;
+            });
+
+            let tData = [];
+            let sheetName = "";
+            if(tabPrefix === 't1') { tData = filtered.filter(e => e.tenureMonths >= 0 && e.tenureMonths < 3); sheetName = "أقل من 3 شهور"; }
+            if(tabPrefix === 't2') { tData = filtered.filter(e => e.tenureMonths >= 3 && e.tenureMonths <= 24); sheetName = "من 3 لسنتين"; }
+            if(tabPrefix === 't3') { tData = filtered.filter(e => e.tenureMonths > 24); sheetName = "أكثر من سنتين"; }
+            if(tabPrefix === 't4') { tData = filtered.filter(e => e.tenureMonths >= 3); sheetName = "3 شهور فأكثر"; }
+
+            if(tData.length === 0) { alert("لا توجد بيانات لتصديرها."); return; }
+
+            let wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(generateEmployeeAOA(tData)), sheetName);
+            XLSX.writeFile(wb, `تقرير_${sheetName.replace(/ /g, '_')}.xlsx`);
         }
 
         function applyActiveFilters() {
@@ -2184,20 +2299,17 @@
                 return matchName && matchReg;
             });
 
-            let t1 = filtered.filter(e => e.tenureMonths >= 0 && e.tenureMonths < 3);
-            let t2 = filtered.filter(e => e.tenureMonths >= 3 && e.tenureMonths <= 24);
-            let t3 = filtered.filter(e => e.tenureMonths > 24);
-
             renderTable('active', filtered);
-            renderTable('t1', t1);
-            renderTable('t2', t2);
-            renderTable('t3', t3);
+            updateTenureUI('t1');
+            updateTenureUI('t2');
+            updateTenureUI('t3');
+            updateTenureUI('t4');
             renderNonCertTable(filtered);
             renderEliteTable(filtered, globalData.excludedEmployees, globalData.missingEmployees);
             renderComparisonTable(filtered);
 
             const excludedBody = document.getElementById('excludedTableBody');
-            if(excludedBody) excludedBody.innerHTML = globalData.excludedEmployees.map(e => `<tr><td class="px-6 py-4">${e.id}</td><td class="px-6 py-4">${e.name}</td><td class="px-6 py-4"><span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs">${e.status}</span></td></tr>`).join('');
+            if(excludedBody) excludedBody.innerHTML = globalData.excludedEmployees.map(e => `<tr><td class="px-6 py-4">${e.id}</td><td class="px-6 py-4">${e.name}</td><td class="px-6 py-4"><span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs">${e.status}</span></td><td class="px-6 py-4 text-xs text-slate-500">مستبعد بالحالة</td></tr>`).join('');
             
             const missingBody = document.getElementById('missingTableBody');
             if(missingBody) missingBody.innerHTML = globalData.missingEmployees.map(e => `<tr><td class="px-6 py-4 font-bold">${e.id}</td><td class="px-6 py-4">${e.name}</td><td class="px-6 py-4 font-bold text-indigo-600">${e.totalCerts}</td></tr>`).join('');
@@ -2787,10 +2899,12 @@
             let t1 = validActive.filter(e => e.tenureMonths >= 0 && e.tenureMonths < 3);
             let t2 = validActive.filter(e => e.tenureMonths >= 3 && e.tenureMonths <= 24);
             let t3 = validActive.filter(e => e.tenureMonths > 24);
+            let t4 = validActive.filter(e => e.tenureMonths >= 3);
             
             if(t1.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(generateEmployeeAOA(t1)), "أقل من 3 شهور");
             if(t2.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(generateEmployeeAOA(t2)), "من 3 لسنتين");
             if(t3.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(generateEmployeeAOA(t3)), "أكثر من سنتين");
+            if(t4.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(generateEmployeeAOA(t4)), "3 شهور فأكثر");
 
             let analysisAOA = [["الإقليم", "إجمالي الموظفين", `${targetCertsCount} شهادة فأكثر`, "النسبة %", `أقل من ${targetCertsCount}`, "النسبة %", "0 شهادة", "النسبة %"]];
             let tempRegions = {};
@@ -2849,6 +2963,232 @@
             
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(statAOA), "إحصائيات الإقليم");
             XLSX.writeFile(wb, `تقرير_${regionName}.xlsx`);
+        }
+
+        // Timeline Dashboard rendering helper
+        function renderTrainingPathTable() {
+            if (globalData.allActive.length === 0) return;
+
+            const pathRegion = document.getElementById('pathRegionFilter').value;
+            const pathSearch = document.getElementById('pathSearchFilter').value.toLowerCase();
+
+            let certCourses = trainingPathDef.filter(c => c.hasCert);
+            let nonCertCourses = trainingPathDef.filter(c => !c.hasCert);
+
+            let filteredEmployees = globalData.allActive.filter(emp => {
+                let matchReg = pathRegion === "" || emp.region === pathRegion;
+                let matchSearch = pathSearch === "" || emp.name.toLowerCase().includes(pathSearch) || emp.id.toString().includes(pathSearch);
+                let notGloballyExcluded = !globalData.excludedRegions.has(emp.region);
+                return matchReg && matchSearch && notGloballyExcluded;
+            });
+
+            let certBodyHtml = '';
+            let nonCertBodyHtml = '';
+
+            filteredEmployees.forEach(emp => {
+                let stopperCourse = null;
+                for (let i = 0; i < certCourses.length; i++) {
+                    if (!emp.pathProgress[certCourses[i].en]) {
+                        stopperCourse = certCourses[i];
+                        break;
+                    }
+                }
+
+                let stopperDisplay = stopperCourse ? `<span class="text-orange-600 font-bold whitespace-nowrap" title="${stopperCourse.ar}">${stopperCourse.certId}. ${stopperCourse.ar}</span>` : `<span class="text-emerald-600 font-bold whitespace-nowrap">✔ أتم المسار</span>`;
+
+                certBodyHtml += `<tr class="hover:bg-slate-50 transition border-b border-slate-100">`;
+                certBodyHtml += `<td class="px-4 py-3 font-bold text-slate-700 sticky-id">${emp.id}</td>`;
+                certBodyHtml += `<td class="px-4 py-3 font-bold text-slate-700 sticky-name truncate max-w-[180px]" title="${emp.name}">${emp.name}</td>`;
+                certBodyHtml += `<td class="px-4 py-3 text-slate-600 text-xs whitespace-nowrap">${emp.region}</td>`;
+                certBodyHtml += `<td class="px-4 py-3 text-right border-l border-slate-200">${stopperDisplay}</td>`;
+                
+                certCourses.forEach(c => {
+                    let isDone = emp.pathProgress[c.en];
+                    let isStopper = (stopperCourse && c.en === stopperCourse.en);
+                    let cellHtml = ''; let bgClass = '';
+                    if (isDone) { cellHtml = `✔`; bgClass = 'bg-emerald-50/30 text-emerald-500 font-bold text-lg'; } 
+                    else if (isStopper) { cellHtml = `•`; bgClass = 'bg-orange-50/30 text-orange-500 font-bold text-2xl leading-none'; } 
+                    else { cellHtml = `✗`; bgClass = 'text-slate-200 font-medium text-sm'; }
+                    certBodyHtml += `<td class="px-2 py-3 text-center border-l border-slate-50 ${bgClass}">${cellHtml}</td>`;
+                });
+                certBodyHtml += `</tr>`;
+
+
+                let nonCertDoneCount = 0;
+                nonCertCourses.forEach(c => { if(emp.pathProgress[c.en]) nonCertDoneCount++; });
+                
+                nonCertBodyHtml += `<tr class="hover:bg-slate-50 transition border-b border-slate-100">`;
+                nonCertBodyHtml += `<td class="px-4 py-3 font-bold text-slate-700 sticky-id">${emp.id}</td>`;
+                nonCertBodyHtml += `<td class="px-4 py-3 font-bold text-slate-700 sticky-name truncate max-w-[180px]" title="${emp.name}">${emp.name}</td>`;
+                nonCertBodyHtml += `<td class="px-4 py-3 text-slate-600 text-xs whitespace-nowrap">${emp.region}</td>`;
+                nonCertBodyHtml += `<td class="px-4 py-3 text-center font-bold text-indigo-600 border-l border-slate-200">${nonCertDoneCount} / ${nonCertCourses.length}</td>`;
+                
+                nonCertCourses.forEach(c => {
+                    let isDone = emp.pathProgress[c.en];
+                    let cellHtml = ''; let bgClass = '';
+                    if (isDone) { cellHtml = `✔`; bgClass = 'bg-emerald-50/30 text-emerald-500 font-bold text-lg'; } 
+                    else { cellHtml = `-`; bgClass = 'text-slate-300 font-medium text-lg leading-none'; }
+                    nonCertBodyHtml += `<td class="px-2 py-3 text-center border-l border-slate-50 ${bgClass}">${cellHtml}</td>`;
+                });
+                nonCertBodyHtml += `</tr>`;
+            });
+
+            if (filteredEmployees.length === 0) {
+                let emptyMsg = `<tr><td colspan="30" class="text-center py-8 text-slate-500">لا توجد بيانات مطابقة للبحث.</td></tr>`;
+                certBodyHtml = emptyMsg; nonCertBodyHtml = emptyMsg;
+            }
+
+            document.getElementById('pathCertTableBody').innerHTML = certBodyHtml;
+            document.getElementById('pathNonCertTableBody').innerHTML = nonCertBodyHtml;
+        }
+
+        function exportTrainingPath() {
+            const pathRegion = document.getElementById('pathRegionFilter').value;
+            const pathSearch = document.getElementById('pathSearchFilter').value.toLowerCase();
+            let certCourses = trainingPathDef.filter(c => c.hasCert);
+            let nonCertCourses = trainingPathDef.filter(c => !c.hasCert);
+
+            let filteredEmployees = globalData.allActive.filter(emp => {
+                let matchReg = pathRegion === "" || emp.region === pathRegion;
+                let matchSearch = pathSearch === "" || emp.name.toLowerCase().includes(pathSearch) || emp.id.toString().includes(pathSearch);
+                let notGloballyExcluded = !globalData.excludedRegions.has(emp.region);
+                return matchReg && matchSearch && notGloballyExcluded;
+            });
+
+            if(filteredEmployees.length === 0) return;
+
+            let wb = XLSX.utils.book_new();
+
+            let certAOA = [];
+            let certHeaders = ["الرقم الوظيفي", "الاسم", "الإقليم", "المسار الحالي (نقطة التوقف)"];
+            certCourses.forEach(c => certHeaders.push(`${c.certId}- ${c.ar}`));
+            certAOA.push(certHeaders);
+
+            filteredEmployees.forEach(emp => {
+                let stopperCourse = null;
+                for (let i = 0; i < certCourses.length; i++) {
+                    if (!emp.pathProgress[certCourses[i].en]) { stopperCourse = certCourses[i]; break; }
+                }
+                let stopperName = stopperCourse ? `${stopperCourse.certId}. ${stopperCourse.ar}` : "أتم المسار بالكامل";
+                
+                let row = [emp.id, emp.name, emp.region, stopperName];
+                certCourses.forEach(c => {
+                    let isDone = emp.pathProgress[c.en];
+                    let isStopper = (stopperCourse && c.en === stopperCourse.en);
+                    if (isDone) row.push("منجز");
+                    else if (isStopper) row.push("واقف عليها");
+                    else row.push("لم يصلها");
+                });
+                certAOA.push(row);
+            });
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(certAOA), "مسار الشهادات الأساسي");
+
+            let nonCertAOA = [];
+            let nonCertHeaders = ["الرقم الوظيفي", "الاسم", "الإقليم", "إجمالي المنجز"];
+            nonCertCourses.forEach(c => nonCertHeaders.push(`${c.ar}`));
+            nonCertAOA.push(nonCertHeaders);
+
+            filteredEmployees.forEach(emp => {
+                let countDone = 0;
+                nonCertCourses.forEach(c => { if(emp.pathProgress[c.en]) countDone++; });
+                
+                let row = [emp.id, emp.name, emp.region, countDone];
+                nonCertCourses.forEach(c => { row.push(emp.pathProgress[c.en] ? "منجز" : "-"); });
+                nonCertAOA.push(row);
+            });
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(nonCertAOA), "الدورات الداعمة");
+
+            XLSX.writeFile(wb, "تقرير_مسار_التدريب_الجديد.xlsx");
+        }
+        
+        function buildTrainingPathHeaders() {
+            let certCourses = trainingPathDef.filter(c => c.hasCert);
+            let nonCertCourses = trainingPathDef.filter(c => !c.hasCert);
+
+            let certHeaderHtml = `
+                <tr>
+                    <th class="px-4 py-4 font-semibold uppercase sticky-id text-right">الرقم الوظيفي</th>
+                    <th class="px-4 py-4 font-semibold uppercase sticky-name text-right">الاسم</th>
+                    <th class="px-4 py-4 font-semibold uppercase whitespace-nowrap">الإقليم</th>
+                    <th class="px-4 py-4 font-semibold uppercase whitespace-nowrap border-l border-slate-200">المسار الحالي 📍</th>
+            `;
+            certCourses.forEach(c => certHeaderHtml += `<th class="px-2 py-4 font-medium text-xs whitespace-normal min-w-[80px] border-l border-slate-200" title="${c.ar}">${c.certId}- ${c.ar}</th>`);
+            certHeaderHtml += `</tr>`;
+            document.getElementById('pathCertHeader').innerHTML = certHeaderHtml;
+
+            let nonCertHeaderHtml = `
+                <tr>
+                    <th class="px-4 py-4 font-semibold uppercase sticky-id text-right">الرقم الوظيفي</th>
+                    <th class="px-4 py-4 font-semibold uppercase sticky-name text-right">الاسم</th>
+                    <th class="px-4 py-4 font-semibold uppercase whitespace-nowrap">الإقليم</th>
+                    <th class="px-4 py-4 font-semibold uppercase text-center border-l border-slate-200">إجمالي المنجز</th>
+            `;
+            nonCertCourses.forEach(c => nonCertHeaderHtml += `<th class="px-2 py-4 font-medium text-xs whitespace-normal min-w-[120px] border-l border-slate-200" title="${c.ar}">${c.ar}</th>`);
+            nonCertHeaderHtml += `</tr>`;
+            document.getElementById('pathNonCertHeader').innerHTML = nonCertHeaderHtml;
+        }
+
+        function populateMonthSelect() {
+            const select = document.getElementById('progressMonthSelect');
+            if(!select) return;
+            select.innerHTML = '';
+            targetMonthsKeys.forEach(m => {
+                let opt = document.createElement('option'); opt.value = m; opt.text = m.replace('-', '/'); select.appendChild(opt);
+            });
+            if(targetMonthsKeys.length > 0) select.value = targetMonthsKeys[targetMonthsKeys.length - 1];
+        }
+
+        function renderTimelineDashboard() {
+            let maxDay = "-", maxDayCount = 0;
+            for(let date in globalData.timeline.daily) {
+                if(globalData.timeline.daily[date] > maxDayCount) { maxDayCount = globalData.timeline.daily[date]; maxDay = date; }
+            }
+
+            let maxWeek = "-", maxWeekCount = 0;
+            for(let week in globalData.timeline.weekly) {
+                if(globalData.timeline.weekly[week] > maxWeekCount) { maxWeekCount = globalData.timeline.weekly[week]; maxWeek = week; }
+            }
+
+            let peakHour = 0, peakHourCount = 0;
+            globalData.timeline.hourly.forEach((count, hour) => {
+                if(count > peakHourCount) { peakHourCount = count; peakHour = hour; }
+            });
+
+            let formattedPeakHour = `${peakHour % 12 || 12}:00 ${peakHour < 12 ? 'ص' : 'م'}`;
+
+            document.getElementById('topActiveDayDate').innerText = maxDay !== "-" ? maxDay : "لا توجد بيانات";
+            document.getElementById('topActiveDayCount').innerText = maxDayCount;
+            document.getElementById('topActiveWeek').innerText = maxWeek !== "-" ? maxWeek : "لا توجد بيانات";
+            document.getElementById('topActiveWeekCount').innerText = maxWeekCount;
+            document.getElementById('peakHourTime').innerText = peakHourCount > 0 ? formattedPeakHour : "لا توجد بيانات";
+            document.getElementById('peakHourCount').innerText = peakHourCount;
+
+            const hourlyLabels = Array.from({length: 24}, (_, i) => `${i % 12 || 12} ${i < 12 ? 'ص' : 'م'}`);
+            
+            if (hourlyChartInstance) hourlyChartInstance.destroy();
+            const ctxHourly = document.getElementById('hourlyChart').getContext('2d');
+            hourlyChartInstance = new Chart(ctxHourly, {
+                type: 'bar',
+                data: {
+                    labels: hourlyLabels,
+                    datasets: [{ label: 'عدد الشهادات المكتسبة', data: globalData.timeline.hourly, backgroundColor: 'rgba(99, 102, 241, 0.7)', borderColor: 'rgb(79, 70, 229)', borderWidth: 1, borderRadius: 4 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+            });
+
+            let sortedDates = Object.keys(globalData.timeline.daily).sort();
+            let dailyDataCounts = sortedDates.map(date => globalData.timeline.daily[date]);
+
+            if (dailyChartInstance) dailyChartInstance.destroy();
+            const ctxDaily = document.getElementById('dailyChart').getContext('2d');
+            dailyChartInstance = new Chart(ctxDaily, {
+                type: 'line',
+                data: {
+                    labels: sortedDates,
+                    datasets: [{ label: 'الشهادات المكتسبة', data: dailyDataCounts, fill: true, backgroundColor: 'rgba(16, 185, 129, 0.1)', borderColor: 'rgb(16, 185, 129)', tension: 0.3, pointBackgroundColor: 'rgb(16, 185, 129)', borderWidth: 2 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+            });
         }
     </script>
 </body>
