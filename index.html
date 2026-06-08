@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منظومة مطابقة القوى والأكاديمية - المطور</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- تم استبدال مكتبة xlsx العادية بنسخة تدعم التنسيقات (xlsx-js-style) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -1065,6 +1066,68 @@
     </div>
 
     <script>
+        // دالة التنسيق المركزية للجداول المصدرة لملف Excel
+        function applyExcelStyles(ws) {
+            if(!ws || !ws['!ref']) return;
+            const range = XLSX.utils.decode_range(ws['!ref']);
+            
+            for (let R = range.s.r; R <= range.e.r; ++R) {
+                for (let C = range.s.c; C <= range.e.c; ++C) {
+                    const cellAddress = {c: C, r: R};
+                    const cellRef = XLSX.utils.encode_cell(cellAddress);
+                    
+                    if (!ws[cellRef]) continue;
+                    if (!ws[cellRef].s) ws[cellRef].s = {};
+
+                    // تسطير كامل لجميع الخلايا (Borders)
+                    ws[cellRef].s.border = {
+                        top: { style: "thin", color: { rgb: "000000" } },
+                        bottom: { style: "thin", color: { rgb: "000000" } },
+                        left: { style: "thin", color: { rgb: "000000" } },
+                        right: { style: "thin", color: { rgb: "000000" } }
+                    };
+
+                    // محاذاة في المنتصف
+                    ws[cellRef].s.alignment = {
+                        vertical: "center",
+                        horizontal: "center",
+                        wrapText: true
+                    };
+
+                    // تنسيقات صف العناوين الأول (اللون الرصاصي الغامق والخط الأبيض العريض)
+                    if (R === 0) {
+                        ws[cellRef].s.fill = {
+                            patternType: "solid",
+                            fgColor: { rgb: "595959" } // رصاصي غامق
+                        };
+                        ws[cellRef].s.font = {
+                            bold: true,
+                            color: { rgb: "FFFFFF" }, // أبيض
+                            sz: 12
+                        };
+                    } else {
+                        // تنسيقات باقي البيانات
+                        ws[cellRef].s.font = {
+                            sz: 11
+                        };
+                    }
+                }
+            }
+
+            // تحديد عرض تقريبي للأعمدة ليكون الشكل واضحاً
+            let cols = [];
+            for (let C = range.s.c; C <= range.e.c; ++C) {
+                cols.push({ wch: 18 });
+            }
+            ws['!cols'] = cols;
+
+            // تفعيل اتجاه الصفحة من اليمين لليسار (RTL)
+            if(!ws['!views']) ws['!views'] = [];
+            ws['!views'].push({ rightToLeft: true });
+            
+            return ws;
+        }
+
         // Chart instances
         let hourlyChartInstance = null;
         let dailyChartInstance = null;
@@ -2055,7 +2118,9 @@
                 aoa.push([e.id, e.name, e.region, track, progress, isAch ? "مكتمل" : "غير مكتمل"]);
             });
 
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), "بيانات المشرف");
+            let ws = XLSX.utils.aoa_to_sheet(aoa);
+            applyExcelStyles(ws);
+            XLSX.utils.book_append_sheet(wb, ws, "بيانات المشرف");
             XLSX.writeFile(wb, `تقييم_المشرف_${currentKpiSupervisor.replace(/ /g, '_')}.xlsx`);
         }
 
@@ -2276,7 +2341,9 @@
             if(tData.length === 0) { alert("لا توجد بيانات لتصديرها."); return; }
 
             let wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(generateEmployeeAOA(tData)), sheetName);
+            let ws = XLSX.utils.aoa_to_sheet(generateEmployeeAOA(tData));
+            applyExcelStyles(ws);
+            XLSX.utils.book_append_sheet(wb, ws, sheetName);
             XLSX.writeFile(wb, `تقرير_${sheetName.replace(/ /g, '_')}.xlsx`);
         }
 
@@ -2457,7 +2524,9 @@
                 ]);
             });
             let sheetName = currentModalSupData.name.substring(0, 25);
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), sheetName);
+            let ws = XLSX.utils.aoa_to_sheet(aoa);
+            applyExcelStyles(ws);
+            XLSX.utils.book_append_sheet(wb, ws, sheetName);
             XLSX.writeFile(wb, `تقرير_${currentModalSupData.name}.xlsx`);
         }
 
@@ -2474,7 +2543,9 @@
                 }
                 aoa.push(row);
             });
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), "تقييم المشرفين");
+            let ws = XLSX.utils.aoa_to_sheet(aoa);
+            applyExcelStyles(ws);
+            XLSX.utils.book_append_sheet(wb, ws, "تقييم المشرفين");
             XLSX.writeFile(wb, "تقرير_تقييم_المشرفين.xlsx");
         }
 
@@ -2843,7 +2914,9 @@
 
             let misAOA = [["الرقم الوظيفي", "الاسم بالاكاديمية", "عدد الشهادات"]];
             globalData.missingEmployees.forEach(e => misAOA.push([e.id, e.name, e.totalCerts]));
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(misAOA), "في الأكاديمية فقط");
+            let ws1 = XLSX.utils.aoa_to_sheet(misAOA);
+            applyExcelStyles(ws1);
+            XLSX.utils.book_append_sheet(wb, ws1, "في الأكاديمية فقط");
 
             let searchInput = document.getElementById('searchName') ? document.getElementById('searchName').value.toLowerCase() : "";
             let sReg = document.getElementById('filterRegion') ? document.getElementById('filterRegion').value : "";
@@ -2856,7 +2929,9 @@
 
             let missingAcAOA = [["الرقم الوظيفي", "الاسم بالقوى", "الإقليم", "المشرف", "حالة الموظف"]];
             filteredMissingFromAc.forEach(e => missingAcAOA.push([e.id, e.name, e.region, e.supervisor, e.status]));
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(missingAcAOA), "في القوى فقط");
+            let ws2 = XLSX.utils.aoa_to_sheet(missingAcAOA);
+            applyExcelStyles(ws2);
+            XLSX.utils.book_append_sheet(wb, ws2, "في القوى فقط");
 
             XLSX.writeFile(wb, "تقرير_عدم_التطابق_بين_الأنظمة.xlsx");
         }
@@ -2879,14 +2954,18 @@
                 let desc = count === 3 ? "استكمل بالكامل" : (count > 0 ? "جزء" : "لم يستكمل");
                 aoa.push([emp.id, emp.name, emp.email || "", emp.region, hasC1 ? "نعم" : "لا", hasC2 ? "نعم" : "لا", hasC3 ? "نعم" : "لا", count, desc]);
             });
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), "تقرير دورات النخبة");
+            let ws = XLSX.utils.aoa_to_sheet(aoa);
+            applyExcelStyles(ws);
+            XLSX.utils.book_append_sheet(wb, ws, "تقرير دورات النخبة");
             XLSX.writeFile(wb, "تقرير_دورات_النخبة.xlsx");
         }
 
         function exportAllData() {
             let wb = XLSX.utils.book_new();
             let validActive = globalData.allActive.filter(e => !globalData.excludedRegions.has(e.region));
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(generateEmployeeAOA(validActive)), "جميع البائعين المعتمدين");
+            let wsAll = XLSX.utils.aoa_to_sheet(generateEmployeeAOA(validActive));
+            applyExcelStyles(wsAll);
+            XLSX.utils.book_append_sheet(wb, wsAll, "جميع البائعين المعتمدين");
             
             let nonCertAOA = [["الرقم الوظيفي", "الاسم", "الإقليم", ...nonCertCoursesKeys]];
             validActive.forEach(emp => {
@@ -2894,17 +2973,19 @@
                 nonCertCoursesKeys.forEach(c => { let p = emp.nonCertProgress[c]; row.push(p !== null ? p + "%" : "-"); });
                 nonCertAOA.push(row);
             });
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(nonCertAOA), "دورات بدون شهادات");
+            let wsNonCert = XLSX.utils.aoa_to_sheet(nonCertAOA);
+            applyExcelStyles(wsNonCert);
+            XLSX.utils.book_append_sheet(wb, wsNonCert, "دورات بدون شهادات");
 
             let t1 = validActive.filter(e => e.tenureMonths >= 0 && e.tenureMonths < 3);
             let t2 = validActive.filter(e => e.tenureMonths >= 3 && e.tenureMonths <= 24);
             let t3 = validActive.filter(e => e.tenureMonths > 24);
             let t4 = validActive.filter(e => e.tenureMonths >= 3);
             
-            if(t1.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(generateEmployeeAOA(t1)), "أقل من 3 شهور");
-            if(t2.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(generateEmployeeAOA(t2)), "من 3 لسنتين");
-            if(t3.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(generateEmployeeAOA(t3)), "أكثر من سنتين");
-            if(t4.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(generateEmployeeAOA(t4)), "3 شهور فأكثر");
+            if(t1.length) { let ws = XLSX.utils.aoa_to_sheet(generateEmployeeAOA(t1)); applyExcelStyles(ws); XLSX.utils.book_append_sheet(wb, ws, "أقل من 3 شهور"); }
+            if(t2.length) { let ws = XLSX.utils.aoa_to_sheet(generateEmployeeAOA(t2)); applyExcelStyles(ws); XLSX.utils.book_append_sheet(wb, ws, "من 3 لسنتين"); }
+            if(t3.length) { let ws = XLSX.utils.aoa_to_sheet(generateEmployeeAOA(t3)); applyExcelStyles(ws); XLSX.utils.book_append_sheet(wb, ws, "أكثر من سنتين"); }
+            if(t4.length) { let ws = XLSX.utils.aoa_to_sheet(generateEmployeeAOA(t4)); applyExcelStyles(ws); XLSX.utils.book_append_sheet(wb, ws, "3 شهور فأكثر"); }
 
             let analysisAOA = [["الإقليم", "إجمالي الموظفين", `${targetCertsCount} شهادة فأكثر`, "النسبة %", `أقل من ${targetCertsCount}`, "النسبة %", "0 شهادة", "النسبة %"]];
             let tempRegions = {};
@@ -2918,19 +2999,27 @@
                 let s = tempRegions[reg];
                 analysisAOA.push([reg, s.total, s.overTarget, (s.total?Math.round((s.overTarget/s.total)*100):0)+'%', s.lessTarget, (s.total?Math.round((s.lessTarget/s.total)*100):0)+'%', s.zero, (s.total?Math.round((s.zero/s.total)*100):0)+'%']);
             }
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(analysisAOA), "تحليل الأقاليم المعتمدة");
+            let wsAnalysis = XLSX.utils.aoa_to_sheet(analysisAOA);
+            applyExcelStyles(wsAnalysis);
+            XLSX.utils.book_append_sheet(wb, wsAnalysis, "تحليل الأقاليم المعتمدة");
 
             let excAOA = [["الرقم الوظيفي", "الاسم", "الحالة"]];
             globalData.excludedEmployees.forEach(e => excAOA.push([e.id, e.name, e.status]));
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(excAOA), "المستبعدين");
+            let wsExc = XLSX.utils.aoa_to_sheet(excAOA);
+            applyExcelStyles(wsExc);
+            XLSX.utils.book_append_sheet(wb, wsExc, "المستبعدين");
 
             let misAOA = [["الرقم الوظيفي", "الاسم بالاكاديمية", "عدد الشهادات"]];
             globalData.missingEmployees.forEach(e => misAOA.push([e.id, e.name, e.totalCerts]));
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(misAOA), "بالأكاديمية فقط");
+            let wsMis = XLSX.utils.aoa_to_sheet(misAOA);
+            applyExcelStyles(wsMis);
+            XLSX.utils.book_append_sheet(wb, wsMis, "بالأكاديمية فقط");
 
             let missingAcAOA = [["الرقم الوظيفي", "الاسم بالقوى", "الإقليم", "المشرف", "حالة الموظف"]];
             globalData.missingFromAcademy.forEach(e => missingAcAOA.push([e.id, e.name, e.region, e.supervisor, e.status]));
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(missingAcAOA), "بالقوى فقط");
+            let wsMisAc = XLSX.utils.aoa_to_sheet(missingAcAOA);
+            applyExcelStyles(wsMisAc);
+            XLSX.utils.book_append_sheet(wb, wsMisAc, "بالقوى فقط");
 
             XLSX.writeFile(wb, "التحليل_الشامل_الحديث.xlsx");
         }
@@ -2940,7 +3029,9 @@
             if (!employees.length) return;
 
             let wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(generateEmployeeAOA(employees)), "بائعين " + regionName.substring(0,20));
+            let ws1 = XLSX.utils.aoa_to_sheet(generateEmployeeAOA(employees));
+            applyExcelStyles(ws1);
+            XLSX.utils.book_append_sheet(wb, ws1, "بائعين " + regionName.substring(0,20));
 
             let nonCertAOA = [["الرقم الوظيفي", "الاسم", "الإقليم", ...nonCertCoursesKeys]];
             employees.forEach(emp => {
@@ -2948,7 +3039,9 @@
                 nonCertCoursesKeys.forEach(c => { let p = emp.nonCertProgress[c]; row.push(p !== null ? p + "%" : "-"); });
                 nonCertAOA.push(row);
             });
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(nonCertAOA), "دورات بدون شهادات");
+            let ws2 = XLSX.utils.aoa_to_sheet(nonCertAOA);
+            applyExcelStyles(ws2);
+            XLSX.utils.book_append_sheet(wb, ws2, "دورات بدون شهادات");
 
             let total = employees.length, overTarget = 0, lessTarget = 0, zero = 0;
             employees.forEach(e => { if (e.totalCerts >= targetCertsCount) overTarget++; else if (e.totalCerts > 0) lessTarget++; else zero++; });
@@ -2961,7 +3054,9 @@
                 ["لم يحصلوا على أي شهادة (0)", zero, (total?Math.round((zero/total)*100):0) + "%"]
             ];
             
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(statAOA), "إحصائيات الإقليم");
+            let ws3 = XLSX.utils.aoa_to_sheet(statAOA);
+            applyExcelStyles(ws3);
+            XLSX.utils.book_append_sheet(wb, ws3, "إحصائيات الإقليم");
             XLSX.writeFile(wb, `تقرير_${regionName}.xlsx`);
         }
 
@@ -3081,7 +3176,9 @@
                 });
                 certAOA.push(row);
             });
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(certAOA), "مسار الشهادات الأساسي");
+            let ws1 = XLSX.utils.aoa_to_sheet(certAOA);
+            applyExcelStyles(ws1);
+            XLSX.utils.book_append_sheet(wb, ws1, "مسار الشهادات الأساسي");
 
             let nonCertAOA = [];
             let nonCertHeaders = ["الرقم الوظيفي", "الاسم", "الإقليم", "إجمالي المنجز"];
@@ -3096,7 +3193,9 @@
                 nonCertCourses.forEach(c => { row.push(emp.pathProgress[c.en] ? "منجز" : "-"); });
                 nonCertAOA.push(row);
             });
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(nonCertAOA), "الدورات الداعمة");
+            let ws2 = XLSX.utils.aoa_to_sheet(nonCertAOA);
+            applyExcelStyles(ws2);
+            XLSX.utils.book_append_sheet(wb, ws2, "الدورات الداعمة");
 
             XLSX.writeFile(wb, "تقرير_مسار_التدريب_الجديد.xlsx");
         }
