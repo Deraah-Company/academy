@@ -2471,7 +2471,7 @@
                 if (emp.isEliteTarget) {
                     let completedElite = getEliteCompletedCount(emp);
                     let remainingElite = Math.max(0, 3 - completedElite);
-                    eliteRows.push([region, manager, supervisor, emp.id, emp.name, completedElite, remainingElite, completedElite === 3 ? 1 : 0, roundKpiValue((completedElite / 3) * 100)]);
+                    eliteRows.push([region, manager, supervisor, emp.id, emp.name, completedElite, remainingElite, completedElite === 3 ? 1 : 0, completedElite === 3 ? 100 : 0]);
                 }
 
                 if (emp.tenureMonths >= 3) {
@@ -2484,21 +2484,14 @@
                 let less3 = group.employees.filter(e => e.tenureMonths >= 0 && e.tenureMonths < 3);
                 let elite = group.employees.filter(e => e.isEliteTarget);
                 let more3 = group.employees.filter(e => e.tenureMonths >= 3);
-                let improvement = group.employees.filter(hasBotEnrollment);
+                const kpiSummary = getSupervisorKpiSummary(group.employees);
 
                 let less3Completed = less3.filter(e => e.totalCerts >= less3KpiTarget).length;
-                let less3Avg = less3.length ? averageNumber(less3.map(e => e.totalCerts >= less3KpiTarget ? 100 : 0)) : 0;
                 let eliteFull = elite.filter(e => getEliteCompletedCount(e) === 3).length;
-                let eliteAvg = elite.length ? averageNumber(elite.map(e => (getEliteCompletedCount(e) / 3) * 100)) : 0;
                 let more3Completed = more3.filter(e => e.totalCerts >= targetCertsCount).length;
-                let more3Avg = more3.length ? averageNumber(more3.map(e => e.totalCerts >= targetCertsCount ? 100 : 0)) : 0;
-                let improvementAvg = improvement.length ? averageNumber(improvement.map(e => getBotImprovementSummary(e).score)) : 0;
-                let supervisorAxes = [];
-                if (less3.length) supervisorAxes.push(less3Avg);
-                if (elite.length) supervisorAxes.push(eliteAvg);
-                if (more3.length) supervisorAxes.push(more3Avg);
-                if (improvement.length) supervisorAxes.push(improvementAvg);
-                let supervisorKpi = supervisorAxes.length ? averageNumber(supervisorAxes) : 0;
+                let eliteAvg = kpiSummary.elite === null ? 0 : kpiSummary.elite;
+                let more3Avg = kpiSummary.more3 === null ? 0 : kpiSummary.more3;
+                let supervisorKpi = kpiSummary.overall;
 
                 return [
                     group.region,
@@ -2768,11 +2761,11 @@
                 [styledCell("شرح حساب KPI وشرح التابات الموجودة في ملف Pivot.", styles.note)],
                 [],
                 [styledCell("طريقة حساب KPI", styles.section)],
-                [styledCell("النخبة: KPI الشخص = عدد دورات النخبة المنجزة ÷ 3 × 100. من يكمل 3/3 يأخذ 100%، ومن تنقصه دورة أو أكثر تنخفض نسبته بنفس النسبة.", styles.note)],
+                [styledCell("النخبة: الموظف الذي يكمل 3/3 يأخذ 100%، وأي موظف أقل من 3/3 يأخذ 0%. KPI المسار هو نسبة الموظفين المكملين 3/3 من إجمالي المستهدفين.", styles.note)],
                 [styledCell(`3 شهور فأكثر: من يحقق ${targetCertsCount} دورة أو المستهدف الحالي يأخذ 100%، وغير المكتمل يأخذ 0% داخل هذا المسار.`, styles.note)],
                 [styledCell("مسار التحسين (BOT): الموظف يأخذ 100% فقط عندما تكون كل دورات BOT المسجل عليها مكتملة بنسبة 100%، وإلا يأخذ 0%. KPI المسار هو متوسط درجات الموظفين.", styles.note)],
                 [styledCell(`أقل من 3 شهور: الموظف الذي يحقق ${less3KpiTarget} شهادات أو أكثر يأخذ 100%، ومن لم يحققها يأخذ 0%، ويدخل متوسط هذا المسار في KPI المشرف.`, styles.note)],
-                [styledCell("KPI المشرف = متوسط مسار أقل من 3 شهور ومسار النخبة ومسار 3 شهور فأكثر ومسار التحسين عند وجودهم. مدير الإقليم = متوسط KPI المشرفين التابعين له.", styles.note)],
+                [styledCell("KPI المشرف = المتوسط الحسابي للمسارات المتاحة فقط: أقل من 3 شهور، النخبة، 3 شهور فأكثر، والتحسين. المسار الذي لا يوجد به موظفون لا يدخل في القسمة. مدير الإقليم = متوسط KPI المشرفين التابعين له.", styles.note)],
                 [],
                 [styledCell("شرح التابات", styles.section)],
                 [styledCell("التاب", styles.header), styledCell("الشرح", styles.header)],
@@ -2929,7 +2922,7 @@
                             completedElite,
                             3,
                             missingElite.join("، "),
-                            roundKpiValue((completedElite / 3) * 100)
+                            0
                         ]);
                     }
                 }
@@ -4547,7 +4540,7 @@
             let wb = XLSX.utils.book_new();
 
             let certAOA = [];
-            let certHeaders = ["الرقم الوظيفي", "الاسم", "المشرف", "الإقليم", "المسار الحالي (نقطة التوقف)"];
+            let certHeaders = ["الرقم الوظيفي", "الاسم", "المشرف", "الإقليم", "المسار الحالي (نقطة التوقف)", "إجمالي الشهادات"];
             certCourses.forEach(c => certHeaders.push(`${c.certId}- ${c.ar}`));
             certAOA.push(certHeaders);
 
@@ -4558,7 +4551,7 @@
                 }
                 let stopperName = stopperCourse ? `${stopperCourse.certId}. ${stopperCourse.ar}` : "أتم المسار بالكامل";
                 
-                let row = [emp.id, emp.name, emp.supervisor || "بدون مشرف", emp.region, stopperName];
+                let row = [emp.id, emp.name, emp.supervisor || "بدون مشرف", emp.region, stopperName, emp.totalCerts];
                 certCourses.forEach(c => {
                     let isDone = emp.pathProgress[c.en];
                     let isStopper = (stopperCourse && c.en === stopperCourse.en);
