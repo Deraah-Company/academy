@@ -52,6 +52,103 @@
         
         .collapsible-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
         .collapsible-content.expanded { max-height: 500px; /* Adjust as needed */ }
+
+        /* Professional dual-layout workspace */
+        .new-layout-only { display: none !important; }
+        .layout-mode-btn { transition: all 0.2s ease; }
+        .layout-mode-btn.active { background: #0f172a; color: #fff; box-shadow: 0 8px 20px rgba(15, 23, 42, 0.18); }
+        body.new-layout { background: linear-gradient(145deg, #f8fafc 0%, #eef2ff 48%, #f8fafc 100%); }
+        body.new-layout .new-layout-only { display: flex !important; }
+        body.new-layout #resultsSection {
+            display: grid !important;
+            grid-template-columns: minmax(0, 1fr) 260px;
+            direction: ltr;
+            align-items: start;
+            overflow: visible;
+            border: 1px solid #dbe3f0;
+            box-shadow: 0 24px 55px -35px rgba(15, 23, 42, 0.45);
+        }
+        body.new-layout #resultsSection.hidden { display: none !important; }
+        body.new-layout #mainTabsNavigation {
+            direction: rtl;
+            grid-column: 2;
+            grid-row: 1;
+            position: sticky;
+            top: 16px;
+            max-height: calc(100vh - 32px);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            gap: 6px;
+            padding: 18px 14px;
+            border: 0;
+            border-left: 1px solid #e2e8f0;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 0 1rem 1rem 0;
+        }
+        body.new-layout #mainTabsNavigation .tab-btn {
+            width: 100%;
+            min-height: 48px;
+            justify-content: flex-start;
+            text-align: right;
+            padding: 11px 13px !important;
+            border: 1px solid transparent !important;
+            border-radius: 11px;
+            background: transparent !important;
+            color: #475569 !important;
+            font-weight: 650;
+        }
+        body.new-layout #mainTabsNavigation .tab-btn i {
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: #f1f5f9;
+            color: #6366f1;
+        }
+        body.new-layout #mainTabsNavigation .tab-btn:hover { background: #f1f5f9 !important; color: #0f172a !important; }
+        body.new-layout #mainTabsNavigation .tab-btn.active {
+            background: linear-gradient(135deg, #312e81, #4f46e5) !important;
+            color: #fff !important;
+            border-color: #4338ca !important;
+            box-shadow: 0 10px 22px -12px rgba(67, 56, 202, 0.9);
+        }
+        body.new-layout #mainTabsNavigation .tab-btn.active i { background: rgba(255,255,255,.16); color: #fff; }
+        body.new-layout #mainTabsContent {
+            direction: rtl;
+            grid-column: 1;
+            grid-row: 1;
+            min-width: 0;
+            min-height: 720px;
+            padding: 28px !important;
+            background: rgba(255,255,255,.96);
+            border-radius: 1rem 0 0 1rem;
+        }
+        body.new-layout #mainTabsContent > .tab-content.active { animation: professionalFade 0.28s ease-out; }
+        body.new-layout .new-layout-local-filter { display: none !important; }
+        body.new-layout .professional-stat-card { box-shadow: 0 14px 30px -22px rgba(15,23,42,.45); }
+        @keyframes professionalFade { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+
+        @media (max-width: 1024px) {
+            body.new-layout #resultsSection { display: block !important; overflow: hidden; }
+            body.new-layout #resultsSection.hidden { display: none !important; }
+            body.new-layout #mainTabsNavigation {
+                position: static;
+                max-height: none;
+                display: flex;
+                flex-direction: row;
+                overflow-x: auto;
+                padding: 12px;
+                border-left: 0;
+                border-bottom: 1px solid #e2e8f0;
+                border-radius: 1rem 1rem 0 0;
+            }
+            body.new-layout #mainTabsNavigation .tab-btn { width: auto; min-width: max-content; }
+            body.new-layout #mainTabsContent { min-height: 0; border-radius: 0 0 1rem 1rem; padding: 18px !important; }
+        }
     </style>
 </head>
 <body class="text-slate-800">
@@ -198,10 +295,35 @@
             </div>
         </div>
 
+        <div id="layoutModeSwitcher" class="bg-white/95 backdrop-blur shadow-sm rounded-2xl p-4 mb-5 border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-sm"><i class="fas fa-layer-group"></i></div>
+                <div>
+                    <h3 class="font-extrabold text-slate-800">طريقة عرض البرنامج</h3>
+                    <p id="layoutModeHint" class="text-xs text-slate-500 mt-1">اختَر الشكل المناسب لطريقة عملك.</p>
+                </div>
+            </div>
+            <div class="inline-flex bg-slate-100 border border-slate-200 rounded-xl p-1 gap-1 self-stretch md:self-auto">
+                <button id="oldLayoutBtn" type="button" onclick="setLayoutMode('old')" class="layout-mode-btn flex-1 md:flex-none px-5 py-2.5 rounded-lg text-sm font-bold text-slate-600">
+                    <i class="fas fa-table-columns ml-2"></i> الشكل القديم
+                </button>
+                <button id="newLayoutBtn" type="button" onclick="setLayoutMode('new')" class="layout-mode-btn flex-1 md:flex-none px-5 py-2.5 rounded-lg text-sm font-bold text-slate-600">
+                    <i class="fas fa-bars-staggered ml-2"></i> الشكل الجديد
+                </button>
+            </div>
+        </div>
+
         <div id="resultsSection" class="bg-white shadow-sm rounded-2xl border border-slate-100 overflow-hidden hidden">
             
-            <div class="flex flex-wrap border-b border-slate-200 bg-slate-50/50">
-                <button class="tab-btn active px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'activeTab')">
+            <div id="mainTabsNavigation" class="flex flex-wrap border-b border-slate-200 bg-slate-50/50">
+                <div class="new-layout-only flex-col px-2 pb-3 mb-1 border-b border-slate-200">
+                    <span class="text-xs font-bold text-indigo-500 tracking-wide">لوحة الأكاديمية</span>
+                    <span id="sidebarRegionBadge" class="text-sm font-extrabold text-slate-800 mt-1">كل الأقاليم</span>
+                </div>
+                <button id="globalFilterTabBtn" class="tab-btn new-layout-only px-5 py-4 focus:outline-none items-center text-sm md:text-base" onclick="switchTab(event, 'globalFilterTab')">
+                    <i class="fas fa-sliders ml-2"></i> الفلترة المركزية
+                </button>
+                <button id="activeTabBtn" class="tab-btn active px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'activeTab')">
                     <i class="fas fa-user-check ml-2"></i> على رأس العمل
                 </button>
                 <button class="tab-btn px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'tenure1Tab')">
@@ -260,7 +382,56 @@
                 </button>
             </div>
 
-            <div class="p-6 md:p-8">
+            <div id="mainTabsContent" class="p-6 md:p-8">
+                <div id="globalFilterTab" class="tab-content">
+                    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-indigo-950 to-indigo-800 text-white p-6 md:p-8 mb-7 shadow-xl">
+                        <div class="absolute -top-24 -left-20 w-64 h-64 rounded-full bg-violet-500/20 blur-3xl"></div>
+                        <div class="absolute -bottom-28 right-20 w-72 h-72 rounded-full bg-cyan-400/10 blur-3xl"></div>
+                        <div class="relative z-10 flex flex-col xl:flex-row xl:items-end justify-between gap-6">
+                            <div>
+                                <span class="inline-flex items-center gap-2 text-xs font-bold bg-white/10 border border-white/15 rounded-full px-3 py-1.5 mb-4"><i class="fas fa-filter"></i> فلتر واحد لكل البرنامج</span>
+                                <h2 class="text-3xl font-extrabold">اختر الإقليم المطلوب</h2>
+                                <p class="text-indigo-100 mt-2 max-w-2xl">الاختيار هنا يطبّق تلقائياً على الجداول، مؤشرات الأداء، المقارنات، المشرفين، مسارات التدريب والتصدير.</p>
+                            </div>
+                            <div class="bg-white/10 border border-white/20 rounded-2xl p-3 min-w-full xl:min-w-[340px] backdrop-blur">
+                                <label for="globalFilterRegionSelect" class="block text-xs font-bold text-indigo-100 mb-2">الإقليم المطبّق حالياً</label>
+                                <select id="globalFilterRegionSelect" onchange="applyGlobalRegionFilter(this.value)" class="w-full bg-white text-slate-900 rounded-xl px-4 py-3 font-extrabold outline-none focus:ring-4 focus:ring-indigo-300/30">
+                                    <option value="">كل الأقاليم</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-7">
+                        <div class="professional-stat-card bg-white border border-slate-200 rounded-2xl p-5">
+                            <div class="flex items-center justify-between"><span class="text-sm font-bold text-slate-500">الموظفون النشطون</span><i class="fas fa-users text-indigo-500 bg-indigo-50 p-3 rounded-xl"></i></div>
+                            <p id="globalFilterActiveCount" class="text-3xl font-black text-slate-900 mt-3">0</p>
+                        </div>
+                        <div class="professional-stat-card bg-white border border-slate-200 rounded-2xl p-5">
+                            <div class="flex items-center justify-between"><span class="text-sm font-bold text-slate-500">إجمالي الشهادات</span><i class="fas fa-certificate text-emerald-500 bg-emerald-50 p-3 rounded-xl"></i></div>
+                            <p id="globalFilterCertificatesCount" class="text-3xl font-black text-slate-900 mt-3">0</p>
+                        </div>
+                        <div class="professional-stat-card bg-white border border-slate-200 rounded-2xl p-5">
+                            <div class="flex items-center justify-between"><span class="text-sm font-bold text-slate-500">عدد المشرفين</span><i class="fas fa-user-tie text-blue-500 bg-blue-50 p-3 rounded-xl"></i></div>
+                            <p id="globalFilterSupervisorsCount" class="text-3xl font-black text-slate-900 mt-3">0</p>
+                        </div>
+                        <div class="professional-stat-card bg-white border border-slate-200 rounded-2xl p-5">
+                            <div class="flex items-center justify-between"><span class="text-sm font-bold text-slate-500">محققو المستهدف</span><i class="fas fa-bullseye text-amber-500 bg-amber-50 p-3 rounded-xl"></i></div>
+                            <p id="globalFilterAchievedCount" class="text-3xl font-black text-slate-900 mt-3">0</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5">
+                        <div class="flex items-center justify-between gap-3 mb-4">
+                            <div>
+                                <h3 class="font-extrabold text-slate-800">اختيار سريع</h3>
+                                <p class="text-xs text-slate-500 mt-1">اضغط على أي إقليم لتطبيقه مباشرة.</p>
+                            </div>
+                            <button type="button" onclick="applyGlobalRegionFilter('')" class="text-sm font-bold text-indigo-700 bg-white border border-indigo-200 hover:bg-indigo-50 rounded-xl px-4 py-2">عرض الكل</button>
+                        </div>
+                        <div id="globalRegionCards" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+                    </div>
+                </div>
                 
                 <div id="activeTab" class="tab-content active">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
@@ -269,7 +440,7 @@
                             <span id="activeCount" class="mr-3 bg-indigo-100 text-indigo-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
                         </h2>
                         
-                        <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+                        <div class="new-layout-local-filter flex flex-col md:flex-row gap-3 w-full md:w-auto">
                             <div class="relative">
                                 <i class="fas fa-search absolute right-3 top-3 text-slate-400"></i>
                                 <input type="text" id="searchName" onkeyup="applyActiveFilters()" placeholder="بحث بالاسم أو الرقم..." class="pl-4 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 w-full md:w-64">
@@ -302,8 +473,8 @@
                             <span id="t1Count" class="mr-2 bg-orange-100 text-orange-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
                         </h2>
                         <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
-                            <input type="text" id="t1Search" onkeyup="updateTenureUI('t1')" placeholder="بحث..." class="pl-4 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-1 focus:ring-indigo-500">
-                            <select id="t1Region" onchange="updateTenureUI('t1')" class="px-4 py-2 border border-slate-300 rounded-lg bg-white">
+                            <input type="text" id="t1Search" onkeyup="updateTenureUI('t1')" placeholder="بحث..." class="new-layout-local-filter pl-4 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-1 focus:ring-indigo-500">
+                            <select id="t1Region" onchange="updateTenureUI('t1')" class="new-layout-local-filter px-4 py-2 border border-slate-300 rounded-lg bg-white">
                                 <option value="">كل الأقاليم</option>
                             </select>
                             <button onclick="exportTenureData('t1')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-lg shadow whitespace-nowrap"><i class="fas fa-file-excel ml-1"></i> تصدير إكسيل</button>
@@ -321,8 +492,8 @@
                             <span id="t2Count" class="mr-2 bg-blue-100 text-blue-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
                         </h2>
                         <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
-                            <input type="text" id="t2Search" onkeyup="updateTenureUI('t2')" placeholder="بحث..." class="pl-4 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-1 focus:ring-indigo-500">
-                            <select id="t2Region" onchange="updateTenureUI('t2')" class="px-4 py-2 border border-slate-300 rounded-lg bg-white">
+                            <input type="text" id="t2Search" onkeyup="updateTenureUI('t2')" placeholder="بحث..." class="new-layout-local-filter pl-4 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-1 focus:ring-indigo-500">
+                            <select id="t2Region" onchange="updateTenureUI('t2')" class="new-layout-local-filter px-4 py-2 border border-slate-300 rounded-lg bg-white">
                                 <option value="">كل الأقاليم</option>
                             </select>
                             <button onclick="exportTenureData('t2')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-lg shadow whitespace-nowrap"><i class="fas fa-file-excel ml-1"></i> تصدير إكسيل</button>
@@ -340,8 +511,8 @@
                             <span id="t3Count" class="mr-2 bg-emerald-100 text-emerald-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
                         </h2>
                         <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
-                            <input type="text" id="t3Search" onkeyup="updateTenureUI('t3')" placeholder="بحث..." class="pl-4 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-1 focus:ring-indigo-500">
-                            <select id="t3Region" onchange="updateTenureUI('t3')" class="px-4 py-2 border border-slate-300 rounded-lg bg-white">
+                            <input type="text" id="t3Search" onkeyup="updateTenureUI('t3')" placeholder="بحث..." class="new-layout-local-filter pl-4 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-1 focus:ring-indigo-500">
+                            <select id="t3Region" onchange="updateTenureUI('t3')" class="new-layout-local-filter px-4 py-2 border border-slate-300 rounded-lg bg-white">
                                 <option value="">كل الأقاليم</option>
                             </select>
                             <button onclick="exportTenureData('t3')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-lg shadow whitespace-nowrap"><i class="fas fa-file-excel ml-1"></i> تصدير إكسيل</button>
@@ -359,8 +530,8 @@
                             <span id="t4Count" class="mr-2 bg-indigo-100 text-indigo-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
                         </h2>
                         <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
-                            <input type="text" id="t4Search" onkeyup="updateTenureUI('t4')" placeholder="بحث..." class="pl-4 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-1 focus:ring-indigo-500">
-                            <select id="t4Region" onchange="updateTenureUI('t4')" class="px-4 py-2 border border-slate-300 rounded-lg bg-white">
+                            <input type="text" id="t4Search" onkeyup="updateTenureUI('t4')" placeholder="بحث..." class="new-layout-local-filter pl-4 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-1 focus:ring-indigo-500">
+                            <select id="t4Region" onchange="updateTenureUI('t4')" class="new-layout-local-filter px-4 py-2 border border-slate-300 rounded-lg bg-white">
                                 <option value="">كل الأقاليم</option>
                             </select>
                             <button onclick="exportTenureData('t4')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-lg shadow whitespace-nowrap"><i class="fas fa-file-excel ml-1"></i> تصدير إكسيل</button>
@@ -383,7 +554,7 @@
                         </div>
                         
                         <!-- فلتر المسار المضاف -->
-                        <div class="flex items-center gap-3 bg-white p-2 rounded-xl border border-teal-200 shadow-sm">
+                        <div class="new-layout-local-filter flex items-center gap-3 bg-white p-2 rounded-xl border border-teal-200 shadow-sm">
                             <label class="font-bold text-teal-800 pr-2">تصفية حسب المسار:</label>
                             <select id="kpiTrackFilter" onchange="renderKPITab()" class="pl-4 pr-8 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-teal-500 bg-white cursor-pointer font-bold text-teal-700 w-48 appearance-none">
                                 <option value="all">الكل (جميع المسارات)</option>
@@ -502,7 +673,7 @@
                         </h2>
                         <p class="text-cyan-700 text-sm mb-4">يمكنك تحديد الأقاليم أو المشرفين للمقارنة بينهم في مختلف المحاور (أقل من 3 شهور، نسبة الإنجاز، التقدم مقارنة بالسابق).</p>
                         
-                        <div class="flex flex-col md:flex-row gap-4 items-center bg-white p-4 rounded-xl border border-cyan-200 shadow-sm">
+                        <div class="new-layout-local-filter flex flex-col md:flex-row gap-4 items-center bg-white p-4 rounded-xl border border-cyan-200 shadow-sm">
                             <div class="flex items-center gap-2 border-l border-slate-200 pl-4">
                                 <label class="font-bold text-slate-700 whitespace-nowrap">نوع المقارنة:</label>
                                 <select id="dashCompareType" onchange="buildDashboardFilterUI()" class="p-2 border border-slate-300 rounded focus:outline-none focus:border-cyan-500 bg-slate-50">
@@ -654,14 +825,14 @@
                         </div>
                         
                         <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-                            <div class="relative bg-white rounded-xl shadow-sm border border-orange-100 p-1 w-full md:w-auto flex">
+                            <div class="new-layout-local-filter relative bg-white rounded-xl shadow-sm border border-orange-100 p-1 w-full md:w-auto flex">
                                 <span class="text-slate-500 p-2 pr-3"><i class="fas fa-filter"></i></span>
                                 <select id="pathRegionFilter" onchange="renderTrainingPathTable()" class="pl-4 pr-2 py-2 focus:outline-none w-full bg-transparent font-bold text-orange-800 cursor-pointer min-w-[200px]">
                                     <option value="">جميع الأقاليم</option>
                                 </select>
                             </div>
                             
-                            <div class="relative bg-white rounded-xl shadow-sm border border-orange-100 p-1 w-full md:w-auto flex">
+                            <div class="new-layout-local-filter relative bg-white rounded-xl shadow-sm border border-orange-100 p-1 w-full md:w-auto flex">
                                 <span class="text-slate-500 p-2 pr-3"><i class="fas fa-search"></i></span>
                                 <input type="text" id="pathSearchFilter" onkeyup="renderTrainingPathTable()" placeholder="بحث باسم الموظف أو رقمه..." class="pl-4 pr-2 py-2 focus:outline-none w-full bg-transparent text-slate-700">
                             </div>
@@ -715,14 +886,14 @@
                         </div>
                         
                         <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-                            <div class="relative bg-white rounded-xl shadow-sm border border-blue-100 p-1 w-full md:w-auto flex">
+                            <div class="new-layout-local-filter relative bg-white rounded-xl shadow-sm border border-blue-100 p-1 w-full md:w-auto flex">
                                 <span class="text-slate-500 p-2 pr-3"><i class="fas fa-filter"></i></span>
                                 <select id="supRegionFilter" onchange="updateSupervisorsTab()" class="pl-4 pr-2 py-2 focus:outline-none w-full bg-transparent font-bold text-blue-800 cursor-pointer min-w-[200px]">
                                     <option value="">جميع القطاعات / الأقاليم</option>
                                 </select>
                             </div>
                             
-                            <div class="relative bg-white rounded-xl shadow-sm border border-blue-100 p-1 w-full md:w-auto flex">
+                            <div class="new-layout-local-filter relative bg-white rounded-xl shadow-sm border border-blue-100 p-1 w-full md:w-auto flex">
                                 <span class="text-slate-500 p-2 pr-3"><i class="fas fa-search"></i></span>
                                 <input type="text" id="supSearchFilter" onkeyup="updateSupervisorsTab()" placeholder="ابحث عن مشرف..." class="pl-4 pr-2 py-2 focus:outline-none w-full bg-transparent text-slate-700">
                             </div>
@@ -834,7 +1005,7 @@
                 </div>
 
                 <div id="analysisTab" class="tab-content">
-                    <div class="bg-white border border-slate-200 shadow-sm rounded-xl p-5 mb-8">
+                    <div class="new-layout-local-filter bg-white border border-slate-200 shadow-sm rounded-xl p-5 mb-8">
                         <div class="flex items-center gap-2 mb-3">
                             <i class="fas fa-filter text-indigo-500"></i>
                             <h3 class="font-bold text-slate-800 text-lg">تضمين / استبعاد الأقاليم من الإحصائية</h3>
@@ -1079,7 +1250,7 @@
                             <p class="text-xs text-slate-500 font-bold mb-1">الدورة المعروضة</p>
                             <h3 id="botSelectedCourseTitle" class="text-lg font-extrabold text-violet-800">Communication Skills (BOT)</h3>
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full xl:w-auto">
+                        <div class="new-layout-local-filter grid grid-cols-1 sm:grid-cols-3 gap-3 w-full xl:w-auto">
                             <div class="relative">
                                 <i class="fas fa-search absolute right-3 top-3 text-slate-400"></i>
                                 <input type="text" id="botSearch" onkeyup="renderBotCourseTab()" placeholder="بحث بالاسم أو الرقم..." class="pl-4 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 w-full sm:w-64">
@@ -1282,6 +1453,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('targetCertsInput').value = targetCertsCount;
             updateDynamicLabels();
+            updateLayoutModeUI();
         });
 
         function changeTargetCerts(val, forceNormalize = false) {
@@ -1469,6 +1641,9 @@
         let currentKpiManager = null;
         let currentKpiSupervisor = null;
         let kpiManagersData = {};
+        let layoutMode = localStorage.getItem('academyLayoutMode') || 'new';
+        let selectedGlobalRegion = localStorage.getItem('academyGlobalRegion') || '';
+        let legacyExcludedRegions = new Set();
 
         document.getElementById('currentDateDisplay').innerText = `تاريخ اليوم: ${new Date().toLocaleDateString('ar-EG')}`;
 
@@ -1491,6 +1666,137 @@
                 updateDashboardCharts();
             }
             if (tabId === 'botPathTab') renderBotCourseTab();
+            if (tabId === 'globalFilterTab') renderGlobalFilterSummary();
+        }
+
+        function resetNewLayoutLocalFilters() {
+            const emptyIds = [
+                'searchName', 'filterRegion', 't1Search', 't1Region', 't2Search', 't2Region',
+                't3Search', 't3Region', 't4Search', 't4Region', 'pathRegionFilter', 'pathSearchFilter',
+                'supRegionFilter', 'supSearchFilter', 'botSearch', 'botRegionFilter', 'botProgressFilter'
+            ];
+            emptyIds.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.value = '';
+            });
+            const kpiTrack = document.getElementById('kpiTrackFilter');
+            if (kpiTrack) kpiTrack.value = 'all';
+        }
+
+        function updateLayoutModeUI() {
+            const isNew = layoutMode === 'new';
+            document.body.classList.toggle('new-layout', isNew);
+            const oldBtn = document.getElementById('oldLayoutBtn');
+            const newBtn = document.getElementById('newLayoutBtn');
+            if (oldBtn) oldBtn.classList.toggle('active', !isNew);
+            if (newBtn) newBtn.classList.toggle('active', isNew);
+            const hint = document.getElementById('layoutModeHint');
+            if (hint) hint.innerText = isNew
+                ? 'قائمة منظمة على اليمين وفلتر إقليم مركزي لكل النتائج.'
+                : 'نفس ترتيب التابات والفلاتر المعتاد بدون أي تغيير.';
+        }
+
+        function setLayoutMode(mode, refresh = true) {
+            const nextMode = mode === 'old' ? 'old' : 'new';
+            const previousMode = layoutMode;
+            if (nextMode === 'new' && previousMode !== 'new') {
+                legacyExcludedRegions = new Set(globalData.excludedRegions || []);
+            }
+            layoutMode = nextMode;
+            localStorage.setItem('academyLayoutMode', layoutMode);
+            updateLayoutModeUI();
+
+            if (layoutMode === 'new') {
+                resetNewLayoutLocalFilters();
+                applyGlobalRegionFilter(selectedGlobalRegion, false);
+                if (refresh && globalData.allActive.length) {
+                    const filterButton = document.getElementById('globalFilterTabBtn');
+                    if (filterButton) filterButton.click();
+                }
+            } else {
+                globalData.excludedRegions = new Set(legacyExcludedRegions);
+                const globalFilterTab = document.getElementById('globalFilterTab');
+                if (globalFilterTab && globalFilterTab.classList.contains('active')) {
+                    const activeButton = document.getElementById('activeTabBtn');
+                    if (activeButton) activeButton.click();
+                }
+            }
+
+            if (refresh && globalData.allActive.length) refreshAllViewsForRegion();
+        }
+
+        function populateGlobalRegionFilter() {
+            const select = document.getElementById('globalFilterRegionSelect');
+            if (!select) return;
+            const regions = Array.from(globalData.regionsSet || []).sort((a, b) => a.localeCompare(b, 'ar'));
+            if (selectedGlobalRegion && !regions.includes(selectedGlobalRegion)) selectedGlobalRegion = '';
+            select.innerHTML = '<option value="">كل الأقاليم</option>' + regions.map(region => `<option value="${safeBotText(region)}">${safeBotText(region)}</option>`).join('');
+            select.value = selectedGlobalRegion;
+        }
+
+        function applyGlobalRegionFilter(region, refresh = true) {
+            selectedGlobalRegion = cleanString(region);
+            localStorage.setItem('academyGlobalRegion', selectedGlobalRegion);
+            if (layoutMode === 'new') {
+                const regions = Array.from(globalData.regionsSet || []);
+                globalData.excludedRegions = new Set(selectedGlobalRegion ? regions.filter(item => item !== selectedGlobalRegion) : []);
+            }
+            const select = document.getElementById('globalFilterRegionSelect');
+            if (select && select.value !== selectedGlobalRegion) select.value = selectedGlobalRegion;
+            renderGlobalFilterSummary();
+            if (refresh && globalData.allActive.length) refreshAllViewsForRegion();
+        }
+
+        function isEmployeeVisibleInCurrentRegion(emp) {
+            if (!emp || (globalData.excludedRegions && globalData.excludedRegions.has(emp.region))) return false;
+            return layoutMode !== 'new' || !selectedGlobalRegion || cleanString(emp.region) === selectedGlobalRegion;
+        }
+
+        function renderGlobalFilterSummary() {
+            const visibleEmployees = globalData.allActive.filter(isEmployeeVisibleInCurrentRegion);
+            const regionLabel = selectedGlobalRegion || 'كل الأقاليم';
+            const totalCertificates = visibleEmployees.reduce((sum, emp) => sum + (Number(emp.totalCerts) || 0), 0);
+            const supervisors = new Set(visibleEmployees.map(emp => cleanString(emp.supervisor)).filter(Boolean));
+            const achieved = visibleEmployees.filter(emp => emp.totalCerts >= targetCertsCount).length;
+            const mappings = {
+                globalFilterActiveCount: visibleEmployees.length,
+                globalFilterCertificatesCount: totalCertificates,
+                globalFilterSupervisorsCount: supervisors.size,
+                globalFilterAchievedCount: achieved,
+                sidebarRegionBadge: regionLabel
+            };
+            Object.entries(mappings).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) element.innerText = value;
+            });
+
+            const cards = document.getElementById('globalRegionCards');
+            if (cards) {
+                const regionCounts = {};
+                globalData.allActive.forEach(emp => { regionCounts[emp.region] = (regionCounts[emp.region] || 0) + 1; });
+                cards.innerHTML = Object.keys(regionCounts).sort((a, b) => a.localeCompare(b, 'ar')).map(region => {
+                    const selected = region === selectedGlobalRegion;
+                    return `<button type="button" onclick="applyGlobalRegionFilter(decodeURIComponent('${encodeURIComponent(region)}'))" class="text-right rounded-xl border p-4 transition ${selected ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white text-slate-700 border-slate-200 hover:border-indigo-300 hover:bg-indigo-50'}">
+                        <span class="block font-extrabold">${safeBotText(region)}</span>
+                        <span class="block text-xs mt-1 ${selected ? 'text-indigo-100' : 'text-slate-500'}">${regionCounts[region]} موظف</span>
+                    </button>`;
+                }).join('');
+            }
+        }
+
+        function refreshAllViewsForRegion() {
+            applyActiveFilters();
+            renderTrainingPathTable();
+            renderKPITab();
+            updateMonthlyProgressTab();
+            renderBotCourseTab();
+            renderComparisonTable(globalData.allActive);
+            renderTimelineDashboard();
+            if (document.getElementById('dashboardTab').classList.contains('active')) {
+                buildDashboardFilterUI();
+                updateDashboardCharts();
+            }
+            renderGlobalFilterSummary();
         }
 
         function switchMissingSubTab(event, sectionId) {
@@ -1805,7 +2111,8 @@
                     region: determineRegion(manager), email: "", totalCerts: 0, oldTotalCerts: 0, 
                     monthsData: {}, nonCertProgress: {}, eliteProgress: {}, isEliteTarget: false,
                     eliteGroup: best100OnlyIds.has(id) ? 'best100' : 'elite',
-                    pathProgress: {}, botCourses: createBotCoursesState()
+                    pathProgress: {}, botCourses: createBotCoursesState(),
+                    timeline: { hourly: Array(24).fill(0), daily: {}, weekly: {} }
                 };
                 
                 targetMonthsKeys.forEach(m => emp.monthsData[m] = 0);
@@ -1868,6 +2175,12 @@
                         let weekNum = getWeekNumber(d);
                         let weekKey = `الأسبوع ${weekNum} - ${year}`;
                         globalData.timeline.weekly[weekKey] = (globalData.timeline.weekly[weekKey] || 0) + 1;
+                        const employeeTimeline = employeeMap[id] && employeeMap[id].timeline;
+                        if (employeeTimeline) {
+                            employeeTimeline.hourly[hour]++;
+                            employeeTimeline.daily[dateKey] = (employeeTimeline.daily[dateKey] || 0) + 1;
+                            employeeTimeline.weekly[weekKey] = (employeeTimeline.weekly[weekKey] || 0) + 1;
+                        }
                     }
                 }
 
@@ -1979,6 +2292,12 @@
             }
 
             buildFilterUI();
+            populateGlobalRegionFilter();
+            legacyExcludedRegions = new Set();
+            if (layoutMode === 'new') {
+                resetNewLayoutLocalFilters();
+                applyGlobalRegionFilter(selectedGlobalRegion, false);
+            }
             buildExclusionUI(); // Build the new exclusion UI
             applyActiveFilters();
             renderTimelineDashboard(); 
@@ -1990,6 +2309,11 @@
             if(document.getElementById('dashboardTab').classList.contains('active')) {
                 buildDashboardFilterUI();
                 updateDashboardCharts();
+            }
+            renderGlobalFilterSummary();
+            if (layoutMode === 'new') {
+                const filterButton = document.getElementById('globalFilterTabBtn');
+                if (filterButton) filterButton.click();
             }
         }
 
@@ -3244,12 +3568,15 @@
                 `;
             });
             container.innerHTML = html;
+            if (layoutMode === 'new') updateDashboardCharts();
         }
 
         function updateDashboardCharts() {
             const type = document.getElementById('dashCompareType').value;
             const checkboxes = document.querySelectorAll('.dash-checkbox:checked');
-            const selectedItems = Array.from(checkboxes).map(cb => cb.value);
+            const selectedItems = layoutMode === 'new'
+                ? [selectedGlobalRegion || 'كل الأقاليم']
+                : Array.from(checkboxes).map(cb => cb.value);
 
             if(selectedItems.length === 0) {
                 document.getElementById('dashEmptyState').classList.remove('hidden');
@@ -3273,7 +3600,9 @@
             selectedItems.forEach(item => {
                 labels.push(item);
                 
-                let emps = globalData.allActive.filter(e => type === 'regions' ? e.region === item : cleanString(e.supervisor) === item);
+                let emps = layoutMode === 'new'
+                    ? globalData.allActive.filter(isEmployeeVisibleInCurrentRegion)
+                    : globalData.allActive.filter(e => type === 'regions' ? e.region === item : cleanString(e.supervisor) === item);
                 
                 let less3 = emps.filter(e => e.tenureMonths >= 0 && e.tenureMonths < 3).length;
                 less3Data.push(less3);
@@ -3396,6 +3725,7 @@
         function toggleRegionExclusion(checkbox) {
             if (checkbox.checked) globalData.excludedRegions.delete(checkbox.value);
             else globalData.excludedRegions.add(checkbox.value);
+            if (layoutMode === 'old') legacyExcludedRegions = new Set(globalData.excludedRegions);
             applyActiveFilters(); 
             renderTrainingPathTable(); 
             renderKPITab(); 
@@ -3410,7 +3740,7 @@
             let filtered = globalData.allActive.filter(e => {
                 let matchName = e.name.toLowerCase().includes(sName) || e.id.toLowerCase().includes(sName);
                 let matchReg = sReg === "" || e.region === sReg;
-                return matchName && matchReg;
+                return matchName && matchReg && isEmployeeVisibleInCurrentRegion(e);
             });
 
             let tData = [];
@@ -3429,7 +3759,7 @@
             let filtered = globalData.allActive.filter(e => {
                 let matchName = e.name.toLowerCase().includes(sName) || e.id.toLowerCase().includes(sName);
                 let matchReg = sReg === "" || e.region === sReg;
-                return matchName && matchReg;
+                return matchName && matchReg && isEmployeeVisibleInCurrentRegion(e);
             });
 
             let tData = [];
@@ -3458,14 +3788,17 @@
             let filtered = globalData.allActive.filter(e => {
                 let matchName = e.name.toLowerCase().includes(sName) || e.id.toLowerCase().includes(sName);
                 let matchReg = sReg === "" || e.region === sReg;
-                return matchName && matchReg;
+                return matchName && matchReg && isEmployeeVisibleInCurrentRegion(e);
             });
 
             let filteredMissingFromAc = globalData.missingFromAcademy.filter(e => {
                 let matchName = e.name.toLowerCase().includes(sName) || e.id.toLowerCase().includes(sName);
                 let matchReg = sReg === "" || e.region === sReg;
-                return matchName && matchReg;
+                return matchName && matchReg && isEmployeeVisibleInCurrentRegion(e);
             });
+
+            const filteredExcluded = globalData.excludedEmployees.filter(isEmployeeVisibleInCurrentRegion);
+            const filteredMissing = globalData.missingEmployees.filter(isEmployeeVisibleInCurrentRegion);
 
             renderTable('active', filtered);
             updateTenureUI('t1');
@@ -3473,15 +3806,15 @@
             updateTenureUI('t3');
             updateTenureUI('t4');
             renderNonCertTable(filtered);
-            renderEliteTable(filtered, globalData.excludedEmployees, globalData.missingEmployees);
+            renderEliteTable(filtered, filteredExcluded, filteredMissing);
             renderBotCourseTab();
             renderComparisonTable(filtered);
 
             const excludedBody = document.getElementById('excludedTableBody');
-            if(excludedBody) excludedBody.innerHTML = globalData.excludedEmployees.map(e => `<tr><td class="px-6 py-4">${e.id}</td><td class="px-6 py-4">${e.name}</td><td class="px-6 py-4"><span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs">${e.status}</span></td><td class="px-6 py-4 text-xs text-slate-500">مستبعد بالحالة</td></tr>`).join('');
+            if(excludedBody) excludedBody.innerHTML = filteredExcluded.map(e => `<tr><td class="px-6 py-4">${e.id}</td><td class="px-6 py-4">${e.name}</td><td class="px-6 py-4"><span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs">${e.status}</span></td><td class="px-6 py-4 text-xs text-slate-500">مستبعد بالحالة</td></tr>`).join('');
             
             const missingBody = document.getElementById('missingTableBody');
-            if(missingBody) missingBody.innerHTML = globalData.missingEmployees.map(e => `<tr><td class="px-6 py-4 font-bold">${e.id}</td><td class="px-6 py-4">${e.name}</td><td class="px-6 py-4 font-bold text-indigo-600">${e.totalCerts}</td></tr>`).join('');
+            if(missingBody) missingBody.innerHTML = filteredMissing.map(e => `<tr><td class="px-6 py-4 font-bold">${e.id}</td><td class="px-6 py-4">${e.name}</td><td class="px-6 py-4 font-bold text-indigo-600">${e.totalCerts}</td></tr>`).join('');
             
             const missingFromAcBody = document.getElementById('missingFromAcTableBody');
             if(missingFromAcBody) {
@@ -3502,8 +3835,8 @@
                 }
             }
 
-            const excludedCount = document.getElementById('excludedCount'); if(excludedCount) excludedCount.innerText = globalData.excludedEmployees.length;
-            const missingCount = document.getElementById('missingCount'); if(missingCount) missingCount.innerText = globalData.missingEmployees.length;
+            const excludedCount = document.getElementById('excludedCount'); if(excludedCount) excludedCount.innerText = filteredExcluded.length;
+            const missingCount = document.getElementById('missingCount'); if(missingCount) missingCount.innerText = filteredMissing.length;
             const missingFromAcCount = document.getElementById('missingFromAcCount'); if(missingFromAcCount) missingFromAcCount.innerText = filteredMissingFromAc.length;
 
             updateAnalysisUI();
@@ -3881,7 +4214,7 @@
                     .map(value => cleanString(value).toLowerCase())
                     .some(value => value.includes(search));
             };
-            const matchesRegion = emp => !region || cleanString(emp.region) === region;
+            const matchesRegion = emp => isEmployeeVisibleInCurrentRegion(emp) && (!region || cleanString(emp.region) === region);
             const matchesProgress = emp => {
                 const record = getRecord(emp);
                 if (!record) return false;
@@ -3895,7 +4228,7 @@
             };
 
             const activeBase = globalData.allActive.filter(emp =>
-                !globalData.excludedRegions.has(emp.region) && isEnrolled(emp) && matchesSearch(emp) && matchesRegion(emp)
+                isEnrolled(emp) && matchesSearch(emp) && matchesRegion(emp)
             );
             const active = activeBase.filter(matchesProgress);
 
@@ -3913,7 +4246,7 @@
             document.querySelectorAll('.bot-course-btn').forEach((button, index) => {
                 const courseKey = botCoursesKeys[index];
                 const count = globalData.allActive.filter(emp =>
-                    !globalData.excludedRegions.has(emp.region) && emp.botCourses && emp.botCourses[courseKey] && emp.botCourses[courseKey].enrolled
+                    isEmployeeVisibleInCurrentRegion(emp) && emp.botCourses && emp.botCourses[courseKey] && emp.botCourses[courseKey].enrolled
                 ).length;
                 const isSelected = index === selectedBotCourseIndex;
                 button.classList.toggle('bg-violet-600', isSelected);
@@ -4175,7 +4508,7 @@
             let wb = XLSX.utils.book_new();
 
             let misAOA = [["الرقم الوظيفي", "الاسم بالاكاديمية", "المشرف", "عدد الشهادات"]];
-            globalData.missingEmployees.forEach(e => misAOA.push([e.id, e.name, e.supervisor || "غير متوفر", e.totalCerts]));
+            globalData.missingEmployees.filter(isEmployeeVisibleInCurrentRegion).forEach(e => misAOA.push([e.id, e.name, e.supervisor || "غير متوفر", e.totalCerts]));
             let ws1 = XLSX.utils.aoa_to_sheet(misAOA);
             applyExcelStyles(ws1);
             XLSX.utils.book_append_sheet(wb, ws1, "في الأكاديمية فقط");
@@ -4186,7 +4519,7 @@
             let filteredMissingFromAc = globalData.missingFromAcademy.filter(e => {
                 let matchName = e.name.toLowerCase().includes(searchInput) || e.id.toLowerCase().includes(searchInput);
                 let matchReg = sReg === "" || e.region === sReg;
-                return matchName && matchReg;
+                return matchName && matchReg && isEmployeeVisibleInCurrentRegion(e);
             });
 
             let missingAcAOA = [["الرقم الوظيفي", "الاسم بالقوى", "الإقليم", "المشرف", "حالة الموظف"]];
@@ -4203,7 +4536,7 @@
             let searchInput = document.getElementById('searchName') ? document.getElementById('searchName').value.toLowerCase() : "";
             let selectedRegion = document.getElementById('filterRegion') ? document.getElementById('filterRegion').value : "";
             let validActive = globalData.allActive.filter(e =>
-                !globalData.excludedRegions.has(e.region) && e.isEliteTarget && matchesEliteCohort(e) &&
+                isEmployeeVisibleInCurrentRegion(e) && e.isEliteTarget && matchesEliteCohort(e) &&
                 (!searchInput || e.name.toLowerCase().includes(searchInput) || e.id.toLowerCase().includes(searchInput)) &&
                 (!selectedRegion || e.region === selectedRegion)
             );
@@ -4233,7 +4566,7 @@
             const participants = new Map();
             const addParticipants = (employees, sourceStatus) => {
                 (employees || []).forEach(emp => {
-                    if (!hasBotEnrollment(emp)) return;
+                    if (!hasBotEnrollment(emp) || !isEmployeeVisibleInCurrentRegion(emp)) return;
                     const key = cleanString(emp.id) || cleanString(emp.email) || cleanString(emp.name);
                     if (!key) return;
                     participants.set(key, { emp, sourceStatus: sourceStatus(emp) });
@@ -4347,7 +4680,7 @@
 
         function exportAllData() {
             let wb = XLSX.utils.book_new();
-            let validActive = globalData.allActive.filter(e => !globalData.excludedRegions.has(e.region));
+            let validActive = globalData.allActive.filter(isEmployeeVisibleInCurrentRegion);
             let wsAll = XLSX.utils.aoa_to_sheet(generateEmployeeAOA(validActive));
             applyExcelStyles(wsAll);
             XLSX.utils.book_append_sheet(wb, wsAll, "جميع البائعين المعتمدين");
@@ -4389,19 +4722,19 @@
             XLSX.utils.book_append_sheet(wb, wsAnalysis, "تحليل الأقاليم المعتمدة");
 
             let excAOA = [["الرقم الوظيفي", "الاسم", "المشرف", "الحالة"]];
-            globalData.excludedEmployees.forEach(e => excAOA.push([e.id, e.name, e.supervisor || "بدون مشرف", e.status]));
+            globalData.excludedEmployees.filter(isEmployeeVisibleInCurrentRegion).forEach(e => excAOA.push([e.id, e.name, e.supervisor || "بدون مشرف", e.status]));
             let wsExc = XLSX.utils.aoa_to_sheet(excAOA);
             applyExcelStyles(wsExc);
             XLSX.utils.book_append_sheet(wb, wsExc, "المستبعدين");
 
             let misAOA = [["الرقم الوظيفي", "الاسم بالاكاديمية", "المشرف", "عدد الشهادات"]];
-            globalData.missingEmployees.forEach(e => misAOA.push([e.id, e.name, e.supervisor || "غير متوفر", e.totalCerts]));
+            globalData.missingEmployees.filter(isEmployeeVisibleInCurrentRegion).forEach(e => misAOA.push([e.id, e.name, e.supervisor || "غير متوفر", e.totalCerts]));
             let wsMis = XLSX.utils.aoa_to_sheet(misAOA);
             applyExcelStyles(wsMis);
             XLSX.utils.book_append_sheet(wb, wsMis, "بالأكاديمية فقط");
 
             let missingAcAOA = [["الرقم الوظيفي", "الاسم بالقوى", "الإقليم", "المشرف", "حالة الموظف"]];
-            globalData.missingFromAcademy.forEach(e => missingAcAOA.push([e.id, e.name, e.region, e.supervisor, e.status]));
+            globalData.missingFromAcademy.filter(isEmployeeVisibleInCurrentRegion).forEach(e => missingAcAOA.push([e.id, e.name, e.region, e.supervisor, e.status]));
             let wsMisAc = XLSX.utils.aoa_to_sheet(missingAcAOA);
             applyExcelStyles(wsMisAc);
             XLSX.utils.book_append_sheet(wb, wsMisAc, "بالقوى فقط");
@@ -4458,8 +4791,7 @@
             let filteredEmployees = globalData.allActive.filter(emp => {
                 let matchReg = pathRegion === "" || emp.region === pathRegion;
                 let matchSearch = pathSearch === "" || emp.name.toLowerCase().includes(pathSearch) || emp.id.toString().includes(pathSearch);
-                let notGloballyExcluded = !globalData.excludedRegions.has(emp.region);
-                return matchReg && matchSearch && notGloballyExcluded;
+                return matchReg && matchSearch && isEmployeeVisibleInCurrentRegion(emp);
             });
 
             let certBodyHtml = '';
@@ -4531,8 +4863,7 @@
             let filteredEmployees = globalData.allActive.filter(emp => {
                 let matchReg = pathRegion === "" || emp.region === pathRegion;
                 let matchSearch = pathSearch === "" || emp.name.toLowerCase().includes(pathSearch) || emp.id.toString().includes(pathSearch);
-                let notGloballyExcluded = !globalData.excludedRegions.has(emp.region);
-                return matchReg && matchSearch && notGloballyExcluded;
+                return matchReg && matchSearch && isEmployeeVisibleInCurrentRegion(emp);
             });
 
             if(filteredEmployees.length === 0) return;
@@ -4622,19 +4953,32 @@
             if(targetMonthsKeys.length > 0) select.value = targetMonthsKeys[targetMonthsKeys.length - 1];
         }
 
+        function getTimelineForCurrentView() {
+            if (layoutMode !== 'new') return globalData.timeline;
+            const timeline = { hourly: Array(24).fill(0), daily: {}, weekly: {} };
+            globalData.allActive.forEach(emp => {
+                if (!isEmployeeVisibleInCurrentRegion(emp) || !emp.timeline) return;
+                emp.timeline.hourly.forEach((count, hour) => { timeline.hourly[hour] += count; });
+                Object.entries(emp.timeline.daily).forEach(([key, count]) => { timeline.daily[key] = (timeline.daily[key] || 0) + count; });
+                Object.entries(emp.timeline.weekly).forEach(([key, count]) => { timeline.weekly[key] = (timeline.weekly[key] || 0) + count; });
+            });
+            return timeline;
+        }
+
         function renderTimelineDashboard() {
+            const currentTimeline = getTimelineForCurrentView();
             let maxDay = "-", maxDayCount = 0;
-            for(let date in globalData.timeline.daily) {
-                if(globalData.timeline.daily[date] > maxDayCount) { maxDayCount = globalData.timeline.daily[date]; maxDay = date; }
+            for(let date in currentTimeline.daily) {
+                if(currentTimeline.daily[date] > maxDayCount) { maxDayCount = currentTimeline.daily[date]; maxDay = date; }
             }
 
             let maxWeek = "-", maxWeekCount = 0;
-            for(let week in globalData.timeline.weekly) {
-                if(globalData.timeline.weekly[week] > maxWeekCount) { maxWeekCount = globalData.timeline.weekly[week]; maxWeek = week; }
+            for(let week in currentTimeline.weekly) {
+                if(currentTimeline.weekly[week] > maxWeekCount) { maxWeekCount = currentTimeline.weekly[week]; maxWeek = week; }
             }
 
             let peakHour = 0, peakHourCount = 0;
-            globalData.timeline.hourly.forEach((count, hour) => {
+            currentTimeline.hourly.forEach((count, hour) => {
                 if(count > peakHourCount) { peakHourCount = count; peakHour = hour; }
             });
 
@@ -4655,13 +4999,13 @@
                 type: 'bar',
                 data: {
                     labels: hourlyLabels,
-                    datasets: [{ label: 'عدد الشهادات المكتسبة', data: globalData.timeline.hourly, backgroundColor: 'rgba(99, 102, 241, 0.7)', borderColor: 'rgb(79, 70, 229)', borderWidth: 1, borderRadius: 4 }]
+                datasets: [{ label: 'عدد الشهادات المكتسبة', data: currentTimeline.hourly, backgroundColor: 'rgba(99, 102, 241, 0.7)', borderColor: 'rgb(79, 70, 229)', borderWidth: 1, borderRadius: 4 }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
             });
 
-            let sortedDates = Object.keys(globalData.timeline.daily).sort();
-            let dailyDataCounts = sortedDates.map(date => globalData.timeline.daily[date]);
+            let sortedDates = Object.keys(currentTimeline.daily).sort();
+            let dailyDataCounts = sortedDates.map(date => currentTimeline.daily[date]);
 
             if (dailyChartInstance) dailyChartInstance.destroy();
             const ctxDaily = document.getElementById('dailyChart').getContext('2d');
