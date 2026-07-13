@@ -415,18 +415,18 @@
                         </div>
                     </div>
 
-                    <div id="kpiAxesSection" class="mb-8 hidden bg-slate-50 p-6 rounded-2xl border border-slate-200 relative">
-                        <!-- زر التصدير الخاص بالمشرف المختار -->
-                        <button onclick="exportSingleSupervisorKPI()" class="absolute top-6 left-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-lg shadow transition flex items-center text-sm">
-                            <i class="fas fa-file-excel ml-2"></i> تصدير هذا المشرف
-                        </button>
-                        
-                        <div class="flex justify-between items-center mb-6">
+                    <div id="kpiAxesSection" class="mb-8 hidden bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                        <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4 mb-6">
                             <h3 class="font-bold text-slate-800 text-xl flex items-center">
                                 <i class="fas fa-chart-line text-teal-500 ml-2"></i> 3. تحليل المحاور للمشرف: <span id="selectedKpiSupName" class="text-teal-700 mr-2"></span>
                             </h3>
-                            <div class="bg-teal-100 text-teal-800 font-bold px-4 py-2 rounded-lg border border-teal-200 shadow-sm ml-32">
-                                متوسط الإنجاز: <span id="kpiOverallAvg" class="text-xl mx-1">0%</span>
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                                <div class="bg-teal-100 text-teal-800 font-bold px-4 py-2 rounded-lg border border-teal-200 shadow-sm whitespace-nowrap">
+                                    متوسط المحاور: <span id="kpiOverallAvg" class="text-xl mx-1">0%</span>
+                                </div>
+                                <button onclick="exportSingleSupervisorKPI()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-lg shadow transition flex items-center justify-center text-sm whitespace-nowrap">
+                                    <i class="fas fa-file-excel ml-2"></i> تصدير هذا المشرف
+                                </button>
                             </div>
                         </div>
                         
@@ -1037,9 +1037,14 @@
                                 </h2>
                                 <p class="text-violet-700 text-sm mt-2">اختر دورة لعرض المسجلين فيها وتقدمهم فقط. كل دورة مستقلة ولا يتم احتساب الموظف على أساس استكمال الدورات الخمس.</p>
                             </div>
-                            <button onclick="exportBotCourseData()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-5 rounded-xl shadow transition transform hover:-translate-y-0.5 whitespace-nowrap">
-                                <i class="fas fa-file-excel ml-2"></i> تصدير Excel للدورة الحالية
-                            </button>
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <button id="exportBotCombinedBtn" onclick="exportBotCombinedData()" class="bg-violet-600 hover:bg-violet-700 text-white font-bold py-2.5 px-5 rounded-xl shadow transition transform hover:-translate-y-0.5 whitespace-nowrap">
+                                    <i class="fas fa-table ml-2"></i> تصدير الشيت المجمّع
+                                </button>
+                                <button onclick="exportBotCourseData()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-5 rounded-xl shadow transition transform hover:-translate-y-0.5 whitespace-nowrap">
+                                    <i class="fas fa-file-excel ml-2"></i> تصدير Excel للدورة الحالية
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -1417,7 +1422,6 @@
             "Understanding Customer Needs ( BOT)"
         ];
         // قائمة أفضل 100 معرض المضمنة من ملف T9 الحالي (الصفوف التي قيمتها "لا" في العمود F).
-        // يمكن تحديثها في أي وقت برفع ملف T9 من الخانة الرابعة.
         const embeddedBest100OnlyIds = new Set(["20595","20838","20874","20895","30209","30756","30966","30978","31184","31235","31268","31281","31993","32059","32097","32615","32648","32781","32785","32887","32922","33009","33010","33080","33095","33227","33245","33457","33497","33533","33564","33807","33926","34189","35099","35649","35880","36435","36460","36547","36684","37867","38844","38950","39571","40016","40254","40260","40267","40762","40913","40914","41045","41255","41468","41533","41581","41600","41640","41660","42185","42323","42462","42634","42940","42993","43009","43085","43299","43385","43456","43473","43779","43911","44001","44009","44085","44099","44116","44182","44209","44460","44498","44556","44614","44727","44781","44997","45005","45124","45355","45381","45525","45749","45914","46041","46046","46303","46361","46382","46451","46471","46472","46550","46665","46776","46804","46914","47115","47304","47375","47410","47466","47489","47513","47648","47708","47753","47758","47856","47859","47885","47902","48036","48043","48110","48163","48182","48250","48309","48322","48409","48411","48480","48784","48846","48856","48857","49027","49054","49076","49093","49098","49219","49230","49234","49281","49313","49397","49410","49438","49487","49813","49817","49900","49930","49934","49953","49954","49988","50062","50080","50093","50228","50229","50251","50292","50301","50312","50353","50407","50416","50430","50455","50548","50577","50584","50633","50681","50698","50720","50727","50831","50837","50856","50939","50941","50963","51053","51132","51135","51139","51141","51154","51181","51201","51227","51235","51305","51318","51321","51381","51386","51428","51468","51473","51477","51481","51521","51557","51627","51644","51679","51680","51682","51725","51772","51777","51828","51899","51917","51937","51939","51968","51976","51998","52018","52048","52098","52104","52137","52186","52189","52204","52205","52224","52234","52328","52329","52335","52340","52358","52369","52372","52376","52386","52387","52388","52398","52408","52425","52434","52564","52578","52619","52622","52641","52686","52727","52743","52757","52770","52772","52781","52791","52793","52801","52842","52853","52901","52911","52917","52939","52959","52967","52997","53010","53088","53092","53130","53156","53157","53177","53190","53206","53225","1103902985"]);
         let selectedBotCourseIndex = 0;
         let selectedEliteCohort = 'all';
@@ -1582,6 +1586,48 @@
 
         function hasBotEnrollment(employee) {
             return getBotImprovementSummary(employee).assignedCount > 0;
+        }
+
+        function calculateKpiRate(employees, isAchieved) {
+            if (!employees.length) return null;
+            return (employees.filter(isAchieved).length / employees.length) * 100;
+        }
+
+        function getSupervisorKpiSummary(employees) {
+            const list = employees || [];
+            const eliteEmps = list.filter(emp => emp.isEliteTarget);
+            const less3Emps = list.filter(emp => emp.tenureMonths >= 0 && emp.tenureMonths < 3);
+            const more3Emps = list.filter(emp => emp.tenureMonths >= 3);
+            const improvementEmps = list.filter(hasBotEnrollment);
+            const elite = calculateKpiRate(eliteEmps, emp => getEliteCompletedCount(emp) === 3);
+            const less3 = calculateKpiRate(less3Emps, emp => emp.totalCerts >= less3KpiTarget);
+            const more3 = calculateKpiRate(more3Emps, emp => emp.totalCerts >= targetCertsCount);
+            const improvement = calculateKpiRate(improvementEmps, emp => getBotImprovementSummary(emp).score === 100);
+            const availableAxes = [elite, less3, more3, improvement].filter(value => value !== null);
+            return {
+                elite,
+                less3,
+                more3,
+                improvement,
+                overall: availableAxes.length ? averageNumber(availableAxes) : 0
+            };
+        }
+
+        function getKpiForTrack(summary, trackFilter) {
+            const trackMap = {
+                elite: summary.elite,
+                less3: summary.less3,
+                more3: summary.more3,
+                improvement: summary.improvement
+            };
+            return trackFilter !== 'all' && trackMap[trackFilter] !== null && trackMap[trackFilter] !== undefined
+                ? trackMap[trackFilter]
+                : summary.overall;
+        }
+
+        function formatKpiValue(value) {
+            if (!Number.isFinite(Number(value))) return "0";
+            return String(Number(Number(value).toFixed(2)));
         }
 
         function buildBest100OnlyIdSet() {
@@ -2149,7 +2195,10 @@
             let managersHtml = '';
             Object.keys(kpiManagersData).sort().forEach(mngName => {
                 let mng = kpiManagersData[mngName];
-                let pct = mng.totalEmp > 0 ? Math.round((mng.achievedEmp / mng.totalEmp) * 100) : 0;
+                const supervisorKpis = Object.values(mng.supervisors).map(sup =>
+                    getKpiForTrack(getSupervisorKpiSummary(sup.employees), trackFilter)
+                );
+                let pct = supervisorKpis.length ? averageNumber(supervisorKpis) : 0;
                 
                 managersHtml += `
                     <label class="cursor-pointer">
@@ -2157,9 +2206,9 @@
                         <div class="kpi-box w-48 h-full bg-white border-2 border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center text-center peer-checked:border-teal-600 peer-checked:bg-teal-50 peer-checked:shadow-inner">
                             <span class="text-sm font-bold text-slate-700 peer-checked:text-teal-800 mb-2">${mngName}</span>
                             <div class="flex items-baseline gap-1">
-                                <span class="text-2xl font-extrabold text-teal-600">${pct}%</span>
+                                <span class="text-2xl font-extrabold text-teal-600">${formatKpiValue(pct)}%</span>
                             </div>
-                            <span class="text-xs text-slate-400 mt-1">الإنجاز (للمسار المختار)</span>
+                            <span class="text-xs text-slate-400 mt-1">متوسط KPI المشرفين</span>
                         </div>
                     </label>
                 `;
@@ -2180,19 +2229,21 @@
             
             let mngData = kpiManagersData[mngName];
             if (!mngData) return;
+            let trackFilter = document.getElementById('kpiTrackFilter') ? document.getElementById('kpiTrackFilter').value : 'all';
 
             let supsHtml = '';
             Object.keys(mngData.supervisors).sort().forEach(supName => {
                 let sup = mngData.supervisors[supName];
-                let pct = sup.totalEmp > 0 ? Math.round((sup.achievedEmp / sup.totalEmp) * 100) : 0;
+                let pct = getKpiForTrack(getSupervisorKpiSummary(sup.employees), trackFilter);
                 
                 supsHtml += `
                     <div onclick="selectKPISupervisor('${supName}')" class="kpi-sup-card bg-white border border-slate-200 rounded-xl p-4 cursor-pointer hover:border-blue-400 hover:shadow-md transition group">
                         <div class="flex justify-between items-center mb-2">
                             <h4 class="font-bold text-slate-800 group-hover:text-blue-700 transition">${supName}</h4>
-                            <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded">${pct}%</span>
+                            <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded">${formatKpiValue(pct)}%</span>
                         </div>
                         <p class="text-xs text-slate-500">إجمالي الموظفين (في المسار): <span class="font-bold">${sup.totalEmp}</span></p>
+                        <p class="text-[11px] text-blue-600 mt-1">متوسط المحاور المتاحة</p>
                     </div>
                 `;
             });
@@ -2220,44 +2271,25 @@
             let less3Emps = supData.employees.filter(e => e.tenureMonths >= 0 && e.tenureMonths < 3);
             let more3Emps = supData.employees.filter(e => e.tenureMonths >= 3);
             let improvementEmps = supData.employees.filter(hasBotEnrollment);
-
-            let eliteAchieved = eliteEmps.filter(e => {
-                let hasC1 = eliteCoursesKeys[0] ? e.eliteProgress[eliteCoursesKeys[0]] : false;
-                let hasC2 = eliteCoursesKeys[1] ? e.eliteProgress[eliteCoursesKeys[1]] : false;
-                let hasC3 = eliteCoursesKeys[2] ? e.eliteProgress[eliteCoursesKeys[2]] : false;
-                return hasC1 && hasC2 && hasC3;
-            }).length;
+            const kpiSummary = getSupervisorKpiSummary(supData.employees);
+            let elitePct = kpiSummary.elite === null ? 'NA' : kpiSummary.elite;
+            let less3Pct = kpiSummary.less3 === null ? 'NA' : kpiSummary.less3;
+            let more3Pct = kpiSummary.more3 === null ? 'NA' : kpiSummary.more3;
+            let improvementPct = kpiSummary.improvement === null ? 'NA' : kpiSummary.improvement;
             
-            let less3Achieved = less3Emps.filter(e => e.totalCerts >= less3KpiTarget).length;
-            let more3Achieved = more3Emps.filter(e => e.totalCerts >= targetCertsCount).length;
-            let improvementAchieved = improvementEmps.filter(e => getBotImprovementSummary(e).score === 100).length;
-
-            let elitePct = eliteEmps.length > 0 ? Math.round((eliteAchieved / eliteEmps.length) * 100) : 'NA';
-            let less3Pct = less3Emps.length > 0 ? Math.round((less3Achieved / less3Emps.length) * 100) : 'NA';
-            let more3Pct = more3Emps.length > 0 ? Math.round((more3Achieved / more3Emps.length) * 100) : 'NA';
-            let improvementPct = improvementEmps.length > 0 ? Math.round((improvementAchieved / improvementEmps.length) * 100) : 'NA';
-            
-            document.getElementById('kpiEliteVal').innerText = elitePct !== 'NA' ? elitePct + '%' : 'NA';
+            document.getElementById('kpiEliteVal').innerText = elitePct !== 'NA' ? formatKpiValue(elitePct) + '%' : 'NA';
             document.getElementById('kpiEliteDesc').innerText = eliteEmps.length > 0 ? `العدد: ${eliteEmps.length} (المستهدف 3/3)` : 'لا يوجد';
             
-            document.getElementById('kpiLess3Val').innerText = less3Pct !== 'NA' ? less3Pct + '%' : 'NA';
+            document.getElementById('kpiLess3Val').innerText = less3Pct !== 'NA' ? formatKpiValue(less3Pct) + '%' : 'NA';
             document.getElementById('kpiLess3Desc').innerText = less3Emps.length > 0 ? `العدد: ${less3Emps.length} (المستهدف ${less3KpiTarget})` : 'لا يوجد';
             
-            document.getElementById('kpiMore3Val').innerText = more3Pct !== 'NA' ? more3Pct + '%' : 'NA';
+            document.getElementById('kpiMore3Val').innerText = more3Pct !== 'NA' ? formatKpiValue(more3Pct) + '%' : 'NA';
             document.getElementById('kpiMore3Desc').innerText = more3Emps.length > 0 ? `العدد: ${more3Emps.length} (المستهدف ${targetCertsCount})` : 'لا يوجد';
 
-            document.getElementById('kpiImprovementVal').innerText = improvementPct !== 'NA' ? improvementPct + '%' : 'NA';
+            document.getElementById('kpiImprovementVal').innerText = improvementPct !== 'NA' ? formatKpiValue(improvementPct) + '%' : 'NA';
             document.getElementById('kpiImprovementDesc').innerText = improvementEmps.length > 0 ? `العدد: ${improvementEmps.length} (100% أو صفر)` : 'لا يوجد';
-
-            let sumPct = 0;
-            let countAxes = 0;
-            if (elitePct !== 'NA') { sumPct += elitePct; countAxes++; }
-            if (less3Pct !== 'NA') { sumPct += less3Pct; countAxes++; }
-            if (more3Pct !== 'NA') { sumPct += more3Pct; countAxes++; }
-            if (improvementPct !== 'NA') { sumPct += improvementPct; countAxes++; }
-            
-            let avg = countAxes > 0 ? Math.round(sumPct / countAxes) : 0;
-            document.getElementById('kpiOverallAvg').innerText = avg + '%';
+            const trackFilter = document.getElementById('kpiTrackFilter') ? document.getElementById('kpiTrackFilter').value : 'all';
+            document.getElementById('kpiOverallAvg').innerText = formatKpiValue(getKpiForTrack(kpiSummary, trackFilter)) + '%';
 
             document.getElementById('kpiAxesSection').classList.remove('hidden');
         }
@@ -4202,6 +4234,78 @@
             XLSX.utils.book_append_sheet(wb, ws, "تقرير دورات النخبة");
             const cohortFileLabel = selectedEliteCohort === 'best100' ? 'أفضل_100_معرض' : (selectedEliteCohort === 'elite' ? 'النخبة_فقط' : 'النخبة_وأفضل_100');
             XLSX.writeFile(wb, `تقرير_دورات_${cohortFileLabel}.xlsx`);
+        }
+
+        function getBotCombinedParticipants() {
+            const participants = new Map();
+            const addParticipants = (employees, sourceStatus) => {
+                (employees || []).forEach(emp => {
+                    if (!hasBotEnrollment(emp)) return;
+                    const key = cleanString(emp.id) || cleanString(emp.email) || cleanString(emp.name);
+                    if (!key) return;
+                    participants.set(key, { emp, sourceStatus: sourceStatus(emp) });
+                });
+            };
+
+            addParticipants(globalData.missingEmployees, () => "غير موجود بقائمة القوى (بالأكاديمية فقط)");
+            addParticipants(globalData.excludedEmployees, emp => `مستبعد (${emp.status || "حالة مستبعدة"})`);
+            addParticipants(globalData.allActive, () => "على رأس العمل");
+
+            return Array.from(participants.values()).sort((a, b) =>
+                cleanString(a.emp.region).localeCompare(cleanString(b.emp.region), "ar") ||
+                cleanString(a.emp.supervisor).localeCompare(cleanString(b.emp.supervisor), "ar") ||
+                cleanString(a.emp.name).localeCompare(cleanString(b.emp.name), "ar")
+            );
+        }
+
+        function buildBotCombinedRows() {
+            const headers = [
+                "الرقم الوظيفي", "الاسم", "الإيميل", "الإقليم", "مدير القطاع / الإقليم", "المشرف",
+                "تاريخ التعيين", "حالة الموظف", ...botCoursesKeys,
+                "عدد الدورات المسجل عليها", "عدد الدورات المكتملة", "ملاحظات"
+            ];
+            const rows = getBotCombinedParticipants().map(({ emp, sourceStatus }) => {
+                const summary = getBotImprovementSummary(emp);
+                const courseMarks = botCoursesKeys.map(course => {
+                    const record = emp.botCourses && emp.botCourses[course];
+                    return record && record.enrolled ? "✓" : "";
+                });
+                return [
+                    emp.id,
+                    emp.name,
+                    emp.email || "",
+                    emp.region || "غير متوفر",
+                    emp.manager || "غير متوفر",
+                    emp.supervisor || "غير متوفر",
+                    emp.hireDate ? formatDateDisplay(emp.hireDate) : "",
+                    sourceStatus,
+                    ...courseMarks,
+                    summary.assignedCount,
+                    summary.completedCount,
+                    `أكمل ${summary.completedCount} من ${summary.assignedCount} دورة من الدورات المسجل عليها`
+                ];
+            });
+            return [headers, ...rows];
+        }
+
+        function exportBotCombinedData() {
+            const aoa = buildBotCombinedRows();
+            if (aoa.length === 1) {
+                alert("لا توجد بيانات مسجلين في دورات تعديل المسار لتصديرها.");
+                return;
+            }
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(aoa);
+            applyExcelStyles(ws);
+            ws['!cols'] = [
+                { wch: 14 }, { wch: 30 }, { wch: 28 }, { wch: 22 }, { wch: 25 }, { wch: 28 },
+                { wch: 16 }, { wch: 30 },
+                ...botCoursesKeys.map(() => ({ wch: 34 })),
+                { wch: 20 }, { wch: 20 }, { wch: 42 }
+            ];
+            XLSX.utils.book_append_sheet(wb, ws, "تعديل المسار - مجمع");
+            XLSX.writeFile(wb, "تقرير_تعديل_المسار_المجمع.xlsx");
         }
 
         function exportBotCourseData() {
