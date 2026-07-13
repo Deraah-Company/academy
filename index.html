@@ -183,6 +183,7 @@
                     <input type="file" id="oldAcademyFile" accept=".xlsx, .xls" class="hidden" onchange="handleFileSelect(event, 'oldAcFileName')" />
                 </div>
 
+
             </div>
 
             <div id="uploadErrorMessage" class="hidden mt-6 bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl flex items-center justify-center gap-3 font-bold">
@@ -247,6 +248,9 @@
                 </button>
                 <button class="tab-btn px-5 py-4 text-yellow-700 font-bold bg-yellow-50 border-r border-yellow-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'eliteTab')">
                     <i class="fas fa-star ml-2"></i> النخبة
+                </button>
+                <button class="tab-btn px-5 py-4 text-violet-700 font-bold bg-violet-50 border-r border-violet-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'botPathTab')">
+                    <i class="fas fa-route ml-2"></i> تعديل المسار
                 </button>
                 <button class="tab-btn px-5 py-4 text-purple-700 font-bold bg-purple-50 border-r border-purple-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'comparisonTab')">
                     <i class="fas fa-balance-scale ml-2"></i> مقارنة الفترات
@@ -386,6 +390,7 @@
                                 <option value="elite">مسار النخبة</option>
                                 <option value="less3">مسار أقل من 3 شهور</option>
                                 <option value="more3">مسار 3 شهور فأكثر</option>
+                                <option value="improvement">مسار التحسين (BOT)</option>
                             </select>
                         </div>
                         <button onclick="exportKpiPivotWorkbook()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-5 rounded-xl shadow transition transform hover:-translate-y-0.5 flex items-center gap-2 whitespace-nowrap">
@@ -427,7 +432,7 @@
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <!-- مسار النخبة -->
-                            <div class="kpi-axis-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-yellow-400 hover:shadow-md transition" onclick="showKPIEmployees('elite')">
+                            <div class="kpi-axis-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-yellow-400 hover:shadow-md transition" onclick="showKPIEmployees('elite', event)">
                                 <div class="flex justify-between items-start mb-2">
                                     <div class="w-10 h-10 bg-yellow-100 text-yellow-600 rounded-lg flex items-center justify-center text-lg"><i class="fas fa-star"></i></div>
                                     <span class="text-2xl font-extrabold text-slate-800" id="kpiEliteVal">NA</span>
@@ -437,7 +442,7 @@
                             </div>
 
                             <!-- أقل من 3 شهور -->
-                            <div class="kpi-axis-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-orange-400 hover:shadow-md transition" onclick="showKPIEmployees('less3')">
+                            <div class="kpi-axis-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-orange-400 hover:shadow-md transition" onclick="showKPIEmployees('less3', event)">
                                 <div class="flex justify-between items-start mb-2">
                                     <div class="w-10 h-10 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center text-lg"><i class="fas fa-hourglass-start"></i></div>
                                     <span class="text-2xl font-extrabold text-slate-800" id="kpiLess3Val">NA</span>
@@ -447,7 +452,7 @@
                             </div>
 
                             <!-- 3 شهور فأكثر -->
-                            <div class="kpi-axis-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 hover:shadow-md transition" onclick="showKPIEmployees('more3')">
+                            <div class="kpi-axis-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 hover:shadow-md transition" onclick="showKPIEmployees('more3', event)">
                                 <div class="flex justify-between items-start mb-2">
                                     <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center text-lg"><i class="fas fa-hourglass-half"></i></div>
                                     <span class="text-2xl font-extrabold text-slate-800" id="kpiMore3Val">NA</span>
@@ -457,13 +462,13 @@
                             </div>
 
                             <!-- مسار التحسين -->
-                            <div class="kpi-axis-card bg-slate-100 p-5 rounded-xl border border-slate-200 shadow-sm cursor-pointer opacity-70">
+                            <div class="kpi-axis-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-violet-400 hover:shadow-md transition" onclick="showKPIEmployees('improvement', event)">
                                 <div class="flex justify-between items-start mb-2">
-                                    <div class="w-10 h-10 bg-slate-200 text-slate-500 rounded-lg flex items-center justify-center text-lg"><i class="fas fa-level-up-alt"></i></div>
-                                    <span class="text-2xl font-extrabold text-slate-500">NA</span>
+                                    <div class="w-10 h-10 bg-violet-100 text-violet-600 rounded-lg flex items-center justify-center text-lg"><i class="fas fa-level-up-alt"></i></div>
+                                    <span class="text-2xl font-extrabold text-slate-800" id="kpiImprovementVal">NA</span>
                                 </div>
-                                <h4 class="font-bold text-slate-600">مسار التحسين</h4>
-                                <p class="text-xs text-slate-400 mt-1">غير متوفر حالياً بالبيانات</p>
+                                <h4 class="font-bold text-slate-700">مسار التحسين (BOT)</h4>
+                                <p class="text-xs text-slate-500 mt-1" id="kpiImprovementDesc">المسجلون في دورات BOT</p>
                             </div>
                         </div>
                     </div>
@@ -945,6 +950,19 @@
                             <i class="fas fa-file-excel ml-2"></i> تصدير إكسيل (النخبة)
                         </button>
                     </div>
+                    <div class="bg-yellow-50/60 border border-yellow-200 rounded-2xl p-4 mb-6">
+                        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                            <div>
+                                <h3 class="font-bold text-yellow-900"><i class="fas fa-layer-group ml-2"></i> تقسيم المستهدفين</h3>
+                                <p class="text-xs text-yellow-700 mt-1" id="eliteCohortSourceNote">قائمة أفضل 100 معرض مسجلة داخل البرنامج من ملف T9.</p>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full lg:w-auto" id="eliteCohortButtons">
+                                <button type="button" data-elite-cohort="all" onclick="selectEliteCohort('all')" class="elite-cohort-btn bg-yellow-500 text-white border border-yellow-500 rounded-xl px-4 py-2.5 text-sm font-bold shadow-sm">الاثنان معاً <span id="eliteCohortAllCount" class="mr-1">0</span></button>
+                                <button type="button" data-elite-cohort="elite" onclick="selectEliteCohort('elite')" class="elite-cohort-btn bg-white text-yellow-800 border border-yellow-200 rounded-xl px-4 py-2.5 text-sm font-bold">النخبة فقط <span id="eliteCohortEliteCount" class="mr-1">0</span></button>
+                                <button type="button" data-elite-cohort="best100" onclick="selectEliteCohort('best100')" class="elite-cohort-btn bg-white text-yellow-800 border border-yellow-200 rounded-xl px-4 py-2.5 text-sm font-bold">أفضل 100 معرض <span id="eliteCohortBest100Count" class="mr-1">0</span></button>
+                            </div>
+                        </div>
+                    </div>
                     <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
                         <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl text-center shadow-sm">
                             <p class="text-slate-600 text-xs md:text-sm font-bold">إجمالي المستهدفين (بالعمل)</p>
@@ -974,6 +992,8 @@
                                     <th class="px-5 py-4 font-semibold tracking-wider">الرقم الوظيفي</th>
                                     <th class="px-5 py-4 font-semibold tracking-wider">الاسم</th>
                                     <th class="px-5 py-4 font-semibold tracking-wider">الإقليم</th>
+                                    <th class="px-5 py-4 font-semibold tracking-wider">المشرف</th>
+                                    <th class="px-5 py-4 font-semibold tracking-wider">الفئة</th>
                                     <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteCourse1Head">Sales Scenarios for Deraah Oud's Top Products</th>
                                     <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteCourse2Head">Sales Scenarios for DERAAH's Top Products</th>
                                     <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteCourse3Head">Time Management and Organization</th>
@@ -995,12 +1015,119 @@
                                         <th class="px-5 py-4 font-semibold tracking-wider">الرقم الوظيفي</th>
                                         <th class="px-5 py-4 font-semibold tracking-wider">الاسم</th>
                                         <th class="px-5 py-4 font-semibold tracking-wider">سبب الاستبعاد / الحالة</th>
+                                        <th class="px-5 py-4 font-semibold tracking-wider">المشرف</th>
+                                        <th class="px-5 py-4 font-semibold tracking-wider">الفئة</th>
                                         <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteOffCourse1Head">دورة النخبة 1</th>
                                         <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteOffCourse2Head">دورة النخبة 2</th>
                                         <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteOffCourse3Head">دورة النخبة 3</th>
                                     </tr>
                                 </thead>
                                 <tbody id="eliteOffTargetTableBody" class="bg-white divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="botPathTab" class="tab-content">
+                    <div class="bg-violet-50 border border-violet-100 rounded-2xl p-5 md:p-6 mb-6">
+                        <div class="flex flex-col lg:flex-row justify-between lg:items-center gap-4">
+                            <div>
+                                <h2 class="text-2xl font-bold text-violet-900 flex items-center">
+                                    <i class="fas fa-route text-violet-500 ml-2"></i> تعديل المسار (BOT)
+                                </h2>
+                                <p class="text-violet-700 text-sm mt-2">اختر دورة لعرض المسجلين فيها وتقدمهم فقط. كل دورة مستقلة ولا يتم احتساب الموظف على أساس استكمال الدورات الخمس.</p>
+                            </div>
+                            <button onclick="exportBotCourseData()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-5 rounded-xl shadow transition transform hover:-translate-y-0.5 whitespace-nowrap">
+                                <i class="fas fa-file-excel ml-2"></i> تصدير Excel للدورة الحالية
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h3 class="font-bold text-slate-700 mb-3"><i class="fas fa-filter text-violet-500 ml-2"></i> اختر الدورة</h3>
+                        <div id="botCourseButtons" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
+                            <button type="button" data-bot-course-index="0" onclick="selectBotCourse(0)" class="bot-course-btn border border-violet-200 bg-violet-50 text-violet-800 rounded-xl px-3 py-3 text-sm font-bold transition hover:border-violet-500">Communication Skills (BOT)</button>
+                            <button type="button" data-bot-course-index="1" onclick="selectBotCourse(1)" class="bot-course-btn border border-violet-200 bg-violet-50 text-violet-800 rounded-xl px-3 py-3 text-sm font-bold transition hover:border-violet-500">Advanced Sales Skills (BOT)</button>
+                            <button type="button" data-bot-course-index="2" onclick="selectBotCourse(2)" class="bot-course-btn border border-violet-200 bg-violet-50 text-violet-800 rounded-xl px-3 py-3 text-sm font-bold transition hover:border-violet-500">Customer EX (BOT)</button>
+                            <button type="button" data-bot-course-index="3" onclick="selectBotCourse(3)" class="bot-course-btn border border-violet-200 bg-violet-50 text-violet-800 rounded-xl px-3 py-3 text-sm font-bold transition hover:border-violet-500">Sell Like A Pro (BOT)</button>
+                            <button type="button" data-bot-course-index="4" onclick="selectBotCourse(4)" class="bot-course-btn border border-violet-200 bg-violet-50 text-violet-800 rounded-xl px-3 py-3 text-sm font-bold transition hover:border-violet-500">Understanding Customer Needs (BOT)</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl shadow-sm">
+                            <p class="text-slate-500 text-sm font-bold">المسجلون في الدورة</p>
+                            <p class="text-3xl font-extrabold text-slate-800 mt-1" id="botStatTotal">0</p>
+                        </div>
+                        <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl shadow-sm">
+                            <p class="text-emerald-700 text-sm font-bold">مكتمل 100%</p>
+                            <p class="text-3xl font-extrabold text-emerald-800 mt-1" id="botStatCompleted">0</p>
+                        </div>
+                        <div class="bg-orange-50 border border-orange-200 p-4 rounded-xl shadow-sm">
+                            <p class="text-orange-700 text-sm font-bold">أقل من 100%</p>
+                            <p class="text-3xl font-extrabold text-orange-800 mt-1" id="botStatIncomplete">0</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col xl:flex-row xl:items-end justify-between gap-4 mb-4">
+                        <div>
+                            <p class="text-xs text-slate-500 font-bold mb-1">الدورة المعروضة</p>
+                            <h3 id="botSelectedCourseTitle" class="text-lg font-extrabold text-violet-800">Communication Skills (BOT)</h3>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full xl:w-auto">
+                            <div class="relative">
+                                <i class="fas fa-search absolute right-3 top-3 text-slate-400"></i>
+                                <input type="text" id="botSearch" onkeyup="renderBotCourseTab()" placeholder="بحث بالاسم أو الرقم..." class="pl-4 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 w-full sm:w-64">
+                            </div>
+                            <select id="botRegionFilter" onchange="renderBotCourseTab()" class="px-4 py-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-violet-500">
+                                <option value="">كل الأقاليم</option>
+                            </select>
+                            <select id="botProgressFilter" onchange="renderBotCourseTab()" class="px-4 py-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-violet-500">
+                                <option value="">كل نسب التقدم</option>
+                                <option value="completed">مكتمل 100%</option>
+                                <option value="incomplete">أقل من 100%</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="table-container border border-slate-200 rounded-xl shadow-sm mb-8">
+                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
+                            <thead class="bg-violet-50 text-slate-800 border-b border-violet-100">
+                                <tr>
+                                    <th class="px-4 py-4 font-semibold">الرقم الوظيفي</th>
+                                    <th class="px-4 py-4 font-semibold">الاسم</th>
+                                    <th class="px-4 py-4 font-semibold">الإيميل</th>
+                                    <th class="px-4 py-4 font-semibold">الإقليم</th>
+                                    <th class="px-4 py-4 font-semibold">مدير القطاع / الإقليم</th>
+                                    <th class="px-4 py-4 font-semibold">المشرف</th>
+                                    <th class="px-4 py-4 font-semibold">تاريخ التعيين</th>
+                                    <th class="px-4 py-4 font-semibold text-center">التقدم</th>
+                                </tr>
+                            </thead>
+                            <tbody id="botCourseTableBody" class="bg-white divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="bg-red-50/40 border border-red-100 rounded-2xl p-5">
+                        <h3 class="text-lg font-bold text-red-800 mb-4 flex items-center">
+                            <i class="fas fa-exclamation-triangle text-red-500 ml-2"></i> مسجلون في الدورة لكنهم مستبعدون أو غير موجودين بالقوى
+                            <span id="botOffTargetCount" class="mr-3 bg-red-100 text-red-700 text-sm font-bold px-3 py-1 rounded-full">0</span>
+                        </h3>
+                        <div class="table-container border border-red-200 rounded-xl shadow-sm bg-white">
+                            <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
+                                <thead class="bg-red-50 text-red-800 border-b border-red-200">
+                                    <tr>
+                                        <th class="px-4 py-4 font-semibold">الرقم الوظيفي</th>
+                                        <th class="px-4 py-4 font-semibold">الاسم</th>
+                                        <th class="px-4 py-4 font-semibold">الإيميل</th>
+                                        <th class="px-4 py-4 font-semibold">سبب الاستبعاد / الحالة</th>
+                                        <th class="px-4 py-4 font-semibold">الإقليم</th>
+                                        <th class="px-4 py-4 font-semibold">مدير القطاع / الإقليم</th>
+                                        <th class="px-4 py-4 font-semibold">المشرف</th>
+                                        <th class="px-4 py-4 font-semibold text-center">التقدم</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="botOffTargetTableBody" class="bg-white divide-y divide-slate-100"></tbody>
                             </table>
                         </div>
                     </div>
@@ -1145,6 +1272,7 @@
 
         // --- Target Certs Logic ---
         let targetCertsCount = parseInt(localStorage.getItem('targetCertsCount')) || 21;
+        const less3KpiTarget = 10;
 
         window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('targetCertsInput').value = targetCertsCount;
@@ -1196,6 +1324,7 @@
             if (type === 'Wf') inputId = 'workforceFile';
             else if (type === 'Ac') inputId = 'academyFile';
             else if (type === 'OldAc') inputId = 'oldAcademyFile';
+            const displayId = { Wf: 'wfFileName', Ac: 'acFileName', OldAc: 'oldAcFileName' }[type];
             
             const input = document.getElementById(inputId);
             
@@ -1212,7 +1341,7 @@
                     dropZone.classList.remove('dragover');
                     if (e.dataTransfer.files.length) {
                         input.files = e.dataTransfer.files;
-                        handleFileSelect({target: input}, `${type.toLowerCase()}FileName`);
+                        handleFileSelect({target: input}, displayId);
                     }
                 });
             }
@@ -1280,6 +1409,19 @@
             "Time Management and Organization"
         ];
 
+        const botCoursesKeys = [
+            "Communication Skills ( BOT)",
+            "Advanced Sales Skills ( BOT)",
+            "Customer EX ( BOT)",
+            "Sell Like A Pro ( BOT)",
+            "Understanding Customer Needs ( BOT)"
+        ];
+        // قائمة أفضل 100 معرض المضمنة من ملف T9 الحالي (الصفوف التي قيمتها "لا" في العمود F).
+        // يمكن تحديثها في أي وقت برفع ملف T9 من الخانة الرابعة.
+        const embeddedBest100OnlyIds = new Set(["20595","20838","20874","20895","30209","30756","30966","30978","31184","31235","31268","31281","31993","32059","32097","32615","32648","32781","32785","32887","32922","33009","33010","33080","33095","33227","33245","33457","33497","33533","33564","33807","33926","34189","35099","35649","35880","36435","36460","36547","36684","37867","38844","38950","39571","40016","40254","40260","40267","40762","40913","40914","41045","41255","41468","41533","41581","41600","41640","41660","42185","42323","42462","42634","42940","42993","43009","43085","43299","43385","43456","43473","43779","43911","44001","44009","44085","44099","44116","44182","44209","44460","44498","44556","44614","44727","44781","44997","45005","45124","45355","45381","45525","45749","45914","46041","46046","46303","46361","46382","46451","46471","46472","46550","46665","46776","46804","46914","47115","47304","47375","47410","47466","47489","47513","47648","47708","47753","47758","47856","47859","47885","47902","48036","48043","48110","48163","48182","48250","48309","48322","48409","48411","48480","48784","48846","48856","48857","49027","49054","49076","49093","49098","49219","49230","49234","49281","49313","49397","49410","49438","49487","49813","49817","49900","49930","49934","49953","49954","49988","50062","50080","50093","50228","50229","50251","50292","50301","50312","50353","50407","50416","50430","50455","50548","50577","50584","50633","50681","50698","50720","50727","50831","50837","50856","50939","50941","50963","51053","51132","51135","51139","51141","51154","51181","51201","51227","51235","51305","51318","51321","51381","51386","51428","51468","51473","51477","51481","51521","51557","51627","51644","51679","51680","51682","51725","51772","51777","51828","51899","51917","51937","51939","51968","51976","51998","52018","52048","52098","52104","52137","52186","52189","52204","52205","52224","52234","52328","52329","52335","52340","52358","52369","52372","52376","52386","52387","52388","52398","52408","52425","52434","52564","52578","52619","52622","52641","52686","52727","52743","52757","52770","52772","52781","52791","52793","52801","52842","52853","52901","52911","52917","52939","52959","52967","52997","53010","53088","53092","53130","53156","53157","53177","53190","53206","53225","1103902985"]);
+        let selectedBotCourseIndex = 0;
+        let selectedEliteCohort = 'all';
+
         const trainingPathDef = [
             { certId: 1, ar: "تاريخ درعه", en: "Deraah History", hasCert: true },
             { certId: 2, ar: "العطور", en: "Perfumes", hasCert: true },
@@ -1314,6 +1456,7 @@
 
         let globalData = {
             allActive: [], excludedEmployees: [], missingEmployees: [], missingFromAcademy: [], regionsSet: new Set(), excludedRegions: new Set(), allExtractedMonths: new Set(), hasOldData: false,
+            hasBest100Data: false, best100OnlyIds: new Set(),
             timeline: { hourly: Array(24).fill(0), daily: {}, weekly: {} },
             hireYearsMonths: {} // To store unique hire years and their months
         };
@@ -1343,6 +1486,7 @@
                 buildDashboardFilterUI();
                 updateDashboardCharts();
             }
+            if (tabId === 'botPathTab') renderBotCourseTab();
         }
 
         function switchMissingSubTab(event, sectionId) {
@@ -1394,6 +1538,73 @@
         }
 
         function cleanString(str) { return str == null ? "" : str.toString().trim(); }
+
+        function normalizeBotCourseName(name) {
+            return cleanString(name)
+                .toLowerCase()
+                .replace(/[\s\u00a0]+/g, '')
+                .replace(/[()\-_.]/g, '');
+        }
+
+        function findBotCourse(courseName) {
+            const normalizedName = normalizeBotCourseName(courseName);
+            if (!normalizedName || !normalizedName.includes('bot')) return null;
+            return botCoursesKeys.find(course => normalizedName.includes(normalizeBotCourseName(course))) || null;
+        }
+
+        function createBotCoursesState() {
+            let state = {};
+            botCoursesKeys.forEach(course => {
+                state[course] = { enrolled: false, progress: null };
+            });
+            return state;
+        }
+
+        function mergeBotCourseRecord(employee, courseKey, progressRaw) {
+            if (!employee || !courseKey) return;
+            if (!employee.botCourses) employee.botCourses = createBotCoursesState();
+            const record = employee.botCourses[courseKey] || { enrolled: false, progress: null };
+            const parsedProgress = parseProgress(progressRaw);
+            record.enrolled = true;
+            if (parsedProgress !== null && (record.progress === null || parsedProgress > record.progress)) record.progress = parsedProgress;
+            employee.botCourses[courseKey] = record;
+        }
+
+        function getBotImprovementSummary(employee) {
+            const assigned = botCoursesKeys.filter(course => employee && employee.botCourses && employee.botCourses[course] && employee.botCourses[course].enrolled);
+            const completed = assigned.filter(course => employee.botCourses[course].progress === 100);
+            return {
+                assignedCount: assigned.length,
+                completedCount: completed.length,
+                score: assigned.length > 0 && completed.length === assigned.length ? 100 : 0
+            };
+        }
+
+        function hasBotEnrollment(employee) {
+            return getBotImprovementSummary(employee).assignedCount > 0;
+        }
+
+        function buildBest100OnlyIdSet() {
+            return new Set(embeddedBest100OnlyIds);
+        }
+
+        function matchesEliteCohort(employee) {
+            if (selectedEliteCohort === 'all') return true;
+            return (employee.eliteGroup || 'elite') === selectedEliteCohort;
+        }
+
+        function getEliteCohortLabel(employee) {
+            return (employee.eliteGroup || 'elite') === 'best100' ? 'أفضل 100 معرض' : 'النخبة';
+        }
+
+        function safeBotText(value) {
+            return cleanString(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
         
         function isExcluded(status) {
             if (!status) return false;
@@ -1494,7 +1705,7 @@
                         const acData = await readExcel(acFile);
                         let oldAcData = null;
                         if (oldAcFile) oldAcData = await readExcel(oldAcFile);
-                        
+                         
                         analyzeData(wfData, acData, oldAcData);
                         
                         const resultsSec = document.getElementById('resultsSection');
@@ -1522,8 +1733,10 @@
         }
 
         function analyzeData(wfRows, acRows, oldAcRows) {
+            const best100OnlyIds = buildBest100OnlyIdSet();
             globalData = { 
                 allActive: [], excludedEmployees: [], missingEmployees: [], missingFromAcademy: [], regionsSet: new Set(), excludedRegions: new Set(), allExtractedMonths: new Set(), hasOldData: !!oldAcRows,
+                hasBest100Data: best100OnlyIds.size > 0, best100OnlyIds,
                 timeline: { hourly: Array(24).fill(0), daily: {}, weekly: {} }, hireYearsMonths: {}
             };
             let employeeMap = {};
@@ -1545,7 +1758,8 @@
                     id, name, hireDate, status, supervisor, manager, 
                     region: determineRegion(manager), email: "", totalCerts: 0, oldTotalCerts: 0, 
                     monthsData: {}, nonCertProgress: {}, eliteProgress: {}, isEliteTarget: false,
-                    pathProgress: {} 
+                    eliteGroup: best100OnlyIds.has(id) ? 'best100' : 'elite',
+                    pathProgress: {}, botCourses: createBotCoursesState()
                 };
                 
                 targetMonthsKeys.forEach(m => emp.monthsData[m] = 0);
@@ -1588,6 +1802,7 @@
                 let courseLower = courseName.toLowerCase();
                 let progressRaw = row.length > 26 ? row[26] : null;
                 let certInfo = parseCertificateDate(certValue);
+                let matchedBotCourse = findBotCourse(courseName);
 
                 if (certValue !== "-") {
                     let timeRegex = /(\d{2})\/(\d{2})\/(\d{4})[\s\r\n]+(\d{1,2}):(\d{2}):(\d{2})[\s\r\n]*(am|pm)/gi;
@@ -1611,6 +1826,8 @@
                 }
 
                 if (employeeMap[id]) {
+                    if (matchedBotCourse) mergeBotCourseRecord(employeeMap[id], matchedBotCourse, progressRaw);
+
                     let matchedElite = eliteCoursesKeys.find(c => courseLower.includes(c.toLowerCase()));
                     if (matchedElite) {
                         employeeMap[id].isEliteTarget = true;
@@ -1632,7 +1849,7 @@
                         employeeMap[id].monthsData[certInfo.key]++;
                     }
 
-                    let matchedPathCourse = trainingPathDef.find(c => courseLower.includes(c.en.toLowerCase()));
+                    let matchedPathCourse = matchedBotCourse ? null : trainingPathDef.find(c => courseLower.includes(c.en.toLowerCase()));
                     if (matchedPathCourse) {
                         if (certValue !== "-" || parseProgress(progressRaw) === 100) {
                             employeeMap[id].pathProgress[matchedPathCourse.en] = true;
@@ -1648,11 +1865,20 @@
                             totalCerts: 0, 
                             eliteProgress: {}, 
                             isEliteTarget: false,
-                            pathProgress: {}
+                            eliteGroup: best100OnlyIds.has(id) ? 'best100' : 'elite',
+                            pathProgress: {},
+                            botCourses: createBotCoursesState(),
+                            hireDate: "",
+                            status: "غير موجود بالقوى",
+                            supervisor: "غير متوفر",
+                            manager: "غير متوفر",
+                            region: "غير متوفر"
                         };
                         eliteCoursesKeys.forEach(c => missingMap[id].eliteProgress[c] = false);
                         trainingPathDef.forEach(c => missingMap[id].pathProgress[c.en] = false);
                     }
+
+                    if (matchedBotCourse) mergeBotCourseRecord(missingMap[id], matchedBotCourse, progressRaw);
 
                     let matchedElite = eliteCoursesKeys.find(c => courseLower.includes(c.toLowerCase()));
                     if (matchedElite) {
@@ -1662,7 +1888,7 @@
                         }
                     }
 
-                    let matchedPathCourse = trainingPathDef.find(c => courseLower.includes(c.en.toLowerCase()));
+                    let matchedPathCourse = matchedBotCourse ? null : trainingPathDef.find(c => courseLower.includes(c.en.toLowerCase()));
                     if (matchedPathCourse) {
                         if (certValue !== "-" || parseProgress(progressRaw) === 100) {
                             missingMap[id].pathProgress[matchedPathCourse.en] = true;
@@ -1875,6 +2101,7 @@
                 if(trackFilter === 'elite' && !emp.isEliteTarget) includeEmp = false;
                 if(trackFilter === 'less3' && (emp.tenureMonths < 0 || emp.tenureMonths >= 3)) includeEmp = false;
                 if(trackFilter === 'more3' && emp.tenureMonths < 3) includeEmp = false;
+                if(trackFilter === 'improvement' && !hasBotEnrollment(emp)) includeEmp = false;
                 
                 if (!includeEmp) return;
 
@@ -1896,7 +2123,9 @@
                     let hasC3 = eliteCoursesKeys[2] ? emp.eliteProgress[eliteCoursesKeys[2]] : false;
                     isAchieved = hasC1 && hasC2 && hasC3;
                 } else if (trackFilter === 'less3') {
-                    isAchieved = emp.totalCerts >= 10;
+                    isAchieved = emp.totalCerts >= less3KpiTarget;
+                } else if (trackFilter === 'improvement') {
+                    isAchieved = getBotImprovementSummary(emp).score === 100;
                 } else {
                     isAchieved = emp.totalCerts >= targetCertsCount;
                 }
@@ -1990,6 +2219,7 @@
             let eliteEmps = supData.employees.filter(e => e.isEliteTarget);
             let less3Emps = supData.employees.filter(e => e.tenureMonths >= 0 && e.tenureMonths < 3);
             let more3Emps = supData.employees.filter(e => e.tenureMonths >= 3);
+            let improvementEmps = supData.employees.filter(hasBotEnrollment);
 
             let eliteAchieved = eliteEmps.filter(e => {
                 let hasC1 = eliteCoursesKeys[0] ? e.eliteProgress[eliteCoursesKeys[0]] : false;
@@ -1998,27 +2228,33 @@
                 return hasC1 && hasC2 && hasC3;
             }).length;
             
-            let less3Achieved = less3Emps.filter(e => e.totalCerts >= 10).length;
+            let less3Achieved = less3Emps.filter(e => e.totalCerts >= less3KpiTarget).length;
             let more3Achieved = more3Emps.filter(e => e.totalCerts >= targetCertsCount).length;
+            let improvementAchieved = improvementEmps.filter(e => getBotImprovementSummary(e).score === 100).length;
 
             let elitePct = eliteEmps.length > 0 ? Math.round((eliteAchieved / eliteEmps.length) * 100) : 'NA';
             let less3Pct = less3Emps.length > 0 ? Math.round((less3Achieved / less3Emps.length) * 100) : 'NA';
             let more3Pct = more3Emps.length > 0 ? Math.round((more3Achieved / more3Emps.length) * 100) : 'NA';
+            let improvementPct = improvementEmps.length > 0 ? Math.round((improvementAchieved / improvementEmps.length) * 100) : 'NA';
             
             document.getElementById('kpiEliteVal').innerText = elitePct !== 'NA' ? elitePct + '%' : 'NA';
             document.getElementById('kpiEliteDesc').innerText = eliteEmps.length > 0 ? `العدد: ${eliteEmps.length} (المستهدف 3/3)` : 'لا يوجد';
             
             document.getElementById('kpiLess3Val').innerText = less3Pct !== 'NA' ? less3Pct + '%' : 'NA';
-            document.getElementById('kpiLess3Desc').innerText = less3Emps.length > 0 ? `العدد: ${less3Emps.length} (المستهدف 10)` : 'لا يوجد';
+            document.getElementById('kpiLess3Desc').innerText = less3Emps.length > 0 ? `العدد: ${less3Emps.length} (المستهدف ${less3KpiTarget})` : 'لا يوجد';
             
             document.getElementById('kpiMore3Val').innerText = more3Pct !== 'NA' ? more3Pct + '%' : 'NA';
             document.getElementById('kpiMore3Desc').innerText = more3Emps.length > 0 ? `العدد: ${more3Emps.length} (المستهدف ${targetCertsCount})` : 'لا يوجد';
+
+            document.getElementById('kpiImprovementVal').innerText = improvementPct !== 'NA' ? improvementPct + '%' : 'NA';
+            document.getElementById('kpiImprovementDesc').innerText = improvementEmps.length > 0 ? `العدد: ${improvementEmps.length} (100% أو صفر)` : 'لا يوجد';
 
             let sumPct = 0;
             let countAxes = 0;
             if (elitePct !== 'NA') { sumPct += elitePct; countAxes++; }
             if (less3Pct !== 'NA') { sumPct += less3Pct; countAxes++; }
             if (more3Pct !== 'NA') { sumPct += more3Pct; countAxes++; }
+            if (improvementPct !== 'NA') { sumPct += improvementPct; countAxes++; }
             
             let avg = countAxes > 0 ? Math.round(sumPct / countAxes) : 0;
             document.getElementById('kpiOverallAvg').innerText = avg + '%';
@@ -2026,7 +2262,7 @@
             document.getElementById('kpiAxesSection').classList.remove('hidden');
         }
 
-        function showKPIEmployees(axis) {
+        function showKPIEmployees(axis, clickEvent) {
             if (!currentKpiManager || !currentKpiSupervisor) return;
             
             let supData = kpiManagersData[currentKpiManager].supervisors[currentKpiSupervisor];
@@ -2034,7 +2270,7 @@
             let axisTitle = '';
 
             document.querySelectorAll('.kpi-axis-card').forEach(c => c.classList.remove('ring-2', 'ring-teal-500', 'bg-teal-50'));
-            event.currentTarget.classList.add('ring-2', 'ring-teal-500', 'bg-teal-50');
+            if (clickEvent && clickEvent.currentTarget) clickEvent.currentTarget.classList.add('ring-2', 'ring-teal-500', 'bg-teal-50');
 
             if (axis === 'elite') {
                 emps = supData.employees.filter(e => e.isEliteTarget);
@@ -2045,6 +2281,9 @@
             } else if (axis === 'more3') {
                 emps = supData.employees.filter(e => e.tenureMonths >= 3);
                 axisTitle = 'تفاصيل 3 شهور فأكثر';
+            } else if (axis === 'improvement') {
+                emps = supData.employees.filter(hasBotEnrollment);
+                axisTitle = 'تفاصيل مسار التحسين (BOT)';
             }
 
             document.getElementById('kpiEmpTableTitle').innerHTML = `<i class="fas fa-list text-teal-500 ml-2"></i> 4. ${axisTitle}`;
@@ -2062,9 +2301,13 @@
                     let count = (hasC1 ? 1 : 0) + (hasC2 ? 1 : 0) + (hasC3 ? 1 : 0);
                     displayProgress = `${count} / 3 دورات`;
                 } else if (axis === 'less3') {
-                    isAchieved = e.totalCerts >= 10;
+                    isAchieved = e.totalCerts >= less3KpiTarget;
                 } else if (axis === 'more3') {
                     isAchieved = e.totalCerts >= targetCertsCount;
+                } else if (axis === 'improvement') {
+                    const botSummary = getBotImprovementSummary(e);
+                    isAchieved = botSummary.score === 100;
+                    displayProgress = `${botSummary.completedCount} / ${botSummary.assignedCount} دورات BOT — KPI ${botSummary.score}%`;
                 }
 
                 let statusHtml = isAchieved 
@@ -2091,36 +2334,33 @@
 
         function exportSingleSupervisorKPI() {
             if (!currentKpiManager || !currentKpiSupervisor) return;
-            
+             
             let supData = kpiManagersData[currentKpiManager].supervisors[currentKpiSupervisor];
             let wb = XLSX.utils.book_new();
+            let trackFilter = document.getElementById('kpiTrackFilter') ? document.getElementById('kpiTrackFilter').value : 'all';
+            let aoa = [["الرقم الوظيفي", "الاسم", "المشرف", "الإقليم", "المسار", "الشهادات/الدورات المنجزة", "حالة الانجاز"]];
 
-            // All employees of this supervisor in the current filtered track
-            let aoa = [["الرقم الوظيفي", "الاسم", "الإقليم", "المسار", "الشهادات/الدورات المنجزة", "حالة الانجاز"]];
-            
+            const addRow = (employee, track, progress, achieved) => {
+                aoa.push([employee.id, employee.name, employee.supervisor || currentKpiSupervisor, employee.region, track, progress, achieved ? "مكتمل" : "غير مكتمل"]);
+            };
+
             supData.employees.forEach(e => {
-                let track = "";
-                let progress = "";
-                let isAch = false;
-
-                if (e.isEliteTarget) {
-                    track = "النخبة";
-                    let hasC1 = eliteCoursesKeys[0] ? e.eliteProgress[eliteCoursesKeys[0]] : false;
-                    let hasC2 = eliteCoursesKeys[1] ? e.eliteProgress[eliteCoursesKeys[1]] : false;
-                    let hasC3 = eliteCoursesKeys[2] ? e.eliteProgress[eliteCoursesKeys[2]] : false;
-                    isAch = hasC1 && hasC2 && hasC3;
-                    progress = `${(hasC1?1:0)+(hasC2?1:0)+(hasC3?1:0)} / 3`;
-                } else if (e.tenureMonths < 3) {
-                    track = "أقل من 3 شهور";
-                    progress = e.totalCerts;
-                    isAch = e.totalCerts >= 10;
-                } else {
-                    track = "3 شهور فأكثر";
-                    progress = e.totalCerts;
-                    isAch = e.totalCerts >= targetCertsCount;
+                if (trackFilter === 'all' || trackFilter === 'elite') {
+                    if (e.isEliteTarget) {
+                        let completed = getEliteCompletedCount(e);
+                        addRow(e, `النخبة - ${getEliteCohortLabel(e)}`, `${completed} / 3`, completed === 3);
+                    }
                 }
-
-                aoa.push([e.id, e.name, e.region, track, progress, isAch ? "مكتمل" : "غير مكتمل"]);
+                if (trackFilter === 'all' || trackFilter === 'less3') {
+                    if (e.tenureMonths >= 0 && e.tenureMonths < 3) addRow(e, "أقل من 3 شهور", e.totalCerts, e.totalCerts >= less3KpiTarget);
+                }
+                if (trackFilter === 'all' || trackFilter === 'more3') {
+                    if (e.tenureMonths >= 3) addRow(e, "3 شهور فأكثر", e.totalCerts, e.totalCerts >= targetCertsCount);
+                }
+                if (trackFilter === 'all' || trackFilter === 'improvement') {
+                    const summary = getBotImprovementSummary(e);
+                    if (summary.assignedCount > 0) addRow(e, "مسار التحسين (BOT)", `${summary.completedCount} / ${summary.assignedCount} — KPI ${summary.score}%`, summary.score === 100);
+                }
             });
 
             let ws = XLSX.utils.aoa_to_sheet(aoa);
@@ -2146,8 +2386,8 @@
         };
 
         const KPI_PIVOT_HEADERS = {
-            supervisors: ["الإقليم", "مدير الإقليم", "المشرف", "عدد أقل من 3 شهور", "أقل من 3 مخلص 21", "أقل من 3 لسه", "عدد النخبة", "النخبة مكمل 3", "متوسط النخبة KPI", "عدد 3 شهور فأكثر", "3 شهور فأكثر مخلص 21", "3 شهور فأكثر لسه", "متوسط 3 شهور فأكثر KPI", "KPI المشرف"],
-            less3: ["الإقليم", "مدير الإقليم", "المشرف", "الرقم الوظيفي", "اسم الموظف", "الهدف الشهري", "إجمالي الدورات", "عدد الموظفين", "مخلص 21", "لسه", "KPI أقل من 3"],
+            supervisors: ["الإقليم", "مدير الإقليم", "المشرف", "عدد أقل من 3 شهور", "أقل من 3 مخلص 10", "أقل من 3 لسه", "عدد النخبة", "النخبة مكمل 3", "متوسط النخبة KPI", "عدد 3 شهور فأكثر", "3 شهور فأكثر مخلص 21", "3 شهور فأكثر لسه", "متوسط 3 شهور فأكثر KPI", "KPI المشرف"],
+            less3: ["الإقليم", "مدير الإقليم", "المشرف", "الرقم الوظيفي", "اسم الموظف", "المستهدف", "إجمالي الدورات", "عدد الموظفين", "مخلص 10", "لسه", "KPI أقل من 3"],
             elite: ["الإقليم", "مدير الإقليم", "المشرف", "الرقم الوظيفي", "اسم الموظف", "دورات النخبة المنجزة", "دورات النخبة المتبقية", "مكمل 3 نخبة", "KPI النخبة"],
             more3: ["الإقليم", "مدير الإقليم", "المشرف", "الرقم الوظيفي", "اسم الموظف", "الهدف الشهري", "إجمالي الدورات", "عدد الموظفين", "مخلص 21", "لسه", "KPI 3 شهور فأكثر"]
         };
@@ -2192,8 +2432,8 @@
                 supervisors[key].employees.push(emp);
 
                 if (emp.tenureMonths >= 0 && emp.tenureMonths < 3) {
-                    let done21 = emp.totalCerts >= targetCertsCount ? 1 : 0;
-                    less3Rows.push([region, manager, supervisor, emp.id, emp.name, targetCertsCount, emp.totalCerts, 1, done21, done21 ? 0 : 1, done21 ? 100 : 0]);
+                    let done10 = emp.totalCerts >= less3KpiTarget ? 1 : 0;
+                    less3Rows.push([region, manager, supervisor, emp.id, emp.name, less3KpiTarget, emp.totalCerts, 1, done10, done10 ? 0 : 1, done10 ? 100 : 0]);
                 }
 
                 if (emp.isEliteTarget) {
@@ -2212,15 +2452,20 @@
                 let less3 = group.employees.filter(e => e.tenureMonths >= 0 && e.tenureMonths < 3);
                 let elite = group.employees.filter(e => e.isEliteTarget);
                 let more3 = group.employees.filter(e => e.tenureMonths >= 3);
+                let improvement = group.employees.filter(hasBotEnrollment);
 
-                let less3Completed = less3.filter(e => e.totalCerts >= targetCertsCount).length;
+                let less3Completed = less3.filter(e => e.totalCerts >= less3KpiTarget).length;
+                let less3Avg = less3.length ? averageNumber(less3.map(e => e.totalCerts >= less3KpiTarget ? 100 : 0)) : 0;
                 let eliteFull = elite.filter(e => getEliteCompletedCount(e) === 3).length;
                 let eliteAvg = elite.length ? averageNumber(elite.map(e => (getEliteCompletedCount(e) / 3) * 100)) : 0;
                 let more3Completed = more3.filter(e => e.totalCerts >= targetCertsCount).length;
                 let more3Avg = more3.length ? averageNumber(more3.map(e => e.totalCerts >= targetCertsCount ? 100 : 0)) : 0;
+                let improvementAvg = improvement.length ? averageNumber(improvement.map(e => getBotImprovementSummary(e).score)) : 0;
                 let supervisorAxes = [];
+                if (less3.length) supervisorAxes.push(less3Avg);
                 if (elite.length) supervisorAxes.push(eliteAvg);
                 if (more3.length) supervisorAxes.push(more3Avg);
+                if (improvement.length) supervisorAxes.push(improvementAvg);
                 let supervisorKpi = supervisorAxes.length ? averageNumber(supervisorAxes) : 0;
 
                 return [
@@ -2493,13 +2738,14 @@
                 [styledCell("طريقة حساب KPI", styles.section)],
                 [styledCell("النخبة: KPI الشخص = عدد دورات النخبة المنجزة ÷ 3 × 100. من يكمل 3/3 يأخذ 100%، ومن تنقصه دورة أو أكثر تنخفض نسبته بنفس النسبة.", styles.note)],
                 [styledCell(`3 شهور فأكثر: من يحقق ${targetCertsCount} دورة أو المستهدف الحالي يأخذ 100%، وغير المكتمل يأخذ 0% داخل هذا المسار.`, styles.note)],
-                [styledCell("أقل من 3 شهور: يظهر للمتابعة وعد الأسماء ومن أكمل ومن لم يكمل، ولا يدخل في KPI النهائي للمشرف.", styles.note)],
-                [styledCell("KPI المشرف = متوسط مسار النخبة ومسار 3 شهور فأكثر عند وجودهما. مدير الإقليم = متوسط KPI المشرفين التابعين له.", styles.note)],
+                [styledCell("مسار التحسين (BOT): الموظف يأخذ 100% فقط عندما تكون كل دورات BOT المسجل عليها مكتملة بنسبة 100%، وإلا يأخذ 0%. KPI المسار هو متوسط درجات الموظفين.", styles.note)],
+                [styledCell(`أقل من 3 شهور: الموظف الذي يحقق ${less3KpiTarget} شهادات أو أكثر يأخذ 100%، ومن لم يحققها يأخذ 0%، ويدخل متوسط هذا المسار في KPI المشرف.`, styles.note)],
+                [styledCell("KPI المشرف = متوسط مسار أقل من 3 شهور ومسار النخبة ومسار 3 شهور فأكثر ومسار التحسين عند وجودهم. مدير الإقليم = متوسط KPI المشرفين التابعين له.", styles.note)],
                 [],
                 [styledCell("شرح التابات", styles.section)],
                 [styledCell("التاب", styles.header), styledCell("الشرح", styles.header)],
                 ["احصائيات مدير الاقليم والمشرفين", "PivotTable حقيقي لاختيار الإقليم أو مدير الإقليم ومراجعة متوسط KPI المشرفين."],
-                ["أقل من 3 شهور", "PivotTable للأسماء الأقل من 3 شهور وموقف كل موظف من المستهدف."],
+                ["أقل من 3 شهور", `PivotTable للأسماء الأقل من 3 شهور وموقف كل موظف من مستهدف ${less3KpiTarget} شهادات.`],
                 ["النخبة", "PivotTable لمسار النخبة: كام دورة اتعملت، كام دورة فاضلة، ونسبة KPI."],
                 ["3 شهور فأكثر", `PivotTable لمن أكمل 3 شهور فأكثر وموقفه من ${targetCertsCount} دورة أو المستهدف الحالي.`],
                 ["الأقاليم والمشرفين", "كل إقليم وتحته المشرفين، ولكل مشرف عدد الموظفين في كل مسار."],
@@ -2656,7 +2902,7 @@
                     }
                 }
 
-                if (emp.tenureMonths >= 0 && emp.tenureMonths < 3 && emp.totalCerts < targetCertsCount) {
+                if (emp.tenureMonths >= 0 && emp.tenureMonths < 3 && emp.totalCerts < less3KpiTarget) {
                     rows.push([
                         region,
                         manager,
@@ -2665,9 +2911,9 @@
                         emp.name,
                         "أقل من 3 شهور",
                         emp.totalCerts,
-                        targetCertsCount,
-                        `باقي ${Math.max(0, targetCertsCount - emp.totalCerts)} دورة للوصول إلى ${targetCertsCount}`,
-                        emp.totalCerts >= targetCertsCount ? 100 : 0
+                        less3KpiTarget,
+                        `باقي ${Math.max(0, less3KpiTarget - emp.totalCerts)} دورة للوصول إلى ${less3KpiTarget}`,
+                        emp.totalCerts >= less3KpiTarget ? 100 : 0
                     ]);
                 }
 
@@ -3115,6 +3361,8 @@
             document.getElementById('t2Region').innerHTML = selectHtml;
             document.getElementById('t3Region').innerHTML = selectHtml;
             document.getElementById('t4Region').innerHTML = selectHtml;
+            const botRegionFilter = document.getElementById('botRegionFilter');
+            if (botRegionFilter) botRegionFilter.innerHTML = selectHtml;
             document.getElementById('supRegionFilter').innerHTML = supFilterHtml;
             document.getElementById('pathRegionFilter').innerHTML = pathFilterHtml;
             document.getElementById('regionExclusionContainer').innerHTML = checksHtml;
@@ -3201,6 +3449,7 @@
             updateTenureUI('t4');
             renderNonCertTable(filtered);
             renderEliteTable(filtered, globalData.excludedEmployees, globalData.missingEmployees);
+            renderBotCourseTab();
             renderComparisonTable(filtered);
 
             const excludedBody = document.getElementById('excludedTableBody');
@@ -3341,11 +3590,12 @@
         function exportCurrentSupervisorModal() {
             if (!currentModalSupData) return;
             let wb = XLSX.utils.book_new();
-            let aoa = [["الرقم الوظيفي", "اسم الموظف", "تاريخ التعيين", "الشهادات الحالية", "الشهادات (سابقاً)"]];
+            let aoa = [["الرقم الوظيفي", "اسم الموظف", "المشرف", "تاريخ التعيين", "الشهادات الحالية", "الشهادات (سابقاً)"]];
             currentModalSupData.employees.forEach(emp => {
                 aoa.push([
                     emp.id,
                     emp.name,
+                    emp.supervisor || currentModalSupData.name,
                     formatDateDisplay(emp.hireDate),
                     emp.totalCerts,
                     globalData.hasOldData ? emp.oldTotalCerts : "-"
@@ -3457,12 +3707,42 @@
             const countEl = document.getElementById('nonCertCount'); if(countEl) countEl.innerText = dataArray.length;
         }
 
+        function selectEliteCohort(cohort) {
+            if (!['all', 'elite', 'best100'].includes(cohort)) return;
+            selectedEliteCohort = cohort;
+            applyActiveFilters();
+        }
+
+        function renderEliteCohortButtons(allEliteTargets) {
+            const eliteCount = allEliteTargets.filter(emp => (emp.eliteGroup || 'elite') === 'elite').length;
+            const best100Count = allEliteTargets.filter(emp => emp.eliteGroup === 'best100').length;
+            const allCountEl = document.getElementById('eliteCohortAllCount'); if (allCountEl) allCountEl.innerText = `(${allEliteTargets.length})`;
+            const eliteCountEl = document.getElementById('eliteCohortEliteCount'); if (eliteCountEl) eliteCountEl.innerText = `(${eliteCount})`;
+            const best100CountEl = document.getElementById('eliteCohortBest100Count'); if (best100CountEl) best100CountEl.innerText = `(${best100Count})`;
+            const noteEl = document.getElementById('eliteCohortSourceNote');
+            if (noteEl) noteEl.innerText = 'القائمة مسجلة داخل البرنامج من ملف T9: قيمة «لا» في العمود F = أفضل 100 معرض، والباقي = النخبة.';
+
+            document.querySelectorAll('.elite-cohort-btn').forEach(button => {
+                const selected = button.dataset.eliteCohort === selectedEliteCohort;
+                button.classList.toggle('bg-yellow-500', selected);
+                button.classList.toggle('text-white', selected);
+                button.classList.toggle('border-yellow-500', selected);
+                button.classList.toggle('shadow-sm', selected);
+                button.classList.toggle('bg-white', !selected);
+                button.classList.toggle('text-yellow-800', !selected);
+                button.classList.toggle('border-yellow-200', !selected);
+                button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+            });
+        }
+
         function renderEliteTable(dataArray, excludedArray, missingArray) {
             let c1Key = eliteCoursesKeys[0]; 
             let c2Key = eliteCoursesKeys[1];
             let c3Key = eliteCoursesKeys[2];
             
-            let eliteTargets = dataArray.filter(emp => emp.isEliteTarget);
+            let allEliteTargets = dataArray.filter(emp => emp.isEliteTarget);
+            renderEliteCohortButtons(allEliteTargets);
+            let eliteTargets = allEliteTargets.filter(matchesEliteCohort);
             
             let finishedC1 = 0, finishedC2 = 0, finishedC3 = 0, finishedBoth = 0;
 
@@ -3499,6 +3779,8 @@
                         <td class="px-5 py-4 font-bold text-slate-700">${emp.id}</td>
                         <td class="px-5 py-4 font-medium text-slate-800 truncate max-w-[200px]" title="${emp.name}">${emp.name}</td>
                         <td class="px-5 py-4"><span class="px-2 py-1 bg-slate-100 rounded border border-slate-200 text-xs whitespace-nowrap">${emp.region}</span></td>
+                        <td class="px-5 py-4 text-xs text-slate-600 whitespace-nowrap">${emp.supervisor || 'بدون مشرف'}</td>
+                        <td class="px-5 py-4"><span class="px-2 py-1 rounded-full text-xs font-bold whitespace-nowrap ${emp.eliteGroup === 'best100' ? 'bg-amber-100 text-amber-800' : 'bg-yellow-100 text-yellow-800'}">${getEliteCohortLabel(emp)}</span></td>
                         <td class="px-5 py-4 font-bold ${hasC1 ? 'text-emerald-500' : 'text-slate-300'}">${hasC1 ? '<i class="fas fa-check text-lg"></i>' : '-'}</td>
                         <td class="px-5 py-4 font-bold ${hasC2 ? 'text-emerald-500' : 'text-slate-300'}">${hasC2 ? '<i class="fas fa-check text-lg"></i>' : '-'}</td>
                         <td class="px-5 py-4 font-bold ${hasC3 ? 'text-emerald-500' : 'text-slate-300'}">${hasC3 ? '<i class="fas fa-check text-lg"></i>' : '-'}</td>
@@ -3508,7 +3790,7 @@
             }).join('');
             
             if (eliteTargets.length === 0) {
-                bodyHtml = `<tr><td colspan="7" class="text-center py-8 text-slate-500">لا توجد بيانات لموظفي النخبة في هذا الفلتر.</td></tr>`;
+                bodyHtml = `<tr><td colspan="9" class="text-center py-8 text-slate-500">لا توجد بيانات في الفئة والفلتر الحاليين.</td></tr>`;
             }
             
             const bodyEl = document.getElementById('eliteTableBody'); if (bodyEl) bodyEl.innerHTML = bodyHtml;
@@ -3516,11 +3798,11 @@
             let sName = document.getElementById('searchName') ? document.getElementById('searchName').value.toLowerCase() : "";
             let sReg = document.getElementById('filterRegion') ? document.getElementById('filterRegion').value : "";
 
-            let offTargetMissing = missingArray.filter(emp => emp.isEliteTarget && 
+            let offTargetMissing = missingArray.filter(emp => emp.isEliteTarget && matchesEliteCohort(emp) &&
                 (emp.name.toLowerCase().includes(sName) || emp.id.toLowerCase().includes(sName))
             ).map(emp => ({ ...emp, offReason: 'غير مدرج بقائمة القوى (بالأكاديمية فقط)' }));
 
-            let offTargetExcluded = excludedArray.filter(emp => emp.isEliteTarget && 
+            let offTargetExcluded = excludedArray.filter(emp => emp.isEliteTarget && matchesEliteCohort(emp) &&
                 (emp.name.toLowerCase().includes(sName) || emp.id.toLowerCase().includes(sName)) &&
                 (sReg === "" || emp.region === sReg)
             ).map(emp => ({ ...emp, offReason: `مستبعد (${emp.status})` }));
@@ -3537,6 +3819,8 @@
                         <td class="px-5 py-4 font-bold text-slate-700">${emp.id}</td>
                         <td class="px-5 py-4 font-medium text-slate-800">${emp.name}</td>
                         <td class="px-5 py-4"><span class="px-2 py-1 bg-red-100 text-red-800 rounded text-xs font-bold whitespace-nowrap">${emp.offReason}</span></td>
+                        <td class="px-5 py-4 text-xs text-slate-600 whitespace-nowrap">${emp.supervisor || 'غير متوفر'}</td>
+                        <td class="px-5 py-4"><span class="px-2 py-1 rounded-full text-xs font-bold whitespace-nowrap ${emp.eliteGroup === 'best100' ? 'bg-amber-100 text-amber-800' : 'bg-yellow-100 text-yellow-800'}">${getEliteCohortLabel(emp)}</span></td>
                         <td class="px-5 py-4 font-bold ${hasC1 ? 'text-emerald-500' : 'text-slate-300'}">${hasC1 ? '<i class="fas fa-check text-lg"></i>' : '-'}</td>
                         <td class="px-5 py-4 font-bold ${hasC2 ? 'text-emerald-500' : 'text-slate-300'}">${hasC2 ? '<i class="fas fa-check text-lg"></i>' : '-'}</td>
                         <td class="px-5 py-4 font-bold ${hasC3 ? 'text-emerald-500' : 'text-slate-300'}">${hasC3 ? '<i class="fas fa-check text-lg"></i>' : '-'}</td>
@@ -3545,11 +3829,136 @@
             }).join('');
 
             if (combinedOffTargets.length === 0) {
-                offBodyHtml = `<tr><td colspan="6" class="text-center py-8 text-slate-500">لا يوجد مستبعدين أو مفقودين مستهدفين في النخبة.</td></tr>`;
+                offBodyHtml = `<tr><td colspan="8" class="text-center py-8 text-slate-500">لا يوجد مستبعدون أو مفقودون في الفئة الحالية.</td></tr>`;
             }
 
             const offBodyEl = document.getElementById('eliteOffTargetTableBody'); if (offBodyEl) offBodyEl.innerHTML = offBodyHtml;
             const offCountEl = document.getElementById('eliteOffTargetCount'); if (offCountEl) offCountEl.innerText = combinedOffTargets.length;
+        }
+
+        function selectBotCourse(index) {
+            const nextIndex = Number(index);
+            if (!Number.isInteger(nextIndex) || nextIndex < 0 || nextIndex >= botCoursesKeys.length) return;
+            selectedBotCourseIndex = nextIndex;
+            renderBotCourseTab();
+        }
+
+        function getBotCourseViewData() {
+            const courseKey = botCoursesKeys[selectedBotCourseIndex] || botCoursesKeys[0];
+            const search = document.getElementById('botSearch') ? document.getElementById('botSearch').value.toLowerCase().trim() : "";
+            const region = document.getElementById('botRegionFilter') ? document.getElementById('botRegionFilter').value : "";
+            const progressFilter = document.getElementById('botProgressFilter') ? document.getElementById('botProgressFilter').value : "";
+
+            const getRecord = emp => emp && emp.botCourses ? emp.botCourses[courseKey] : null;
+            const matchesSearch = emp => {
+                if (!search) return true;
+                return [emp.id, emp.name, emp.email, emp.region, emp.manager, emp.supervisor]
+                    .map(value => cleanString(value).toLowerCase())
+                    .some(value => value.includes(search));
+            };
+            const matchesRegion = emp => !region || cleanString(emp.region) === region;
+            const matchesProgress = emp => {
+                const record = getRecord(emp);
+                if (!record) return false;
+                if (progressFilter === 'completed') return record.progress === 100;
+                if (progressFilter === 'incomplete') return record.progress !== 100;
+                return true;
+            };
+            const isEnrolled = emp => {
+                const record = getRecord(emp);
+                return !!(record && record.enrolled);
+            };
+
+            const activeBase = globalData.allActive.filter(emp =>
+                !globalData.excludedRegions.has(emp.region) && isEnrolled(emp) && matchesSearch(emp) && matchesRegion(emp)
+            );
+            const active = activeBase.filter(matchesProgress);
+
+            const excluded = globalData.excludedEmployees
+                .filter(emp => isEnrolled(emp) && matchesSearch(emp) && matchesRegion(emp) && matchesProgress(emp))
+                .map(emp => ({ ...emp, botOffReason: `مستبعد (${emp.status || 'حالة مستبعدة'})` }));
+            const missing = globalData.missingEmployees
+                .filter(emp => isEnrolled(emp) && matchesSearch(emp) && matchesRegion(emp) && matchesProgress(emp))
+                .map(emp => ({ ...emp, botOffReason: 'غير موجود بقائمة القوى (بالأكاديمية فقط)' }));
+
+            return { courseKey, activeBase, active, offTargets: [...excluded, ...missing] };
+        }
+
+        function renderBotCourseButtons() {
+            document.querySelectorAll('.bot-course-btn').forEach((button, index) => {
+                const courseKey = botCoursesKeys[index];
+                const count = globalData.allActive.filter(emp =>
+                    !globalData.excludedRegions.has(emp.region) && emp.botCourses && emp.botCourses[courseKey] && emp.botCourses[courseKey].enrolled
+                ).length;
+                const isSelected = index === selectedBotCourseIndex;
+                button.classList.toggle('bg-violet-600', isSelected);
+                button.classList.toggle('text-white', isSelected);
+                button.classList.toggle('border-violet-600', isSelected);
+                button.classList.toggle('shadow-md', isSelected);
+                button.classList.toggle('bg-violet-50', !isSelected);
+                button.classList.toggle('text-violet-800', !isSelected);
+                button.classList.toggle('border-violet-200', !isSelected);
+                button.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+                button.innerHTML = `<span class="block leading-5">${safeBotText(courseKey.replace(' ( BOT)', ' (BOT)'))}</span><span class="inline-block mt-2 px-2 py-0.5 rounded-full text-xs ${isSelected ? 'bg-white/20 text-white' : 'bg-white text-violet-700 border border-violet-100'}">${count} مسجل</span>`;
+            });
+        }
+
+        function renderBotCourseRow(emp, courseKey, offTarget) {
+            const record = emp.botCourses[courseKey];
+            const progress = record.progress === null ? "-" : `${Math.round(record.progress)}%`;
+            let progressClass = 'text-slate-500 bg-slate-100';
+            if (record.progress === 100) progressClass = 'text-emerald-700 bg-emerald-100';
+            else if (record.progress !== null && record.progress >= 50) progressClass = 'text-blue-700 bg-blue-100';
+            else if (record.progress !== null) progressClass = 'text-orange-700 bg-orange-100';
+            const progressStatus = record.progress === 100 ? 'مكتمل' : 'غير مكتمل';
+            const commonCells = `
+                <td class="px-4 py-3 font-bold text-slate-700 whitespace-nowrap">${safeBotText(emp.id)}</td>
+                <td class="px-4 py-3 font-medium text-slate-800 whitespace-nowrap">${safeBotText(emp.name)}</td>
+                <td class="px-4 py-3 text-slate-500 text-xs whitespace-nowrap" dir="ltr">${safeBotText(emp.email || '-')}</td>`;
+            const detailsCells = `
+                <td class="px-4 py-3"><span class="px-2 py-1 bg-slate-100 rounded border border-slate-200 text-xs whitespace-nowrap">${safeBotText(emp.region || 'غير متوفر')}</span></td>
+                <td class="px-4 py-3 text-slate-600 text-xs whitespace-nowrap">${safeBotText(emp.manager || 'غير متوفر')}</td>
+                <td class="px-4 py-3 text-slate-600 text-xs whitespace-nowrap">${safeBotText(emp.supervisor || 'غير متوفر')}</td>`;
+            const progressCells = `
+                <td class="px-4 py-3 text-center"><span class="inline-block min-w-[110px] px-3 py-1 rounded-full text-xs font-bold ${progressClass}">${progress} — ${progressStatus}</span></td>`;
+
+            if (offTarget) {
+                return `<tr class="hover:bg-red-50 transition border-b border-red-100">
+                    ${commonCells}
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-bold whitespace-nowrap">${safeBotText(emp.botOffReason)}</span></td>
+                    ${detailsCells}
+                    ${progressCells}
+                </tr>`;
+            }
+
+            return `<tr class="hover:bg-violet-50 transition border-b border-slate-100">
+                ${commonCells}
+                ${detailsCells}
+                <td class="px-4 py-3 text-slate-500 text-xs whitespace-nowrap" dir="ltr">${safeBotText(formatDateDisplay(emp.hireDate) || '-')}</td>
+                ${progressCells}
+            </tr>`;
+        }
+
+        function renderBotCourseTab() {
+            const titleEl = document.getElementById('botSelectedCourseTitle');
+            if (!titleEl) return;
+            renderBotCourseButtons();
+
+            const view = getBotCourseViewData();
+            titleEl.innerText = view.courseKey.replace(' ( BOT)', ' (BOT)');
+            const completedCount = view.activeBase.filter(emp => emp.botCourses[view.courseKey].progress === 100).length;
+            const totalEl = document.getElementById('botStatTotal'); if (totalEl) totalEl.innerText = view.activeBase.length;
+            const completedEl = document.getElementById('botStatCompleted'); if (completedEl) completedEl.innerText = completedCount;
+            const incompleteEl = document.getElementById('botStatIncomplete'); if (incompleteEl) incompleteEl.innerText = view.activeBase.length - completedCount;
+
+            let bodyHtml = view.active.map(emp => renderBotCourseRow(emp, view.courseKey, false)).join('');
+            if (!bodyHtml) bodyHtml = `<tr><td colspan="8" class="text-center py-10 text-slate-500">لا يوجد موظفون مطابقون للدورة والفلاتر الحالية.</td></tr>`;
+            const bodyEl = document.getElementById('botCourseTableBody'); if (bodyEl) bodyEl.innerHTML = bodyHtml;
+
+            let offHtml = view.offTargets.map(emp => renderBotCourseRow(emp, view.courseKey, true)).join('');
+            if (!offHtml) offHtml = `<tr><td colspan="8" class="text-center py-8 text-slate-500">لا يوجد مستبعدون أو مفقودون مطابقون للدورة والفلاتر الحالية.</td></tr>`;
+            const offBodyEl = document.getElementById('botOffTargetTableBody'); if (offBodyEl) offBodyEl.innerHTML = offHtml;
+            const offCountEl = document.getElementById('botOffTargetCount'); if (offCountEl) offCountEl.innerText = view.offTargets.length;
         }
 
         function renderComparisonTable(dataArray) {
@@ -3740,8 +4149,8 @@
         function exportMissingData() {
             let wb = XLSX.utils.book_new();
 
-            let misAOA = [["الرقم الوظيفي", "الاسم بالاكاديمية", "عدد الشهادات"]];
-            globalData.missingEmployees.forEach(e => misAOA.push([e.id, e.name, e.totalCerts]));
+            let misAOA = [["الرقم الوظيفي", "الاسم بالاكاديمية", "المشرف", "عدد الشهادات"]];
+            globalData.missingEmployees.forEach(e => misAOA.push([e.id, e.name, e.supervisor || "غير متوفر", e.totalCerts]));
             let ws1 = XLSX.utils.aoa_to_sheet(misAOA);
             applyExcelStyles(ws1);
             XLSX.utils.book_append_sheet(wb, ws1, "في الأكاديمية فقط");
@@ -3766,13 +4175,19 @@
 
         function exportEliteData() {
             let wb = XLSX.utils.book_new();
-            let validActive = globalData.allActive.filter(e => !globalData.excludedRegions.has(e.region) && e.isEliteTarget);
+            let searchInput = document.getElementById('searchName') ? document.getElementById('searchName').value.toLowerCase() : "";
+            let selectedRegion = document.getElementById('filterRegion') ? document.getElementById('filterRegion').value : "";
+            let validActive = globalData.allActive.filter(e =>
+                !globalData.excludedRegions.has(e.region) && e.isEliteTarget && matchesEliteCohort(e) &&
+                (!searchInput || e.name.toLowerCase().includes(searchInput) || e.id.toLowerCase().includes(searchInput)) &&
+                (!selectedRegion || e.region === selectedRegion)
+            );
             
             let c1Key = eliteCoursesKeys[0] || "دورة 1"; 
             let c2Key = eliteCoursesKeys[1] || "دورة 2";
             let c3Key = eliteCoursesKeys[2] || "دورة 3";
 
-            let aoa = [["الرقم الوظيفي", "الاسم", "الإيميل", "الإقليم", c1Key, c2Key, c3Key, "مجموع المستكمل", "الحالة الوصفية"]];
+            let aoa = [["الرقم الوظيفي", "الاسم", "الإيميل", "المشرف", "مدير الإقليم", "الإقليم", "الفئة", c1Key, c2Key, c3Key, "مجموع المستكمل", "الحالة الوصفية"]];
             
             validActive.forEach(emp => {
                 let hasC1 = eliteCoursesKeys[0] ? emp.eliteProgress[eliteCoursesKeys[0]] : false;
@@ -3780,12 +4195,57 @@
                 let hasC3 = eliteCoursesKeys[2] ? emp.eliteProgress[eliteCoursesKeys[2]] : false;
                 let count = (hasC1 ? 1 : 0) + (hasC2 ? 1 : 0) + (hasC3 ? 1 : 0);
                 let desc = count === 3 ? "استكمل بالكامل" : (count > 0 ? "جزء" : "لم يستكمل");
-                aoa.push([emp.id, emp.name, emp.email || "", emp.region, hasC1 ? "نعم" : "لا", hasC2 ? "نعم" : "لا", hasC3 ? "نعم" : "لا", count, desc]);
+                aoa.push([emp.id, emp.name, emp.email || "", emp.supervisor || "بدون مشرف", emp.manager || "", emp.region, getEliteCohortLabel(emp), hasC1 ? "نعم" : "لا", hasC2 ? "نعم" : "لا", hasC3 ? "نعم" : "لا", count, desc]);
             });
             let ws = XLSX.utils.aoa_to_sheet(aoa);
             applyExcelStyles(ws);
             XLSX.utils.book_append_sheet(wb, ws, "تقرير دورات النخبة");
-            XLSX.writeFile(wb, "تقرير_دورات_النخبة.xlsx");
+            const cohortFileLabel = selectedEliteCohort === 'best100' ? 'أفضل_100_معرض' : (selectedEliteCohort === 'elite' ? 'النخبة_فقط' : 'النخبة_وأفضل_100');
+            XLSX.writeFile(wb, `تقرير_دورات_${cohortFileLabel}.xlsx`);
+        }
+
+        function exportBotCourseData() {
+            const view = getBotCourseViewData();
+            if (view.active.length === 0 && view.offTargets.length === 0) {
+                alert("لا توجد بيانات مطابقة للدورة والفلاتر الحالية لتصديرها.");
+                return;
+            }
+
+            const headers = [
+                "الدورة", "الرقم الوظيفي", "الاسم", "الإيميل", "الإقليم", "مدير القطاع / الإقليم",
+                "المشرف", "تاريخ التعيين", "حالة الموظف", "نسبة التقدم", "حالة التقدم"
+            ];
+            const toRow = emp => {
+                const record = emp.botCourses[view.courseKey];
+                return [
+                    view.courseKey,
+                    emp.id,
+                    emp.name,
+                    emp.email || "",
+                    emp.region || "غير متوفر",
+                    emp.manager || "غير متوفر",
+                    emp.supervisor || "غير متوفر",
+                    emp.hireDate ? formatDateDisplay(emp.hireDate) : "",
+                    emp.botOffReason || emp.status || "على رأس العمل",
+                    record.progress === null ? "-" : `${Math.round(record.progress)}%`,
+                    record.progress === 100 ? "مكتمل 100%" : "غير مكتمل"
+                ];
+            };
+
+            const wb = XLSX.utils.book_new();
+            if (view.active.length > 0) {
+                const wsActive = XLSX.utils.aoa_to_sheet([headers, ...view.active.map(toRow)]);
+                applyExcelStyles(wsActive);
+                XLSX.utils.book_append_sheet(wb, wsActive, "الموظفون الحاليون");
+            }
+            if (view.offTargets.length > 0) {
+                const wsOff = XLSX.utils.aoa_to_sheet([headers, ...view.offTargets.map(toRow)]);
+                applyExcelStyles(wsOff);
+                XLSX.utils.book_append_sheet(wb, wsOff, "المستبعدون والمفقودون");
+            }
+
+            const fileCourseName = view.courseKey.replace(/[^a-zA-Z0-9\u0600-\u06FF]+/g, '_').replace(/^_+|_+$/g, '');
+            XLSX.writeFile(wb, `تقرير_تعديل_المسار_${fileCourseName}.xlsx`);
         }
 
         function exportAllData() {
@@ -3795,9 +4255,9 @@
             applyExcelStyles(wsAll);
             XLSX.utils.book_append_sheet(wb, wsAll, "جميع البائعين المعتمدين");
             
-            let nonCertAOA = [["الرقم الوظيفي", "الاسم", "الإقليم", ...nonCertCoursesKeys]];
+            let nonCertAOA = [["الرقم الوظيفي", "الاسم", "المشرف", "الإقليم", ...nonCertCoursesKeys]];
             validActive.forEach(emp => {
-                let row = [emp.id, emp.name, emp.region];
+                let row = [emp.id, emp.name, emp.supervisor || "بدون مشرف", emp.region];
                 nonCertCoursesKeys.forEach(c => { let p = emp.nonCertProgress[c]; row.push(p !== null ? p + "%" : "-"); });
                 nonCertAOA.push(row);
             });
@@ -3831,14 +4291,14 @@
             applyExcelStyles(wsAnalysis);
             XLSX.utils.book_append_sheet(wb, wsAnalysis, "تحليل الأقاليم المعتمدة");
 
-            let excAOA = [["الرقم الوظيفي", "الاسم", "الحالة"]];
-            globalData.excludedEmployees.forEach(e => excAOA.push([e.id, e.name, e.status]));
+            let excAOA = [["الرقم الوظيفي", "الاسم", "المشرف", "الحالة"]];
+            globalData.excludedEmployees.forEach(e => excAOA.push([e.id, e.name, e.supervisor || "بدون مشرف", e.status]));
             let wsExc = XLSX.utils.aoa_to_sheet(excAOA);
             applyExcelStyles(wsExc);
             XLSX.utils.book_append_sheet(wb, wsExc, "المستبعدين");
 
-            let misAOA = [["الرقم الوظيفي", "الاسم بالاكاديمية", "عدد الشهادات"]];
-            globalData.missingEmployees.forEach(e => misAOA.push([e.id, e.name, e.totalCerts]));
+            let misAOA = [["الرقم الوظيفي", "الاسم بالاكاديمية", "المشرف", "عدد الشهادات"]];
+            globalData.missingEmployees.forEach(e => misAOA.push([e.id, e.name, e.supervisor || "غير متوفر", e.totalCerts]));
             let wsMis = XLSX.utils.aoa_to_sheet(misAOA);
             applyExcelStyles(wsMis);
             XLSX.utils.book_append_sheet(wb, wsMis, "بالأكاديمية فقط");
@@ -3861,9 +4321,9 @@
             applyExcelStyles(ws1);
             XLSX.utils.book_append_sheet(wb, ws1, "بائعين " + regionName.substring(0,20));
 
-            let nonCertAOA = [["الرقم الوظيفي", "الاسم", "الإقليم", ...nonCertCoursesKeys]];
+            let nonCertAOA = [["الرقم الوظيفي", "الاسم", "المشرف", "الإقليم", ...nonCertCoursesKeys]];
             employees.forEach(emp => {
-                let row = [emp.id, emp.name, emp.region];
+                let row = [emp.id, emp.name, emp.supervisor || "بدون مشرف", emp.region];
                 nonCertCoursesKeys.forEach(c => { let p = emp.nonCertProgress[c]; row.push(p !== null ? p + "%" : "-"); });
                 nonCertAOA.push(row);
             });
@@ -3983,7 +4443,7 @@
             let wb = XLSX.utils.book_new();
 
             let certAOA = [];
-            let certHeaders = ["الرقم الوظيفي", "الاسم", "الإقليم", "المسار الحالي (نقطة التوقف)"];
+            let certHeaders = ["الرقم الوظيفي", "الاسم", "المشرف", "الإقليم", "المسار الحالي (نقطة التوقف)"];
             certCourses.forEach(c => certHeaders.push(`${c.certId}- ${c.ar}`));
             certAOA.push(certHeaders);
 
@@ -3994,7 +4454,7 @@
                 }
                 let stopperName = stopperCourse ? `${stopperCourse.certId}. ${stopperCourse.ar}` : "أتم المسار بالكامل";
                 
-                let row = [emp.id, emp.name, emp.region, stopperName];
+                let row = [emp.id, emp.name, emp.supervisor || "بدون مشرف", emp.region, stopperName];
                 certCourses.forEach(c => {
                     let isDone = emp.pathProgress[c.en];
                     let isStopper = (stopperCourse && c.en === stopperCourse.en);
@@ -4009,7 +4469,7 @@
             XLSX.utils.book_append_sheet(wb, ws1, "مسار الشهادات الأساسي");
 
             let nonCertAOA = [];
-            let nonCertHeaders = ["الرقم الوظيفي", "الاسم", "الإقليم", "إجمالي المنجز"];
+            let nonCertHeaders = ["الرقم الوظيفي", "الاسم", "المشرف", "الإقليم", "إجمالي المنجز"];
             nonCertCourses.forEach(c => nonCertHeaders.push(`${c.ar}`));
             nonCertAOA.push(nonCertHeaders);
 
@@ -4017,7 +4477,7 @@
                 let countDone = 0;
                 nonCertCourses.forEach(c => { if(emp.pathProgress[c.en]) countDone++; });
                 
-                let row = [emp.id, emp.name, emp.region, countDone];
+                let row = [emp.id, emp.name, emp.supervisor || "بدون مشرف", emp.region, countDone];
                 nonCertCourses.forEach(c => { row.push(emp.pathProgress[c.en] ? "منجز" : "-"); });
                 nonCertAOA.push(row);
             });
@@ -4120,4 +4580,3 @@
     </script>
 </body>
 </html>
-
