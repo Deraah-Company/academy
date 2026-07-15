@@ -219,6 +219,92 @@
         </div>
     </div>
 
+    <!-- Monthly employee trend modal -->
+    <div class="modal-overlay" id="monthlyEmployeeModal" onclick="closeMonthlyEmployeeDetails(event)">
+        <div class="modal-content overflow-hidden" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-start gap-4 p-6 border-b border-slate-200 bg-gradient-to-l from-indigo-950 to-indigo-800 text-white rounded-t-2xl">
+                <div>
+                    <p id="monthlyEmployeeViewLabel" class="text-indigo-200 text-xs font-bold mb-1">تحليل الزيادة الشهرية للبائع</p>
+                    <h3 class="text-2xl font-extrabold" id="monthlyEmployeeName">اسم البائع</h3>
+                    <p class="text-indigo-100 mt-2 text-sm" id="monthlyEmployeeMeta">الرقم الوظيفي • المشرف • الإقليم</p>
+                </div>
+                <button type="button" onclick="closeMonthlyEmployeeDetails()" class="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 transition flex items-center justify-center" aria-label="إغلاق">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto" style="max-height: 75vh;">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div class="rounded-2xl border border-indigo-100 bg-indigo-50 p-4">
+                        <p class="text-xs font-bold text-indigo-600">آخر تقييم شهري</p>
+                        <p id="monthlyEmployeeCurrentKpi" class="text-3xl font-extrabold text-indigo-900 mt-1">0%</p>
+                    </div>
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                        <p class="text-xs font-bold text-slate-500">متوسط الفترة</p>
+                        <p id="monthlyEmployeeAverageKpi" class="text-3xl font-extrabold text-slate-900 mt-1">0%</p>
+                    </div>
+                    <div id="monthlyEmployeeTrendCard" class="rounded-2xl border border-slate-200 bg-white p-4">
+                        <p class="text-xs font-bold text-slate-500">الاتجاه الحالي</p>
+                        <p id="monthlyEmployeeTrendText" class="text-xl font-extrabold text-slate-800 mt-2">لا توجد مقارنة</p>
+                    </div>
+                </div>
+                <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 rounded-xl bg-slate-100 p-1.5 mb-5">
+                        <button id="monthlyEmployeeKpiChartBtn" type="button" onclick="selectMonthlyEmployeeChartView('kpi')" class="rounded-lg bg-indigo-600 text-white px-5 py-3 text-sm font-extrabold shadow-md transition" aria-pressed="true"><i class="fas fa-gauge-high ml-2"></i>KPI فقط</button>
+                        <button id="monthlyEmployeeCertificatesChartBtn" type="button" onclick="selectMonthlyEmployeeChartView('certificates')" class="rounded-lg text-slate-600 px-5 py-3 text-sm font-extrabold hover:bg-white transition" aria-pressed="false"><i class="fas fa-award ml-2"></i>الشهادات والتارجت</button>
+                    </div>
+                    <div id="monthlyEmployeeCertificateSummary" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+                        <div class="rounded-xl border border-cyan-100 bg-cyan-50 p-3"><p class="text-[10px] font-bold text-cyan-700">منجز آخر شهر</p><p id="monthlyEmployeeLatestCompleted" class="text-2xl font-extrabold text-cyan-900 mt-1">0</p></div>
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-3"><p class="text-[10px] font-bold text-slate-600">تارجت آخر شهر</p><p id="monthlyEmployeeLatestTarget" class="text-2xl font-extrabold text-slate-900 mt-1">0</p></div>
+                        <div id="monthlyEmployeeCertificateGapCard" class="rounded-xl border border-emerald-100 bg-emerald-50 p-3"><p class="text-[10px] font-bold text-emerald-700">الموقف من التارجت</p><p id="monthlyEmployeeCertificateGap" class="text-xl font-extrabold text-emerald-900 mt-1">—</p></div>
+                    </div>
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <h4 id="monthlyEmployeeChartTitle" class="font-extrabold text-slate-800"><i class="fas fa-chart-line text-indigo-500 ml-2"></i>اتجاه KPI فقط</h4>
+                        <span id="monthlyEmployeeChartNote" class="text-xs text-slate-500">الشارت يعرض النسبة فقط من 0% إلى 100%</span>
+                    </div>
+                    <div class="h-[360px]">
+                        <canvas id="monthlyEmployeeTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly supervisor details modal -->
+    <div class="modal-overlay" id="monthlySupervisorModal" onclick="closeMonthlySupervisorDetails(event)">
+        <div class="modal-content overflow-hidden" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-start gap-4 p-6 border-b border-slate-200 bg-gradient-to-l from-slate-950 via-indigo-950 to-teal-800 text-white rounded-t-2xl">
+                <div>
+                    <p id="monthlyGroupModalEyebrow" class="text-teal-200 text-xs font-bold mb-1">تفاصيل أداء المشرف والفريق</p>
+                    <h3 id="monthlySupervisorName" class="text-2xl font-extrabold">اسم المشرف</h3>
+                    <p id="monthlySupervisorMeta" class="text-indigo-100 mt-2 text-sm">الإقليم • نوع التقييم</p>
+                </div>
+                <button type="button" onclick="closeMonthlySupervisorDetails()" class="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 transition flex items-center justify-center" aria-label="إغلاق"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto" style="max-height: 78vh;">
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-5">
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4"><p class="text-xs font-bold text-slate-500">عدد البائعين</p><p id="monthlySupervisorTeamCount" class="text-3xl font-extrabold text-slate-900 mt-1">0</p></div>
+                    <div class="rounded-2xl border border-indigo-100 bg-indigo-50 p-4"><p class="text-xs font-bold text-indigo-600">KPI آخر شهر</p><p id="monthlySupervisorCurrentKpi" class="text-3xl font-extrabold text-indigo-900 mt-1">0%</p></div>
+                    <div class="rounded-2xl border border-cyan-100 bg-cyan-50 p-4"><p class="text-xs font-bold text-cyan-700">متوسط الفترة</p><p id="monthlySupervisorAverageKpi" class="text-3xl font-extrabold text-cyan-900 mt-1">0%</p></div>
+                    <div id="monthlySupervisorTrendCard" class="rounded-2xl border border-slate-200 bg-white p-4"><p class="text-xs font-bold text-slate-500">الاتجاه الحالي</p><p id="monthlySupervisorTrendText" class="text-xl font-extrabold text-slate-800 mt-2">—</p></div>
+                </div>
+                <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm mb-5">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3"><h4 id="monthlyGroupChartTitle" class="font-extrabold text-slate-800"><i class="fas fa-chart-line text-indigo-500 ml-2"></i>اتجاه متوسط KPI للفريق</h4><span class="text-xs text-slate-500">متوسط نسب البائعين المحتسبين في كل شهر</span></div>
+                    <div class="h-[300px]"><canvas id="monthlySupervisorTrendChart"></canvas></div>
+                </div>
+                <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                    <div class="p-4 border-b border-slate-200 flex flex-col md:flex-row md:items-end justify-between gap-3">
+                        <div><h4 id="monthlyGroupEmployeesTitle" class="font-extrabold text-slate-800"><i class="fas fa-users text-teal-500 ml-2"></i>تفاصيل البائعين التابعين</h4><p class="text-xs text-slate-500 mt-1">اضغط على أي بائع لفتح شارت تفاصيله.</p></div>
+                        <div class="relative w-full md:w-80"><input id="monthlySupervisorEmployeeSearch" type="search" oninput="renderMonthlySupervisorEmployeeTable()" autocomplete="off" placeholder="بحث بالاسم أو الرقم..." class="w-full rounded-xl border border-slate-300 bg-slate-50 py-2.5 pr-10 pl-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-200"><i class="fas fa-search absolute right-3 top-3.5 text-slate-400"></i></div>
+                    </div>
+                    <div class="table-container max-h-[360px]">
+                        <table class="min-w-full text-sm text-right"><thead class="bg-slate-100 text-slate-700 sticky top-0"><tr><th class="px-3 py-3">الرقم</th><th class="px-4 py-3">اسم البائع</th><th class="px-4 py-3">المشرف</th><th class="px-3 py-3 text-center">KPI الحالي</th><th class="px-3 py-3 text-center">متوسط الفترة</th><th class="px-3 py-3 text-center">الشهادات المحتسبة</th><th class="px-3 py-3 text-center">الاتجاه</th></tr></thead><tbody id="monthlySupervisorEmployeeTableBody" class="divide-y divide-slate-100"></tbody></table>
+                    </div>
+                    <div id="monthlySupervisorEmployeeEmpty" class="hidden text-center py-8 text-slate-500 font-bold">لا توجد نتائج مطابقة.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="max-w-screen-2xl mx-auto px-4 py-8">
         
         <header class="bg-white shadow-sm rounded-2xl p-8 mb-6 border border-slate-100 flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
@@ -325,6 +411,9 @@
                 </button>
                 <button id="activeTabBtn" class="tab-btn active px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'activeTab')">
                     <i class="fas fa-user-check ml-2"></i> على رأس العمل
+                </button>
+                <button id="monthlyEvaluationTabBtn" class="tab-btn px-5 py-4 text-emerald-700 font-bold bg-emerald-50 border-r border-emerald-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'monthlyEvaluationTab')">
+                    <i class="fas fa-chart-line ml-2"></i> التقييم الشهري
                 </button>
                 <button class="tab-btn px-5 py-4 text-slate-600 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'tenure1Tab')">
                     <i class="fas fa-hourglass-start ml-2"></i> أقل من 3 شهور
@@ -466,6 +555,107 @@
                             </thead>
                             <tbody id="activeTableBody" class="bg-white divide-y divide-slate-100"></tbody>
                         </table>
+                    </div>
+                </div>
+
+                <!-- ================= Monthly employee evaluation ================= -->
+                <div id="monthlyEvaluationTab" class="tab-content">
+                    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-indigo-950 to-emerald-800 text-white p-6 md:p-8 mb-6 shadow-xl">
+                        <div class="absolute -top-20 -left-16 w-56 h-56 rounded-full bg-emerald-400/15 blur-3xl"></div>
+                        <div class="absolute -bottom-24 right-28 w-64 h-64 rounded-full bg-indigo-400/15 blur-3xl"></div>
+                        <div class="relative z-10 flex flex-col xl:flex-row xl:items-end justify-between gap-6">
+                            <div>
+                                <span class="inline-flex items-center gap-2 rounded-full bg-white/10 border border-white/15 px-3 py-1 text-xs font-bold text-emerald-100 mb-4">
+                                    <i class="fas fa-chart-line"></i> اتجاه KPI شهري لكل بائع
+                                </span>
+                                <h2 class="text-3xl md:text-4xl font-extrabold mb-3">التقييم الشهري</h2>
+                                <p id="monthlyEvaluationDescription" class="text-indigo-100 max-w-3xl leading-7">الـKPI هنا يحاسب البائع على الشهادات الجديدة في كل شهر فقط. التارجت الشهري هو الفرق بين الإجمالي التراكمي لهذا الشهر والشهر السابق.</p>
+                            </div>
+                            <div class="rounded-2xl bg-white/10 border border-white/15 px-5 py-4 min-w-[240px]">
+                                <p class="text-xs text-indigo-200 font-bold">نطاق التقرير الحالي</p>
+                                <p id="monthlyEvaluationRegionLabel" class="text-xl font-extrabold mt-1">كل الأقاليم</p>
+                                <p id="monthlyEvaluationDetailHint" class="text-xs text-indigo-200 mt-2">اضغط على أي بائع لعرض الشارت التفصيلي.</p>
+                                <button id="exportMonthlyEvaluationBtn" type="button" onclick="exportMonthlyEvaluationData()" class="mt-4 w-full rounded-xl bg-emerald-400 hover:bg-emerald-300 text-emerald-950 px-4 py-3 text-sm font-extrabold shadow-lg transition flex items-center justify-center gap-2">
+                                    <i class="fas fa-file-excel"></i> تصدير التقييم Excel
+                                </button>
+                                <p class="text-[10px] text-indigo-200 mt-2 text-center">يشمل البائعين والمشرفين والأقاليم: شهري وتراكمي</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-indigo-100 bg-white p-3 mb-6 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div class="px-2">
+                            <h3 class="font-extrabold text-slate-900"><i class="fas fa-layer-group text-indigo-500 ml-2"></i>طريقة عرض التقييم</h3>
+                            <p class="text-xs text-slate-500 mt-1">بدّل بين إنجاز الشهر وحده وبين إجمالي الإنجاز حتى نهاية كل شهر.</p>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 min-w-full lg:min-w-[520px] rounded-xl bg-slate-100 p-1.5">
+                            <button id="monthlyIncrementViewBtn" type="button" onclick="selectMonthlyEvaluationView('increment')" class="rounded-lg bg-indigo-600 text-white px-5 py-3 text-sm font-extrabold shadow-md transition" aria-pressed="true"><i class="fas fa-arrow-trend-up ml-2"></i>الزيادة الشهرية (KPI)</button>
+                            <button id="monthlyCumulativeViewBtn" type="button" onclick="selectMonthlyEvaluationView('cumulative')" class="rounded-lg text-slate-600 px-5 py-3 text-sm font-extrabold hover:bg-white transition" aria-pressed="false"><i class="fas fa-chart-area ml-2"></i>الإجمالي التراكمي</button>
+                        </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-teal-100 bg-white p-3 mb-6 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div class="px-2"><h3 class="font-extrabold text-slate-900"><i class="fas fa-sitemap text-teal-600 ml-2"></i>مستوى التحليل</h3><p class="text-xs text-slate-500 mt-1">اعرض كل بائع منفردًا أو متوسط كل مشرف داخل إقليمه.</p></div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 min-w-full lg:min-w-[720px] rounded-xl bg-slate-100 p-1.5">
+                            <button id="monthlyEmployeesAudienceBtn" type="button" onclick="selectMonthlyEvaluationAudience('employees')" class="rounded-lg bg-teal-600 text-white px-5 py-3 text-sm font-extrabold shadow-md transition" aria-pressed="true"><i class="fas fa-user ml-2"></i>البائعون</button>
+                            <button id="monthlySupervisorsAudienceBtn" type="button" onclick="selectMonthlyEvaluationAudience('supervisors')" class="rounded-lg text-slate-600 px-5 py-3 text-sm font-extrabold hover:bg-white transition" aria-pressed="false"><i class="fas fa-user-tie ml-2"></i>المشرفون حسب الإقليم</button>
+                            <button id="monthlyRegionsAudienceBtn" type="button" onclick="selectMonthlyEvaluationAudience('regions')" class="rounded-lg text-slate-600 px-5 py-3 text-sm font-extrabold hover:bg-white transition" aria-pressed="false"><i class="fas fa-map-location-dot ml-2"></i>الأقاليم</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+                        <div class="professional-stat-card rounded-2xl border border-slate-200 bg-white p-5">
+                            <p id="monthlyEvaluationCountLabel" class="text-xs font-bold text-slate-500">البائعون في التقييم</p>
+                            <div class="flex items-end justify-between mt-2"><span id="monthlyEvaluationEmployeeCount" class="text-3xl font-extrabold text-slate-900">0</span><i class="fas fa-users text-2xl text-indigo-400"></i></div>
+                        </div>
+                        <div class="professional-stat-card rounded-2xl border border-indigo-100 bg-indigo-50 p-5">
+                            <p class="text-xs font-bold text-indigo-600">متوسط KPI للفترة</p>
+                            <div class="flex items-end justify-between mt-2"><span id="monthlyEvaluationAverageKpi" class="text-3xl font-extrabold text-indigo-900">0%</span><i class="fas fa-gauge-high text-2xl text-indigo-400"></i></div>
+                        </div>
+                        <div class="professional-stat-card rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
+                            <p id="monthlyEvaluationImprovedLabel" class="text-xs font-bold text-emerald-700">تحسنوا في آخر شهر</p>
+                            <div class="flex items-end justify-between mt-2"><span id="monthlyEvaluationImprovedCount" class="text-3xl font-extrabold text-emerald-900">0</span><i class="fas fa-arrow-trend-up text-2xl text-emerald-500"></i></div>
+                        </div>
+                        <div class="professional-stat-card rounded-2xl border border-rose-100 bg-rose-50 p-5">
+                            <p id="monthlyEvaluationDeclinedLabel" class="text-xs font-bold text-rose-700">تراجعوا في آخر شهر</p>
+                            <div class="flex items-end justify-between mt-2"><span id="monthlyEvaluationDeclinedCount" class="text-3xl font-extrabold text-rose-900">0</span><i class="fas fa-arrow-trend-down text-2xl text-rose-500"></i></div>
+                        </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-slate-200 bg-white p-4 mb-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div>
+                            <h3 id="monthlyEvaluationTargetTitle" class="font-extrabold text-slate-800"><i class="fas fa-bullseye text-indigo-500 ml-2"></i>تعديل الزيادة المستهدفة للشهر</h3>
+                            <p id="monthlyEvaluationTargetHelp" class="text-xs text-slate-500 mt-1">الرقم الظاهر هو الفرق فقط عن الشهر السابق. تعديلُه يحدّث الإجمالي التراكمي تلقائيًا، ومسحُه يعيد الحساب التلقائي من ملف الأكاديمية.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2 text-xs font-bold">
+                            <span class="px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100"><i class="fas fa-arrow-up ml-1"></i>تحسن</span>
+                            <span class="px-3 py-1.5 rounded-full bg-rose-50 text-rose-700 border border-rose-100"><i class="fas fa-arrow-down ml-1"></i>تراجع</span>
+                            <span class="px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 border border-amber-100"><i class="fas fa-minus ml-1"></i>ثابت وأقل من التارجت</span>
+                            <span class="px-3 py-1.5 rounded-full bg-teal-50 text-teal-700 border border-teal-100"><i class="fas fa-check ml-1"></i>حقق 100%</span>
+                        </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-slate-200 bg-white p-4 mb-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="relative w-full md:max-w-xl">
+                            <label id="monthlyEvaluationSearchLabel" for="monthlyEvaluationSearch" class="block text-xs font-extrabold text-slate-600 mb-2"><i class="fas fa-magnifying-glass text-indigo-500 ml-2"></i>البحث داخل جدول التقييم</label>
+                            <input id="monthlyEvaluationSearch" type="search" oninput="renderMonthlyEvaluationTab()" autocomplete="off" placeholder="اكتب اسم البائع أو الرقم الوظيفي..." class="w-full rounded-xl border border-slate-300 bg-slate-50 py-3 pr-11 pl-4 text-sm font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400">
+                            <i class="fas fa-search absolute right-4 bottom-4 text-slate-400 pointer-events-none"></i>
+                        </div>
+                        <div class="flex items-center gap-3 rounded-xl bg-indigo-50 border border-indigo-100 px-4 py-3 shrink-0">
+                            <span class="w-9 h-9 rounded-lg bg-white text-indigo-600 flex items-center justify-center shadow-sm"><i class="fas fa-users-viewfinder"></i></span>
+                            <div><p class="text-[10px] font-bold text-indigo-500">نتائج البحث</p><p id="monthlyEvaluationSearchCount" class="text-sm font-extrabold text-indigo-900">0 من 0</p></div>
+                        </div>
+                    </div>
+
+                    <div class="table-container border border-slate-200 rounded-2xl shadow-sm bg-white">
+                        <table class="min-w-full divide-y divide-slate-200 text-sm text-right">
+                            <thead id="monthlyEvaluationTableHead" class="bg-slate-100 text-slate-800 border-b border-slate-200"></thead>
+                            <tbody id="monthlyEvaluationTableBody" class="bg-white divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                    <div id="monthlyEvaluationEmptyState" class="hidden text-center py-14 rounded-2xl border border-dashed border-slate-300 bg-slate-50 mt-4">
+                        <i class="fas fa-chart-line text-5xl text-slate-300 mb-3"></i>
+                        <p id="monthlyEvaluationEmptyStateText" class="font-bold text-slate-600">ارفع ملفي القوى والأكاديمية لعرض التقييم الشهري.</p>
                     </div>
                 </div>
 
@@ -1589,6 +1779,17 @@
 
         const excludedStatuses = ['استقالة', 'استقاله', 'إنهاء خدمة', 'انهاء خدمة', 'انهاء خدمه', 'انقطاع', 'انتقل إلى', 'انتقل الي', 'نقل'];
         let targetMonthsKeys = ["10-2025", "11-2025", "12-2025", "01-2026", "02-2026", "03-2026", "04-2026", "05-2026", "06-2026"];
+        const excludedAcademyCertificateMonths = new Set(["09-2025"]);
+
+        function isExcludedAcademyCertificateMonth(monthKey) {
+            const [month, year] = String(monthKey || '').split('-').map(Number);
+            if (!month || !year) return false;
+            return excludedAcademyCertificateMonths.has(`${String(month).padStart(2, '0')}-${year}`);
+        }
+
+        function getMonthlyEvaluationMonths(months = targetMonthsKeys) {
+            return (months || []).filter(month => !isExcludedAcademyCertificateMonth(month));
+        }
         
         const nonCertCoursesKeys = ["1+2 Offer", "delivery order software", "Updates and New Circulars", "Deraah Seminars", "Deraah's new products", "Deraah campaigns", "Capsule", "Sales Scenario By English"];
         
@@ -1610,6 +1811,16 @@
         let selectedBotCourseIndex = 0;
         let botViewMode = 'combined';
         let selectedEliteCohort = 'all';
+        const MONTHLY_EVALUATION_TARGETS_KEY = 'academyMonthlyEvaluationTargetsV1';
+        let monthlyEvaluationTargetOverrides = loadMonthlyEvaluationTargetOverrides();
+        let monthlyEvaluationViewMode = 'increment';
+        let monthlyEvaluationAudienceMode = 'employees';
+        let monthlyEmployeeChartInstance = null;
+        let monthlyEmployeeChartView = 'kpi';
+        let monthlyEmployeeChartData = null;
+        let monthlySupervisorChartInstance = null;
+        let currentMonthlySupervisorGroup = null;
+        let currentMonthlyGroupDetailLevel = 'supervisor';
 
         const trainingPathDef = [
             { certId: 1, ar: "تاريخ درعه", en: "Deraah History", hasCert: true },
@@ -1678,6 +1889,7 @@
                 buildDashboardFilterUI();
                 updateDashboardCharts();
             }
+            if (tabId === 'monthlyEvaluationTab') renderMonthlyEvaluationTab();
             if (tabId === 'botPathTab') renderBotCourseTab();
             if (tabId === 'globalFilterTab') renderGlobalFilterSummary();
         }
@@ -1809,6 +2021,7 @@
             renderTrainingPathTable();
             renderKPITab();
             updateMonthlyProgressTab();
+            renderMonthlyEvaluationTab();
             renderBotCourseTab();
             renderComparisonTable(globalData.allActive);
             renderTimelineDashboard();
@@ -2175,9 +2388,12 @@
                 let courseLower = courseName.toLowerCase();
                 let progressRaw = row.length > 26 ? row[26] : null;
                 let certInfo = parseCertificateDate(certValue);
+                const isIgnoredTestCertificate = Boolean(certInfo && isExcludedAcademyCertificateMonth(certInfo.key));
+                if (isIgnoredTestCertificate) certInfo = null;
+                const hasEffectiveCertificate = certValue !== "-" && !isIgnoredTestCertificate;
                 let matchedBotCourse = findBotCourse(courseName);
 
-                if (certValue !== "-") {
+                if (hasEffectiveCertificate && certInfo) {
                     let timeRegex = /(\d{2})\/(\d{2})\/(\d{4})[\s\r\n]+(\d{1,2}):(\d{2}):(\d{2})[\s\r\n]*(am|pm)/gi;
                     let match;
                     while ((match = timeRegex.exec(certValue)) !== null) {
@@ -2210,7 +2426,7 @@
                     let matchedElite = eliteCoursesKeys.find(c => courseLower.includes(c.toLowerCase()));
                     if (matchedElite) {
                         employeeMap[id].isEliteTarget = true;
-                        if (certValue !== "-" || parseProgress(progressRaw) === 100) {
+                        if (hasEffectiveCertificate || parseProgress(progressRaw) === 100) {
                             employeeMap[id].eliteProgress[matchedElite] = true;
                         }
                     }
@@ -2230,7 +2446,7 @@
 
                     let matchedPathCourse = matchedBotCourse ? null : trainingPathDef.find(c => courseLower.includes(c.en.toLowerCase()));
                     if (matchedPathCourse) {
-                        if (certValue !== "-" || parseProgress(progressRaw) === 100) {
+                        if (hasEffectiveCertificate || parseProgress(progressRaw) === 100) {
                             employeeMap[id].pathProgress[matchedPathCourse.en] = true;
                         }
                     }
@@ -2262,14 +2478,14 @@
                     let matchedElite = eliteCoursesKeys.find(c => courseLower.includes(c.toLowerCase()));
                     if (matchedElite) {
                         missingMap[id].isEliteTarget = true;
-                        if (certValue !== "-" || parseProgress(progressRaw) === 100) {
+                        if (hasEffectiveCertificate || parseProgress(progressRaw) === 100) {
                             missingMap[id].eliteProgress[matchedElite] = true;
                         }
                     }
 
                     let matchedPathCourse = matchedBotCourse ? null : trainingPathDef.find(c => courseLower.includes(c.en.toLowerCase()));
                     if (matchedPathCourse) {
-                        if (certValue !== "-" || parseProgress(progressRaw) === 100) {
+                        if (hasEffectiveCertificate || parseProgress(progressRaw) === 100) {
                             missingMap[id].pathProgress[matchedPathCourse.en] = true;
                         }
                     }
@@ -2296,12 +2512,12 @@
                     let id = cleanString(row[14]); if (!id) continue;
                     let certValue = row.length > 38 ? cleanString(row[38]) : "-";
                     let certInfo = parseCertificateDate(certValue);
-                    if (certInfo) oldCertMap[id] = (oldCertMap[id] || 0) + 1;
+                    if (certInfo && !isExcludedAcademyCertificateMonth(certInfo.key)) oldCertMap[id] = (oldCertMap[id] || 0) + 1;
                 }
                 globalData.allActive.forEach(emp => emp.oldTotalCerts = oldCertMap[emp.id] || 0);
             }
 
-            let sortedExtracted = Array.from(globalData.allExtractedMonths).sort((a, b) => {
+            let sortedExtracted = Array.from(globalData.allExtractedMonths).filter(month => !isExcludedAcademyCertificateMonth(month)).sort((a, b) => {
                 let [m1, y1] = a.split('-').map(Number);
                 let [m2, y2] = b.split('-').map(Number);
                 return y1 !== y2 ? y1 - y2 : m1 - m2;
@@ -2320,6 +2536,7 @@
             }
             buildExclusionUI(); // Build the new exclusion UI
             applyActiveFilters();
+            renderMonthlyEvaluationTab();
             renderTimelineDashboard(); 
             buildTrainingPathHeaders(); 
             renderTrainingPathTable();  
@@ -3749,6 +3966,7 @@
             applyActiveFilters(); 
             renderTrainingPathTable(); 
             renderKPITab(); 
+            renderMonthlyEvaluationTab();
             if(document.getElementById('dashboardTab').classList.contains('active')) updateDashboardCharts();
         }
 
@@ -4047,6 +4265,830 @@
             
             const bodyEl = document.getElementById(idBody); if(bodyEl) bodyEl.innerHTML = bodyHtml;
             const countEl = document.getElementById(idCount); if(countEl) countEl.innerText = dataArray.length;
+        }
+
+        function loadMonthlyEvaluationTargetOverrides() {
+            try {
+                const stored = JSON.parse(localStorage.getItem(MONTHLY_EVALUATION_TARGETS_KEY) || '{}');
+                if (!stored || typeof stored !== 'object' || Array.isArray(stored)) return {};
+                return Object.fromEntries(Object.entries(stored).filter(([, value]) => Number.isFinite(Number(value)) && Number(value) > 0).map(([month, value]) => [month, Math.floor(Number(value))]));
+            } catch (error) {
+                return {};
+            }
+        }
+
+        function persistMonthlyEvaluationTargetOverrides() {
+            const cleanOverrides = Object.fromEntries(Object.entries(monthlyEvaluationTargetOverrides).filter(([, value]) => Number.isFinite(Number(value)) && Number(value) > 0));
+            monthlyEvaluationTargetOverrides = cleanOverrides;
+            if (Object.keys(cleanOverrides).length === 0 && typeof localStorage.removeItem === 'function') {
+                localStorage.removeItem(MONTHLY_EVALUATION_TARGETS_KEY);
+            } else {
+                localStorage.setItem(MONTHLY_EVALUATION_TARGETS_KEY, JSON.stringify(cleanOverrides));
+            }
+        }
+
+        function getMonthlyEvaluationEmployees() {
+            return globalData.allActive
+                .filter(isEmployeeVisibleInCurrentRegion)
+                .sort((a, b) => cleanString(a.name).localeCompare(cleanString(b.name), 'ar'));
+        }
+
+        function getMonthlyEvaluationMonthEnd(monthKey) {
+            const [month, year] = String(monthKey || '').split('-').map(Number);
+            if (!month || !year) return null;
+            return new Date(year, month, 0, 23, 59, 59, 999);
+        }
+
+        function isEmployeeEligibleForMonthlyEvaluation(emp, monthKey) {
+            const monthEnd = getMonthlyEvaluationMonthEnd(monthKey);
+            const hireDate = parseExcelDate(emp && emp.hireDate);
+            if (!monthEnd || !hireDate || isNaN(hireDate)) return true;
+            return hireDate <= monthEnd;
+        }
+
+        function getEmployeeMonthlyCertificates(emp, monthKey) {
+            return Math.max(0, Number(emp && emp.monthsData && emp.monthsData[monthKey]) || 0);
+        }
+
+        function getEmployeeCumulativeCertificates(emp, monthIndex, months = getMonthlyEvaluationMonths()) {
+            const resolvedIndex = typeof monthIndex === 'number' ? monthIndex : months.indexOf(monthIndex);
+            if (!emp || resolvedIndex < 0) return 0;
+            return months.slice(0, resolvedIndex + 1).reduce((sum, month) => sum + getEmployeeMonthlyCertificates(emp, month), 0);
+        }
+
+        // ملف الأكاديمية يسجل الشهادات بتاريخها؛ لذلك الـMax التلقائي هنا إجمالي تراكمي حتى نهاية الشهر.
+        function getAutoMonthlyTarget(monthKey, employees = getMonthlyEvaluationEmployees(), months = getMonthlyEvaluationMonths()) {
+            const monthIndex = months.indexOf(monthKey);
+            if (monthIndex < 0) return 0;
+            return employees.reduce((max, emp) => {
+                if (!isEmployeeEligibleForMonthlyEvaluation(emp, monthKey)) return max;
+                return Math.max(max, getEmployeeCumulativeCertificates(emp, monthIndex, months));
+            }, 0);
+        }
+
+        function getMonthlyTargetSeries(employees = getMonthlyEvaluationEmployees(), months = getMonthlyEvaluationMonths()) {
+            let previousCumulativeTarget = 0;
+            let previousAutoTarget = 0;
+            return months.map((monthKey, monthIndex) => {
+                const autoCumulativeTarget = getAutoMonthlyTarget(monthKey, employees, months);
+                const isManual = Object.prototype.hasOwnProperty.call(monthlyEvaluationTargetOverrides, monthKey)
+                    && Number(monthlyEvaluationTargetOverrides[monthKey]) > 0;
+                const requestedCumulativeTarget = isManual
+                    ? Math.floor(Number(monthlyEvaluationTargetOverrides[monthKey]))
+                    : autoCumulativeTarget;
+                // الإجمالي التراكمي لا يمكن أن يقل من شهر لآخر، حتى بعد تعديل يدوي في شهر سابق.
+                const cumulativeTarget = Math.max(previousCumulativeTarget, requestedCumulativeTarget);
+                const incrementTarget = Math.max(0, cumulativeTarget - previousCumulativeTarget);
+                const autoIncrementTarget = Math.max(0, autoCumulativeTarget - previousAutoTarget);
+                const info = {
+                    monthKey,
+                    monthIndex,
+                    isManual,
+                    isCarriedForward: cumulativeTarget > requestedCumulativeTarget,
+                    autoTarget: autoCumulativeTarget,
+                    autoCumulativeTarget,
+                    autoIncrementTarget,
+                    requestedCumulativeTarget,
+                    cumulativeTarget,
+                    incrementTarget,
+                    target: cumulativeTarget
+                };
+                previousCumulativeTarget = cumulativeTarget;
+                previousAutoTarget = autoCumulativeTarget;
+                return info;
+            });
+        }
+
+        function getMonthlyTargetInfo(monthKey, employees = getMonthlyEvaluationEmployees(), months = getMonthlyEvaluationMonths()) {
+            return getMonthlyTargetSeries(employees, months).find(info => info.monthKey === monthKey) || {
+                monthKey, monthIndex: -1, isManual: false, isCarriedForward: false,
+                autoTarget: 0, autoCumulativeTarget: 0, autoIncrementTarget: 0,
+                requestedCumulativeTarget: 0, cumulativeTarget: 0, incrementTarget: 0, target: 0
+            };
+        }
+
+        function getMonthlyEvaluationCompleted(emp, monthKey, monthIndex, mode = monthlyEvaluationViewMode, months = getMonthlyEvaluationMonths()) {
+            return mode === 'cumulative'
+                ? getEmployeeCumulativeCertificates(emp, monthIndex, months)
+                : getEmployeeMonthlyCertificates(emp, monthKey);
+        }
+
+        function calculateMonthlyKpi(emp, monthKey, target, mode = 'increment', monthIndex = getMonthlyEvaluationMonths().indexOf(monthKey), months = getMonthlyEvaluationMonths()) {
+            if (!emp || !isEmployeeEligibleForMonthlyEvaluation(emp, monthKey) || !Number(target)) return null;
+            const completed = getMonthlyEvaluationCompleted(emp, monthKey, monthIndex, mode, months);
+            return roundKpiValue(Math.min(100, (completed / Number(target)) * 100));
+        }
+
+        function getMonthlyTrendState(currentKpi, previousKpi) {
+            if (currentKpi === null || currentKpi === undefined) return { key: 'unavailable', delta: null };
+            if (previousKpi === null || previousKpi === undefined) return { key: currentKpi >= 100 ? 'achieved' : 'start', delta: null };
+            const delta = roundKpiValue(currentKpi - previousKpi);
+            if (delta > 0) return { key: currentKpi >= 100 ? 'achieved' : 'improved', delta };
+            if (delta < 0) return { key: 'declined', delta };
+            return { key: currentKpi >= 100 ? 'achieved' : 'stagnant', delta: 0 };
+        }
+
+        function getMonthlyTrendPresentation(trend) {
+            const configs = {
+                improved: { label: `تحسن +${formatKpiValue(trend.delta)} نقطة`, shortLabel: 'صاعد', icon: 'fa-arrow-up', cellClass: 'bg-emerald-50 text-emerald-700 border-emerald-100', cardClass: 'border-emerald-100 bg-emerald-50', textClass: 'text-emerald-800' },
+                declined: { label: `تراجع ${formatKpiValue(trend.delta)} نقطة`, shortLabel: 'نازل', icon: 'fa-arrow-down', cellClass: 'bg-rose-50 text-rose-700 border-rose-100', cardClass: 'border-rose-100 bg-rose-50', textClass: 'text-rose-800' },
+                achieved: { label: 'محقق 100%', shortLabel: 'محقق', icon: 'fa-check', cellClass: 'bg-teal-50 text-teal-700 border-teal-100', cardClass: 'border-teal-100 bg-teal-50', textClass: 'text-teal-800' },
+                stagnant: { label: 'ثابت وأقل من التارجت', shortLabel: 'ثابت', icon: 'fa-minus', cellClass: 'bg-amber-50 text-amber-700 border-amber-100', cardClass: 'border-amber-100 bg-amber-50', textClass: 'text-amber-800' },
+                start: { label: 'بداية القياس', shortLabel: 'بداية', icon: 'fa-circle', cellClass: 'bg-slate-50 text-slate-600 border-slate-200', cardClass: 'border-slate-200 bg-slate-50', textClass: 'text-slate-700' },
+                noTarget: { label: 'لا يوجد تارجت جديد', shortLabel: 'بدون زيادة', icon: 'fa-minus', cellClass: 'bg-slate-50 text-slate-500 border-slate-200', cardClass: 'border-slate-200 bg-slate-50', textClass: 'text-slate-600' },
+                unavailable: { label: 'قبل التعيين', shortLabel: 'غير محسوب', icon: 'fa-minus', cellClass: 'bg-slate-50 text-slate-400 border-slate-100', cardClass: 'border-slate-200 bg-slate-50', textClass: 'text-slate-500' }
+            };
+            return configs[trend.key] || configs.unavailable;
+        }
+
+        function selectMonthlyEvaluationView(mode) {
+            monthlyEvaluationViewMode = mode === 'cumulative' ? 'cumulative' : 'increment';
+            renderMonthlyEvaluationTab();
+        }
+
+        function selectMonthlyEvaluationAudience(mode) {
+            monthlyEvaluationAudienceMode = mode === 'regions' ? 'regions' : (mode === 'supervisors' ? 'supervisors' : 'employees');
+            const searchInput = document.getElementById('monthlyEvaluationSearch');
+            if (searchInput) searchInput.value = '';
+            renderMonthlyEvaluationTab();
+        }
+
+        function getMonthlySupervisorGroups(employees = getMonthlyEvaluationEmployees()) {
+            const groups = new Map();
+            employees.forEach(emp => {
+                const supervisor = cleanString(emp.supervisor) || 'بدون مشرف';
+                const region = cleanString(emp.region) || 'غير محدد';
+                const key = `${region}|||${supervisor}`;
+                if (!groups.has(key)) groups.set(key, { key, supervisor, region, employees: [] });
+                groups.get(key).employees.push(emp);
+            });
+            return Array.from(groups.values()).sort((a, b) => {
+                const regionCompare = a.region.localeCompare(b.region, 'ar');
+                return regionCompare || a.supervisor.localeCompare(b.supervisor, 'ar');
+            });
+        }
+
+        function getMonthlyRegionGroups(employees = getMonthlyEvaluationEmployees()) {
+            const groups = new Map();
+            employees.forEach(emp => {
+                const region = cleanString(emp.region) || 'غير محدد';
+                if (!groups.has(region)) groups.set(region, { key: region, region, employees: [] });
+                groups.get(region).employees.push(emp);
+            });
+            return Array.from(groups.values()).sort((a, b) => a.region.localeCompare(b.region, 'ar'));
+        }
+
+        function getMonthlyEmployeeKpiSeries(emp, targetInfos, months, mode = monthlyEvaluationViewMode) {
+            return months.map((month, index) => {
+                const target = mode === 'cumulative' ? targetInfos[index].cumulativeTarget : targetInfos[index].incrementTarget;
+                return calculateMonthlyKpi(emp, month, target, mode, index, months);
+            });
+        }
+
+        function averageMonthlyKpis(values) {
+            const valid = values.filter(value => value !== null && value !== undefined && Number.isFinite(Number(value)));
+            return valid.length ? roundKpiValue(valid.reduce((sum, value) => sum + Number(value), 0) / valid.length) : null;
+        }
+
+        function getMonthlySupervisorMetrics(group, targetInfos, months, mode = monthlyEvaluationViewMode) {
+            const employeeSeries = group.employees.map(emp => ({ emp, kpis: getMonthlyEmployeeKpiSeries(emp, targetInfos, months, mode) }));
+            const monthlyKpis = months.map((_, monthIndex) => averageMonthlyKpis(employeeSeries.map(item => item.kpis[monthIndex])));
+            const periodAverage = averageMonthlyKpis(monthlyKpis);
+            const latestIndex = months.length - 1;
+            const previousIndex = latestIndex - 1;
+            const latestTrend = getMonthlyTrendState(monthlyKpis[latestIndex], previousIndex >= 0 ? monthlyKpis[previousIndex] : null);
+            return { employeeSeries, monthlyKpis, periodAverage, latestTrend };
+        }
+
+        function handleMonthlyTargetChange(monthKey, rawValue, mode = monthlyEvaluationViewMode) {
+            const value = String(rawValue === undefined || rawValue === null ? '' : rawValue).trim();
+            if (!value) {
+                delete monthlyEvaluationTargetOverrides[monthKey];
+                persistMonthlyEvaluationTargetOverrides();
+                renderMonthlyEvaluationTab();
+                return;
+            }
+            const parsed = Math.floor(Number(value));
+            const allowZero = mode === 'increment';
+            if (!Number.isFinite(parsed) || parsed < 0 || (!allowZero && parsed === 0)) {
+                alert(mode === 'increment' ? 'الزيادة الشهرية يجب أن تكون صفرًا أو عدد شهادات صحيحًا أكبر منه.' : 'الإجمالي التراكمي يجب أن يكون عدد شهادات صحيحًا أكبر من صفر.');
+                renderMonthlyEvaluationTab();
+                return;
+            }
+            const employees = getMonthlyEvaluationEmployees();
+            const months = getMonthlyEvaluationMonths();
+            const monthIndex = months.indexOf(monthKey);
+            if (monthIndex < 0) return;
+            const currentSeries = getMonthlyTargetSeries(employees, months);
+            const previousCumulativeTarget = monthIndex > 0 ? currentSeries[monthIndex - 1].cumulativeTarget : 0;
+            const cumulativeValue = mode === 'increment' ? previousCumulativeTarget + parsed : parsed;
+            if (cumulativeValue < previousCumulativeTarget || cumulativeValue <= 0) {
+                alert('الإجمالي التراكمي لهذا الشهر لا يمكن أن يكون أقل من إجمالي الشهر السابق.');
+                renderMonthlyEvaluationTab();
+                return;
+            }
+            monthlyEvaluationTargetOverrides[monthKey] = Math.min(cumulativeValue, 9999);
+            persistMonthlyEvaluationTargetOverrides();
+            renderMonthlyEvaluationTab();
+        }
+
+        function renderMonthlyEvaluationCell(emp, monthKey, monthIndex, targetInfos, mode = monthlyEvaluationViewMode, months = getMonthlyEvaluationMonths()) {
+            if (!isEmployeeEligibleForMonthlyEvaluation(emp, monthKey)) {
+                return `<td class="min-w-[130px] px-3 py-3 text-center bg-slate-50 text-slate-400"><span class="text-xs font-bold">قبل التعيين</span></td>`;
+            }
+            const info = targetInfos[monthIndex];
+            const target = mode === 'cumulative' ? info.cumulativeTarget : info.incrementTarget;
+            const completed = getMonthlyEvaluationCompleted(emp, monthKey, monthIndex, mode, months);
+            if (!target) {
+                const presentation = getMonthlyTrendPresentation({ key: 'noTarget', delta: null });
+                return `<td class="min-w-[130px] px-3 py-3 text-center border-l border-slate-100 ${presentation.cellClass}" title="${presentation.label}"><div class="font-extrabold">—</div><div class="text-[11px] mt-1 opacity-75">لا توجد زيادة مستهدفة</div></td>`;
+            }
+            const currentKpi = calculateMonthlyKpi(emp, monthKey, target, mode, monthIndex, months);
+            const previousTarget = monthIndex > 0 ? (mode === 'cumulative' ? targetInfos[monthIndex - 1].cumulativeTarget : targetInfos[monthIndex - 1].incrementTarget) : 0;
+            const previousKpi = monthIndex > 0 ? calculateMonthlyKpi(emp, months[monthIndex - 1], previousTarget, mode, monthIndex - 1, months) : null;
+            const trend = getMonthlyTrendState(currentKpi, previousKpi);
+            const presentation = getMonthlyTrendPresentation(trend);
+            const displayKpi = currentKpi === null ? '—' : `${formatKpiValue(currentKpi)}%`;
+            return `<td class="min-w-[130px] px-3 py-3 text-center border-l border-slate-100 ${presentation.cellClass}" title="${safeBotText(presentation.label)}">
+                <div class="flex items-center justify-center gap-1.5 font-extrabold"><span>${displayKpi}</span><i class="fas ${presentation.icon} text-[10px]"></i></div>
+                <div class="text-[11px] mt-1 opacity-75">${completed} من ${target || 0} شهادة</div>
+            </td>`;
+        }
+
+        function renderMonthlySupervisorCell(group, metrics, monthIndex) {
+            const currentKpi = metrics.monthlyKpis[monthIndex];
+            const previousKpi = monthIndex > 0 ? metrics.monthlyKpis[monthIndex - 1] : null;
+            if (currentKpi === null || currentKpi === undefined) {
+                return `<td class="min-w-[145px] px-3 py-3 text-center border-l border-slate-100 bg-slate-50 text-slate-400"><div class="font-extrabold">—</div><div class="text-[11px] mt-1">غير محسوب</div></td>`;
+            }
+            const presentation = getMonthlyTrendPresentation(getMonthlyTrendState(currentKpi, previousKpi));
+            const monthValues = metrics.employeeSeries.map(item => item.kpis[monthIndex]).filter(value => value !== null && value !== undefined);
+            const achievedCount = monthValues.filter(value => value >= 100).length;
+            return `<td class="min-w-[145px] px-3 py-3 text-center border-l border-slate-100 ${presentation.cellClass}" title="${safeBotText(presentation.label)}">
+                <div class="flex items-center justify-center gap-1.5 font-extrabold"><span>${formatKpiValue(currentKpi)}%</span><i class="fas ${presentation.icon} text-[10px]"></i></div>
+                <div class="text-[11px] mt-1 opacity-75">${achievedCount} من ${monthValues.length} حققوا 100%</div>
+            </td>`;
+        }
+
+        function renderMonthlyEvaluationTab() {
+            const header = document.getElementById('monthlyEvaluationTableHead');
+            const body = document.getElementById('monthlyEvaluationTableBody');
+            const emptyState = document.getElementById('monthlyEvaluationEmptyState');
+            if (!header || !body) return;
+
+            const allEmployees = getMonthlyEvaluationEmployees();
+            const allSupervisorGroups = getMonthlySupervisorGroups(allEmployees);
+            const allRegionGroups = getMonthlyRegionGroups(allEmployees);
+            const isSupervisorAudience = monthlyEvaluationAudienceMode === 'supervisors';
+            const isRegionAudience = monthlyEvaluationAudienceMode === 'regions';
+            const isGroupAudience = isSupervisorAudience || isRegionAudience;
+            const searchInput = document.getElementById('monthlyEvaluationSearch');
+            const searchTerm = cleanString(searchInput ? searchInput.value : '').toLowerCase();
+            const employees = allEmployees.filter(emp => !searchTerm || cleanString(emp.name).toLowerCase().includes(searchTerm) || cleanString(emp.id).toLowerCase().includes(searchTerm));
+            const supervisorGroups = allSupervisorGroups.filter(group => !searchTerm || group.supervisor.toLowerCase().includes(searchTerm) || group.region.toLowerCase().includes(searchTerm));
+            const regionGroups = allRegionGroups.filter(group => !searchTerm || group.region.toLowerCase().includes(searchTerm));
+            const displayedItems = isRegionAudience ? regionGroups : (isSupervisorAudience ? supervisorGroups : employees);
+            const allItems = isRegionAudience ? allRegionGroups : (isSupervisorAudience ? allSupervisorGroups : allEmployees);
+            const months = getMonthlyEvaluationMonths();
+            // البحث يفلتر الصفوف فقط؛ التارجت يظل محسوباً من كل موظفي الإقليم الحالي.
+            const targetInfos = getMonthlyTargetSeries(allEmployees, months);
+            const isCumulative = monthlyEvaluationViewMode === 'cumulative';
+
+            const regionLabel = document.getElementById('monthlyEvaluationRegionLabel');
+            if (regionLabel) regionLabel.innerText = selectedGlobalRegion || (layoutMode === 'new' ? 'كل الأقاليم' : 'حسب فلترة الأقاليم الحالية');
+            const searchCount = document.getElementById('monthlyEvaluationSearchCount');
+            if (searchCount) searchCount.innerText = `${displayedItems.length} من ${allItems.length}`;
+            const emptyStateText = document.getElementById('monthlyEvaluationEmptyStateText');
+
+            const incrementBtn = document.getElementById('monthlyIncrementViewBtn');
+            const cumulativeBtn = document.getElementById('monthlyCumulativeViewBtn');
+            const activeClasses = 'rounded-lg bg-indigo-600 text-white px-5 py-3 text-sm font-extrabold shadow-md transition';
+            const inactiveClasses = 'rounded-lg text-slate-600 px-5 py-3 text-sm font-extrabold hover:bg-white transition';
+            if (incrementBtn) { incrementBtn.className = isCumulative ? inactiveClasses : activeClasses; incrementBtn.setAttribute('aria-pressed', String(!isCumulative)); }
+            if (cumulativeBtn) { cumulativeBtn.className = isCumulative ? activeClasses : inactiveClasses; cumulativeBtn.setAttribute('aria-pressed', String(isCumulative)); }
+            const employeesAudienceBtn = document.getElementById('monthlyEmployeesAudienceBtn');
+            const supervisorsAudienceBtn = document.getElementById('monthlySupervisorsAudienceBtn');
+            const regionsAudienceBtn = document.getElementById('monthlyRegionsAudienceBtn');
+            const audienceActiveClasses = 'rounded-lg bg-teal-600 text-white px-5 py-3 text-sm font-extrabold shadow-md transition';
+            if (employeesAudienceBtn) { employeesAudienceBtn.className = isGroupAudience ? inactiveClasses : audienceActiveClasses; employeesAudienceBtn.setAttribute('aria-pressed', String(!isGroupAudience)); }
+            if (supervisorsAudienceBtn) { supervisorsAudienceBtn.className = isSupervisorAudience ? audienceActiveClasses : inactiveClasses; supervisorsAudienceBtn.setAttribute('aria-pressed', String(isSupervisorAudience)); }
+            if (regionsAudienceBtn) { regionsAudienceBtn.className = isRegionAudience ? audienceActiveClasses : inactiveClasses; regionsAudienceBtn.setAttribute('aria-pressed', String(isRegionAudience)); }
+
+            const description = document.getElementById('monthlyEvaluationDescription');
+            const audienceDescription = isRegionAudience ? ' كمتوسط لكل إقليم' : (isSupervisorAudience ? ' كمتوسط لفريق كل مشرف' : ' لكل بائع');
+            if (description) description.innerText = isCumulative
+                ? `هذا العرض يوضح الإجمالي التراكمي حتى نهاية كل شهر${audienceDescription}.`
+                : `الـKPI يحاسب على الشهادات الجديدة في الشهر فقط${isRegionAudience ? '، ويعرض متوسط جميع بائعي الإقليم' : (isSupervisorAudience ? '، ويعرض متوسط فريق كل مشرف داخل إقليمه' : '')}.`;
+            const detailHint = document.getElementById('monthlyEvaluationDetailHint');
+            if (detailHint) detailHint.innerText = isRegionAudience ? 'اضغط على أي إقليم لعرض كل بائعيه ومشرفيه.' : (isSupervisorAudience ? 'اضغط على أي مشرف لعرض تفاصيل فريقه بالكامل.' : 'اضغط على أي بائع لعرض الشارت التفصيلي.');
+            const searchLabel = document.getElementById('monthlyEvaluationSearchLabel');
+            if (searchLabel) searchLabel.innerHTML = `<i class="fas fa-magnifying-glass text-indigo-500 ml-2"></i>${isRegionAudience ? 'البحث باسم الإقليم' : (isSupervisorAudience ? 'البحث باسم المشرف أو الإقليم' : 'البحث باسم البائع أو الرقم الوظيفي')}`;
+            if (searchInput) searchInput.placeholder = isRegionAudience ? 'اكتب اسم الإقليم...' : (isSupervisorAudience ? 'اكتب اسم المشرف أو الإقليم...' : 'اكتب اسم البائع أو الرقم الوظيفي...');
+            document.getElementById('monthlyEvaluationCountLabel').innerText = isRegionAudience ? 'الأقاليم في التقييم' : (isSupervisorAudience ? 'المشرفون في التقييم' : 'البائعون في التقييم');
+            document.getElementById('monthlyEvaluationImprovedLabel').innerText = isRegionAudience ? 'أقاليم تحسنت في آخر شهر' : (isSupervisorAudience ? 'مشرفون تحسنوا في آخر شهر' : 'تحسنوا في آخر شهر');
+            document.getElementById('monthlyEvaluationDeclinedLabel').innerText = isRegionAudience ? 'أقاليم تراجعت في آخر شهر' : (isSupervisorAudience ? 'مشرفون تراجعوا في آخر شهر' : 'تراجعوا في آخر شهر');
+
+            const targetTitle = document.getElementById('monthlyEvaluationTargetTitle');
+            if (targetTitle) targetTitle.innerHTML = `<i class="fas fa-bullseye text-indigo-500 ml-2"></i>${isCumulative ? 'تعديل الإجمالي التراكمي المستهدف' : 'تعديل الزيادة المستهدفة للشهر'}`;
+            const targetHelp = document.getElementById('monthlyEvaluationTargetHelp');
+            if (targetHelp) targetHelp.innerText = isCumulative
+                ? 'الرقم الظاهر هو إجمالي الشهادات المطلوبة حتى نهاية الشهر. لا يمكن أن يقل عن إجمالي الشهر السابق، ومسحُه يعيد الـMax التلقائي.'
+                : 'الرقم الظاهر هو الفرق فقط عن الشهر السابق. تعديلُه يحدّث الإجمالي التراكمي تلقائيًا، ومسحُه يعيد الحساب التلقائي من ملف الأكاديمية.';
+
+            if (allEmployees.length === 0 || months.length === 0) {
+                header.innerHTML = '';
+                body.innerHTML = '';
+                if (emptyState) emptyState.classList.remove('hidden');
+                if (emptyStateText) emptyStateText.innerText = 'ارفع ملفي القوى والأكاديمية لعرض التقييم الشهري.';
+                ['monthlyEvaluationEmployeeCount', 'monthlyEvaluationImprovedCount', 'monthlyEvaluationDeclinedCount'].forEach(id => { const el = document.getElementById(id); if (el) el.innerText = '0'; });
+                document.getElementById('monthlyEvaluationAverageKpi').innerText = '0%';
+                return;
+            }
+            if (emptyState) emptyState.classList.toggle('hidden', displayedItems.length > 0);
+            if (emptyStateText) emptyStateText.innerText = displayedItems.length ? '' : `لا توجد نتائج مطابقة للبحث "${searchInput ? searchInput.value : ''}".`;
+
+            const monthHeaders = months.map((month, index) => {
+                const info = targetInfos[index];
+                const sourceLabel = info.isManual ? 'تارجت يدوي' : (info.isCarriedForward ? 'مُرحّل من السابق' : 'Max تلقائي');
+                return `<th class="min-w-[150px] px-3 py-3 text-center border-l border-slate-200 bg-slate-100"><span class="block font-extrabold text-slate-800">${month.replace('-', '/')}</span><span class="block text-[10px] text-slate-500 mt-1">${sourceLabel} • ${isCumulative ? 'تراكمي' : 'زيادة شهرية'}</span></th>`;
+            }).join('');
+            const targetInputs = months.map((month, index) => {
+                const info = targetInfos[index];
+                const activeTarget = isCumulative ? info.cumulativeTarget : info.incrementTarget;
+                const autoTarget = isCumulative ? info.autoCumulativeTarget : info.autoIncrementTarget;
+                return `<th class="min-w-[150px] px-3 py-2 text-center border-l border-slate-200 bg-white"><label class="block text-[10px] font-bold ${info.isManual ? 'text-violet-600' : 'text-slate-500'} mb-1">${isCumulative ? 'الإجمالي' : 'الزيادة'} ${info.isManual ? '• محفوظ' : '• تلقائي'}</label><input type="number" min="${isCumulative ? 1 : 0}" max="9999" step="1" value="${activeTarget}" placeholder="تلقائي: ${autoTarget}" onchange="handleMonthlyTargetChange(decodeURIComponent('${encodeURIComponent(month)}'), this.value, '${monthlyEvaluationViewMode}')" class="w-24 rounded-lg border ${info.isManual ? 'border-violet-300 bg-violet-50 text-violet-800' : 'border-slate-300 bg-white text-slate-700'} px-2 py-1.5 text-center font-extrabold focus:outline-none focus:ring-2 focus:ring-indigo-200" title="امسح الرقم لإلغاء الحفظ والرجوع للحساب التلقائي"></th>`;
+            }).join('');
+
+            if (isRegionAudience) {
+                header.innerHTML = `<tr><th rowspan="2" class="min-w-[220px] px-4 py-3 text-right font-extrabold">اسم الإقليم</th><th rowspan="2" class="min-w-[130px] px-3 py-3 text-center font-extrabold">عدد المشرفين</th><th rowspan="2" class="min-w-[120px] px-3 py-3 text-center font-extrabold">عدد البائعين</th><th rowspan="2" class="min-w-[130px] px-3 py-3 text-center font-extrabold">متوسط الفترة</th><th rowspan="2" class="min-w-[130px] px-3 py-3 text-center font-extrabold bg-indigo-50 text-indigo-800">الاتجاه الحالي</th>${monthHeaders}</tr><tr>${targetInputs}</tr>`;
+            } else if (isSupervisorAudience) {
+                // لا نثبت عمود الاسم هنا حتى لا يغطي الأعمدة أثناء السحب الأفقي.
+                header.innerHTML = `<tr><th rowspan="2" class="min-w-[240px] px-4 py-3 text-right font-extrabold">اسم المشرف</th><th rowspan="2" class="min-w-[170px] px-4 py-3 text-right font-extrabold">الإقليم</th><th rowspan="2" class="min-w-[120px] px-3 py-3 text-center font-extrabold">عدد البائعين</th><th rowspan="2" class="min-w-[130px] px-3 py-3 text-center font-extrabold">متوسط الفترة</th><th rowspan="2" class="min-w-[130px] px-3 py-3 text-center font-extrabold bg-indigo-50 text-indigo-800">الاتجاه الحالي</th>${monthHeaders}</tr><tr>${targetInputs}</tr>`;
+            } else {
+                header.innerHTML = `<tr><th rowspan="2" class="sticky-id px-3 py-3 text-right font-extrabold">الرقم</th><th rowspan="2" class="sticky-name px-4 py-3 text-right font-extrabold">اسم البائع</th><th rowspan="2" class="min-w-[170px] px-4 py-3 text-right font-extrabold">المشرف</th><th rowspan="2" class="min-w-[150px] px-4 py-3 text-right font-extrabold">الإقليم</th><th rowspan="2" class="min-w-[130px] px-4 py-3 text-center font-extrabold bg-indigo-50 text-indigo-800">الاتجاه الحالي</th>${monthHeaders}</tr><tr>${targetInputs}</tr>`;
+            }
+
+            const latestIndex = months.length - 1;
+            const previousIndex = latestIndex - 1;
+            const allKpis = [];
+            let improvedCount = 0;
+            let declinedCount = 0;
+
+            if (isRegionAudience) {
+                body.innerHTML = regionGroups.map(group => {
+                    const metrics = getMonthlySupervisorMetrics(group, targetInfos, months, monthlyEvaluationViewMode);
+                    metrics.monthlyKpis.forEach(value => { if (value !== null) allKpis.push(value); });
+                    if (metrics.latestTrend.key === 'improved' || (metrics.latestTrend.key === 'achieved' && metrics.latestTrend.delta > 0)) improvedCount++;
+                    if (metrics.latestTrend.key === 'declined') declinedCount++;
+                    const presentation = getMonthlyTrendPresentation(metrics.latestTrend);
+                    const monthCells = months.map((_, index) => renderMonthlySupervisorCell(group, metrics, index)).join('');
+                    const supervisorsCount = new Set(group.employees.map(emp => cleanString(emp.supervisor) || 'بدون مشرف')).size;
+                    return `<tr class="group cursor-pointer hover:bg-cyan-50/70 transition" onclick="showMonthlyRegionDetails(decodeURIComponent('${encodeURIComponent(group.key)}'))"><td class="min-w-[220px] px-4 py-3"><span class="font-extrabold text-cyan-800">${safeBotText(group.region)}</span><span class="block text-[10px] text-slate-400 mt-1">اضغط لعرض كل البائعين والمشرفين</span></td><td class="min-w-[130px] px-3 py-3 text-center font-extrabold text-teal-700">${supervisorsCount}</td><td class="min-w-[120px] px-3 py-3 text-center font-extrabold text-slate-800">${group.employees.length}</td><td class="min-w-[130px] px-3 py-3 text-center font-extrabold text-indigo-700">${metrics.periodAverage === null ? '—' : `${formatKpiValue(metrics.periodAverage)}%`}</td><td class="min-w-[130px] px-3 py-3 text-center"><span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-extrabold ${presentation.cellClass}"><i class="fas ${presentation.icon}"></i>${presentation.shortLabel}</span></td>${monthCells}</tr>`;
+                }).join('');
+            } else if (isSupervisorAudience) {
+                body.innerHTML = supervisorGroups.map(group => {
+                    const metrics = getMonthlySupervisorMetrics(group, targetInfos, months, monthlyEvaluationViewMode);
+                    metrics.monthlyKpis.forEach(value => { if (value !== null) allKpis.push(value); });
+                    if (metrics.latestTrend.key === 'improved' || (metrics.latestTrend.key === 'achieved' && metrics.latestTrend.delta > 0)) improvedCount++;
+                    if (metrics.latestTrend.key === 'declined') declinedCount++;
+                    const presentation = getMonthlyTrendPresentation(metrics.latestTrend);
+                    const monthCells = months.map((_, index) => renderMonthlySupervisorCell(group, metrics, index)).join('');
+                    return `<tr class="group cursor-pointer hover:bg-teal-50/70 transition" onclick="showMonthlySupervisorDetails(decodeURIComponent('${encodeURIComponent(group.key)}'))"><td class="min-w-[240px] px-4 py-3"><span class="font-extrabold text-teal-700">${safeBotText(group.supervisor)}</span><span class="block text-[10px] text-slate-400 mt-1">اضغط لتفاصيل الفريق</span></td><td class="min-w-[170px] px-4 py-3 text-xs text-slate-600">${safeBotText(group.region)}</td><td class="min-w-[120px] px-3 py-3 text-center font-extrabold text-slate-800">${group.employees.length}</td><td class="min-w-[130px] px-3 py-3 text-center font-extrabold text-indigo-700">${metrics.periodAverage === null ? '—' : `${formatKpiValue(metrics.periodAverage)}%`}</td><td class="min-w-[130px] px-3 py-3 text-center"><span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-extrabold ${presentation.cellClass}"><i class="fas ${presentation.icon}"></i>${presentation.shortLabel}</span></td>${monthCells}</tr>`;
+                }).join('');
+            } else {
+                body.innerHTML = employees.map(emp => {
+                    const monthlyKpis = getMonthlyEmployeeKpiSeries(emp, targetInfos, months, monthlyEvaluationViewMode);
+                    monthlyKpis.forEach(value => { if (value !== null) allKpis.push(value); });
+                    const latestTrend = getMonthlyTrendState(monthlyKpis[latestIndex], previousIndex >= 0 ? monthlyKpis[previousIndex] : null);
+                    if (latestTrend.key === 'improved' || (latestTrend.key === 'achieved' && latestTrend.delta > 0)) improvedCount++;
+                    if (latestTrend.key === 'declined') declinedCount++;
+                    const presentation = getMonthlyTrendPresentation(latestTrend);
+                    const monthCells = months.map((month, index) => renderMonthlyEvaluationCell(emp, month, index, targetInfos, monthlyEvaluationViewMode, months)).join('');
+                    return `<tr class="group cursor-pointer hover:bg-indigo-50/60 transition" onclick="showMonthlyEmployeeDetails(decodeURIComponent('${encodeURIComponent(emp.id)}'))"><td class="sticky-id px-3 py-3 font-bold text-slate-600 group-hover:bg-indigo-50">${safeBotText(emp.id)}</td><td class="sticky-name px-4 py-3 group-hover:bg-indigo-50"><span class="font-extrabold text-indigo-700">${safeBotText(emp.name)}</span><span class="block text-[10px] text-slate-400 mt-1">اضغط لعرض الشارت</span></td><td class="min-w-[170px] px-4 py-3 text-xs text-slate-600">${safeBotText(emp.supervisor || 'بدون مشرف')}</td><td class="min-w-[150px] px-4 py-3 text-xs text-slate-600">${safeBotText(emp.region)}</td><td class="min-w-[130px] px-3 py-3 text-center"><span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-extrabold ${presentation.cellClass}"><i class="fas ${presentation.icon}"></i>${presentation.shortLabel}</span></td>${monthCells}</tr>`;
+                }).join('');
+            }
+
+            const average = averageMonthlyKpis(allKpis) || 0;
+            document.getElementById('monthlyEvaluationEmployeeCount').innerText = displayedItems.length;
+            document.getElementById('monthlyEvaluationAverageKpi').innerText = `${formatKpiValue(average)}%`;
+            document.getElementById('monthlyEvaluationImprovedCount').innerText = improvedCount;
+            document.getElementById('monthlyEvaluationDeclinedCount').innerText = declinedCount;
+        }
+
+        function showMonthlySupervisorDetails(groupKey) {
+            const allEmployees = getMonthlyEvaluationEmployees();
+            const group = getMonthlySupervisorGroups(allEmployees).find(item => item.key === groupKey);
+            showMonthlyGroupDetails(group, 'supervisor');
+        }
+
+        function showMonthlyRegionDetails(regionKey) {
+            const allEmployees = getMonthlyEvaluationEmployees();
+            const group = getMonthlyRegionGroups(allEmployees).find(item => item.key === regionKey);
+            showMonthlyGroupDetails(group, 'region');
+        }
+
+        function showMonthlyGroupDetails(group, level = 'supervisor') {
+            const allEmployees = getMonthlyEvaluationEmployees();
+            const modal = document.getElementById('monthlySupervisorModal');
+            if (!group || !modal) return;
+            currentMonthlySupervisorGroup = group;
+            currentMonthlyGroupDetailLevel = level === 'region' ? 'region' : 'supervisor';
+            const searchInput = document.getElementById('monthlySupervisorEmployeeSearch');
+            if (searchInput) searchInput.value = '';
+            const months = getMonthlyEvaluationMonths();
+            const targetInfos = getMonthlyTargetSeries(allEmployees, months);
+            const metrics = getMonthlySupervisorMetrics(group, targetInfos, months, monthlyEvaluationViewMode);
+            const latest = months.length ? metrics.monthlyKpis[months.length - 1] : null;
+            const presentation = getMonthlyTrendPresentation(metrics.latestTrend);
+            const isCumulative = monthlyEvaluationViewMode === 'cumulative';
+            const isRegionDetail = currentMonthlyGroupDetailLevel === 'region';
+            const supervisorsCount = new Set(group.employees.map(emp => cleanString(emp.supervisor) || 'بدون مشرف')).size;
+
+            document.getElementById('monthlyGroupModalEyebrow').innerText = isRegionDetail ? 'تفاصيل أداء الإقليم بالكامل' : 'تفاصيل أداء المشرف والفريق';
+            document.getElementById('monthlySupervisorName').innerText = isRegionDetail ? group.region : group.supervisor;
+            document.getElementById('monthlySupervisorMeta').innerText = isRegionDetail
+                ? `${supervisorsCount} مشرف • ${isCumulative ? 'الإجمالي التراكمي' : 'الزيادة الشهرية'} • متوسط جميع بائعي الإقليم`
+                : `${group.region} • ${isCumulative ? 'الإجمالي التراكمي' : 'الزيادة الشهرية'} • متوسط نسب الفريق`;
+            document.getElementById('monthlySupervisorTeamCount').innerText = group.employees.length;
+            document.getElementById('monthlyGroupChartTitle').innerHTML = `<i class="fas fa-chart-line text-indigo-500 ml-2"></i>${isRegionDetail ? 'اتجاه متوسط KPI للإقليم' : 'اتجاه متوسط KPI للفريق'}`;
+            document.getElementById('monthlyGroupEmployeesTitle').innerHTML = `<i class="fas fa-users text-teal-500 ml-2"></i>${isRegionDetail ? 'كل بائعي ومشرفي الإقليم' : 'تفاصيل البائعين التابعين'}`;
+            document.getElementById('monthlySupervisorCurrentKpi').innerText = latest === null ? '—' : `${formatKpiValue(latest)}%`;
+            document.getElementById('monthlySupervisorAverageKpi').innerText = metrics.periodAverage === null ? '—' : `${formatKpiValue(metrics.periodAverage)}%`;
+            const trendCard = document.getElementById('monthlySupervisorTrendCard');
+            trendCard.className = `rounded-2xl border p-4 ${presentation.cardClass}`;
+            const trendText = document.getElementById('monthlySupervisorTrendText');
+            trendText.className = `text-xl font-extrabold mt-2 ${presentation.textClass}`;
+            trendText.innerHTML = `<i class="fas ${presentation.icon} ml-2"></i>${presentation.label}`;
+            modal.style.display = 'flex';
+            renderMonthlySupervisorEmployeeTable();
+
+            const canvas = document.getElementById('monthlySupervisorTrendChart');
+            if (!canvas || typeof Chart === 'undefined') return;
+            if (monthlySupervisorChartInstance) monthlySupervisorChartInstance.destroy();
+            const pointColors = metrics.monthlyKpis.map((value, index) => {
+                const key = getMonthlyTrendState(value, index > 0 ? metrics.monthlyKpis[index - 1] : null).key;
+                if (key === 'declined') return '#e11d48';
+                if (key === 'improved' || key === 'achieved') return '#059669';
+                return '#d97706';
+            });
+            monthlySupervisorChartInstance = new Chart(canvas.getContext('2d'), {
+                type: 'line',
+                data: { labels: months.map(month => month.replace('-', '/')), datasets: [{ label: isRegionDetail ? 'متوسط KPI الإقليم %' : 'متوسط KPI الفريق %', data: metrics.monthlyKpis, fill: true, backgroundColor: 'rgba(13, 148, 136, 0.10)', borderColor: '#0f766e', borderWidth: 3, tension: 0.28, pointRadius: 6, pointHoverRadius: 8, pointBorderWidth: 2, pointBorderColor: '#ffffff', pointBackgroundColor: pointColors }] },
+                options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, scales: { y: { beginAtZero: true, max: 100, title: { display: true, text: 'متوسط KPI %' }, ticks: { callback: value => `${value}%` } } }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: item => `${isRegionDetail ? 'متوسط الإقليم' : 'متوسط الفريق'}: ${formatKpiValue(item.raw)}%` } } } }
+            });
+        }
+
+        function renderMonthlySupervisorEmployeeTable() {
+            const body = document.getElementById('monthlySupervisorEmployeeTableBody');
+            const empty = document.getElementById('monthlySupervisorEmployeeEmpty');
+            const group = currentMonthlySupervisorGroup;
+            if (!body || !group) return;
+            const searchInput = document.getElementById('monthlySupervisorEmployeeSearch');
+            const searchTerm = cleanString(searchInput ? searchInput.value : '').toLowerCase();
+            const filteredEmployees = group.employees.filter(emp => !searchTerm || cleanString(emp.name).toLowerCase().includes(searchTerm) || cleanString(emp.id).toLowerCase().includes(searchTerm));
+            const allEmployees = getMonthlyEvaluationEmployees();
+            const months = getMonthlyEvaluationMonths();
+            const targetInfos = getMonthlyTargetSeries(allEmployees, months);
+            const latestIndex = months.length - 1;
+            const previousIndex = latestIndex - 1;
+
+            body.innerHTML = filteredEmployees.map(emp => {
+                const kpis = getMonthlyEmployeeKpiSeries(emp, targetInfos, months, monthlyEvaluationViewMode);
+                const latest = latestIndex >= 0 ? kpis[latestIndex] : null;
+                const average = averageMonthlyKpis(kpis);
+                const trend = getMonthlyTrendState(latest, previousIndex >= 0 ? kpis[previousIndex] : null);
+                const presentation = getMonthlyTrendPresentation(trend);
+                const totalIncluded = months.reduce((sum, month) => sum + getEmployeeMonthlyCertificates(emp, month), 0);
+                return `<tr class="cursor-pointer hover:bg-indigo-50 transition" onclick="openMonthlyEmployeeFromSupervisor(decodeURIComponent('${encodeURIComponent(emp.id)}'))"><td class="px-3 py-3 font-bold text-slate-600">${safeBotText(emp.id)}</td><td class="px-4 py-3"><span class="font-extrabold text-indigo-700">${safeBotText(emp.name)}</span><span class="block text-[10px] text-slate-400 mt-1">فتح تفاصيل البائع</span></td><td class="px-4 py-3 text-xs font-bold text-slate-600">${safeBotText(emp.supervisor || 'بدون مشرف')}</td><td class="px-3 py-3 text-center font-extrabold text-indigo-700">${latest === null ? '—' : `${formatKpiValue(latest)}%`}</td><td class="px-3 py-3 text-center font-bold text-slate-700">${average === null ? '—' : `${formatKpiValue(average)}%`}</td><td class="px-3 py-3 text-center font-bold text-cyan-700">${totalIncluded}</td><td class="px-3 py-3 text-center"><span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border text-[11px] font-extrabold ${presentation.cellClass}"><i class="fas ${presentation.icon}"></i>${presentation.shortLabel}</span></td></tr>`;
+            }).join('');
+            if (empty) empty.classList.toggle('hidden', filteredEmployees.length > 0);
+        }
+
+        function openMonthlyEmployeeFromSupervisor(employeeId) {
+            closeMonthlySupervisorDetails();
+            showMonthlyEmployeeDetails(employeeId);
+        }
+
+        function closeMonthlySupervisorDetails() {
+            const modal = document.getElementById('monthlySupervisorModal');
+            if (modal) modal.style.display = 'none';
+            if (monthlySupervisorChartInstance) {
+                monthlySupervisorChartInstance.destroy();
+                monthlySupervisorChartInstance = null;
+            }
+            currentMonthlySupervisorGroup = null;
+            currentMonthlyGroupDetailLevel = 'supervisor';
+        }
+
+        function showMonthlyEmployeeDetails(employeeId) {
+            const emp = globalData.allActive.find(item => String(item.id) === String(employeeId));
+            const modal = document.getElementById('monthlyEmployeeModal');
+            if (!emp || !modal) return;
+            const employees = getMonthlyEvaluationEmployees();
+            const allMonths = getMonthlyEvaluationMonths();
+            const allTargetInfos = getMonthlyTargetSeries(employees, allMonths);
+            const visiblePoints = allMonths.map((month, index) => ({ month, index, info: allTargetInfos[index] })).filter(point => isEmployeeEligibleForMonthlyEvaluation(emp, point.month));
+            const months = visiblePoints.map(point => point.month);
+            const completed = visiblePoints.map(point => getMonthlyEvaluationCompleted(emp, point.month, point.index, monthlyEvaluationViewMode, allMonths));
+            const targets = visiblePoints.map(point => monthlyEvaluationViewMode === 'cumulative' ? point.info.cumulativeTarget : point.info.incrementTarget);
+            const kpis = visiblePoints.map((point, index) => calculateMonthlyKpi(emp, point.month, targets[index], monthlyEvaluationViewMode, point.index, allMonths));
+            const validKpis = kpis.filter(value => value !== null);
+            const latest = validKpis.length ? validKpis[validKpis.length - 1] : null;
+            const previous = validKpis.length > 1 ? validKpis[validKpis.length - 2] : null;
+            const trend = validKpis.length ? getMonthlyTrendState(latest, previous) : { key: 'noTarget', delta: null };
+            const presentation = getMonthlyTrendPresentation(trend);
+            const isCumulative = monthlyEvaluationViewMode === 'cumulative';
+
+            document.getElementById('monthlyEmployeeName').innerText = emp.name;
+            document.getElementById('monthlyEmployeeMeta').innerText = `${emp.id} • ${emp.supervisor || 'بدون مشرف'} • ${emp.region} • ${isCumulative ? 'الإجمالي التراكمي' : 'الزيادة الشهرية'}`;
+            document.getElementById('monthlyEmployeeCurrentKpi').innerText = latest === null ? '—' : `${formatKpiValue(latest)}%`;
+            document.getElementById('monthlyEmployeeAverageKpi').innerText = `${formatKpiValue(validKpis.length ? validKpis.reduce((sum, value) => sum + value, 0) / validKpis.length : 0)}%`;
+            const viewLabel = document.getElementById('monthlyEmployeeViewLabel');
+            if (viewLabel) viewLabel.innerText = isCumulative ? 'تحليل الإجمالي التراكمي للبائع' : 'تحليل الزيادة الشهرية للبائع';
+            const trendCard = document.getElementById('monthlyEmployeeTrendCard');
+            trendCard.className = `rounded-2xl border p-4 ${presentation.cardClass}`;
+            const trendText = document.getElementById('monthlyEmployeeTrendText');
+            trendText.className = `text-xl font-extrabold mt-2 ${presentation.textClass}`;
+            trendText.innerHTML = `<i class="fas ${presentation.icon} ml-2"></i>${presentation.label}`;
+            modal.style.display = 'flex';
+            monthlyEmployeeChartData = { months, completed, targets, kpis, isCumulative };
+            const latestChartIndex = Math.max(months.length - 1, 0);
+            const latestCompleted = completed[latestChartIndex] || 0;
+            const latestTarget = targets[latestChartIndex] || 0;
+            document.getElementById('monthlyEmployeeLatestCompleted').innerText = latestCompleted;
+            document.getElementById('monthlyEmployeeLatestTarget').innerText = latestTarget;
+            const gapCard = document.getElementById('monthlyEmployeeCertificateGapCard');
+            const gapText = document.getElementById('monthlyEmployeeCertificateGap');
+            if (!latestTarget) {
+                gapCard.className = 'rounded-xl border border-slate-200 bg-slate-50 p-3';
+                gapText.className = 'text-xl font-extrabold text-slate-700 mt-1';
+                gapText.innerText = 'لا يوجد تارجت';
+            } else if (latestCompleted >= latestTarget) {
+                gapCard.className = 'rounded-xl border border-emerald-100 bg-emerald-50 p-3';
+                gapText.className = 'text-xl font-extrabold text-emerald-900 mt-1';
+                gapText.innerText = latestCompleted === latestTarget ? 'محقق بالكامل' : `أعلى بـ ${latestCompleted - latestTarget}`;
+            } else {
+                gapCard.className = 'rounded-xl border border-rose-100 bg-rose-50 p-3';
+                gapText.className = 'text-xl font-extrabold text-rose-900 mt-1';
+                gapText.innerText = `متبقي ${latestTarget - latestCompleted}`;
+            }
+            selectMonthlyEmployeeChartView('kpi');
+        }
+
+        function selectMonthlyEmployeeChartView(view) {
+            monthlyEmployeeChartView = view === 'certificates' ? 'certificates' : 'kpi';
+            const isCertificates = monthlyEmployeeChartView === 'certificates';
+            const kpiBtn = document.getElementById('monthlyEmployeeKpiChartBtn');
+            const certificatesBtn = document.getElementById('monthlyEmployeeCertificatesChartBtn');
+            const activeClasses = 'rounded-lg bg-indigo-600 text-white px-5 py-3 text-sm font-extrabold shadow-md transition';
+            const inactiveClasses = 'rounded-lg text-slate-600 px-5 py-3 text-sm font-extrabold hover:bg-white transition';
+            if (kpiBtn) { kpiBtn.className = isCertificates ? inactiveClasses : activeClasses; kpiBtn.setAttribute('aria-pressed', String(!isCertificates)); }
+            if (certificatesBtn) { certificatesBtn.className = isCertificates ? activeClasses : inactiveClasses; certificatesBtn.setAttribute('aria-pressed', String(isCertificates)); }
+            const certificateSummary = document.getElementById('monthlyEmployeeCertificateSummary');
+            if (certificateSummary) certificateSummary.classList.toggle('hidden', !isCertificates);
+            renderMonthlyEmployeeTrendChart();
+        }
+
+        function renderMonthlyEmployeeTrendChart() {
+            const data = monthlyEmployeeChartData;
+            const canvas = document.getElementById('monthlyEmployeeTrendChart');
+            if (!data || !canvas || typeof Chart === 'undefined') return;
+            if (monthlyEmployeeChartInstance) monthlyEmployeeChartInstance.destroy();
+
+            const { months, completed, targets, kpis, isCumulative } = data;
+            const isCertificates = monthlyEmployeeChartView === 'certificates';
+            const chartTitle = document.getElementById('monthlyEmployeeChartTitle');
+            const chartNote = document.getElementById('monthlyEmployeeChartNote');
+            if (chartTitle) chartTitle.innerHTML = isCertificates
+                ? `<i class="fas fa-award text-cyan-500 ml-2"></i>المنجز مقابل التارجت ${isCumulative ? 'التراكمي' : 'الشهري'}`
+                : `<i class="fas fa-chart-line text-indigo-500 ml-2"></i>اتجاه KPI ${isCumulative ? 'التراكمي' : 'الشهري'} فقط`;
+            if (chartNote) chartNote.innerText = isCertificates
+                ? 'مقارنة بعدد الشهادات فقط دون خلطها بنسبة الـKPI'
+                : 'الشارت يعرض النسبة فقط من 0% إلى 100%';
+
+            if (isCertificates) {
+                const completedColors = completed.map((value, index) => targets[index] > 0 && value >= targets[index] ? '#10b981' : '#06b6d4');
+                monthlyEmployeeChartInstance = new Chart(canvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: months.map(month => month.replace('-', '/')),
+                        datasets: [
+                            { label: isCumulative ? 'المنجز التراكمي' : 'منجز الشهر', data: completed, backgroundColor: completedColors, borderColor: completedColors, borderWidth: 1, borderRadius: 7, maxBarThickness: 34 },
+                            { label: isCumulative ? 'التارجت التراكمي' : 'تارجت الشهر', data: targets, backgroundColor: 'rgba(100, 116, 139, 0.22)', borderColor: '#64748b', borderWidth: 2, borderRadius: 7, maxBarThickness: 34 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        scales: { y: { beginAtZero: true, title: { display: true, text: 'عدد الشهادات' }, ticks: { precision: 0 } } },
+                        plugins: {
+                            legend: { position: 'bottom', labels: { usePointStyle: true, padding: 18 } },
+                            tooltip: { callbacks: { afterBody: items => { const index = items[0] ? items[0].dataIndex : 0; const gap = targets[index] - completed[index]; return gap > 0 ? `المتبقي: ${gap} شهادة` : 'التارجت محقق'; } } }
+                        }
+                    }
+                });
+                return;
+            }
+
+            const pointColors = kpis.map((value, index) => {
+                const prior = index > 0 ? kpis[index - 1] : null;
+                const key = getMonthlyTrendState(value, prior).key;
+                if (key === 'declined') return '#e11d48';
+                if (key === 'improved' || key === 'achieved') return '#059669';
+                return '#d97706';
+            });
+            monthlyEmployeeChartInstance = new Chart(canvas.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: months.map(month => month.replace('-', '/')),
+                    datasets: [{
+                        label: isCumulative ? 'KPI التراكمي %' : 'KPI الشهري %', data: kpis, fill: true,
+                        backgroundColor: 'rgba(79, 70, 229, 0.10)', borderColor: '#4f46e5', borderWidth: 3, tension: 0.28,
+                        pointRadius: 6, pointHoverRadius: 8, pointBorderWidth: 2, pointBorderColor: '#ffffff', pointBackgroundColor: pointColors,
+                        segment: { borderColor: context => context.p1.parsed.y < context.p0.parsed.y ? '#e11d48' : (context.p1.parsed.y > context.p0.parsed.y ? '#059669' : '#d97706') }
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: { y: { beginAtZero: true, max: 100, title: { display: true, text: 'KPI %' }, ticks: { callback: value => `${value}%` } } },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: item => `KPI: ${formatKpiValue(item.raw)}%` } }
+                    }
+                }
+            });
+        }
+
+        function closeMonthlyEmployeeDetails() {
+            const modal = document.getElementById('monthlyEmployeeModal');
+            if (modal) modal.style.display = 'none';
+            if (monthlyEmployeeChartInstance) {
+                monthlyEmployeeChartInstance.destroy();
+                monthlyEmployeeChartInstance = null;
+            }
+            monthlyEmployeeChartData = null;
+        }
+
+        function buildMonthlyEvaluationExportRows(mode, employees = getMonthlyEvaluationEmployees(), months = getMonthlyEvaluationMonths()) {
+            const targetInfos = getMonthlyTargetSeries(employees, months);
+            const isCumulative = mode === 'cumulative';
+            const headers = ["الرقم الوظيفي", "اسم البائع", "المشرف", "مدير الإقليم", "الإقليم", "تاريخ التعيين", "إجمالي الشهادات المحتسبة"];
+            months.forEach(month => {
+                const label = month.replace('-', '/');
+                headers.push(`${label} - ${isCumulative ? 'المنجز التراكمي' : 'منجز الشهر'}`);
+                headers.push(`${label} - ${isCumulative ? 'التارجت التراكمي' : 'زيادة التارجت'}`);
+                headers.push(`${label} - KPI %`);
+            });
+
+            const rows = employees.map(emp => {
+                const totalIncluded = months.reduce((sum, month) => sum + getEmployeeMonthlyCertificates(emp, month), 0);
+                const row = [emp.id, emp.name, emp.supervisor || "بدون مشرف", emp.manager || "", emp.region || "", formatDateDisplay(emp.hireDate), totalIncluded];
+                months.forEach((month, index) => {
+                    if (!isEmployeeEligibleForMonthlyEvaluation(emp, month)) {
+                        row.push("قبل التعيين", "", "");
+                        return;
+                    }
+                    const target = isCumulative ? targetInfos[index].cumulativeTarget : targetInfos[index].incrementTarget;
+                    const completed = getMonthlyEvaluationCompleted(emp, month, index, mode, months);
+                    const kpi = calculateMonthlyKpi(emp, month, target, mode, index, months);
+                    row.push(completed, target, kpi === null ? (target ? "" : "لا يوجد تارجت جديد") : kpi);
+                });
+                return row;
+            });
+            return { headers, rows, targetInfos };
+        }
+
+        function createMonthlyEvaluationWorksheet(mode, employees, months) {
+            const { headers, rows } = buildMonthlyEvaluationExportRows(mode, employees, months);
+            const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+            applyExcelStyles(ws);
+            const isCumulative = mode === 'cumulative';
+            const accent = isCumulative ? '0F766E' : '4F46E5';
+            const endCol = XLSX.utils.encode_col(Math.max(headers.length - 1, 0));
+
+            headers.forEach((_, columnIndex) => {
+                const cell = ws[XLSX.utils.encode_cell({ r: 0, c: columnIndex })];
+                if (!cell) return;
+                cell.s.fill = { patternType: 'solid', fgColor: { rgb: accent } };
+                cell.s.font = { name: 'Arial', bold: true, color: { rgb: 'FFFFFF' }, sz: 10 };
+            });
+
+            rows.forEach((row, rowIndex) => {
+                months.forEach((_, monthIndex) => {
+                    const kpiColumn = 7 + (monthIndex * 3) + 2;
+                    const value = row[kpiColumn];
+                    const cell = ws[XLSX.utils.encode_cell({ r: rowIndex + 1, c: kpiColumn })];
+                    if (!cell || typeof value !== 'number') return;
+                    const fill = value >= 100 ? 'D1FAE5' : (value >= 50 ? 'FEF3C7' : 'FFE4E6');
+                    const color = value >= 100 ? '047857' : (value >= 50 ? 'B45309' : 'BE123C');
+                    cell.s.fill = { patternType: 'solid', fgColor: { rgb: fill } };
+                    cell.s.font = { name: 'Arial', bold: true, color: { rgb: color }, sz: 10 };
+                });
+            });
+
+            ws['!cols'] = [15, 30, 28, 26, 22, 16, 20, ...months.flatMap(() => [18, 18, 14])].map(width => ({ wch: width }));
+            ws['!rows'] = [{ hpt: 36 }, ...rows.map(() => ({ hpt: 24 }))];
+            ws['!views'] = [{ rightToLeft: true, showGridLines: false }];
+            ws['!autofilter'] = { ref: `A1:${endCol}${Math.max(rows.length + 1, 1)}` };
+            ws['!tabColor'] = { rgb: accent };
+            return ws;
+        }
+
+        function createMonthlySupervisorWorksheet(mode, employees, months) {
+            const targetInfos = getMonthlyTargetSeries(employees, months);
+            const groups = getMonthlySupervisorGroups(employees);
+            const headers = ['اسم المشرف', 'الإقليم', 'عدد البائعين', 'متوسط الفترة', ...months.map(month => `${month.replace('-', '/')} - متوسط KPI %`)];
+            const rows = groups.map(group => {
+                const metrics = getMonthlySupervisorMetrics(group, targetInfos, months, mode);
+                return [group.supervisor, group.region, group.employees.length, metrics.periodAverage === null ? '' : metrics.periodAverage, ...metrics.monthlyKpis.map(value => value === null ? '' : value)];
+            });
+            const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+            applyExcelStyles(ws);
+            const accent = mode === 'cumulative' ? '0F766E' : '0E7490';
+            headers.forEach((_, columnIndex) => {
+                const cell = ws[XLSX.utils.encode_cell({ r: 0, c: columnIndex })];
+                if (!cell) return;
+                cell.s.fill = { patternType: 'solid', fgColor: { rgb: accent } };
+                cell.s.font = { name: 'Arial', bold: true, color: { rgb: 'FFFFFF' }, sz: 10 };
+            });
+            rows.forEach((row, rowIndex) => {
+                for (let columnIndex = 3; columnIndex < headers.length; columnIndex++) {
+                    const value = row[columnIndex];
+                    const cell = ws[XLSX.utils.encode_cell({ r: rowIndex + 1, c: columnIndex })];
+                    if (!cell || typeof value !== 'number') continue;
+                    const fill = value >= 100 ? 'D1FAE5' : (value >= 50 ? 'FEF3C7' : 'FFE4E6');
+                    const color = value >= 100 ? '047857' : (value >= 50 ? 'B45309' : 'BE123C');
+                    cell.s.fill = { patternType: 'solid', fgColor: { rgb: fill } };
+                    cell.s.font = { name: 'Arial', bold: true, color: { rgb: color }, sz: 10 };
+                }
+            });
+            const endCol = XLSX.utils.encode_col(Math.max(headers.length - 1, 0));
+            ws['!cols'] = [30, 22, 16, 18, ...months.map(() => 20)].map(width => ({ wch: width }));
+            ws['!rows'] = [{ hpt: 36 }, ...rows.map(() => ({ hpt: 24 }))];
+            ws['!views'] = [{ rightToLeft: true, showGridLines: false }];
+            ws['!autofilter'] = { ref: `A1:${endCol}${Math.max(rows.length + 1, 1)}` };
+            ws['!tabColor'] = { rgb: accent };
+            return ws;
+        }
+
+        function createMonthlyRegionWorksheet(mode, employees, months) {
+            const targetInfos = getMonthlyTargetSeries(employees, months);
+            const groups = getMonthlyRegionGroups(employees);
+            const headers = ['اسم الإقليم', 'عدد المشرفين', 'عدد البائعين', 'متوسط الفترة', ...months.map(month => `${month.replace('-', '/')} - متوسط KPI %`)];
+            const rows = groups.map(group => {
+                const metrics = getMonthlySupervisorMetrics(group, targetInfos, months, mode);
+                const supervisorsCount = new Set(group.employees.map(emp => cleanString(emp.supervisor) || 'بدون مشرف')).size;
+                return [group.region, supervisorsCount, group.employees.length, metrics.periodAverage === null ? '' : metrics.periodAverage, ...metrics.monthlyKpis.map(value => value === null ? '' : value)];
+            });
+            const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+            applyExcelStyles(ws);
+            const accent = mode === 'cumulative' ? '0E7490' : '0369A1';
+            headers.forEach((_, columnIndex) => {
+                const cell = ws[XLSX.utils.encode_cell({ r: 0, c: columnIndex })];
+                if (!cell) return;
+                cell.s.fill = { patternType: 'solid', fgColor: { rgb: accent } };
+                cell.s.font = { name: 'Arial', bold: true, color: { rgb: 'FFFFFF' }, sz: 10 };
+            });
+            rows.forEach((row, rowIndex) => {
+                for (let columnIndex = 3; columnIndex < headers.length; columnIndex++) {
+                    const value = row[columnIndex];
+                    const cell = ws[XLSX.utils.encode_cell({ r: rowIndex + 1, c: columnIndex })];
+                    if (!cell || typeof value !== 'number') continue;
+                    const fill = value >= 100 ? 'D1FAE5' : (value >= 50 ? 'FEF3C7' : 'FFE4E6');
+                    const color = value >= 100 ? '047857' : (value >= 50 ? 'B45309' : 'BE123C');
+                    cell.s.fill = { patternType: 'solid', fgColor: { rgb: fill } };
+                    cell.s.font = { name: 'Arial', bold: true, color: { rgb: color }, sz: 10 };
+                }
+            });
+            const endCol = XLSX.utils.encode_col(Math.max(headers.length - 1, 0));
+            ws['!cols'] = [30, 18, 16, 18, ...months.map(() => 20)].map(width => ({ wch: width }));
+            ws['!rows'] = [{ hpt: 36 }, ...rows.map(() => ({ hpt: 24 }))];
+            ws['!views'] = [{ rightToLeft: true, showGridLines: false }];
+            ws['!autofilter'] = { ref: `A1:${endCol}${Math.max(rows.length + 1, 1)}` };
+            ws['!tabColor'] = { rgb: accent };
+            return ws;
+        }
+
+        function exportMonthlyEvaluationData() {
+            const employees = getMonthlyEvaluationEmployees();
+            const months = getMonthlyEvaluationMonths();
+            if (!employees.length || !months.length) {
+                alert('لا توجد بيانات متاحة لتصدير التقييم الشهري.');
+                return;
+            }
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, createMonthlyEvaluationWorksheet('increment', employees, months), 'الزيادة الشهرية');
+            XLSX.utils.book_append_sheet(wb, createMonthlyEvaluationWorksheet('cumulative', employees, months), 'الإجمالي التراكمي');
+            XLSX.utils.book_append_sheet(wb, createMonthlySupervisorWorksheet('increment', employees, months), 'المشرفون - شهري');
+            XLSX.utils.book_append_sheet(wb, createMonthlySupervisorWorksheet('cumulative', employees, months), 'المشرفون - تراكمي');
+            XLSX.utils.book_append_sheet(wb, createMonthlyRegionWorksheet('increment', employees, months), 'الأقاليم - شهري');
+            XLSX.utils.book_append_sheet(wb, createMonthlyRegionWorksheet('cumulative', employees, months), 'الأقاليم - تراكمي');
+            const regionLabel = selectedGlobalRegion || 'كل الأقاليم';
+            const safeRegion = String(regionLabel).replace(/[\\/:*?"<>|]/g, '_').replace(/\s+/g, '_');
+            XLSX.writeFile(wb, `تقرير_التقييم_الشهري_${safeRegion}.xlsx`);
         }
 
         function renderNonCertTable(dataArray) {
