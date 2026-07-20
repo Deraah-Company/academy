@@ -476,6 +476,12 @@
                 <button class="tab-btn px-5 py-4 text-orange-700 font-bold bg-orange-50 border-r border-orange-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'trainingPathTab')">
                     <i class="fas fa-route ml-2"></i> مسار التدريب
                 </button>
+                <button class="tab-btn px-5 py-4 text-emerald-700 font-bold bg-emerald-50 border-r border-emerald-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'gulfTrackTab')">
+                    <i class="fas fa-water ml-2"></i> إقليم الخليج
+                </button>
+                <button class="tab-btn px-5 py-4 text-rose-700 font-bold bg-rose-50 border-r border-rose-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'laBeauteTrackTab')">
+                    <i class="fas fa-gem ml-2"></i> La beaute
+                </button>
 
                 <button class="tab-btn px-5 py-4 text-blue-700 font-bold bg-blue-50 border-r border-blue-200 focus:outline-none flex items-center text-sm md:text-base" onclick="switchTab(event, 'supervisorsTab')">
                     <i class="fas fa-sitemap ml-2"></i> تقييم المشرفين
@@ -598,7 +604,7 @@
                                     <i class="fas fa-chart-line"></i> اتجاه KPI شهري لكل بائع
                                 </span>
                                 <h2 class="text-3xl md:text-4xl font-extrabold mb-3">التقييم الشهري</h2>
-                                <p id="monthlyEvaluationDescription" class="text-indigo-100 max-w-3xl leading-7">الـKPI هنا يحاسب البائع على الشهادات الجديدة في كل شهر فقط. التارجت الشهري هو الفرق بين الإجمالي التراكمي لهذا الشهر والشهر السابق.</p>
+                                <p id="monthlyEvaluationDescription" class="text-indigo-100 max-w-3xl leading-7">09/2025 شهر سماح بلا KPI مستقل؛ شهاداته محسوبة كرصد افتتاحي لأول تقييم رسمي، وبعده يحاسب الـKPI على شهادات كل شهر فقط.</p>
                             </div>
                             <div class="rounded-2xl bg-white/10 border border-white/15 px-5 py-4 min-w-[240px]">
                                 <p class="text-xs text-indigo-200 font-bold">نطاق التقرير الحالي</p>
@@ -1039,7 +1045,7 @@
                             <h2 class="text-2xl font-bold text-orange-900 flex items-center mb-2">
                                 <i class="fas fa-route text-orange-500 ml-2"></i> مسار التدريب (نقطة الوقوف)
                             </h2>
-                            <p class="text-orange-700 text-sm">يعرض تسلسل الدورات الـ 29، ويوضح الدورة الحالية التي تتطلب إنجاز (نقطة التوقف للموظف). <br>
+                            <p class="text-orange-700 text-sm">يعرض تسلسل الدورات الـ 29 للموظفين العاديين، ويوضح الدورة الحالية التي تتطلب إنجاز. موظفو الخليج وLa beaute موجودون في التابات المستقلة الخاصة بهم. <br>
                                 <span class="inline-block mt-2">
                                     <span class="text-emerald-500 font-bold mr-1">✔ منجز</span>
                                     <span class="text-orange-500 font-bold text-lg mr-1 ml-2">• واقف عليها</span>
@@ -1098,6 +1104,99 @@
                         </div>
                     </div>
 
+                </div>
+
+                <div id="gulfTrackTab" class="tab-content">
+                    <div class="rounded-3xl bg-gradient-to-l from-emerald-900 via-teal-800 to-cyan-700 text-white p-6 md:p-8 mb-6 shadow-xl">
+                        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-5">
+                            <div>
+                                <span class="inline-flex items-center gap-2 rounded-full bg-white/10 border border-white/20 px-3 py-1.5 text-xs font-bold"><i class="fas fa-water"></i> إقليم مستقل داخل الأكاديمية</span>
+                                <h2 class="text-3xl font-extrabold mt-3">لوحة إقليم الخليج</h2>
+                                <p class="text-emerald-50 mt-2">تقارير كاملة لموظفي الخليج ودوراتهم الخاصة: الموظفون، المشرفون، KPI، الإحصائيات والتقييم الشهري.</p>
+                            </div>
+                            <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                                <div class="bg-white rounded-xl p-1 flex items-center min-w-[270px]">
+                                    <i class="fas fa-search text-slate-400 px-3"></i>
+                                    <input id="gulfTrackSearch" type="search" oninput="renderGulfRegionDashboard()" placeholder="بحث بالاسم أو الرقم أو المشرف" class="w-full px-2 py-2 text-slate-800 outline-none rounded-xl">
+                                </div>
+                                <button id="exportGulfRegionWorkbookBtn" type="button" onclick="exportGulfRegionWorkbook()" class="rounded-xl bg-white text-emerald-800 font-extrabold px-5 py-3 shadow hover:bg-emerald-50 transition"><i class="fas fa-file-excel ml-2"></i> تقرير الخليج الكامل</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 xl:grid-cols-5 gap-4 mb-6">
+                        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-xs font-bold text-slate-500">موظفو الخليج</p><p id="gulfTrackEmployeeCount" class="text-3xl font-extrabold text-slate-900 mt-2">0</p></div>
+                        <div class="rounded-2xl border border-cyan-200 bg-cyan-50 p-5 shadow-sm"><p class="text-xs font-bold text-cyan-700">المشرفون</p><p id="gulfSupervisorCount" class="text-3xl font-extrabold text-cyan-900 mt-2">0</p></div>
+                        <div class="rounded-2xl border border-teal-200 bg-teal-50 p-5 shadow-sm"><p class="text-xs font-bold text-teal-700">إجمالي الدورات المنجزة</p><p id="gulfTotalCompletions" class="text-3xl font-extrabold text-teal-900 mt-2">0</p><p class="text-[10px] text-teal-600 mt-1">من 11 دورة خليجية لكل موظف</p></div>
+                        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm"><p class="text-xs font-bold text-emerald-700">أكملوا الـ11 دورة</p><p id="gulfTrackCompletedCount" class="text-3xl font-extrabold text-emerald-900 mt-2">0</p></div>
+                        <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm"><p class="text-xs font-bold text-indigo-700">KPI الإقليم</p><p id="gulfRegionKpi" class="text-3xl font-extrabold text-indigo-900 mt-2">0%</p><p class="text-[10px] text-indigo-600 mt-1">متوسط تقدم الموظفين من 11 دورة</p></div>
+                    </div>
+
+                    <div class="rounded-2xl border border-emerald-100 bg-white shadow-sm p-2 mb-6 overflow-x-auto">
+                        <div class="flex gap-2 min-w-max" id="gulfInternalTabs">
+                            <button type="button" data-gulf-section="overview" onclick="switchGulfSubTab('overview')" class="gulf-sub-tab rounded-xl bg-emerald-700 text-white px-5 py-3 text-sm font-extrabold"><i class="fas fa-gauge-high ml-2"></i>نظرة عامة</button>
+                            <button type="button" data-gulf-section="employees" onclick="switchGulfSubTab('employees')" class="gulf-sub-tab rounded-xl text-slate-600 hover:bg-emerald-50 px-5 py-3 text-sm font-extrabold"><i class="fas fa-users ml-2"></i>الموظفون</button>
+                            <button type="button" data-gulf-section="courses" onclick="switchGulfSubTab('courses')" class="gulf-sub-tab rounded-xl text-slate-600 hover:bg-emerald-50 px-5 py-3 text-sm font-extrabold"><i class="fas fa-book-open ml-2"></i>دورات الخليج</button>
+                            <button type="button" data-gulf-section="supervisors" onclick="switchGulfSubTab('supervisors')" class="gulf-sub-tab rounded-xl text-slate-600 hover:bg-emerald-50 px-5 py-3 text-sm font-extrabold"><i class="fas fa-user-tie ml-2"></i>المشرفون وKPI</button>
+                            <button type="button" data-gulf-section="monthly" onclick="switchGulfSubTab('monthly')" class="gulf-sub-tab rounded-xl text-slate-600 hover:bg-emerald-50 px-5 py-3 text-sm font-extrabold"><i class="fas fa-chart-line ml-2"></i>التقييم الشهري</button>
+                        </div>
+                    </div>
+
+                    <div id="gulfOverviewSection" class="gulf-subsection">
+                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
+                            <div class="rounded-2xl border border-slate-200 overflow-hidden shadow-sm"><div class="bg-emerald-900 text-white px-5 py-4 font-extrabold"><i class="fas fa-ranking-star ml-2"></i>ملخص أداء المشرفين</div><div class="table-container"><table class="min-w-full text-sm text-right"><thead class="bg-slate-100"><tr><th class="px-4 py-3">المشرف</th><th class="px-4 py-3">الفريق</th><th class="px-4 py-3">متوسط التقدم</th><th class="px-4 py-3">KPI</th></tr></thead><tbody id="gulfOverviewSupervisorsBody" class="divide-y divide-slate-100"></tbody></table></div></div>
+                            <div class="rounded-2xl border border-slate-200 overflow-hidden shadow-sm"><div class="bg-slate-900 text-white px-5 py-4 font-extrabold"><i class="fas fa-triangle-exclamation ml-2"></i>الدورات الأكثر احتياجًا للمتابعة</div><div class="table-container"><table class="min-w-full text-sm text-right"><thead class="bg-slate-100"><tr><th class="px-4 py-3">الدورة</th><th class="px-4 py-3">منجز</th><th class="px-4 py-3">متبقي</th><th class="px-4 py-3">النسبة</th></tr></thead><tbody id="gulfOverviewCoursesBody" class="divide-y divide-slate-100"></tbody></table></div></div>
+                        </div>
+                    </div>
+
+                    <div id="gulfEmployeesSection" class="gulf-subsection hidden">
+                        <div class="table-container border border-slate-200 rounded-2xl shadow-sm" style="max-height:68vh"><table class="min-w-full divide-y divide-slate-200 text-sm text-right whitespace-nowrap"><thead id="gulfTrackTableHead" class="bg-slate-100 text-slate-800"></thead><tbody id="gulfTrackTableBody" class="bg-white divide-y divide-slate-100"></tbody></table></div>
+                    </div>
+
+                    <div id="gulfCoursesSection" class="gulf-subsection hidden">
+                        <div class="rounded-2xl border border-slate-200 overflow-hidden shadow-sm"><div class="bg-slate-900 text-white px-5 py-4 font-extrabold"><i class="fas fa-chart-bar ml-2"></i>إحصائيات دورات الخليج</div><div class="table-container"><table class="min-w-full text-sm text-right"><thead class="bg-slate-100"><tr><th class="px-5 py-3">#</th><th class="px-5 py-3">الدورة</th><th class="px-5 py-3">منجز</th><th class="px-5 py-3">متبقي</th><th class="px-5 py-3">نسبة الإنجاز</th></tr></thead><tbody id="gulfTrackCourseStatsBody" class="divide-y divide-slate-100"></tbody></table></div></div>
+                    </div>
+
+                    <div id="gulfSupervisorsSection" class="gulf-subsection hidden">
+                        <div class="rounded-2xl border border-slate-200 overflow-hidden shadow-sm mb-5"><div class="bg-cyan-900 text-white px-5 py-4 font-extrabold"><i class="fas fa-user-tie ml-2"></i>تقييم مشرفي الخليج</div><div class="table-container"><table class="min-w-full text-sm text-right"><thead class="bg-slate-100"><tr><th class="px-4 py-3">المشرف</th><th class="px-4 py-3">عدد الموظفين</th><th class="px-4 py-3">إجمالي المنجز</th><th class="px-4 py-3">أكملوا 11</th><th class="px-4 py-3">متوسط التقدم</th><th class="px-4 py-3">KPI المشرف</th><th class="px-4 py-3">التفاصيل</th></tr></thead><tbody id="gulfSupervisorsTableBody" class="divide-y divide-slate-100"></tbody></table></div></div>
+                        <div id="gulfSupervisorDetail" class="hidden rounded-2xl border border-emerald-200 bg-emerald-50/40 overflow-hidden"><div class="px-5 py-4 bg-emerald-900 text-white flex items-center justify-between"><div><p class="text-xs text-emerald-200">تفاصيل فريق المشرف</p><h3 id="gulfSupervisorDetailName" class="text-xl font-extrabold mt-1"></h3></div><button type="button" onclick="closeGulfSupervisorDetail()" class="w-9 h-9 rounded-lg bg-white/10 hover:bg-white/20"><i class="fas fa-times"></i></button></div><div class="table-container"><table class="min-w-full text-sm text-right"><thead class="bg-white"><tr><th class="px-4 py-3">الرقم</th><th class="px-4 py-3">الموظف</th><th class="px-4 py-3">المنجز</th><th class="px-4 py-3">نسبة التقدم</th><th class="px-4 py-3">الحالة</th></tr></thead><tbody id="gulfSupervisorTeamBody" class="bg-white divide-y divide-slate-100"></tbody></table></div></div>
+                    </div>
+
+                    <div id="gulfMonthlySection" class="gulf-subsection hidden">
+                        <div class="rounded-2xl border border-indigo-100 bg-indigo-50 px-5 py-4 mb-4"><h3 class="font-extrabold text-indigo-900"><i class="fas fa-calendar-check ml-2"></i>التقييم الشهري لدورات الخليج فقط</h3><p class="text-xs text-indigo-700 mt-1">المستهدف ثابت: 11 دورة خليجية. مثال: إنجاز دورة واحدة = 9.09%، وKPI المشرف هو متوسط نسب موظفيه.</p></div>
+                        <div class="table-container border border-slate-200 rounded-2xl shadow-sm" style="max-height:68vh"><table class="min-w-full divide-y divide-slate-200 text-sm text-right whitespace-nowrap"><thead id="gulfMonthlyTableHead" class="bg-slate-100 text-slate-800"></thead><tbody id="gulfMonthlyTableBody" class="bg-white divide-y divide-slate-100"></tbody></table></div>
+                        <div id="gulfMonthlyEmpty" class="hidden text-center py-12 text-slate-500 rounded-2xl border border-dashed border-slate-300 mt-4"><i class="fas fa-calendar-xmark text-4xl text-slate-300 mb-3"></i><p class="font-bold">لا توجد شهادات مؤرخة لدورات الخليج حتى الآن.</p></div>
+                    </div>
+                </div>
+
+                <div id="laBeauteTrackTab" class="tab-content">
+                    <div class="rounded-3xl bg-gradient-to-l from-rose-900 via-fuchsia-800 to-violet-700 text-white p-6 md:p-8 mb-6 shadow-xl">
+                        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-5">
+                            <div>
+                                <span class="inline-flex items-center gap-2 rounded-full bg-amber-300 text-amber-950 px-3 py-1.5 text-xs font-extrabold"><i class="fas fa-clock"></i> COMING SOON</span>
+                                <h2 class="text-3xl font-extrabold mt-3">موظفو La beaute</h2>
+                                <p class="text-rose-50 mt-2">المسار الخاص بـLa beaute قيد التجهيز. البيانات الحالية أدناه للمراجعة فقط: أصحاب الشهادات، وأصحاب الدورات بدون شهادات.</p>
+                            </div>
+                            <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                                <div class="bg-white rounded-xl p-1 flex items-center min-w-[270px]">
+                                    <i class="fas fa-search text-slate-400 px-3"></i>
+                                    <input id="laBeauteTrackSearch" type="search" oninput="renderLaBeauteComingSoon()" placeholder="بحث بالاسم أو الرقم أو المشرف" class="w-full px-2 py-2 text-slate-800 outline-none rounded-xl">
+                                </div>
+                                <button type="button" onclick="exportLaBeauteSnapshot()" class="rounded-xl bg-white text-rose-800 font-extrabold px-5 py-3 shadow hover:bg-rose-50 transition"><i class="fas fa-file-excel ml-2"></i> تصدير البيانات الحالية</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+                        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-xs font-bold text-slate-500">موظفو La beaute</p><p id="laBeauteTrackEmployeeCount" class="text-3xl font-extrabold text-slate-900 mt-2">0</p></div>
+                        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm"><p class="text-xs font-bold text-emerald-700">معهم شهادات</p><p id="laBeauteCertificateHolderCount" class="text-3xl font-extrabold text-emerald-900 mt-2">0</p></div>
+                        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm"><p class="text-xs font-bold text-amber-700">دورات فقط</p><p id="laBeauteCourseOnlyCount" class="text-3xl font-extrabold text-amber-900 mt-2">0</p></div>
+                        <div class="rounded-2xl border border-fuchsia-200 bg-fuchsia-50 p-5 shadow-sm"><p class="text-xs font-bold text-fuchsia-700">إجمالي تسجيلات الدورات</p><p id="laBeauteCourseRecordCount" class="text-3xl font-extrabold text-fuchsia-900 mt-2">0</p></div>
+                    </div>
+                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
+                        <div class="rounded-2xl border border-emerald-200 overflow-hidden shadow-sm"><div class="bg-emerald-800 text-white px-5 py-4"><h3 class="font-extrabold"><i class="fas fa-certificate ml-2"></i>أشخاص معهم شهادات</h3><p class="text-xs text-emerald-100 mt-1">اضغط على الاسم لمعرفة الشهادات والدورات بالتفصيل.</p></div><div class="table-container" style="max-height:62vh"><table class="min-w-full text-sm text-right"><thead class="bg-slate-100"><tr><th class="px-4 py-3">الرقم</th><th class="px-4 py-3">الاسم</th><th class="px-4 py-3">المشرف</th><th class="px-4 py-3">الشهادات</th><th class="px-4 py-3">التفاصيل</th></tr></thead><tbody id="laBeauteCertificatePeopleBody" class="divide-y divide-slate-100 bg-white"></tbody></table></div></div>
+                        <div class="rounded-2xl border border-amber-200 overflow-hidden shadow-sm"><div class="bg-amber-700 text-white px-5 py-4"><h3 class="font-extrabold"><i class="fas fa-book-reader ml-2"></i>أشخاص معهم دورات فقط</h3><p class="text-xs text-amber-100 mt-1">مسجلون في دورات ولكن لا توجد لهم شهادة حتى الآن.</p></div><div class="table-container" style="max-height:62vh"><table class="min-w-full text-sm text-right"><thead class="bg-slate-100"><tr><th class="px-4 py-3">الرقم</th><th class="px-4 py-3">الاسم</th><th class="px-4 py-3">المشرف</th><th class="px-4 py-3">الدورات</th><th class="px-4 py-3">التفاصيل</th></tr></thead><tbody id="laBeauteCourseOnlyPeopleBody" class="divide-y divide-slate-100 bg-white"></tbody></table></div></div>
+                    </div>
+
+                    <div id="laBeauteEmployeeModal" class="fixed inset-0 z-[95] hidden items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4" onclick="if(event.target===this) closeLaBeauteEmployeeDetails()"><div class="bg-white rounded-3xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden"><div class="bg-gradient-to-l from-rose-900 to-violet-800 text-white px-6 py-5 flex items-start justify-between"><div><p class="text-xs text-rose-200 font-bold">تفاصيل الدورات والشهادات الحالية</p><h3 id="laBeauteEmployeeName" class="text-2xl font-extrabold mt-1"></h3><p id="laBeauteEmployeeMeta" class="text-sm text-rose-100 mt-2"></p></div><button type="button" onclick="closeLaBeauteEmployeeDetails()" class="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20"><i class="fas fa-times"></i></button></div><div class="p-5 overflow-auto max-h-[70vh]"><div class="grid grid-cols-2 gap-4 mb-5"><div class="rounded-xl bg-emerald-50 border border-emerald-100 p-4"><p class="text-xs font-bold text-emerald-700">دورات بشهادة</p><p id="laBeauteEmployeeCertificateCount" class="text-2xl font-extrabold text-emerald-900 mt-1">0</p></div><div class="rounded-xl bg-amber-50 border border-amber-100 p-4"><p class="text-xs font-bold text-amber-700">دورات بدون شهادة</p><p id="laBeauteEmployeeCourseOnlyDetailCount" class="text-2xl font-extrabold text-amber-900 mt-1">0</p></div></div><div class="table-container border border-slate-200 rounded-2xl"><table class="min-w-full text-sm text-right"><thead class="bg-slate-100"><tr><th class="px-4 py-3">الدورة</th><th class="px-4 py-3">التقدم</th><th class="px-4 py-3">الحالة</th><th class="px-4 py-3">تاريخ الشهادة</th></tr></thead><tbody id="laBeauteEmployeeCoursesBody" class="divide-y divide-slate-100"></tbody></table></div></div></div></div>
                 </div>
 
                 <div id="supervisorsTab" class="tab-content">
@@ -1358,7 +1457,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
                         <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl text-center shadow-sm">
                             <p class="text-slate-600 text-xs md:text-sm font-bold">إجمالي المستهدفين (بالعمل)</p>
                             <p class="text-3xl font-extrabold text-slate-800 mt-1" id="eliteStatTotal">0</p>
@@ -1375,8 +1474,12 @@
                             <p class="text-purple-600 text-xs md:text-sm font-bold">أكملوا الثالثة</p>
                             <p class="text-3xl font-extrabold text-purple-800 mt-1" id="eliteStatC3">0</p>
                         </div>
+                        <div class="bg-fuchsia-50 border border-fuchsia-200 p-4 rounded-xl text-center shadow-sm">
+                            <p class="text-fuchsia-600 text-xs md:text-sm font-bold">أكملوا الرابعة</p>
+                            <p class="text-3xl font-extrabold text-fuchsia-800 mt-1" id="eliteStatC4">0</p>
+                        </div>
                         <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-center shadow-sm">
-                            <p class="text-emerald-600 text-xs md:text-sm font-bold">أكملوا (الـ 3) كاملة</p>
+                            <p class="text-emerald-600 text-xs md:text-sm font-bold">أكملوا (الـ 4) كاملة</p>
                             <p class="text-3xl font-extrabold text-emerald-800 mt-1" id="eliteStatBoth">0</p>
                         </div>
                     </div>
@@ -1392,6 +1495,7 @@
                                     <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteCourse1Head">Sales Scenarios for Deraah Oud's Top Products</th>
                                     <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteCourse2Head">Sales Scenarios for DERAAH's Top Products</th>
                                     <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteCourse3Head">Time Management and Organization</th>
+                                    <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteCourse4Head">policies ( elite )</th>
                                     <th class="px-5 py-4 font-semibold tracking-wider">حالة الاستكمال</th>
                                 </tr>
                             </thead>
@@ -1415,6 +1519,7 @@
                                         <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteOffCourse1Head">دورة النخبة 1</th>
                                         <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteOffCourse2Head">دورة النخبة 2</th>
                                         <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteOffCourse3Head">دورة النخبة 3</th>
+                                        <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteOffCourse4Head">دورة النخبة 4</th>
                                     </tr>
                                 </thead>
                                 <tbody id="eliteOffTargetTableBody" class="bg-white divide-y divide-slate-100"></tbody>
@@ -1808,16 +1913,27 @@
 
         const excludedStatuses = ['استقالة', 'استقاله', 'إنهاء خدمة', 'انهاء خدمة', 'انهاء خدمه', 'انقطاع', 'انتقل إلى', 'انتقل الي', 'نقل'];
         let targetMonthsKeys = ["10-2025", "11-2025", "12-2025", "01-2026", "02-2026", "03-2026", "04-2026", "05-2026", "06-2026"];
-        const excludedAcademyCertificateMonths = new Set(["09-2025"]);
+        const academyGraceMonths = new Set(["09-2025"]);
 
-        function isExcludedAcademyCertificateMonth(monthKey) {
+        function normalizeAcademyMonthKey(monthKey) {
             const [month, year] = String(monthKey || '').split('-').map(Number);
-            if (!month || !year) return false;
-            return excludedAcademyCertificateMonths.has(`${String(month).padStart(2, '0')}-${year}`);
+            if (!month || !year) return '';
+            return `${String(month).padStart(2, '0')}-${year}`;
+        }
+
+        function getAcademyMonthSortValue(monthKey) {
+            const normalized = normalizeAcademyMonthKey(monthKey);
+            if (!normalized) return -1;
+            const [month, year] = normalized.split('-').map(Number);
+            return (year * 12) + month;
+        }
+
+        function isAcademyGraceMonth(monthKey) {
+            return academyGraceMonths.has(normalizeAcademyMonthKey(monthKey));
         }
 
         function getMonthlyEvaluationMonths(months = targetMonthsKeys) {
-            return (months || []).filter(month => !isExcludedAcademyCertificateMonth(month));
+            return (months || []).filter(month => !isAcademyGraceMonth(month));
         }
         
         const nonCertCoursesKeys = ["1+2 Offer", "delivery order software", "Updates and New Circulars", "Deraah Seminars", "Deraah's new products", "Deraah campaigns", "Capsule", "Sales Scenario By English"];
@@ -1825,7 +1941,23 @@
         const eliteCoursesKeys = [
             "Sales Scenarios for Deraah Oud's Top Products", 
             "Sales Scenarios for DERAAH's Top Products",
-            "Time Management and Organization"
+            "Time Management and Organization",
+            "policies ( elite )"
+        ];
+        const ELITE_TARGET_COUNT = eliteCoursesKeys.length;
+
+        const gulfTrainingPathDef = [
+            { certId: 1, ar: "تاريخ درعه (الخليج)", en: "Deraah History ( GULF )", hasCert: true },
+            { certId: 2, ar: "العطور (الخليج)", en: "Perfumes ( GULF )", hasCert: true },
+            { certId: 3, ar: "العود (الخليج)", en: "EL OUD ( GULF )", hasCert: true },
+            { certId: 4, ar: "الإكسسوارات الرجالية (الخليج)", en: "Deraah Men Accessories ( GULF )", hasCert: true },
+            { certId: 5, ar: "الإكسسوارات النسائية (الخليج)", en: "Women’s Accessories ( GULF )", hasCert: true },
+            { certId: 6, ar: "الهدايا (الخليج)", en: "Gifts ( GULF )", hasCert: true },
+            { certId: 7, ar: "الأنظمة (الخليج)", en: "System ( GULF )", hasCert: true },
+            { certId: 8, ar: "البيع باحتراف (الخليج)", en: "Sell Like A Pro (Gulf)", hasCert: true },
+            { certId: 9, ar: "تجربة العملاء (الخليج)", en: "Customer Experience (Gulf)", hasCert: true },
+            { certId: 10, ar: "برنامج ولاء مكافآتي - الخليج", en: '"My Rewards-Gulf" Loyalty Program', hasCert: true },
+            { certId: 11, ar: "سياسات الشركة (الخليج)", en: "Company policies (Gulf)", hasCert: true }
         ];
 
         const botCoursesKeys = [
@@ -1897,6 +2029,8 @@
         let layoutMode = localStorage.getItem('academyLayoutMode') || 'new';
         let selectedGlobalRegion = localStorage.getItem('academyGlobalRegion') || '';
         let legacyExcludedRegions = new Set();
+        let currentGulfSubTab = 'overview';
+        let currentGulfSupervisor = '';
 
         document.getElementById('currentDateDisplay').innerText = `تاريخ اليوم: ${new Date().toLocaleDateString('ar-EG')}`;
 
@@ -1911,6 +2045,8 @@
             if(targetTab) targetTab.classList.add('active');
             
             if (tabId === 'trainingPathTab') renderTrainingPathTable();
+            if (tabId === 'gulfTrackTab') renderGulfRegionDashboard();
+            if (tabId === 'laBeauteTrackTab') renderLaBeauteComingSoon();
             if (tabId === 'kpiTab') {
                 if(Object.keys(kpiManagersData).length === 0) renderKPITab();
             }
@@ -1927,7 +2063,8 @@
             const emptyIds = [
                 'searchName', 'filterRegion', 't1Search', 't1Region', 't2Search', 't2Region',
                 't3Search', 't3Region', 't4Search', 't4Region', 'pathRegionFilter', 'pathSearchFilter',
-                'supRegionFilter', 'supSearchFilter', 'botSearch', 'botRegionFilter', 'botProgressFilter'
+                'supRegionFilter', 'supSearchFilter', 'botSearch', 'botRegionFilter', 'botProgressFilter',
+                'gulfTrackSearch', 'laBeauteTrackSearch'
             ];
             emptyIds.forEach(id => {
                 const element = document.getElementById(id);
@@ -2002,8 +2139,13 @@
         }
 
         function isEmployeeVisibleInCurrentRegion(emp) {
-            if (!emp || (globalData.excludedRegions && globalData.excludedRegions.has(emp.region))) return false;
+            if (!emp || getEmployeeAcademyTrack(emp) !== 'standard') return false;
+            if (globalData.excludedRegions && globalData.excludedRegions.has(emp.region)) return false;
             return layoutMode !== 'new' || !selectedGlobalRegion || cleanString(emp.region) === selectedGlobalRegion;
+        }
+
+        function getStandardActiveEmployees() {
+            return globalData.allActive.filter(emp => getEmployeeAcademyTrack(emp) === 'standard');
         }
 
         function renderGlobalFilterSummary() {
@@ -2034,7 +2176,7 @@
             const cards = document.getElementById('globalRegionCards');
             if (cards) {
                 const regionCounts = {};
-                globalData.allActive.forEach(emp => { regionCounts[emp.region] = (regionCounts[emp.region] || 0) + 1; });
+                getStandardActiveEmployees().forEach(emp => { regionCounts[emp.region] = (regionCounts[emp.region] || 0) + 1; });
                 cards.innerHTML = Object.keys(regionCounts).sort((a, b) => a.localeCompare(b, 'ar')).map(region => {
                     const selected = region === selectedGlobalRegion;
                     return `<button type="button" onclick="applyGlobalRegionFilter(decodeURIComponent('${encodeURIComponent(region)}'))" class="text-right rounded-xl border p-4 transition ${selected ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white text-slate-700 border-slate-200 hover:border-indigo-300 hover:bg-indigo-50'}">
@@ -2124,6 +2266,62 @@
             return botCoursesKeys.find(course => normalizedName.includes(normalizeBotCourseName(course))) || null;
         }
 
+        function normalizeAcademyCourseName(value) {
+            return cleanString(value)
+                .toLowerCase()
+                .replace(/[’‘]/g, "'")
+                .replace(/[“”]/g, '"')
+                .replace(/[^a-z0-9\u0600-\u06FF]+/g, '');
+        }
+
+        function findGulfCourse(courseName) {
+            const normalizedName = normalizeAcademyCourseName(courseName);
+            if (!normalizedName || !normalizedName.includes('gulf')) return null;
+            return gulfTrainingPathDef.find(course => {
+                const normalizedCourse = normalizeAcademyCourseName(course.en);
+                return normalizedName.includes(normalizedCourse) || normalizedCourse.includes(normalizedName);
+            }) || null;
+        }
+
+        function findEliteCourse(courseName) {
+            const normalizedName = normalizeAcademyCourseName(courseName);
+            if (!normalizedName) return null;
+            return eliteCoursesKeys.find(course => normalizedName.includes(normalizeAcademyCourseName(course))) || null;
+        }
+
+        function getEmployeeAcademyTrack(employee) {
+            const region = cleanString(employee && employee.region).toLowerCase().replace(/\s+/g, '');
+            if (region.includes('الخليج') || region.includes('gulf')) return 'gulf';
+            if (region.includes('labeaute')) return 'labeaute';
+            return 'standard';
+        }
+
+        function getAcademyTrackCourses(trackKey) {
+            return trackKey === 'gulf'
+                ? gulfTrainingPathDef
+                : trainingPathDef.filter(course => course.hasCert);
+        }
+
+        function isAcademyTrackCourseCompleted(employee, course, trackKey = getEmployeeAcademyTrack(employee)) {
+            if (!employee || !course) return false;
+            if (trackKey === 'gulf') return Boolean(employee.gulfProgress && employee.gulfProgress[course.en]);
+            return Boolean(employee.pathProgress && employee.pathProgress[course.en]);
+        }
+
+        function getAcademyTrackSummary(employee, trackKey = getEmployeeAcademyTrack(employee)) {
+            const courses = getAcademyTrackCourses(trackKey);
+            const completedCount = courses.filter(course => isAcademyTrackCourseCompleted(employee, course, trackKey)).length;
+            const stopper = courses.find(course => !isAcademyTrackCourseCompleted(employee, course, trackKey)) || null;
+            return {
+                courses,
+                completedCount,
+                totalCount: courses.length,
+                score: courses.length ? roundKpiValue((completedCount / courses.length) * 100) : 0,
+                stopper,
+                isComplete: completedCount === courses.length
+            };
+        }
+
         function createBotCoursesState() {
             let state = {};
             botCoursesKeys.forEach(course => {
@@ -2167,7 +2365,7 @@
             const less3Emps = list.filter(emp => emp.tenureMonths >= 0 && emp.tenureMonths < 3);
             const more3Emps = list.filter(emp => emp.tenureMonths >= 3);
             const improvementEmps = list.filter(hasBotEnrollment);
-            const elite = calculateKpiRate(eliteEmps, emp => getEliteCompletedCount(emp) === 3);
+            const elite = calculateKpiRate(eliteEmps, emp => getEliteCompletedCount(emp) === ELITE_TARGET_COUNT);
             const less3 = calculateKpiRate(less3Emps, emp => emp.totalCerts >= less3KpiTarget);
             const more3 = calculateKpiRate(more3Emps, emp => emp.totalCerts >= targetCertsCount);
             const improvement = calculateKpiRate(improvementEmps, emp => getBotImprovementSummary(emp).score === 100);
@@ -2250,8 +2448,67 @@
         function parseCertificateDate(cellValue) {
             if (!cellValue || cellValue === "-") return null;
             let match = cellValue.toString().match(/(\d{2})\/(\d{2})\/(\d{4})/);
-            if (match) return { key: `${match[2]}-${match[3]}` };
+            if (match) {
+                const day = Number(match[1]);
+                const month = Number(match[2]);
+                const year = Number(match[3]);
+                return { key: `${match[2]}-${match[3]}`, sortValue: Date.UTC(year, month - 1, day) };
+            }
             return null;
+        }
+
+        function isEffectiveAcademyCourseCompletion(hasEffectiveCertificate, progressRaw) {
+            return hasEffectiveCertificate || parseProgress(progressRaw) === 100;
+        }
+
+        function mergeEffectiveCertificateRecord(employee, courseName, certInfo) {
+            if (!employee || !certInfo) return;
+            if (!employee.certificateRecords) employee.certificateRecords = {};
+            const normalizedCourse = normalizeAcademyCourseName(courseName);
+            const courseKey = normalizedCourse || `unknown:${certInfo.key}:${certInfo.sortValue || 0}`;
+            const existing = employee.certificateRecords[courseKey];
+            if (!existing || Number(certInfo.sortValue || 0) < Number(existing.sortValue || 0)) {
+                employee.certificateRecords[courseKey] = { key: certInfo.key, sortValue: Number(certInfo.sortValue || 0) };
+            }
+        }
+
+        function mergeAcademyCourseRecord(employee, courseName, progressRaw, certInfo) {
+            if (!employee || !cleanString(courseName)) return;
+            if (!employee.academyCourses) employee.academyCourses = {};
+            const courseKey = normalizeAcademyCourseName(courseName) || cleanString(courseName).toLowerCase();
+            const parsedProgress = parseProgress(progressRaw);
+            const current = employee.academyCourses[courseKey] || {
+                key: courseKey,
+                name: cleanString(courseName),
+                progress: null,
+                hasCertificate: false,
+                certificateMonth: '',
+                certificateSortValue: null
+            };
+            if (parsedProgress !== null && (current.progress === null || parsedProgress > current.progress)) {
+                current.progress = parsedProgress;
+            }
+            if (certInfo) {
+                current.hasCertificate = true;
+                if (current.certificateSortValue === null || Number(certInfo.sortValue || 0) < current.certificateSortValue) {
+                    current.certificateMonth = certInfo.key;
+                    current.certificateSortValue = Number(certInfo.sortValue || 0);
+                }
+            }
+            employee.academyCourses[courseKey] = current;
+        }
+
+        function finalizeEmployeeCertificateCounts(employee) {
+            if (!employee) return;
+            employee.totalCerts = 0;
+            employee.monthsData = employee.monthsData || {};
+            Object.keys(employee.monthsData).forEach(month => { employee.monthsData[month] = 0; });
+            Object.values(employee.certificateRecords || {}).forEach(record => {
+                if (!record) return;
+                employee.totalCerts++;
+                if (employee.monthsData[record.key] === undefined) employee.monthsData[record.key] = 0;
+                employee.monthsData[record.key]++;
+            });
         }
 
         function getWeekNumber(d) {
@@ -2373,7 +2630,8 @@
                     region: determineRegion(manager), email: "", totalCerts: 0, oldTotalCerts: 0, 
                     monthsData: {}, nonCertProgress: {}, eliteProgress: {}, isEliteTarget: false,
                     eliteGroup: best100OnlyIds.has(id) ? 'best100' : 'elite',
-                    pathProgress: {}, botCourses: createBotCoursesState(),
+                    pathProgress: {}, gulfProgress: {}, botCourses: createBotCoursesState(),
+                    certificateRecords: {}, academyCourses: {},
                     timeline: { hourly: Array(24).fill(0), daily: {}, weekly: {} }
                 };
                 
@@ -2381,6 +2639,7 @@
                 nonCertCoursesKeys.forEach(c => emp.nonCertProgress[c] = null);
                 eliteCoursesKeys.forEach(c => emp.eliteProgress[c] = false);
                 trainingPathDef.forEach(c => emp.pathProgress[c.en] = false); 
+                gulfTrainingPathDef.forEach(c => emp.gulfProgress[c.en] = false);
                 
                 emp.tenureMonths = calculateTenureMonths(hireDate);
                 employeeMap[id] = emp;
@@ -2396,7 +2655,7 @@
                 if (isExcluded(status)) {
                     globalData.excludedEmployees.push(emp);
                 } else {
-                    globalData.regionsSet.add(emp.region);
+                    if (getEmployeeAcademyTrack(emp) === 'standard') globalData.regionsSet.add(emp.region);
                     globalData.allActive.push(emp);
                 }
             }
@@ -2417,10 +2676,10 @@
                 let courseLower = courseName.toLowerCase();
                 let progressRaw = row.length > 26 ? row[26] : null;
                 let certInfo = parseCertificateDate(certValue);
-                const isIgnoredTestCertificate = Boolean(certInfo && isExcludedAcademyCertificateMonth(certInfo.key));
-                if (isIgnoredTestCertificate) certInfo = null;
-                const hasEffectiveCertificate = certValue !== "-" && !isIgnoredTestCertificate;
+                const hasEffectiveCertificate = Boolean(certInfo);
+                const hasEffectiveCourseCompletion = isEffectiveAcademyCourseCompletion(hasEffectiveCertificate, progressRaw);
                 let matchedBotCourse = findBotCourse(courseName);
+                let matchedGulfCourse = findGulfCourse(courseName);
 
                 if (hasEffectiveCertificate && certInfo) {
                     let timeRegex = /(\d{2})\/(\d{2})\/(\d{4})[\s\r\n]+(\d{1,2}):(\d{2}):(\d{2})[\s\r\n]*(am|pm)/gi;
@@ -2450,12 +2709,16 @@
                 }
 
                 if (employeeMap[id]) {
+                    mergeAcademyCourseRecord(employeeMap[id], courseName, progressRaw, certInfo);
                     if (matchedBotCourse) mergeBotCourseRecord(employeeMap[id], matchedBotCourse, progressRaw);
+                    if (matchedGulfCourse && hasEffectiveCourseCompletion) {
+                        employeeMap[id].gulfProgress[matchedGulfCourse.en] = true;
+                    }
 
-                    let matchedElite = eliteCoursesKeys.find(c => courseLower.includes(c.toLowerCase()));
+                    let matchedElite = findEliteCourse(courseName);
                     if (matchedElite) {
                         employeeMap[id].isEliteTarget = true;
-                        if (hasEffectiveCertificate || parseProgress(progressRaw) === 100) {
+                        if (hasEffectiveCourseCompletion) {
                             employeeMap[id].eliteProgress[matchedElite] = true;
                         }
                     }
@@ -2467,15 +2730,13 @@
                             if (parsedProg !== null) employeeMap[id].nonCertProgress[matchedCourse] = parsedProg;
                         }
                     } else if (certInfo) {
-                        employeeMap[id].totalCerts++;
+                        mergeEffectiveCertificateRecord(employeeMap[id], courseName, certInfo);
                         globalData.allExtractedMonths.add(certInfo.key);
-                        if (employeeMap[id].monthsData[certInfo.key] === undefined) employeeMap[id].monthsData[certInfo.key] = 0;
-                        employeeMap[id].monthsData[certInfo.key]++;
                     }
 
-                    let matchedPathCourse = matchedBotCourse ? null : trainingPathDef.find(c => courseLower.includes(c.en.toLowerCase()));
+                    let matchedPathCourse = (matchedBotCourse || matchedGulfCourse) ? null : trainingPathDef.find(c => courseLower.includes(c.en.toLowerCase()));
                     if (matchedPathCourse) {
-                        if (hasEffectiveCertificate || parseProgress(progressRaw) === 100) {
+                        if (hasEffectiveCourseCompletion) {
                             employeeMap[id].pathProgress[matchedPathCourse.en] = true;
                         }
                     }
@@ -2490,7 +2751,8 @@
                             eliteProgress: {}, 
                             isEliteTarget: false,
                             eliteGroup: best100OnlyIds.has(id) ? 'best100' : 'elite',
-                            pathProgress: {},
+                            pathProgress: {}, gulfProgress: {},
+                            certificateRecords: {}, academyCourses: {}, monthsData: {},
                             botCourses: createBotCoursesState(),
                             hireDate: "",
                             status: "غير موجود بالقوى",
@@ -2500,32 +2762,40 @@
                         };
                         eliteCoursesKeys.forEach(c => missingMap[id].eliteProgress[c] = false);
                         trainingPathDef.forEach(c => missingMap[id].pathProgress[c.en] = false);
+                        gulfTrainingPathDef.forEach(c => missingMap[id].gulfProgress[c.en] = false);
                     }
 
-                    if (matchedBotCourse) mergeBotCourseRecord(missingMap[id], matchedBotCourse, progressRaw);
+                    mergeAcademyCourseRecord(missingMap[id], courseName, progressRaw, certInfo);
 
-                    let matchedElite = eliteCoursesKeys.find(c => courseLower.includes(c.toLowerCase()));
+                    if (matchedBotCourse) mergeBotCourseRecord(missingMap[id], matchedBotCourse, progressRaw);
+                    if (matchedGulfCourse && hasEffectiveCourseCompletion) {
+                        missingMap[id].gulfProgress[matchedGulfCourse.en] = true;
+                    }
+
+                    let matchedElite = findEliteCourse(courseName);
                     if (matchedElite) {
                         missingMap[id].isEliteTarget = true;
-                        if (hasEffectiveCertificate || parseProgress(progressRaw) === 100) {
+                        if (hasEffectiveCourseCompletion) {
                             missingMap[id].eliteProgress[matchedElite] = true;
                         }
                     }
 
-                    let matchedPathCourse = matchedBotCourse ? null : trainingPathDef.find(c => courseLower.includes(c.en.toLowerCase()));
+                    let matchedPathCourse = (matchedBotCourse || matchedGulfCourse) ? null : trainingPathDef.find(c => courseLower.includes(c.en.toLowerCase()));
                     if (matchedPathCourse) {
-                        if (hasEffectiveCertificate || parseProgress(progressRaw) === 100) {
+                        if (hasEffectiveCourseCompletion) {
                             missingMap[id].pathProgress[matchedPathCourse.en] = true;
                         }
                     }
 
                     if (certInfo) { 
-                        missingMap[id].totalCerts++; 
+                        mergeEffectiveCertificateRecord(missingMap[id], courseName, certInfo);
                         globalData.allExtractedMonths.add(certInfo.key); 
                     }
                 }
             }
             globalData.missingEmployees = Object.values(missingMap);
+            Object.values(employeeMap).forEach(finalizeEmployeeCertificateCounts);
+            globalData.missingEmployees.forEach(finalizeEmployeeCertificateCounts);
 
             for (let id in employeeMap) {
                 if (!allAcIds.has(id)) {
@@ -2539,14 +2809,18 @@
                     let row = oldAcRows[i];
                     if (!row || row.length < 15) continue;
                     let id = cleanString(row[14]); if (!id) continue;
+                    let courseName = row.length > 1 ? cleanString(row[1]) : "";
                     let certValue = row.length > 38 ? cleanString(row[38]) : "-";
                     let certInfo = parseCertificateDate(certValue);
-                    if (certInfo && !isExcludedAcademyCertificateMonth(certInfo.key)) oldCertMap[id] = (oldCertMap[id] || 0) + 1;
+                    if (certInfo) {
+                        if (!oldCertMap[id]) oldCertMap[id] = new Set();
+                        oldCertMap[id].add(normalizeAcademyCourseName(courseName) || `unknown:${certInfo.key}:${certInfo.sortValue || i}`);
+                    }
                 }
-                globalData.allActive.forEach(emp => emp.oldTotalCerts = oldCertMap[emp.id] || 0);
+                globalData.allActive.forEach(emp => emp.oldTotalCerts = oldCertMap[emp.id] ? oldCertMap[emp.id].size : 0);
             }
 
-            let sortedExtracted = Array.from(globalData.allExtractedMonths).filter(month => !isExcludedAcademyCertificateMonth(month)).sort((a, b) => {
+            let sortedExtracted = Array.from(globalData.allExtractedMonths).filter(month => !isAcademyGraceMonth(month)).sort((a, b) => {
                 let [m1, y1] = a.split('-').map(Number);
                 let [m2, y2] = b.split('-').map(Number);
                 return y1 !== y2 ? y1 - y2 : m1 - m2;
@@ -2644,7 +2918,7 @@
             let employeeProgress = {}; let employeeExcludedState = {}; 
 
             globalData.allActive.forEach(emp => {
-                if (globalData.excludedRegions.has(emp.region)) return;
+                if (!isEmployeeVisibleInCurrentRegion(emp)) return;
                 let isExcludedByDate = false;
                 let empDate = parseExcelDate(emp.hireDate);
                 
@@ -2674,7 +2948,7 @@
             let regionStats = {}; let overallStats = { valid: 0, excluded: 0, achieved: 0, failed: 0 };
 
             globalData.allActive.forEach(emp => {
-                if (globalData.excludedRegions.has(emp.region)) return;
+                if (!isEmployeeVisibleInCurrentRegion(emp)) return;
                 if (!regionStats[emp.region]) regionStats[emp.region] = { valid: 0, excludedNew: 0, achieved: 0, failed: 0 };
                 
                 if (employeeExcludedState[emp.id]) {
@@ -2730,7 +3004,7 @@
             let trackFilter = document.getElementById('kpiTrackFilter') ? document.getElementById('kpiTrackFilter').value : 'all';
             
             globalData.allActive.forEach(emp => {
-                if (globalData.excludedRegions.has(emp.region)) return;
+                if (!isEmployeeVisibleInCurrentRegion(emp)) return;
                 
                 // Track Filter Logic
                 let includeEmp = true;
@@ -2754,10 +3028,7 @@
                 // Track-specific target calculation for the high-level manager card
                 let isAchieved = false;
                 if(trackFilter === 'elite') {
-                    let hasC1 = eliteCoursesKeys[0] ? emp.eliteProgress[eliteCoursesKeys[0]] : false;
-                    let hasC2 = eliteCoursesKeys[1] ? emp.eliteProgress[eliteCoursesKeys[1]] : false;
-                    let hasC3 = eliteCoursesKeys[2] ? emp.eliteProgress[eliteCoursesKeys[2]] : false;
-                    isAchieved = hasC1 && hasC2 && hasC3;
+                    isAchieved = getEliteCompletedCount(emp) === ELITE_TARGET_COUNT;
                 } else if (trackFilter === 'less3') {
                     isAchieved = emp.totalCerts >= less3KpiTarget;
                 } else if (trackFilter === 'improvement') {
@@ -2868,7 +3139,7 @@
             let improvementPct = kpiSummary.improvement === null ? 'NA' : kpiSummary.improvement;
             
             document.getElementById('kpiEliteVal').innerText = elitePct !== 'NA' ? formatKpiValue(elitePct) + '%' : 'NA';
-            document.getElementById('kpiEliteDesc').innerText = eliteEmps.length > 0 ? `العدد: ${eliteEmps.length} (المستهدف 3/3)` : 'لا يوجد';
+            document.getElementById('kpiEliteDesc').innerText = eliteEmps.length > 0 ? `العدد: ${eliteEmps.length} (المستهدف ${ELITE_TARGET_COUNT}/${ELITE_TARGET_COUNT})` : 'لا يوجد';
             
             document.getElementById('kpiLess3Val').innerText = less3Pct !== 'NA' ? formatKpiValue(less3Pct) + '%' : 'NA';
             document.getElementById('kpiLess3Desc').innerText = less3Emps.length > 0 ? `العدد: ${less3Emps.length} (المستهدف ${less3KpiTarget})` : 'لا يوجد';
@@ -2916,12 +3187,9 @@
                 let displayProgress = e.totalCerts;
                 
                 if (axis === 'elite') {
-                    let hasC1 = eliteCoursesKeys[0] ? e.eliteProgress[eliteCoursesKeys[0]] : false;
-                    let hasC2 = eliteCoursesKeys[1] ? e.eliteProgress[eliteCoursesKeys[1]] : false;
-                    let hasC3 = eliteCoursesKeys[2] ? e.eliteProgress[eliteCoursesKeys[2]] : false;
-                    isAchieved = hasC1 && hasC2 && hasC3;
-                    let count = (hasC1 ? 1 : 0) + (hasC2 ? 1 : 0) + (hasC3 ? 1 : 0);
-                    displayProgress = `${count} / 3 دورات`;
+                    const count = getEliteCompletedCount(e);
+                    isAchieved = count === ELITE_TARGET_COUNT;
+                    displayProgress = `${count} / ${ELITE_TARGET_COUNT} دورات`;
                 } else if (axis === 'less3') {
                     isAchieved = e.totalCerts >= less3KpiTarget;
                 } else if (axis === 'more3') {
@@ -2970,7 +3238,7 @@
                 if (trackFilter === 'all' || trackFilter === 'elite') {
                     if (e.isEliteTarget) {
                         let completed = getEliteCompletedCount(e);
-                        addRow(e, `النخبة - ${getEliteCohortLabel(e)}`, `${completed} / 3`, completed === 3);
+                        addRow(e, `النخبة - ${getEliteCohortLabel(e)}`, `${completed} / ${ELITE_TARGET_COUNT}`, completed === ELITE_TARGET_COUNT);
                     }
                 }
                 if (trackFilter === 'all' || trackFilter === 'less3') {
@@ -3008,9 +3276,9 @@
         };
 
         const KPI_PIVOT_HEADERS = {
-            supervisors: ["الإقليم", "مدير الإقليم", "المشرف", "عدد أقل من 3 شهور", "أقل من 3 مخلص 10", "أقل من 3 لسه", "عدد النخبة", "النخبة مكمل 3", "متوسط النخبة KPI", "عدد 3 شهور فأكثر", "3 شهور فأكثر مخلص 21", "3 شهور فأكثر لسه", "متوسط 3 شهور فأكثر KPI", "KPI المشرف"],
+            supervisors: ["الإقليم", "مدير الإقليم", "المشرف", "عدد أقل من 3 شهور", "أقل من 3 مخلص 10", "أقل من 3 لسه", "عدد النخبة", "النخبة مكمل 4", "متوسط النخبة KPI", "عدد 3 شهور فأكثر", "3 شهور فأكثر مخلص 21", "3 شهور فأكثر لسه", "متوسط 3 شهور فأكثر KPI", "KPI المشرف"],
             less3: ["الإقليم", "مدير الإقليم", "المشرف", "الرقم الوظيفي", "اسم الموظف", "المستهدف", "إجمالي الدورات", "عدد الموظفين", "مخلص 10", "لسه", "KPI أقل من 3"],
-            elite: ["الإقليم", "مدير الإقليم", "المشرف", "الرقم الوظيفي", "اسم الموظف", "دورات النخبة المنجزة", "دورات النخبة المتبقية", "مكمل 3 نخبة", "KPI النخبة"],
+            elite: ["الإقليم", "مدير الإقليم", "المشرف", "الرقم الوظيفي", "اسم الموظف", "دورات النخبة المنجزة", "دورات النخبة المتبقية", "مكمل 4 نخبة", "KPI النخبة"],
             more3: ["الإقليم", "مدير الإقليم", "المشرف", "الرقم الوظيفي", "اسم الموظف", "الهدف الشهري", "إجمالي الدورات", "عدد الموظفين", "مخلص 21", "لسه", "KPI 3 شهور فأكثر"]
         };
 
@@ -3037,7 +3305,7 @@
         }
 
         function buildKpiPivotRows() {
-            let active = globalData.allActive.filter(emp => !globalData.excludedRegions.has(emp.region));
+            let active = globalData.allActive.filter(isEmployeeVisibleInCurrentRegion);
             let supervisors = {};
             let less3Rows = [];
             let eliteRows = [];
@@ -3060,8 +3328,8 @@
 
                 if (emp.isEliteTarget) {
                     let completedElite = getEliteCompletedCount(emp);
-                    let remainingElite = Math.max(0, 3 - completedElite);
-                    eliteRows.push([region, manager, supervisor, emp.id, emp.name, completedElite, remainingElite, completedElite === 3 ? 1 : 0, completedElite === 3 ? 100 : 0]);
+                    let remainingElite = Math.max(0, ELITE_TARGET_COUNT - completedElite);
+                    eliteRows.push([region, manager, supervisor, emp.id, emp.name, completedElite, remainingElite, completedElite === ELITE_TARGET_COUNT ? 1 : 0, completedElite === ELITE_TARGET_COUNT ? 100 : 0]);
                 }
 
                 if (emp.tenureMonths >= 3) {
@@ -3077,7 +3345,7 @@
                 const kpiSummary = getSupervisorKpiSummary(group.employees);
 
                 let less3Completed = less3.filter(e => e.totalCerts >= less3KpiTarget).length;
-                let eliteFull = elite.filter(e => getEliteCompletedCount(e) === 3).length;
+                let eliteFull = elite.filter(e => getEliteCompletedCount(e) === ELITE_TARGET_COUNT).length;
                 let more3Completed = more3.filter(e => e.totalCerts >= targetCertsCount).length;
                 let eliteAvg = kpiSummary.elite === null ? 0 : kpiSummary.elite;
                 let more3Avg = kpiSummary.more3 === null ? 0 : kpiSummary.more3;
@@ -3351,7 +3619,7 @@
                 [styledCell("شرح حساب KPI وشرح التابات الموجودة في ملف Pivot.", styles.note)],
                 [],
                 [styledCell("طريقة حساب KPI", styles.section)],
-                [styledCell("النخبة: الموظف الذي يكمل 3/3 يأخذ 100%، وأي موظف أقل من 3/3 يأخذ 0%. KPI المسار هو نسبة الموظفين المكملين 3/3 من إجمالي المستهدفين.", styles.note)],
+                [styledCell(`النخبة: الموظف الذي يكمل ${ELITE_TARGET_COUNT}/${ELITE_TARGET_COUNT} يأخذ 100%، وأي موظف أقل من ${ELITE_TARGET_COUNT}/${ELITE_TARGET_COUNT} يأخذ 0%. KPI المسار هو نسبة الموظفين المكملين ${ELITE_TARGET_COUNT}/${ELITE_TARGET_COUNT} من إجمالي المستهدفين.`, styles.note)],
                 [styledCell(`3 شهور فأكثر: من يحقق ${targetCertsCount} دورة أو المستهدف الحالي يأخذ 100%، وغير المكتمل يأخذ 0% داخل هذا المسار.`, styles.note)],
                 [styledCell("Back on Track (BOT): الموظف يأخذ 100% فقط عندما تكون كل دورات BOT المسجل عليها مكتملة بنسبة 100%، وإلا يأخذ 0%. KPI المسار هو متوسط درجات الموظفين.", styles.note)],
                 [styledCell(`أقل من 3 شهور: الموظف الذي يحقق ${less3KpiTarget} شهادات أو أكثر يأخذ 100%، ومن لم يحققها يأخذ 0%، ويدخل متوسط هذا المسار في KPI المشرف.`, styles.note)],
@@ -3490,7 +3758,7 @@
         }
 
         function buildKpiMissingRows() {
-            let active = globalData.allActive.filter(emp => !globalData.excludedRegions.has(emp.region));
+            let active = globalData.allActive.filter(isEmployeeVisibleInCurrentRegion);
             let rows = [];
 
             active.forEach(emp => {
@@ -3510,7 +3778,7 @@
                             emp.name,
                             "النخبة",
                             completedElite,
-                            3,
+                            ELITE_TARGET_COUNT,
                             missingElite.join("، "),
                             0
                         ]);
@@ -3750,6 +4018,20 @@
             setTimeout(() => URL.revokeObjectURL(url), 1000);
         }
 
+        async function updateKpiPivotEliteTargetLabels(zip) {
+            const xmlPaths = Object.keys(zip.files).filter(path => path.endsWith('.xml') && !zip.files[path].dir);
+            for (const path of xmlPaths) {
+                const file = zip.file(path);
+                if (!file) continue;
+                let xml = await file.async('string');
+                const updated = xml
+                    .replace(/النخبة مكمل 3/g, 'النخبة مكمل 4')
+                    .replace(/مكمل 3 نخبة/g, 'مكمل 4 نخبة')
+                    .replace(/النخبة[^<]{0,80}3\/3/g, match => match.replace(/3\/3/g, '4/4'));
+                if (updated !== xml) zip.file(path, updated);
+            }
+        }
+
         async function exportKpiPivotWorkbook() {
             if (!globalData.allActive.length) {
                 alert("لا توجد بيانات بعد. قم بمعالجة ملفات القوى والأكاديمية أولاً.");
@@ -3779,6 +4061,7 @@
 
             try {
                 let zip = await JSZip.loadAsync(base64ToUint8Array(KPI_PIVOT_TEMPLATE_BASE64));
+                await updateKpiPivotEliteTargetLabels(zip);
                 let styles = await ensureKpiWorkbookStyles(zip);
                 await repairKpiPivotTemplate(zip, styles.percentNumFmtId);
                 let replacements = [
@@ -3819,7 +4102,7 @@
             const container = document.getElementById('dashChecksContainer');
             
             let items = new Set();
-            globalData.allActive.forEach(e => {
+            getStandardActiveEmployees().forEach(e => {
                 if(type === 'regions') items.add(e.region);
                 else if(type === 'supervisors' && cleanString(e.supervisor)) items.add(cleanString(e.supervisor));
             });
@@ -3868,7 +4151,7 @@
                 
                 let emps = layoutMode === 'new'
                     ? globalData.allActive.filter(isEmployeeVisibleInCurrentRegion)
-                    : globalData.allActive.filter(e => type === 'regions' ? e.region === item : cleanString(e.supervisor) === item);
+                    : globalData.allActive.filter(e => isEmployeeVisibleInCurrentRegion(e) && (type === 'regions' ? e.region === item : cleanString(e.supervisor) === item));
                 
                 let less3 = emps.filter(e => e.tenureMonths >= 0 && e.tenureMonths < 3).length;
                 less3Data.push(less3);
@@ -4120,7 +4403,7 @@
             let supStats = {};
             
             globalData.allActive.forEach(emp => {
-                if (globalData.excludedRegions.has(emp.region)) return;
+                if (!isEmployeeVisibleInCurrentRegion(emp)) return;
                 if (supRegion && emp.region !== supRegion) return;
                 
                 let supName = cleanString(emp.supervisor);
@@ -4342,7 +4625,13 @@
         function getEmployeeCumulativeCertificates(emp, monthIndex, months = getMonthlyEvaluationMonths()) {
             const resolvedIndex = typeof monthIndex === 'number' ? monthIndex : months.indexOf(monthIndex);
             if (!emp || resolvedIndex < 0) return 0;
-            return months.slice(0, resolvedIndex + 1).reduce((sum, month) => sum + getEmployeeMonthlyCertificates(emp, month), 0);
+            const cutoffMonth = months[resolvedIndex];
+            const cutoffValue = getAcademyMonthSortValue(cutoffMonth);
+            const creditedMonths = new Set(months.slice(0, resolvedIndex + 1));
+            academyGraceMonths.forEach(month => {
+                if (getAcademyMonthSortValue(month) <= cutoffValue) creditedMonths.add(month);
+            });
+            return Array.from(creditedMonths).reduce((sum, month) => sum + getEmployeeMonthlyCertificates(emp, month), 0);
         }
 
         // ملف الأكاديمية يسجل الشهادات بتاريخها؛ لذلك الـMax التلقائي هنا إجمالي تراكمي حتى نهاية الشهر.
@@ -4397,7 +4686,7 @@
         }
 
         function getMonthlyEvaluationCompleted(emp, monthKey, monthIndex, mode = monthlyEvaluationViewMode, months = getMonthlyEvaluationMonths()) {
-            return mode === 'cumulative'
+            return mode === 'cumulative' || monthIndex === 0
                 ? getEmployeeCumulativeCertificates(emp, monthIndex, months)
                 : getEmployeeMonthlyCertificates(emp, monthKey);
         }
@@ -4606,8 +4895,8 @@
             const description = document.getElementById('monthlyEvaluationDescription');
             const audienceDescription = isRegionAudience ? ' كمتوسط لكل إقليم' : (isSupervisorAudience ? ' كمتوسط لفريق كل مشرف' : ' لكل بائع');
             if (description) description.innerText = isCumulative
-                ? `هذا العرض يوضح الإجمالي التراكمي حتى نهاية كل شهر${audienceDescription}.`
-                : `الـKPI يحاسب على الشهادات الجديدة في الشهر فقط${isRegionAudience ? '، ويعرض متوسط جميع بائعي الإقليم' : (isSupervisorAudience ? '، ويعرض متوسط فريق كل مشرف داخل إقليمه' : '')}.`;
+                ? `هذا العرض يوضح الإجمالي التراكمي حتى نهاية كل شهر${audienceDescription}. شهادات 09/2025 محسوبة كرصد افتتاحي بدون تقييم مستقل للشهر.`
+                : `09/2025 شهر سماح بلا KPI مستقل؛ إنجازه يُضاف لأول تقييم رسمي، وبعده يحاسب الـKPI على شهادات كل شهر فقط${isRegionAudience ? '، ويعرض متوسط جميع بائعي الإقليم' : (isSupervisorAudience ? '، ويعرض متوسط فريق كل مشرف داخل إقليمه' : '')}.`;
             const detailHint = document.getElementById('monthlyEvaluationDetailHint');
             if (detailHint) detailHint.innerText = isRegionAudience ? 'اضغط على أي إقليم لعرض كل بائعيه ومشرفيه.' : (isSupervisorAudience ? 'اضغط على أي مشرف لعرض تفاصيل فريقه بالكامل.' : 'اضغط على أي بائع لعرض الشارت التفصيلي.');
             const searchLabel = document.getElementById('monthlyEvaluationSearchLabel');
@@ -4787,7 +5076,7 @@
                 const average = averageMonthlyKpis(kpis);
                 const trend = getMonthlyTrendState(latest, previousIndex >= 0 ? kpis[previousIndex] : null);
                 const presentation = getMonthlyTrendPresentation(trend);
-                const totalIncluded = months.reduce((sum, month) => sum + getEmployeeMonthlyCertificates(emp, month), 0);
+                const totalIncluded = months.length ? getEmployeeCumulativeCertificates(emp, months.length - 1, months) : 0;
                 return `<tr class="cursor-pointer hover:bg-indigo-50 transition" onclick="openMonthlyEmployeeFromSupervisor(decodeURIComponent('${encodeURIComponent(emp.id)}'))"><td class="px-3 py-3 font-bold text-slate-600">${safeBotText(emp.id)}</td><td class="px-4 py-3"><span class="font-extrabold text-indigo-700">${safeBotText(emp.name)}</span><span class="block text-[10px] text-slate-400 mt-1">فتح تفاصيل البائع</span></td><td class="px-4 py-3 text-xs font-bold text-slate-600">${safeBotText(emp.supervisor || 'بدون مشرف')}</td><td class="px-3 py-3 text-center font-extrabold text-indigo-700">${latest === null ? '—' : `${formatKpiValue(latest)}%`}</td><td class="px-3 py-3 text-center font-bold text-slate-700">${average === null ? '—' : `${formatKpiValue(average)}%`}</td><td class="px-3 py-3 text-center font-bold text-cyan-700">${totalIncluded}</td><td class="px-3 py-3 text-center"><span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border text-[11px] font-extrabold ${presentation.cellClass}"><i class="fas ${presentation.icon}"></i>${presentation.shortLabel}</span></td></tr>`;
             }).join('');
             if (empty) empty.classList.toggle('hidden', filteredEmployees.length > 0);
@@ -4973,7 +5262,7 @@
             });
 
             const rows = employees.map(emp => {
-                const totalIncluded = months.reduce((sum, month) => sum + getEmployeeMonthlyCertificates(emp, month), 0);
+                const totalIncluded = months.length ? getEmployeeCumulativeCertificates(emp, months.length - 1, months) : 0;
                 const row = [emp.id, emp.name, emp.supervisor || "بدون مشرف", emp.manager || "", emp.region || "", formatDateDisplay(emp.hireDate), totalIncluded];
                 months.forEach((month, index) => {
                     if (!isEmployeeEligibleForMonthlyEvaluation(emp, month)) {
@@ -5185,43 +5474,35 @@
         }
 
         function renderEliteTable(dataArray, excludedArray, missingArray) {
-            let c1Key = eliteCoursesKeys[0]; 
-            let c2Key = eliteCoursesKeys[1];
-            let c3Key = eliteCoursesKeys[2];
-            
             let allEliteTargets = dataArray.filter(emp => emp.isEliteTarget);
             renderEliteCohortButtons(allEliteTargets);
             let eliteTargets = allEliteTargets.filter(matchesEliteCohort);
-            
-            let finishedC1 = 0, finishedC2 = 0, finishedC3 = 0, finishedBoth = 0;
-
-            eliteTargets.forEach(emp => {
-                let hasC1 = c1Key ? emp.eliteProgress[c1Key] : false;
-                let hasC2 = c2Key ? emp.eliteProgress[c2Key] : false;
-                let hasC3 = c3Key ? emp.eliteProgress[c3Key] : false;
-                
-                if (hasC1) finishedC1++;
-                if (hasC2) finishedC2++;
-                if (hasC3) finishedC3++;
-                if (hasC1 && hasC2 && hasC3) finishedBoth++;
-            });
+            const courseFinishCounts = eliteCoursesKeys.map(course => eliteTargets.filter(emp => emp.eliteProgress && emp.eliteProgress[course]).length);
+            const finishedBoth = eliteTargets.filter(emp => getEliteCompletedCount(emp) === ELITE_TARGET_COUNT).length;
 
             const statTotalEl = document.getElementById('eliteStatTotal'); if (statTotalEl) statTotalEl.innerText = eliteTargets.length;
-            const statC1El = document.getElementById('eliteStatC1'); if (statC1El) statC1El.innerText = finishedC1;
-            const statC2El = document.getElementById('eliteStatC2'); if (statC2El) statC2El.innerText = finishedC2;
-            const statC3El = document.getElementById('eliteStatC3'); if (statC3El) statC3El.innerText = finishedC3;
+            eliteCoursesKeys.forEach((course, index) => {
+                const statElement = document.getElementById(`eliteStatC${index + 1}`);
+                if (statElement) statElement.innerText = courseFinishCounts[index] || 0;
+                const headElement = document.getElementById(`eliteCourse${index + 1}Head`);
+                if (headElement) headElement.innerText = course;
+                const offHeadElement = document.getElementById(`eliteOffCourse${index + 1}Head`);
+                if (offHeadElement) offHeadElement.innerText = course;
+            });
             const statBothEl = document.getElementById('eliteStatBoth'); if (statBothEl) statBothEl.innerText = finishedBoth;
 
             let bodyHtml = eliteTargets.map(emp => {
-                let hasC1 = c1Key ? emp.eliteProgress[c1Key] : false;
-                let hasC2 = c2Key ? emp.eliteProgress[c2Key] : false;
-                let hasC3 = c3Key ? emp.eliteProgress[c3Key] : false;
-                let completedCount = (hasC1 ? 1 : 0) + (hasC2 ? 1 : 0) + (hasC3 ? 1 : 0);
+                const completedCount = getEliteCompletedCount(emp);
                 
                 let statusHtml = '';
-                if (completedCount === 3) statusHtml = `<span class="bg-emerald-100 text-emerald-700 font-bold px-3 py-1 rounded-full text-xs"><i class="fas fa-check-double ml-1"></i> استكمل بالكامل (3)</span>`;
+                if (completedCount === ELITE_TARGET_COUNT) statusHtml = `<span class="bg-emerald-100 text-emerald-700 font-bold px-3 py-1 rounded-full text-xs"><i class="fas fa-check-double ml-1"></i> استكمل بالكامل (${ELITE_TARGET_COUNT})</span>`;
                 else if (completedCount > 0) statusHtml = `<span class="bg-orange-100 text-orange-700 font-bold px-3 py-1 rounded-full text-xs"><i class="fas fa-exclamation-circle ml-1"></i> جزء (${completedCount})</span>`;
                 else statusHtml = `<span class="bg-red-100 text-red-700 font-bold px-3 py-1 rounded-full text-xs"><i class="fas fa-times-circle ml-1"></i> لم يستكمل (0)</span>`;
+
+                const courseCells = eliteCoursesKeys.map(course => {
+                    const done = Boolean(emp.eliteProgress && emp.eliteProgress[course]);
+                    return `<td class="px-5 py-4 text-center font-bold ${done ? 'text-emerald-500' : 'text-slate-300'}">${done ? '<i class="fas fa-check text-lg"></i>' : '-'}</td>`;
+                }).join('');
 
                 return `
                     <tr class="hover:bg-yellow-50 transition border-b border-slate-100">
@@ -5230,16 +5511,14 @@
                         <td class="px-5 py-4"><span class="px-2 py-1 bg-slate-100 rounded border border-slate-200 text-xs whitespace-nowrap">${emp.region}</span></td>
                         <td class="px-5 py-4 text-xs text-slate-600 whitespace-nowrap">${emp.supervisor || 'بدون مشرف'}</td>
                         <td class="px-5 py-4"><span class="px-2 py-1 rounded-full text-xs font-bold whitespace-nowrap ${emp.eliteGroup === 'best100' ? 'bg-amber-100 text-amber-800' : 'bg-yellow-100 text-yellow-800'}">${getEliteCohortLabel(emp)}</span></td>
-                        <td class="px-5 py-4 font-bold ${hasC1 ? 'text-emerald-500' : 'text-slate-300'}">${hasC1 ? '<i class="fas fa-check text-lg"></i>' : '-'}</td>
-                        <td class="px-5 py-4 font-bold ${hasC2 ? 'text-emerald-500' : 'text-slate-300'}">${hasC2 ? '<i class="fas fa-check text-lg"></i>' : '-'}</td>
-                        <td class="px-5 py-4 font-bold ${hasC3 ? 'text-emerald-500' : 'text-slate-300'}">${hasC3 ? '<i class="fas fa-check text-lg"></i>' : '-'}</td>
+                        ${courseCells}
                         <td class="px-5 py-4">${statusHtml}</td>
                     </tr>
                 `;
             }).join('');
             
             if (eliteTargets.length === 0) {
-                bodyHtml = `<tr><td colspan="9" class="text-center py-8 text-slate-500">لا توجد بيانات في الفئة والفلتر الحاليين.</td></tr>`;
+                bodyHtml = `<tr><td colspan="${6 + ELITE_TARGET_COUNT}" class="text-center py-8 text-slate-500">لا توجد بيانات في الفئة والفلتر الحاليين.</td></tr>`;
             }
             
             const bodyEl = document.getElementById('eliteTableBody'); if (bodyEl) bodyEl.innerHTML = bodyHtml;
@@ -5259,9 +5538,10 @@
             let combinedOffTargets = [...offTargetExcluded, ...offTargetMissing];
             
             let offBodyHtml = combinedOffTargets.map(emp => {
-                let hasC1 = c1Key ? emp.eliteProgress[c1Key] : false;
-                let hasC2 = c2Key ? emp.eliteProgress[c2Key] : false;
-                let hasC3 = c3Key ? emp.eliteProgress[c3Key] : false;
+                const courseCells = eliteCoursesKeys.map(course => {
+                    const done = Boolean(emp.eliteProgress && emp.eliteProgress[course]);
+                    return `<td class="px-5 py-4 text-center font-bold ${done ? 'text-emerald-500' : 'text-slate-300'}">${done ? '<i class="fas fa-check text-lg"></i>' : '-'}</td>`;
+                }).join('');
 
                 return `
                     <tr class="hover:bg-red-50 transition border-b border-red-100">
@@ -5270,15 +5550,13 @@
                         <td class="px-5 py-4"><span class="px-2 py-1 bg-red-100 text-red-800 rounded text-xs font-bold whitespace-nowrap">${emp.offReason}</span></td>
                         <td class="px-5 py-4 text-xs text-slate-600 whitespace-nowrap">${emp.supervisor || 'غير متوفر'}</td>
                         <td class="px-5 py-4"><span class="px-2 py-1 rounded-full text-xs font-bold whitespace-nowrap ${emp.eliteGroup === 'best100' ? 'bg-amber-100 text-amber-800' : 'bg-yellow-100 text-yellow-800'}">${getEliteCohortLabel(emp)}</span></td>
-                        <td class="px-5 py-4 font-bold ${hasC1 ? 'text-emerald-500' : 'text-slate-300'}">${hasC1 ? '<i class="fas fa-check text-lg"></i>' : '-'}</td>
-                        <td class="px-5 py-4 font-bold ${hasC2 ? 'text-emerald-500' : 'text-slate-300'}">${hasC2 ? '<i class="fas fa-check text-lg"></i>' : '-'}</td>
-                        <td class="px-5 py-4 font-bold ${hasC3 ? 'text-emerald-500' : 'text-slate-300'}">${hasC3 ? '<i class="fas fa-check text-lg"></i>' : '-'}</td>
+                        ${courseCells}
                     </tr>
                 `;
             }).join('');
 
             if (combinedOffTargets.length === 0) {
-                offBodyHtml = `<tr><td colspan="8" class="text-center py-8 text-slate-500">لا يوجد مستبعدون أو مفقودون في الفئة الحالية.</td></tr>`;
+                offBodyHtml = `<tr><td colspan="${5 + ELITE_TARGET_COUNT}" class="text-center py-8 text-slate-500">لا يوجد مستبعدون أو مفقودون في الفئة الحالية.</td></tr>`;
             }
 
             const offBodyEl = document.getElementById('eliteOffTargetTableBody'); if (offBodyEl) offBodyEl.innerHTML = offBodyHtml;
@@ -5564,7 +5842,7 @@
 
             let regionStats = {};
             dataArray.forEach(emp => {
-                if (globalData.excludedRegions.has(emp.region)) return;
+                if (!isEmployeeVisibleInCurrentRegion(emp)) return;
                 if (!regionStats[emp.region]) regionStats[emp.region] = { total: 0, oldOverTarget: 0, newOverTarget: 0 };
                 let stats = regionStats[emp.region];
                 stats.total++;
@@ -5620,7 +5898,7 @@
             nonCertCoursesKeys.forEach(c => analysis.nonCerts[c] = { totalTaken: 0, p100: 0, p50to99: 0, pLess50: 0, p0: 0, pNull: 0 });
 
             globalData.allActive.forEach(emp => {
-                if (globalData.excludedRegions.has(emp.region)) return; 
+                if (!isEmployeeVisibleInCurrentRegion(emp)) return;
                 analysis.active++;
                 
                 if (emp.tenureMonths >= 0) {
@@ -5654,8 +5932,8 @@
             });
 
             document.getElementById('statActive').innerText = analysis.active;
-            document.getElementById('statExcluded').innerText = globalData.excludedEmployees.length;
-            document.getElementById('statMissing').innerText = globalData.missingEmployees.length;
+            document.getElementById('statExcluded').innerText = globalData.excludedEmployees.filter(isEmployeeVisibleInCurrentRegion).length;
+            document.getElementById('statMissing').innerText = globalData.missingEmployees.filter(isEmployeeVisibleInCurrentRegion).length;
             document.getElementById('statLess3').innerText = analysis.tenure.less3;
             document.getElementById('stat3to2').innerText = analysis.tenure.between3and24;
             document.getElementById('statOver2').innerText = analysis.tenure.over24;
@@ -5770,19 +6048,12 @@
                 (!selectedRegion || e.region === selectedRegion)
             );
             
-            let c1Key = eliteCoursesKeys[0] || "دورة 1"; 
-            let c2Key = eliteCoursesKeys[1] || "دورة 2";
-            let c3Key = eliteCoursesKeys[2] || "دورة 3";
-
-            let aoa = [["الرقم الوظيفي", "الاسم", "الإيميل", "المشرف", "مدير الإقليم", "الإقليم", "الفئة", c1Key, c2Key, c3Key, "مجموع المستكمل", "الحالة الوصفية"]];
+            let aoa = [["الرقم الوظيفي", "الاسم", "الإيميل", "المشرف", "مدير الإقليم", "الإقليم", "الفئة", ...eliteCoursesKeys, "مجموع المستكمل", "المستهدف", "الحالة الوصفية", "KPI النخبة"]];
             
             validActive.forEach(emp => {
-                let hasC1 = eliteCoursesKeys[0] ? emp.eliteProgress[eliteCoursesKeys[0]] : false;
-                let hasC2 = eliteCoursesKeys[1] ? emp.eliteProgress[eliteCoursesKeys[1]] : false;
-                let hasC3 = eliteCoursesKeys[2] ? emp.eliteProgress[eliteCoursesKeys[2]] : false;
-                let count = (hasC1 ? 1 : 0) + (hasC2 ? 1 : 0) + (hasC3 ? 1 : 0);
-                let desc = count === 3 ? "استكمل بالكامل" : (count > 0 ? "جزء" : "لم يستكمل");
-                aoa.push([emp.id, emp.name, emp.email || "", emp.supervisor || "بدون مشرف", emp.manager || "", emp.region, getEliteCohortLabel(emp), hasC1 ? "نعم" : "لا", hasC2 ? "نعم" : "لا", hasC3 ? "نعم" : "لا", count, desc]);
+                const count = getEliteCompletedCount(emp);
+                const desc = count === ELITE_TARGET_COUNT ? "استكمل بالكامل" : (count > 0 ? "جزء" : "لم يستكمل");
+                aoa.push([emp.id, emp.name, emp.email || "", emp.supervisor || "بدون مشرف", emp.manager || "", emp.region, getEliteCohortLabel(emp), ...eliteCoursesKeys.map(course => emp.eliteProgress && emp.eliteProgress[course] ? "نعم" : "لا"), count, ELITE_TARGET_COUNT, desc, count === ELITE_TARGET_COUNT ? "100%" : "0%"]);
             });
             let ws = XLSX.utils.aoa_to_sheet(aoa);
             applyExcelStyles(ws);
@@ -5932,6 +6203,17 @@
             kpi: 'KPI'
         });
 
+        const GULF_EXECUTIVE_SHEETS = Object.freeze({
+            home: 'الرئيسية',
+            employees: 'الموظفون',
+            progress: 'تقدم الدورات',
+            path: 'مسار التدريب',
+            analysis: 'التحليل والإحصاء',
+            kpi: 'KPI',
+            elite: 'النخبة',
+            bot: 'Back on Track'
+        });
+
         const EXECUTIVE_COURSE_NAMES_AR = Object.freeze({
             '1+2 Offer': 'عرض 1+2',
             'delivery order software': 'تطبيقات التوصيل',
@@ -5944,6 +6226,7 @@
             "Sales Scenarios for Deraah Oud's Top Products": 'سيناريوهات بيع أبرز منتجات عود درعه',
             "Sales Scenarios for DERAAH's Top Products": 'سيناريوهات بيع أبرز منتجات درعه',
             'Time Management and Organization': 'إدارة الوقت والتنظيم',
+            'policies ( elite )': 'السياسات (النخبة)',
             'Communication Skills ( BOT)': 'مهارات التواصل (BOT)',
             'Advanced Sales Skills ( BOT)': 'مهارات البيع المتقدمة (BOT)',
             'Customer EX ( BOT)': 'تجربة العملاء (BOT)',
@@ -6235,7 +6518,8 @@
         }
 
         function buildExecutiveAnalysisWorksheet(region, employees, courseLanguage = 'ar') {
-            const certCourses = trainingPathDef.filter(course => course.hasCert);
+            const trackKey = employees.length ? getEmployeeAcademyTrack(employees[0]) : getEmployeeAcademyTrack({ region });
+            const certCourses = getAcademyTrackCourses(trackKey);
             const total = employees.length;
             const totalCertificates = employees.reduce((sum, emp) => sum + (Number(emp.totalCerts) || 0), 0);
             const achieved = employees.filter(emp => emp.totalCerts >= targetCertsCount).length;
@@ -6261,7 +6545,7 @@
                 ['رقم الدورة', 'اسم الدورة', 'الحاصلون على الشهادة', 'غير الحاصلين', 'نسبة الإنجاز']
             ];
             certCourses.forEach(course => {
-                const completed = employees.filter(emp => emp.pathProgress && emp.pathProgress[course.en]).length;
+                const completed = employees.filter(emp => isAcademyTrackCourseCompleted(emp, course, trackKey)).length;
                 aoa.push([course.certId, getExecutiveCourseDisplayName(course, courseLanguage), completed, Math.max(0, total - completed), percent(completed)]);
             });
 
@@ -6312,7 +6596,7 @@
                 if (emp.tenureMonths >= 0 && emp.tenureMonths < 3) addDetail(emp, 'أقل من 3 شهور', emp.totalCerts, less3KpiTarget, emp.totalCerts >= less3KpiTarget ? 100 : 0);
                 if (emp.isEliteTarget) {
                     const completed = getEliteCompletedCount(emp);
-                    addDetail(emp, 'النخبة', completed, 3, completed === 3 ? 100 : 0);
+                    addDetail(emp, 'النخبة', completed, ELITE_TARGET_COUNT, completed === ELITE_TARGET_COUNT ? 100 : 0);
                 }
                 if (emp.tenureMonths >= 3) addDetail(emp, '3 شهور فأكثر', emp.totalCerts, targetCertsCount, emp.totalCerts >= targetCertsCount ? 100 : 0);
                 const improvement = getBotImprovementSummary(emp);
@@ -6364,7 +6648,50 @@
             }
         }
 
-        async function addExecutiveShapeNavigation(wb) {
+        function escapeExecutiveXml(value) {
+            return cleanString(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&apos;');
+        }
+
+        async function customizeExecutiveHomeDrawing(templateZip, outputZip, homeButtons) {
+            if (!Array.isArray(homeButtons) || !homeButtons.length) return;
+            const drawingPath = 'xl/drawings/drawing1.xml';
+            const drawingFile = templateZip.file(drawingPath);
+            if (!drawingFile) throw new Error('Home navigation drawing is missing');
+            const drawingXml = await drawingFile.async('string');
+            const anchorMatches = Array.from(drawingXml.matchAll(/<xdr:twoCellAnchor>[\s\S]*?<\/xdr:twoCellAnchor>/g));
+            if (anchorMatches.length < homeButtons.length) throw new Error('Home navigation template does not have enough buttons');
+
+            const customizedAnchors = homeButtons.map((button, index) => {
+                const relationId = `rId${index + 1}`;
+                const label = escapeExecutiveXml(button.label);
+                const tooltip = escapeExecutiveXml(`فتح ${button.sheet}`);
+                return anchorMatches[index][0]
+                    .replace(/\bname="[^"]*"/, `name="btnGulfNavigation${index + 1}"`)
+                    .replace(/<a:hlinkClick\b[^>]*\/>/, `<a:hlinkClick xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:id="${relationId}" tooltip="${tooltip}"/>`)
+                    .replace(/<a:t>[\s\S]*?<\/a:t>/, `<a:t>${label}</a:t>`);
+            });
+            const firstAnchorStart = anchorMatches[0].index;
+            const lastAnchor = anchorMatches[anchorMatches.length - 1];
+            const lastAnchorEnd = lastAnchor.index + lastAnchor[0].length;
+            outputZip.file(drawingPath, `${drawingXml.slice(0, firstAnchorStart)}${customizedAnchors.join('')}${drawingXml.slice(lastAnchorEnd)}`);
+
+            const relationPath = 'xl/drawings/_rels/drawing1.xml.rels';
+            const relationFile = templateZip.file(relationPath);
+            if (!relationFile) throw new Error('Home navigation relationships are missing');
+            const relationXml = await relationFile.async('string');
+            const relationshipType = (relationXml.match(/\bType=["']([^"']*\/hyperlink)["']/i) || [])[1]
+                || 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink';
+            const rootOpen = (relationXml.match(/^[\s\S]*?<Relationships\b[^>]*>/i) || ['<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'])[0];
+            const relationships = homeButtons.map((button, index) => `<Relationship Id="rId${index + 1}" Type="${relationshipType}" Target="#&apos;${escapeExecutiveXml(button.sheet)}&apos;!A1"/>`).join('');
+            outputZip.file(relationPath, `${rootOpen}${relationships}</Relationships>`);
+        }
+
+        async function addExecutiveShapeNavigation(wb, options = {}) {
             if (typeof JSZip === 'undefined') throw new Error('JSZip is not available');
 
             const workbookBytes = XLSX.write(wb, { bookType: 'xlsx', type: 'array', cellStyles: true });
@@ -6373,9 +6700,18 @@
                 JSZip.loadAsync(base64ToUint8Array(REGION_REPORT_NAVIGATION_TEMPLATE_BASE64))
             ]);
 
+            const drawingSheetIndexes = new Set(options.drawingSheetIndexes || Array.from({ length: wb.SheetNames.length }, (_, index) => index + 1));
             await copyExecutiveTemplateFolder(templateZip, outputZip, 'xl/drawings/');
+            if (options.drawingSheetIndexes) {
+                Object.keys(outputZip.files).filter(path => path.startsWith('xl/drawings/')).forEach(path => {
+                    const drawingIndex = Number((path.match(/drawing(\d+)\.xml/i) || [])[1]);
+                    if (drawingIndex && !drawingSheetIndexes.has(drawingIndex)) outputZip.remove(path);
+                });
+            }
+            if (options.homeButtons) await customizeExecutiveHomeDrawing(templateZip, outputZip, options.homeButtons);
 
-            for (let index = 1; index <= 9; index++) {
+            for (let index = 1; index <= wb.SheetNames.length; index++) {
+                if (!drawingSheetIndexes.has(index)) continue;
                 const templateRelPath = `xl/worksheets/_rels/sheet${index}.xml.rels`;
                 const templateRelFile = templateZip.file(templateRelPath);
                 if (!templateRelFile) continue;
@@ -6400,7 +6736,9 @@
                 outputZip.file(outputRelPath, outputRelXml);
 
                 const sheetPath = `xl/worksheets/sheet${index}.xml`;
-                let sheetXml = await outputZip.file(sheetPath).async('string');
+                const outputSheetFile = outputZip.file(sheetPath);
+                if (!outputSheetFile) continue;
+                let sheetXml = await outputSheetFile.async('string');
                 if (!/\bxmlns:r=/.test(sheetXml)) {
                     sheetXml = sheetXml.replace('<worksheet ', '<worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" ');
                 }
@@ -6411,7 +6749,12 @@
             const templateContentTypes = await templateZip.file('[Content_Types].xml').async('string');
             let contentTypes = await outputZip.file('[Content_Types].xml').async('string');
             const templateOverrides = Array.from(templateContentTypes.matchAll(/<Override\b[^>]*\/>/g), match => match[0])
-                .filter(tag => /PartName=["']\/xl\/drawings\//i.test(tag));
+                .filter(tag => {
+                    if (!/PartName=["']\/xl\/drawings\//i.test(tag)) return false;
+                    if (!options.drawingSheetIndexes) return true;
+                    const drawingIndex = Number((tag.match(/drawing(\d+)\.xml/i) || [])[1]);
+                    return drawingIndex && drawingSheetIndexes.has(drawingIndex);
+                });
             for (const overrideTag of templateOverrides) {
                 const partNameMatch = overrideTag.match(/\bPartName=["']([^"']+)["']/i);
                 if (partNameMatch && !contentTypes.includes(`PartName="${partNameMatch[1]}"`) && !contentTypes.includes(`PartName='${partNameMatch[1]}'`)) {
@@ -6421,7 +6764,7 @@
             outputZip.file('[Content_Types].xml', contentTypes);
 
             const templateAppProps = templateZip.file('docProps/app.xml');
-            if (templateAppProps) outputZip.file('docProps/app.xml', await templateAppProps.async('uint8array'));
+            if (options.copyAppProps !== false && templateAppProps) outputZip.file('docProps/app.xml', await templateAppProps.async('uint8array'));
 
             return outputZip.generateAsync({
                 type: 'blob',
@@ -6436,7 +6779,7 @@
                 alert('اختر إقليماً محدداً من الفلتر المركزي أولاً.');
                 return;
             }
-            const hasEmployees = globalData.allActive.some(emp => cleanString(emp.region) === region);
+            const hasEmployees = globalData.allActive.some(emp => getEmployeeAcademyTrack(emp) === 'standard' && cleanString(emp.region) === region);
             if (!hasEmployees) {
                 alert('لا توجد بيانات موظفين نشطين في الإقليم المختار.');
                 return;
@@ -6464,7 +6807,7 @@
             }
 
             const employees = globalData.allActive
-                .filter(emp => cleanString(emp.region) === region)
+                .filter(emp => getEmployeeAcademyTrack(emp) === 'standard' && cleanString(emp.region) === region)
                 .sort((a, b) => cleanString(a.supervisor).localeCompare(cleanString(b.supervisor), 'ar') || cleanString(a.name).localeCompare(cleanString(b.name), 'ar'));
             if (!employees.length) {
                 alert('لا توجد بيانات موظفين نشطين في الإقليم المختار.');
@@ -6489,13 +6832,15 @@
                 return [emp.id, emp.name, emp.supervisor || 'بدون مشرف', emp.manager || region, completed, ...progressValues];
             });
 
-            const certCourses = trainingPathDef.filter(course => course.hasCert);
-            const pathHeaders = ['الرقم الوظيفي', 'الاسم', 'المشرف', 'مدير الإقليم', 'المسار الحالي (نقطة التوقف)', 'إجمالي الشهادات', ...certCourses.map(course => `${course.certId}- ${getExecutiveCourseDisplayName(course, courseLanguage)}`)];
+            const academyTrackKey = getEmployeeAcademyTrack({ region });
+            const certCourses = getAcademyTrackCourses(academyTrackKey);
+            const pathHeaders = ['الرقم الوظيفي', 'الاسم', 'المشرف', 'مدير الإقليم', 'المسار الحالي (نقطة التوقف)', 'إجمالي الشهادات', 'المنجز من المسار', ...certCourses.map(course => `${course.certId}- ${getExecutiveCourseDisplayName(course, courseLanguage)}`)];
             const pathRows = employees.map(emp => {
-                const stopper = certCourses.find(course => !emp.pathProgress || !emp.pathProgress[course.en]);
+                const trackSummary = getAcademyTrackSummary(emp, academyTrackKey);
+                const stopper = trackSummary.stopper;
                 const stopperName = stopper ? `${stopper.certId}. ${getExecutiveCourseDisplayName(stopper, courseLanguage)}` : 'أتم المسار بالكامل';
-                return [emp.id, emp.name, emp.supervisor || 'بدون مشرف', emp.manager || region, stopperName, emp.totalCerts, ...certCourses.map(course => {
-                    const done = emp.pathProgress && emp.pathProgress[course.en];
+                return [emp.id, emp.name, emp.supervisor || 'بدون مشرف', emp.manager || region, stopperName, emp.totalCerts, `${trackSummary.completedCount} / ${trackSummary.totalCount}`, ...certCourses.map(course => {
+                    const done = isAcademyTrackCourseCompleted(emp, course, academyTrackKey);
                     if (done) return 'منجز';
                     return stopper && stopper.en === course.en ? 'واقف عليها' : 'لم يصلها';
                 })];
@@ -6505,7 +6850,7 @@
             const eliteHeaders = ['الرقم الوظيفي', 'الاسم', 'المشرف', 'مدير الإقليم', 'الفئة', ...eliteCoursesKeys.map(course => getExecutiveCourseDisplayName(course, courseLanguage)), 'عدد الدورات المكتملة', 'الحالة', 'KPI النخبة'];
             const eliteRows = eliteEmployees.map(emp => {
                 const completed = getEliteCompletedCount(emp);
-                return [emp.id, emp.name, emp.supervisor || 'بدون مشرف', emp.manager || region, getEliteCohortLabel(emp), ...eliteCoursesKeys.map(course => emp.eliteProgress && emp.eliteProgress[course] ? 'منجز' : 'غير منجز'), completed, completed === 3 ? 'مكتمل' : 'غير مكتمل', completed === 3 ? '100%' : '0%'];
+                return [emp.id, emp.name, emp.supervisor || 'بدون مشرف', emp.manager || region, getEliteCohortLabel(emp), ...eliteCoursesKeys.map(course => emp.eliteProgress && emp.eliteProgress[course] ? 'منجز' : 'غير منجز'), completed, completed === ELITE_TARGET_COUNT ? 'مكتمل' : 'غير مكتمل', completed === ELITE_TARGET_COUNT ? '100%' : '0%'];
             });
 
             const [rawBotHeaders, ...allBotRows] = buildBotCombinedRows();
@@ -6534,7 +6879,7 @@
             XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.less3, region, commonEmployeeHeaders, makeTenureRows(less3Employees, less3KpiTarget), { colWidths: [15, 28, 28, 28, 24, 18, 18, 16, 18, 14], tabColor: 'EA580C' }), CENTRAL_EXECUTIVE_SHEETS.less3);
             XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.more3, region, commonEmployeeHeaders, makeTenureRows(more3Employees, targetCertsCount), { colWidths: [15, 28, 28, 28, 24, 18, 18, 16, 18, 14], tabColor: '2563EB' }), CENTRAL_EXECUTIVE_SHEETS.more3);
             XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.nonCert, region, nonCertHeaders, nonCertRows, { colWidths: [15, 28, 28, 24, 20, ...nonCertCoursesKeys.map(() => 30)], tabColor: '7C3AED' }), CENTRAL_EXECUTIVE_SHEETS.nonCert);
-            XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.path, region, pathHeaders, pathRows, { colWidths: [15, 28, 28, 24, 38, 18, ...certCourses.map(() => 30)], tabColor: EXECUTIVE_EXCEL_COLORS.amber }), CENTRAL_EXECUTIVE_SHEETS.path);
+            XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.path, region, pathHeaders, pathRows, { colWidths: [15, 28, 28, 24, 38, 18, 18, ...certCourses.map(() => 30)], tabColor: EXECUTIVE_EXCEL_COLORS.amber }), CENTRAL_EXECUTIVE_SHEETS.path);
             XLSX.utils.book_append_sheet(wb, buildExecutiveAnalysisWorksheet(region, employees, courseLanguage), CENTRAL_EXECUTIVE_SHEETS.analysis);
             XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.elite, region, eliteHeaders, eliteRows, { colWidths: [15, 28, 28, 24, 20, ...eliteCoursesKeys.map(() => 34), 22, 20, 16], tabColor: 'CA8A04' }), CENTRAL_EXECUTIVE_SHEETS.elite);
             XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.bot, region, botHeaders, botRows, { colWidths: [15, 28, 28, 22, 24, 28, 18, 28, ...botCoursesKeys.map(() => 34), 22, 22, 42], tabColor: '7C3AED' }), CENTRAL_EXECUTIVE_SHEETS.bot);
@@ -6634,7 +6979,7 @@
         }
 
         function exportRegion(regionName) {
-            let employees = globalData.allActive.filter(e => e.region === regionName);
+            let employees = globalData.allActive.filter(e => getEmployeeAcademyTrack(e) === 'standard' && e.region === regionName);
             if (!employees.length) return;
 
             let wb = XLSX.utils.book_new();
@@ -6669,6 +7014,659 @@
             XLSX.writeFile(wb, `تقرير_${regionName}.xlsx`);
         }
 
+        const SPECIAL_ACADEMY_TRACKS = Object.freeze({
+            gulf: {
+                prefix: 'gulfTrack',
+                title: 'إقليم الخليج',
+                employeeLabel: 'موظف خليج',
+                fileName: 'تقرير_إقليم_الخليج.xlsx'
+            },
+            labeaute: {
+                prefix: 'laBeauteTrack',
+                title: 'مسار La beaute',
+                employeeLabel: 'موظف La beaute',
+                fileName: 'تقرير_مسار_La_beaute.xlsx'
+            }
+        });
+
+        function getSpecialTrackEmployees(trackKey) {
+            return globalData.allActive.filter(employee => getEmployeeAcademyTrack(employee) === trackKey);
+        }
+
+        function getFilteredSpecialTrackEmployees(trackKey) {
+            const config = SPECIAL_ACADEMY_TRACKS[trackKey];
+            if (!config) return [];
+            const searchElement = document.getElementById(`${config.prefix}Search`);
+            const search = cleanString(searchElement ? searchElement.value : '').toLowerCase();
+            return getSpecialTrackEmployees(trackKey).filter(employee => {
+                if (!search) return true;
+                return cleanString(employee.name).toLowerCase().includes(search)
+                    || cleanString(employee.id).toLowerCase().includes(search)
+                    || cleanString(employee.supervisor).toLowerCase().includes(search);
+            });
+        }
+
+        function renderSpecialAcademyTrack(trackKey) {
+            const config = SPECIAL_ACADEMY_TRACKS[trackKey];
+            if (!config) return;
+            const courses = getAcademyTrackCourses(trackKey);
+            const allEmployees = getSpecialTrackEmployees(trackKey);
+            const employees = getFilteredSpecialTrackEmployees(trackKey);
+            const summaries = allEmployees.map(employee => getAcademyTrackSummary(employee, trackKey));
+            const completedCount = summaries.filter(summary => summary.isComplete).length;
+            const average = summaries.length ? roundKpiValue(averageNumber(summaries.map(summary => summary.score))) : 0;
+
+            const setTrackText = (suffix, value) => {
+                const element = document.getElementById(`${config.prefix}${suffix}`);
+                if (element) element.innerText = value;
+            };
+            setTrackText('EmployeeCount', allEmployees.length);
+            setTrackText('CourseCount', courses.length);
+            setTrackText('CompletedCount', completedCount);
+            setTrackText('Average', `${formatKpiValue(average)}%`);
+
+            const head = document.getElementById(`${config.prefix}TableHead`);
+            if (head) {
+                head.innerHTML = `<tr>
+                    <th class="px-4 py-4 sticky-id">الرقم الوظيفي</th>
+                    <th class="px-4 py-4 sticky-name">الاسم</th>
+                    <th class="px-4 py-4">المشرف</th>
+                    <th class="px-4 py-4">تاريخ التعيين</th>
+                    <th class="px-4 py-4">نقطة الوقوف</th>
+                    <th class="px-4 py-4">المنجز</th>
+                    <th class="px-4 py-4">النسبة</th>
+                    ${courses.map(course => `<th class="px-3 py-4 text-xs" title="${safeBotText(course.en)}">${course.certId}. ${safeBotText(course.ar)}</th>`).join('')}
+                </tr>`;
+            }
+
+            const body = document.getElementById(`${config.prefix}TableBody`);
+            if (body) {
+                body.innerHTML = employees.length ? employees.map(employee => {
+                    const summary = getAcademyTrackSummary(employee, trackKey);
+                    const stopperName = summary.stopper ? `${summary.stopper.certId}. ${summary.stopper.ar}` : 'أتم المسار بالكامل';
+                    return `<tr class="hover:bg-slate-50 transition">
+                        <td class="px-4 py-3 sticky-id font-bold text-slate-700">${safeBotText(employee.id)}</td>
+                        <td class="px-4 py-3 sticky-name font-bold text-slate-800" title="${safeBotText(employee.name)}">${safeBotText(employee.name)}</td>
+                        <td class="px-4 py-3 text-slate-600">${safeBotText(employee.supervisor || 'بدون مشرف')}</td>
+                        <td class="px-4 py-3 text-xs text-slate-500" dir="ltr">${safeBotText(formatDateDisplay(employee.hireDate) || '-')}</td>
+                        <td class="px-4 py-3 font-bold ${summary.stopper ? 'text-orange-600' : 'text-emerald-600'}">${safeBotText(stopperName)}</td>
+                        <td class="px-4 py-3 text-center font-extrabold text-indigo-700">${summary.completedCount} / ${summary.totalCount}</td>
+                        <td class="px-4 py-3 text-center"><span class="inline-flex rounded-full px-3 py-1 font-extrabold ${summary.score === 100 ? 'bg-emerald-100 text-emerald-800' : 'bg-indigo-100 text-indigo-800'}">${formatKpiValue(summary.score)}%</span></td>
+                        ${courses.map(course => {
+                            const done = isAcademyTrackCourseCompleted(employee, course, trackKey);
+                            const isStopper = summary.stopper && summary.stopper.en === course.en;
+                            if (done) return '<td class="px-3 py-3 text-center bg-emerald-50 text-emerald-600 font-extrabold text-lg">✔</td>';
+                            if (isStopper) return '<td class="px-3 py-3 text-center bg-orange-50 text-orange-500 font-extrabold text-2xl">•</td>';
+                            return '<td class="px-3 py-3 text-center text-slate-300 font-bold">✕</td>';
+                        }).join('')}
+                    </tr>`;
+                }).join('') : `<tr><td colspan="${7 + courses.length}" class="py-10 text-center text-slate-500">لا توجد بيانات مطابقة للبحث.</td></tr>`;
+            }
+
+            const statsBody = document.getElementById(`${config.prefix}CourseStatsBody`);
+            if (statsBody) {
+                statsBody.innerHTML = courses.map(course => {
+                    const done = allEmployees.filter(employee => isAcademyTrackCourseCompleted(employee, course, trackKey)).length;
+                    const percentage = allEmployees.length ? roundKpiValue((done / allEmployees.length) * 100) : 0;
+                    return `<tr class="hover:bg-slate-50"><td class="px-5 py-3 font-bold">${course.certId}</td><td class="px-5 py-3"><span class="font-bold text-slate-800">${safeBotText(course.ar)}</span><span class="block text-xs text-slate-500" dir="ltr">${safeBotText(course.en)}</span></td><td class="px-5 py-3 font-extrabold text-emerald-700">${done}</td><td class="px-5 py-3 font-extrabold text-orange-700">${allEmployees.length - done}</td><td class="px-5 py-3 font-extrabold text-indigo-700">${formatKpiValue(percentage)}%</td></tr>`;
+                }).join('');
+            }
+        }
+
+        function exportSpecialAcademyTrack(trackKey) {
+            const config = SPECIAL_ACADEMY_TRACKS[trackKey];
+            if (!config) return;
+            if (trackKey === 'gulf') {
+                exportGulfRegionWorkbook();
+                return;
+            }
+            if (trackKey === 'labeaute') {
+                exportLaBeauteSnapshot();
+                return;
+            }
+            const employees = getFilteredSpecialTrackEmployees(trackKey);
+            const courses = getAcademyTrackCourses(trackKey);
+            if (!employees.length) return;
+
+            const pathRows = [["الرقم الوظيفي", "الاسم", "المشرف", "مدير الإقليم", "الإقليم", "تاريخ التعيين", "نقطة الوقوف", "الدورات المنجزة", "إجمالي دورات المسار", "نسبة الإنجاز", ...courses.map(course => `${course.certId}. ${course.ar} — ${course.en}`)]];
+            employees.forEach(employee => {
+                const summary = getAcademyTrackSummary(employee, trackKey);
+                pathRows.push([
+                    employee.id,
+                    employee.name,
+                    employee.supervisor || 'بدون مشرف',
+                    employee.manager || '',
+                    employee.region || '',
+                    formatDateDisplay(employee.hireDate),
+                    summary.stopper ? `${summary.stopper.certId}. ${summary.stopper.ar}` : 'أتم المسار بالكامل',
+                    summary.completedCount,
+                    summary.totalCount,
+                    `${formatKpiValue(summary.score)}%`,
+                    ...courses.map(course => {
+                        if (isAcademyTrackCourseCompleted(employee, course, trackKey)) return 'منجز';
+                        return summary.stopper && summary.stopper.en === course.en ? 'واقف عليها' : 'لم يصلها';
+                    })
+                ]);
+            });
+
+            const allEmployees = getSpecialTrackEmployees(trackKey);
+            const statsRows = [["ترتيب الدورة", "اسم الدورة بالعربي", "Course name", "إجمالي الموظفين", "المنجز", "المتبقي", "نسبة الإنجاز"]];
+            courses.forEach(course => {
+                const done = allEmployees.filter(employee => isAcademyTrackCourseCompleted(employee, course, trackKey)).length;
+                statsRows.push([course.certId, course.ar, course.en, allEmployees.length, done, allEmployees.length - done, `${formatKpiValue(allEmployees.length ? (done / allEmployees.length) * 100 : 0)}%`]);
+            });
+
+            const workbook = XLSX.utils.book_new();
+            const pathSheet = XLSX.utils.aoa_to_sheet(pathRows);
+            const statsSheet = XLSX.utils.aoa_to_sheet(statsRows);
+            applyExcelStyles(pathSheet);
+            applyExcelStyles(statsSheet);
+            pathSheet['!cols'] = [{ wch: 16 }, { wch: 30 }, { wch: 28 }, { wch: 24 }, { wch: 18 }, { wch: 16 }, { wch: 34 }, { wch: 18 }, { wch: 20 }, { wch: 16 }, ...courses.map(() => ({ wch: 34 }))];
+            statsSheet['!cols'] = [{ wch: 16 }, { wch: 30 }, { wch: 40 }, { wch: 18 }, { wch: 14 }, { wch: 14 }, { wch: 18 }];
+            XLSX.utils.book_append_sheet(workbook, pathSheet, 'المسار');
+            XLSX.utils.book_append_sheet(workbook, statsSheet, 'إحصائيات الدورات');
+            XLSX.writeFile(workbook, config.fileName);
+        }
+
+        function getAcademyCourseAudit(employee) {
+            const records = Object.values(employee && employee.academyCourses ? employee.academyCourses : {})
+                .filter(record => record && cleanString(record.name))
+                .sort((a, b) => cleanString(a.name).localeCompare(cleanString(b.name), 'ar'));
+            return {
+                records,
+                certificates: records.filter(record => record.hasCertificate),
+                courseOnly: records.filter(record => !record.hasCertificate)
+            };
+        }
+
+        function renderLaBeauteComingSoon() {
+            const allEmployees = getSpecialTrackEmployees('labeaute');
+            const employees = getFilteredSpecialTrackEmployees('labeaute');
+            const allAudits = allEmployees.map(employee => ({ employee, audit: getAcademyCourseAudit(employee) }));
+            const certificateHolders = allAudits.filter(item => item.audit.certificates.length > 0);
+            const courseOnlyPeople = allAudits.filter(item => item.audit.certificates.length === 0 && item.audit.courseOnly.length > 0);
+            const totalCourseRecords = allAudits.reduce((sum, item) => sum + item.audit.records.length, 0);
+            const setText = (id, value) => {
+                const element = document.getElementById(id);
+                if (element) element.innerText = value;
+            };
+            setText('laBeauteTrackEmployeeCount', allEmployees.length);
+            setText('laBeauteCertificateHolderCount', certificateHolders.length);
+            setText('laBeauteCourseOnlyCount', courseOnlyPeople.length);
+            setText('laBeauteCourseRecordCount', totalCourseRecords);
+
+            const filteredAudits = employees.map(employee => ({ employee, audit: getAcademyCourseAudit(employee) }));
+            const certificateRows = filteredAudits.filter(item => item.audit.certificates.length > 0);
+            const courseOnlyRows = filteredAudits.filter(item => item.audit.certificates.length === 0 && item.audit.courseOnly.length > 0);
+            const renderPersonRows = (rows, type) => rows.length ? rows.map(({ employee, audit }) => {
+                const count = type === 'certificate' ? audit.certificates.length : audit.courseOnly.length;
+                const encodedId = encodeURIComponent(cleanString(employee.id));
+                const badgeClass = type === 'certificate' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
+                return `<tr class="hover:bg-slate-50 transition">
+                    <td class="px-4 py-3 font-bold text-slate-600">${safeBotText(employee.id)}</td>
+                    <td class="px-4 py-3"><button type="button" onclick="showLaBeauteEmployeeDetails(decodeURIComponent('${encodedId}'))" class="font-extrabold text-violet-700 hover:underline">${safeBotText(employee.name)}</button></td>
+                    <td class="px-4 py-3 text-slate-600">${safeBotText(employee.supervisor || 'بدون مشرف')}</td>
+                    <td class="px-4 py-3"><span class="inline-flex rounded-full px-3 py-1 text-xs font-extrabold ${badgeClass}">${count}</span></td>
+                    <td class="px-4 py-3"><button type="button" onclick="showLaBeauteEmployeeDetails(decodeURIComponent('${encodedId}'))" class="rounded-lg bg-violet-50 text-violet-700 px-3 py-2 text-xs font-extrabold hover:bg-violet-100">عرض الدورات</button></td>
+                </tr>`;
+            }).join('') : '<tr><td colspan="5" class="py-10 text-center text-slate-500">لا توجد أسماء مطابقة في هذه المجموعة.</td></tr>';
+
+            const certificateBody = document.getElementById('laBeauteCertificatePeopleBody');
+            const courseOnlyBody = document.getElementById('laBeauteCourseOnlyPeopleBody');
+            if (certificateBody) certificateBody.innerHTML = renderPersonRows(certificateRows, 'certificate');
+            if (courseOnlyBody) courseOnlyBody.innerHTML = renderPersonRows(courseOnlyRows, 'course');
+        }
+
+        function showLaBeauteEmployeeDetails(employeeId) {
+            const employee = getSpecialTrackEmployees('labeaute').find(item => cleanString(item.id) === cleanString(employeeId));
+            if (!employee) return;
+            const audit = getAcademyCourseAudit(employee);
+            const setText = (id, value) => {
+                const element = document.getElementById(id);
+                if (element) element.innerText = value;
+            };
+            setText('laBeauteEmployeeName', employee.name || 'موظف La beaute');
+            setText('laBeauteEmployeeMeta', `${employee.id} • ${employee.supervisor || 'بدون مشرف'} • ${employee.manager || 'بدون مدير إقليم'}`);
+            setText('laBeauteEmployeeCertificateCount', audit.certificates.length);
+            setText('laBeauteEmployeeCourseOnlyDetailCount', audit.courseOnly.length);
+            const body = document.getElementById('laBeauteEmployeeCoursesBody');
+            if (body) {
+                body.innerHTML = audit.records.length ? audit.records.map(record => {
+                    const progressLabel = record.progress === null ? '—' : `${formatKpiValue(record.progress)}%`;
+                    const status = record.hasCertificate
+                        ? '<span class="inline-flex rounded-full bg-emerald-100 text-emerald-800 px-3 py-1 text-xs font-extrabold">شهادة</span>'
+                        : '<span class="inline-flex rounded-full bg-amber-100 text-amber-800 px-3 py-1 text-xs font-extrabold">دورة بدون شهادة</span>';
+                    const certificateMonth = record.certificateMonth ? record.certificateMonth.replace('-', '/') : '—';
+                    return `<tr><td class="px-4 py-3 font-bold text-slate-800">${safeBotText(record.name)}</td><td class="px-4 py-3 font-extrabold text-indigo-700">${progressLabel}</td><td class="px-4 py-3">${status}</td><td class="px-4 py-3 text-slate-600" dir="ltr">${certificateMonth}</td></tr>`;
+                }).join('') : '<tr><td colspan="4" class="py-10 text-center text-slate-500">لا توجد تسجيلات دورات لهذا الموظف في الملف الحالي.</td></tr>';
+            }
+            const modal = document.getElementById('laBeauteEmployeeModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+            }
+        }
+
+        function closeLaBeauteEmployeeDetails() {
+            const modal = document.getElementById('laBeauteEmployeeModal');
+            if (!modal) return;
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+        }
+
+        function exportLaBeauteSnapshot() {
+            const employees = getSpecialTrackEmployees('labeaute');
+            if (!employees.length) return;
+            const audited = employees.map(employee => ({ employee, audit: getAcademyCourseAudit(employee) }));
+            const certificateHolders = audited.filter(item => item.audit.certificates.length > 0);
+            const courseOnlyPeople = audited.filter(item => item.audit.certificates.length === 0 && item.audit.courseOnly.length > 0);
+            const summaryRows = [
+                ['تقرير La beaute المؤقت', 'COMING SOON'],
+                ['ملاحظة', 'المسار الخاص بـ La beaute قيد التجهيز؛ التقرير يعرض بيانات الدورات والشهادات الحالية فقط.'],
+                ['إجمالي موظفي La beaute', employees.length],
+                ['أشخاص معهم شهادات', certificateHolders.length],
+                ['أشخاص معهم دورات فقط', courseOnlyPeople.length],
+                ['إجمالي تسجيلات الدورات', audited.reduce((sum, item) => sum + item.audit.records.length, 0)]
+            ];
+            const certificateRows = [['الرقم الوظيفي', 'الاسم', 'المشرف', 'مدير الإقليم', 'عدد الشهادات', 'أسماء الشهادات']];
+            certificateHolders.forEach(({ employee, audit }) => certificateRows.push([employee.id, employee.name, employee.supervisor || '', employee.manager || '', audit.certificates.length, audit.certificates.map(record => record.name).join(' | ')]));
+            const courseOnlyRows = [['الرقم الوظيفي', 'الاسم', 'المشرف', 'مدير الإقليم', 'عدد الدورات', 'أسماء الدورات']];
+            courseOnlyPeople.forEach(({ employee, audit }) => courseOnlyRows.push([employee.id, employee.name, employee.supervisor || '', employee.manager || '', audit.courseOnly.length, audit.courseOnly.map(record => record.name).join(' | ')]));
+            const detailRows = [['الرقم الوظيفي', 'الاسم', 'المشرف', 'اسم الدورة', 'التقدم', 'الحالة', 'شهر الشهادة']];
+            audited.forEach(({ employee, audit }) => audit.records.forEach(record => detailRows.push([employee.id, employee.name, employee.supervisor || '', record.name, record.progress === null ? '' : `${formatKpiValue(record.progress)}%`, record.hasCertificate ? 'شهادة' : 'دورة بدون شهادة', record.certificateMonth ? record.certificateMonth.replace('-', '/') : ''])));
+            const workbook = XLSX.utils.book_new();
+            [
+                ['ملخص مؤقت', summaryRows, [28, 80]],
+                ['معهم شهادات', certificateRows, [16, 32, 28, 26, 16, 80]],
+                ['دورات فقط', courseOnlyRows, [16, 32, 28, 26, 16, 80]],
+                ['تفاصيل الدورات', detailRows, [16, 32, 28, 55, 14, 22, 16]]
+            ].forEach(([name, rows, widths]) => {
+                const sheet = XLSX.utils.aoa_to_sheet(rows);
+                applyExcelStyles(sheet);
+                sheet['!cols'] = widths.map(wch => ({ wch }));
+                XLSX.utils.book_append_sheet(workbook, sheet, name);
+            });
+            XLSX.writeFile(workbook, 'بيانات_La_beaute_قبل_إطلاق_المسار.xlsx');
+        }
+
+        function getGulfAcademyCourseRecord(employee, course) {
+            const direct = employee && employee.academyCourses && employee.academyCourses[normalizeAcademyCourseName(course && course.en)];
+            if (direct) return direct;
+            return Object.values(employee && employee.academyCourses ? employee.academyCourses : {}).find(record => {
+                const matched = findGulfCourse(record && record.name);
+                return matched && course && matched.en === course.en;
+            }) || null;
+        }
+
+        function getGulfSupervisorGroups(employees = getSpecialTrackEmployees('gulf')) {
+            const groups = new Map();
+            employees.forEach(employee => {
+                const supervisor = cleanString(employee.supervisor) || 'بدون مشرف';
+                if (!groups.has(supervisor)) groups.set(supervisor, { name: supervisor, employees: [] });
+                groups.get(supervisor).employees.push(employee);
+            });
+            return Array.from(groups.values()).map(group => {
+                const summaries = group.employees.map(employee => getAcademyTrackSummary(employee, 'gulf'));
+                const completedPaths = summaries.filter(summary => summary.isComplete).length;
+                return {
+                    ...group,
+                    totalEmployees: group.employees.length,
+                    totalCompletions: summaries.reduce((sum, summary) => sum + summary.completedCount, 0),
+                    completedPaths,
+                    averageProgress: roundKpiValue(averageNumber(summaries.map(summary => summary.score))),
+                    kpi: roundKpiValue(averageNumber(summaries.map(summary => summary.score)))
+                };
+            }).sort((a, b) => b.kpi - a.kpi || b.averageProgress - a.averageProgress || a.name.localeCompare(b.name, 'ar'));
+        }
+
+        function switchGulfSubTab(section) {
+            currentGulfSubTab = section || 'overview';
+            document.querySelectorAll('.gulf-subsection').forEach(element => element.classList.add('hidden'));
+            const target = document.getElementById(`gulf${currentGulfSubTab.charAt(0).toUpperCase()}${currentGulfSubTab.slice(1)}Section`);
+            if (target) target.classList.remove('hidden');
+            document.querySelectorAll('.gulf-sub-tab').forEach(button => {
+                const isActive = button.dataset && button.dataset.gulfSection === currentGulfSubTab;
+                button.classList.toggle('bg-emerald-700', isActive);
+                button.classList.toggle('text-white', isActive);
+                button.classList.toggle('text-slate-600', !isActive);
+            });
+            if (currentGulfSubTab === 'monthly') renderGulfMonthlyEvaluation();
+        }
+
+        function renderGulfRegionDashboard() {
+            renderSpecialAcademyTrack('gulf');
+            const employees = getSpecialTrackEmployees('gulf');
+            const summaries = employees.map(employee => getAcademyTrackSummary(employee, 'gulf'));
+            const supervisorGroups = getGulfSupervisorGroups(employees);
+            const completedPaths = summaries.filter(summary => summary.isComplete).length;
+            const setText = (id, value) => {
+                const element = document.getElementById(id);
+                if (element) element.innerText = value;
+            };
+            setText('gulfTrackEmployeeCount', employees.length);
+            setText('gulfSupervisorCount', supervisorGroups.length);
+            setText('gulfTotalCompletions', summaries.reduce((sum, summary) => sum + summary.completedCount, 0));
+            setText('gulfTrackCompletedCount', completedPaths);
+            setText('gulfRegionKpi', `${formatKpiValue(averageNumber(summaries.map(summary => summary.score)))}%`);
+
+            const overviewSupervisors = document.getElementById('gulfOverviewSupervisorsBody');
+            if (overviewSupervisors) overviewSupervisors.innerHTML = supervisorGroups.length ? supervisorGroups.map(group => `<tr><td class="px-4 py-3 font-extrabold text-teal-800">${safeBotText(group.name)}</td><td class="px-4 py-3">${group.totalEmployees}</td><td class="px-4 py-3 font-extrabold text-indigo-700">${formatKpiValue(group.averageProgress)}%</td><td class="px-4 py-3"><span class="inline-flex rounded-full px-3 py-1 text-xs font-extrabold ${group.kpi === 100 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${formatKpiValue(group.kpi)}%</span></td></tr>`).join('') : '<tr><td colspan="4" class="py-8 text-center text-slate-500">لا توجد بيانات مشرفين بالخليج.</td></tr>';
+
+            const courseStats = gulfTrainingPathDef.map(course => {
+                const done = employees.filter(employee => isAcademyTrackCourseCompleted(employee, course, 'gulf')).length;
+                return { course, done, remaining: employees.length - done, percentage: employees.length ? roundKpiValue((done / employees.length) * 100) : 0 };
+            });
+            const overviewCourses = document.getElementById('gulfOverviewCoursesBody');
+            if (overviewCourses) overviewCourses.innerHTML = courseStats.slice().sort((a, b) => a.percentage - b.percentage || a.course.certId - b.course.certId).map(item => `<tr><td class="px-4 py-3"><span class="font-extrabold text-slate-800">${safeBotText(item.course.ar)}</span><span class="block text-[11px] text-slate-500" dir="ltr">${safeBotText(item.course.en)}</span></td><td class="px-4 py-3 font-bold text-emerald-700">${item.done}</td><td class="px-4 py-3 font-bold text-orange-700">${item.remaining}</td><td class="px-4 py-3 font-extrabold text-indigo-700">${formatKpiValue(item.percentage)}%</td></tr>`).join('');
+
+            const supervisorsBody = document.getElementById('gulfSupervisorsTableBody');
+            if (supervisorsBody) supervisorsBody.innerHTML = supervisorGroups.length ? supervisorGroups.map(group => {
+                const encodedName = encodeURIComponent(group.name);
+                return `<tr class="hover:bg-slate-50"><td class="px-4 py-3 font-extrabold text-teal-800">${safeBotText(group.name)}</td><td class="px-4 py-3">${group.totalEmployees}</td><td class="px-4 py-3">${group.totalCompletions}</td><td class="px-4 py-3 font-bold text-emerald-700">${group.completedPaths}</td><td class="px-4 py-3 font-extrabold text-indigo-700">${formatKpiValue(group.averageProgress)}%</td><td class="px-4 py-3"><span class="inline-flex rounded-full px-3 py-1 text-xs font-extrabold ${group.kpi === 100 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${formatKpiValue(group.kpi)}%</span></td><td class="px-4 py-3"><button type="button" onclick="showGulfSupervisorDetails(decodeURIComponent('${encodedName}'))" class="rounded-lg bg-cyan-50 text-cyan-800 px-3 py-2 text-xs font-extrabold hover:bg-cyan-100">الفريق</button></td></tr>`;
+            }).join('') : '<tr><td colspan="7" class="py-8 text-center text-slate-500">لا توجد بيانات مشرفين بالخليج.</td></tr>';
+            renderGulfMonthlyEvaluation();
+            if (currentGulfSupervisor) showGulfSupervisorDetails(currentGulfSupervisor);
+            switchGulfSubTab(currentGulfSubTab);
+        }
+
+        function showGulfSupervisorDetails(supervisorName) {
+            const group = getGulfSupervisorGroups().find(item => item.name === supervisorName);
+            if (!group) return;
+            currentGulfSupervisor = supervisorName;
+            const nameElement = document.getElementById('gulfSupervisorDetailName');
+            if (nameElement) nameElement.innerText = `${group.name} — ${group.totalEmployees} موظف`;
+            const body = document.getElementById('gulfSupervisorTeamBody');
+            if (body) body.innerHTML = group.employees.slice().sort((a, b) => cleanString(a.name).localeCompare(cleanString(b.name), 'ar')).map(employee => {
+                const summary = getAcademyTrackSummary(employee, 'gulf');
+                return `<tr><td class="px-4 py-3 font-bold">${safeBotText(employee.id)}</td><td class="px-4 py-3 font-extrabold text-slate-800">${safeBotText(employee.name)}</td><td class="px-4 py-3">${summary.completedCount} / ${summary.totalCount}</td><td class="px-4 py-3 font-extrabold text-indigo-700">${formatKpiValue(summary.score)}%</td><td class="px-4 py-3 font-bold ${summary.isComplete ? 'text-emerald-700' : 'text-orange-700'}">${summary.isComplete ? 'أكمل المستهدف' : `متبقي ${summary.totalCount - summary.completedCount}`}</td></tr>`;
+            }).join('');
+            const detail = document.getElementById('gulfSupervisorDetail');
+            if (detail) detail.classList.remove('hidden');
+        }
+
+        function closeGulfSupervisorDetail() {
+            currentGulfSupervisor = '';
+            const detail = document.getElementById('gulfSupervisorDetail');
+            if (detail) detail.classList.add('hidden');
+        }
+
+        function getGulfMonthlyMonths(employees = getSpecialTrackEmployees('gulf')) {
+            const months = new Set();
+            employees.forEach(employee => gulfTrainingPathDef.forEach(course => {
+                const record = getGulfAcademyCourseRecord(employee, course);
+                if (record && record.hasCertificate && record.certificateMonth) months.add(normalizeAcademyMonthKey(record.certificateMonth));
+            }));
+            return Array.from(months).filter(Boolean).sort((a, b) => getAcademyMonthSortValue(a) - getAcademyMonthSortValue(b));
+        }
+
+        function getGulfCompletedThroughMonth(employee, monthKey) {
+            const cutoff = getAcademyMonthSortValue(monthKey);
+            if (cutoff < 0) return 0;
+            return gulfTrainingPathDef.filter(course => {
+                const record = getGulfAcademyCourseRecord(employee, course);
+                return record && record.hasCertificate && getAcademyMonthSortValue(record.certificateMonth) <= cutoff;
+            }).length;
+        }
+
+        function getGulfMonthlyTarget(monthKey, employees = getSpecialTrackEmployees('gulf')) {
+            return gulfTrainingPathDef.length;
+        }
+
+        function renderGulfMonthlyEvaluation() {
+            const employees = getFilteredSpecialTrackEmployees('gulf').slice().sort((a, b) => cleanString(a.name).localeCompare(cleanString(b.name), 'ar'));
+            const allGulfEmployees = getSpecialTrackEmployees('gulf');
+            const months = getGulfMonthlyMonths(allGulfEmployees);
+            const head = document.getElementById('gulfMonthlyTableHead');
+            const body = document.getElementById('gulfMonthlyTableBody');
+            const empty = document.getElementById('gulfMonthlyEmpty');
+            if (!months.length) {
+                if (head) head.innerHTML = '';
+                if (body) body.innerHTML = '';
+                if (empty) empty.classList.remove('hidden');
+                return;
+            }
+            if (empty) empty.classList.add('hidden');
+            if (head) head.innerHTML = `<tr><th class="px-4 py-4 sticky-id">الرقم</th><th class="px-4 py-4 sticky-name">الموظف</th><th class="px-4 py-4">المشرف</th>${months.map(month => `<th colspan="3" class="px-4 py-3 text-center border-r border-slate-200"><span dir="ltr">${month.replace('-', '/')}</span><span class="block text-[10px] text-slate-500 mt-1">منجز تراكمي • مستهدف • KPI</span></th>`).join('')}</tr>`;
+            if (body) body.innerHTML = employees.length ? employees.map(employee => `<tr class="hover:bg-slate-50"><td class="px-4 py-3 sticky-id font-bold">${safeBotText(employee.id)}</td><td class="px-4 py-3 sticky-name font-extrabold text-slate-800">${safeBotText(employee.name)}</td><td class="px-4 py-3 text-slate-600">${safeBotText(employee.supervisor || 'بدون مشرف')}</td>${months.map(month => {
+                if (!isEmployeeEligibleForMonthlyEvaluation(employee, month)) return '<td colspan="3" class="px-4 py-3 text-center bg-slate-50 text-slate-400">غير معين بعد</td>';
+                const completed = getGulfCompletedThroughMonth(employee, month);
+                const target = getGulfMonthlyTarget(month, allGulfEmployees);
+                const kpi = target ? Math.min(100, roundKpiValue((completed / target) * 100)) : 0;
+                const color = kpi === 100 ? 'bg-emerald-50 text-emerald-800' : kpi >= 70 ? 'bg-amber-50 text-amber-800' : 'bg-rose-50 text-rose-800';
+                return `<td class="px-3 py-3 text-center font-extrabold text-teal-700 border-r border-slate-100">${completed}</td><td class="px-3 py-3 text-center font-bold text-slate-700">${target}</td><td class="px-3 py-3 text-center font-extrabold ${color}">${formatKpiValue(kpi)}%</td>`;
+            }).join('')}</tr>`).join('') : `<tr><td colspan="${3 + (months.length * 3)}" class="py-10 text-center text-slate-500">لا توجد نتائج مطابقة للبحث.</td></tr>`;
+        }
+
+        function buildGulfExecutiveHomeWorksheet(employees, menuItems) {
+            const ws = buildExecutiveHomeWorksheet('إقليم الخليج', employees, menuItems);
+            const summaries = employees.map(employee => getAcademyTrackSummary(employee, 'gulf'));
+            const totalCompletions = summaries.reduce((sum, summary) => sum + summary.completedCount, 0);
+            const completedPaths = summaries.filter(summary => summary.isComplete).length;
+            setExecutiveExcelCell(ws, 'A1', 'تقارير الأكاديمية  |  إقليم الخليج');
+            setExecutiveExcelCell(ws, 'G5', `دورات الخليج المنجزة\n${totalCompletions}`);
+            setExecutiveExcelCell(ws, 'J5', `أكملوا 11 دورة\n${completedPaths}`);
+            setExecutiveExcelCell(ws, 'A21', `تقرير إقليم الخليج  •  KPI المشرف = متوسط تقدم موظفيه من 11 دورة  •  ${new Date().toLocaleDateString('ar-EG')}`);
+            return ws;
+        }
+
+        function buildGulfExecutiveAnalysisWorksheet(employees) {
+            const summaries = employees.map(employee => getAcademyTrackSummary(employee, 'gulf'));
+            const supervisorGroups = getGulfSupervisorGroups(employees);
+            const total = employees.length;
+            const totalCompletions = summaries.reduce((sum, summary) => sum + summary.completedCount, 0);
+            const completedPaths = summaries.filter(summary => summary.isComplete).length;
+            const regionKpi = roundKpiValue(averageNumber(summaries.map(summary => summary.score)));
+            const percentage = value => total ? `${formatKpiValue((value / total) * 100)}%` : '0%';
+            const aoa = [
+                ['⌂  Home | الرئيسية'],
+                [GULF_EXECUTIVE_SHEETS.analysis],
+                ['إقليم الخليج  |  الإحصائيات تخص دورات الخليج الـ11 فقط'],
+                [],
+                ['ملخص الإقليم'],
+                ['المؤشر', 'العدد / القيمة', 'النسبة'],
+                ['إجمالي الموظفين النشطين', total, total ? '100%' : '0%'],
+                ['عدد المشرفين', supervisorGroups.length, '-'],
+                ['إجمالي دورات الخليج المنجزة', totalCompletions, '-'],
+                ['أكملوا 11 دورة', completedPaths, percentage(completedPaths)],
+                ['متوسط الدورات المنجزة لكل موظف', total ? roundKpiValue(totalCompletions / total) : 0, '-'],
+                ['KPI إقليم الخليج', `${formatKpiValue(regionKpi)}%`, 'متوسط نسب الموظفين'],
+                [],
+                ['إحصائيات دورات الخليج'],
+                ['رقم الدورة', 'اسم الدورة', 'المستهدفون', 'المنجزون', 'المتبقي', 'نسبة الإنجاز']
+            ];
+            gulfTrainingPathDef.forEach(course => {
+                const completed = employees.filter(employee => isAcademyTrackCourseCompleted(employee, course, 'gulf')).length;
+                aoa.push([course.certId, course.ar, total, completed, Math.max(0, total - completed), percentage(completed)]);
+            });
+            const ws = XLSX.utils.aoa_to_sheet(aoa);
+            return finalizeExecutiveWorksheet(ws, {
+                titleRow: 1,
+                metaRow: 2,
+                sectionRows: [4, 13],
+                headerRows: [5, 14],
+                colWidths: [18, 46, 20, 20, 20, 20],
+                tabColor: '0891B2',
+                autoFilterRef: `A15:F${15 + gulfTrainingPathDef.length}`
+            });
+        }
+
+        function buildGulfExecutiveKpiWorksheet(employees) {
+            const groups = getGulfSupervisorGroups(employees);
+            const summaryHeaders = ['مدير الإقليم', 'المشرف', 'عدد الموظفين', 'إجمالي الدورات المنجزة', 'متوسط المنجز لكل موظف', 'أكملوا 11 دورة', 'KPI المشرف'];
+            const summaryRows = groups.map(group => {
+                const manager = cleanString(group.employees[0] && group.employees[0].manager) || 'إقليم الخليج';
+                return [manager, group.name, group.totalEmployees, group.totalCompletions, roundKpiValue(group.totalCompletions / group.totalEmployees), group.completedPaths, `${formatKpiValue(group.kpi)}%`];
+            });
+            const detailHeaders = ['مدير الإقليم', 'المشرف', 'الرقم الوظيفي', 'اسم الموظف', 'المنجز من دورات الخليج', 'المستهدف', 'المتبقي', 'الحالة', 'KPI الموظف'];
+            const detailRows = employees.map(employee => {
+                const summary = getAcademyTrackSummary(employee, 'gulf');
+                return [employee.manager || 'إقليم الخليج', employee.supervisor || 'بدون مشرف', employee.id, employee.name, summary.completedCount, 11, Math.max(0, 11 - summary.completedCount), summary.isComplete ? 'مكتمل' : 'قيد الإنجاز', `${formatKpiValue(summary.score)}%`];
+            });
+            const aoa = [
+                ['⌂  Home | الرئيسية'],
+                [GULF_EXECUTIVE_SHEETS.kpi],
+                ['إقليم الخليج  |  KPI الموظف = المنجز ÷ 11  |  KPI المشرف = المتوسط الحسابي لنسب جميع موظفيه'],
+                [],
+                ['ملخص KPI مشرفي الخليج'],
+                summaryHeaders,
+                ...(summaryRows.length ? summaryRows : [summaryHeaders.map((_, index) => index === 0 ? 'لا توجد بيانات KPI' : '')]),
+                [],
+                ['تفاصيل الموظفين']
+            ];
+            const detailsSectionRow = aoa.length - 1;
+            const detailHeaderRow = aoa.length;
+            aoa.push(detailHeaders);
+            aoa.push(...(detailRows.length ? detailRows : [detailHeaders.map((_, index) => index === 0 ? 'لا توجد تفاصيل KPI' : '')]));
+            const ws = XLSX.utils.aoa_to_sheet(aoa);
+            return finalizeExecutiveWorksheet(ws, {
+                titleRow: 1,
+                metaRow: 2,
+                sectionRows: [4, detailsSectionRow],
+                headerRows: [5, detailHeaderRow],
+                colWidths: [24, 30, 18, 30, 24, 16, 16, 18, 18],
+                tabColor: EXECUTIVE_EXCEL_COLORS.teal
+            });
+        }
+
+        function buildGulfBotRows(employees) {
+            const headers = [
+                'الرقم الوظيفي', 'الاسم', 'الإيميل', 'الإقليم', 'مدير القطاع / الإقليم', 'المشرف',
+                'تاريخ التعيين', 'حالة الموظف', ...botCoursesKeys,
+                'عدد الدورات المسجل عليها', 'عدد الدورات المكتملة', 'ملاحظات'
+            ];
+            const rows = employees.filter(employee => getBotImprovementSummary(employee).assignedCount > 0).map(employee => {
+                const summary = getBotImprovementSummary(employee);
+                return [
+                    employee.id, employee.name, employee.email || '', 'إقليم الخليج', employee.manager || 'إقليم الخليج',
+                    employee.supervisor || 'بدون مشرف', formatDateDisplay(employee.hireDate), employee.status || 'على رأس العمل',
+                    ...botCoursesKeys.map(course => getBotEnrollmentProgressLabel(employee.botCourses && employee.botCourses[course])),
+                    summary.assignedCount, summary.completedCount, `أكمل ${summary.completedCount} من ${summary.assignedCount} دورة من الدورات المسجل عليها`
+                ];
+            });
+            return { headers, rows };
+        }
+
+        function removeExecutiveSheetNavigation(ws) {
+            if (!ws || !ws.A1) return ws;
+            ws.A1.v = '';
+            ws.A1.t = 's';
+            delete ws.A1.l;
+            return ws;
+        }
+
+        async function exportGulfRegionWorkbook() {
+            if (typeof XLSX === 'undefined' || !XLSX.utils) {
+                alert('مكتبة Excel غير متاحة حالياً. تأكد من الاتصال ثم أعد تحميل الصفحة.');
+                return;
+            }
+            const employees = getSpecialTrackEmployees('gulf')
+                .slice()
+                .sort((a, b) => cleanString(a.supervisor).localeCompare(cleanString(b.supervisor), 'ar') || cleanString(a.name).localeCompare(cleanString(b.name), 'ar'));
+            if (!employees.length) {
+                alert('لا توجد بيانات موظفين نشطين في إقليم الخليج.');
+                return;
+            }
+
+            const menuItems = [
+                { label: GULF_EXECUTIVE_SHEETS.employees, sheet: GULF_EXECUTIVE_SHEETS.employees },
+                { label: GULF_EXECUTIVE_SHEETS.progress, sheet: GULF_EXECUTIVE_SHEETS.progress },
+                { label: GULF_EXECUTIVE_SHEETS.path, sheet: GULF_EXECUTIVE_SHEETS.path },
+                { label: GULF_EXECUTIVE_SHEETS.analysis, sheet: GULF_EXECUTIVE_SHEETS.analysis },
+                { label: GULF_EXECUTIVE_SHEETS.kpi, sheet: GULF_EXECUTIVE_SHEETS.kpi }
+            ];
+            const employeeHeaders = ['الرقم الوظيفي', 'الاسم', 'الإيميل', 'المشرف', 'مدير الإقليم', 'تاريخ التعيين', 'إجمالي الشهادات', 'المنجز من الخليج', 'المستهدف', 'الحالة', 'KPI الخليج'];
+            const employeeRows = employees.map(employee => {
+                const summary = getAcademyTrackSummary(employee, 'gulf');
+                return [employee.id, employee.name, employee.email || '', employee.supervisor || 'بدون مشرف', employee.manager || 'إقليم الخليج', formatDateDisplay(employee.hireDate), employee.totalCerts, summary.completedCount, 11, summary.isComplete ? 'مكتمل' : 'قيد الإنجاز', `${formatKpiValue(summary.score)}%`];
+            });
+
+            const progressHeaders = ['الرقم الوظيفي', 'الاسم', 'المشرف', 'مدير الإقليم', 'المنجز من 11', 'KPI الخليج', ...gulfTrainingPathDef.map(course => `${course.certId}- ${course.ar}`)];
+            const progressRows = employees.map(employee => {
+                const summary = getAcademyTrackSummary(employee, 'gulf');
+                return [
+                    employee.id,
+                    employee.name,
+                    employee.supervisor || 'بدون مشرف',
+                    employee.manager || 'إقليم الخليج',
+                    `${summary.completedCount} / 11`,
+                    `${formatKpiValue(summary.score)}%`,
+                    ...gulfTrainingPathDef.map(course => {
+                        const record = getGulfAcademyCourseRecord(employee, course);
+                        if (isAcademyTrackCourseCompleted(employee, course, 'gulf') || (record && record.hasCertificate)) return '100%';
+                        const progress = record && record.progress !== null ? Number(record.progress) : 0;
+                        const safeProgress = Number.isFinite(progress) ? Math.max(0, Math.min(100, progress)) : 0;
+                        return `${formatKpiValue(safeProgress)}%`;
+                    })
+                ];
+            });
+
+            const pathHeaders = ['الرقم الوظيفي', 'الاسم', 'المشرف', 'مدير الإقليم', 'المسار الحالي (نقطة التوقف)', 'إجمالي الشهادات', 'المنجز من 11', 'KPI الخليج', ...gulfTrainingPathDef.map(course => `${course.certId}- ${course.ar}`)];
+            const pathRows = employees.map(employee => {
+                const summary = getAcademyTrackSummary(employee, 'gulf');
+                const stopper = summary.stopper;
+                return [employee.id, employee.name, employee.supervisor || 'بدون مشرف', employee.manager || 'إقليم الخليج', stopper ? `${stopper.certId}. ${stopper.ar}` : 'أتم مسار الخليج بالكامل', employee.totalCerts, `${summary.completedCount} / 11`, `${formatKpiValue(summary.score)}%`, ...gulfTrainingPathDef.map(course => {
+                    if (isAcademyTrackCourseCompleted(employee, course, 'gulf')) return 'منجز';
+                    return stopper && stopper.en === course.en ? 'واقف عليها' : 'لم يصلها';
+                })];
+            });
+
+            const eliteEmployees = employees.filter(employee => employee.isEliteTarget);
+            const eliteHeaders = ['الرقم الوظيفي', 'الاسم', 'المشرف', 'مدير الإقليم', 'الفئة', ...eliteCoursesKeys.map(course => getExecutiveCourseDisplayName(course, 'ar')), 'عدد الدورات المكتملة', 'الحالة'];
+            const eliteRows = eliteEmployees.map(employee => {
+                const completed = getEliteCompletedCount(employee);
+                return [employee.id, employee.name, employee.supervisor || 'بدون مشرف', employee.manager || 'إقليم الخليج', getEliteCohortLabel(employee), ...eliteCoursesKeys.map(course => employee.eliteProgress && employee.eliteProgress[course] ? 'منجز' : 'غير منجز'), completed, completed === ELITE_TARGET_COUNT ? 'مكتمل' : 'غير مكتمل'];
+            });
+            const gulfBot = buildGulfBotRows(employees);
+
+            const workbook = XLSX.utils.book_new();
+            workbook.Props = {
+                Title: 'تقرير إقليم الخليج',
+                Subject: 'تقارير الأكاديمية لإقليم الخليج — KPI مبني على 11 دورة خليجية',
+                Author: 'منظومة الأكاديمية',
+                CreatedDate: new Date()
+            };
+            XLSX.utils.book_append_sheet(workbook, buildGulfExecutiveHomeWorksheet(employees, menuItems), GULF_EXECUTIVE_SHEETS.home);
+            XLSX.utils.book_append_sheet(workbook, createExecutiveTableWorksheet(GULF_EXECUTIVE_SHEETS.employees, 'إقليم الخليج', employeeHeaders, employeeRows, { subtitle: 'كل موظفي إقليم الخليج في كشف واحد — بدون تقسيم حسب مدة الخدمة', colWidths: [15, 28, 28, 28, 24, 18, 18, 20, 16, 18, 16], tabColor: '2563EB' }), GULF_EXECUTIVE_SHEETS.employees);
+            XLSX.utils.book_append_sheet(workbook, createExecutiveTableWorksheet(GULF_EXECUTIVE_SHEETS.progress, 'إقليم الخليج', progressHeaders, progressRows, { subtitle: 'نسبة تقدم كل موظف في كل دورة من دورات الخليج الـ11 — الدورة المكتملة تظهر 100%', colWidths: [15, 28, 28, 24, 18, 16, ...gulfTrainingPathDef.map(() => 30)], tabColor: '7C3AED' }), GULF_EXECUTIVE_SHEETS.progress);
+            XLSX.utils.book_append_sheet(workbook, createExecutiveTableWorksheet(GULF_EXECUTIVE_SHEETS.path, 'إقليم الخليج', pathHeaders, pathRows, { subtitle: 'مسار الخليج المستقل — 11 دورة', colWidths: [15, 28, 28, 24, 38, 18, 18, 16, ...gulfTrainingPathDef.map(() => 30)], tabColor: EXECUTIVE_EXCEL_COLORS.amber }), GULF_EXECUTIVE_SHEETS.path);
+            XLSX.utils.book_append_sheet(workbook, buildGulfExecutiveAnalysisWorksheet(employees), GULF_EXECUTIVE_SHEETS.analysis);
+            XLSX.utils.book_append_sheet(workbook, buildGulfExecutiveKpiWorksheet(employees), GULF_EXECUTIVE_SHEETS.kpi);
+            XLSX.utils.book_append_sheet(workbook, removeExecutiveSheetNavigation(createExecutiveTableWorksheet(GULF_EXECUTIVE_SHEETS.elite, 'إقليم الخليج', eliteHeaders, eliteRows, { subtitle: 'شيت مخفي اختياري — استخدم Unhide لعرض بيانات النخبة', colWidths: [15, 28, 28, 24, 20, ...eliteCoursesKeys.map(() => 34), 22, 20], tabColor: 'CA8A04' })), GULF_EXECUTIVE_SHEETS.elite);
+            XLSX.utils.book_append_sheet(workbook, removeExecutiveSheetNavigation(createExecutiveTableWorksheet(GULF_EXECUTIVE_SHEETS.bot, 'إقليم الخليج', gulfBot.headers, gulfBot.rows, { subtitle: 'شيت مخفي اختياري — استخدم Unhide لعرض بيانات Back on Track', colWidths: [15, 28, 28, 22, 24, 28, 18, 28, ...botCoursesKeys.map(() => 34), 22, 22, 42], tabColor: '7C3AED' })), GULF_EXECUTIVE_SHEETS.bot);
+            workbook.Workbook = workbook.Workbook || {};
+            workbook.Workbook.Sheets = workbook.SheetNames.map(sheetName => ({
+                Hidden: sheetName === GULF_EXECUTIVE_SHEETS.elite || sheetName === GULF_EXECUTIVE_SHEETS.bot ? 1 : 0
+            }));
+
+            const filename = 'تقرير_إقليم_الخليج_الكامل.xlsx';
+            if (typeof JSZip === 'undefined' || !REGION_REPORT_NAVIGATION_TEMPLATE_BASE64) {
+                XLSX.writeFile(workbook, filename);
+                return;
+            }
+            const exportButton = document.getElementById('exportGulfRegionWorkbookBtn');
+            const originalButtonHtml = exportButton ? exportButton.innerHTML : '';
+            if (exportButton) {
+                exportButton.disabled = true;
+                exportButton.innerHTML = '<span class="inline-block animate-spin">◌</span><span>جاري تجهيز تقرير الخليج...</span>';
+            }
+            try {
+                const styledBlob = await addExecutiveShapeNavigation(workbook, {
+                    drawingSheetIndexes: [1, 2, 3, 4, 5, 6],
+                    homeButtons: menuItems,
+                    copyAppProps: false
+                });
+                saveBlob(styledBlob, filename);
+            } catch (error) {
+                console.error('Gulf styled workbook export failed:', error);
+                XLSX.writeFile(workbook, filename);
+            } finally {
+                if (exportButton) {
+                    exportButton.disabled = false;
+                    exportButton.innerHTML = originalButtonHtml;
+                }
+            }
+        }
+
         // Timeline Dashboard rendering helper
         function renderTrainingPathTable() {
             if (globalData.allActive.length === 0) return;
@@ -6682,7 +7680,7 @@
             let filteredEmployees = globalData.allActive.filter(emp => {
                 let matchReg = pathRegion === "" || emp.region === pathRegion;
                 let matchSearch = pathSearch === "" || emp.name.toLowerCase().includes(pathSearch) || emp.id.toString().includes(pathSearch);
-                return matchReg && matchSearch && isEmployeeVisibleInCurrentRegion(emp);
+                return matchReg && matchSearch && isEmployeeVisibleInCurrentRegion(emp) && getEmployeeAcademyTrack(emp) === 'standard';
             });
 
             let certBodyHtml = '';
@@ -6754,7 +7752,7 @@
             let filteredEmployees = globalData.allActive.filter(emp => {
                 let matchReg = pathRegion === "" || emp.region === pathRegion;
                 let matchSearch = pathSearch === "" || emp.name.toLowerCase().includes(pathSearch) || emp.id.toString().includes(pathSearch);
-                return matchReg && matchSearch && isEmployeeVisibleInCurrentRegion(emp);
+                return matchReg && matchSearch && isEmployeeVisibleInCurrentRegion(emp) && getEmployeeAcademyTrack(emp) === 'standard';
             });
 
             if(filteredEmployees.length === 0) return;
@@ -6845,7 +7843,6 @@
         }
 
         function getTimelineForCurrentView() {
-            if (layoutMode !== 'new') return globalData.timeline;
             const timeline = { hourly: Array(24).fill(0), daily: {}, weekly: {} };
             globalData.allActive.forEach(emp => {
                 if (!isEmployeeVisibleInCurrentRegion(emp) || !emp.timeline) return;
