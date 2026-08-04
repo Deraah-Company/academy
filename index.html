@@ -3272,20 +3272,30 @@
             less3Pivot: "أقل من 3 شهور",
             elitePivot: "النخبة",
             more3Pivot: "3 شهور فأكثر",
+            botPivot: "Back on Track",
             regionSupervisors: "الأقاليم والمشرفين",
             courseTargets: "تارجت الدورات الجديدة",
             missingSearch: "بحث النواقص",
             dataSup: "بيانات_المشرفين",
             dataLess3: "بيانات_أقل_3",
             dataElite: "بيانات_النخبة",
-            dataMore3: "بيانات_3_فأكثر"
+            dataMore3: "بيانات_3_فأكثر",
+            dataBot: "بيانات_BOT"
         };
 
         const KPI_PIVOT_HEADERS = {
-            supervisors: ["الإقليم", "مدير الإقليم", "المشرف", "عدد أقل من 3 شهور", "أقل من 3 مخلص 10", "أقل من 3 لسه", "عدد النخبة", "النخبة مكمل 4", "متوسط النخبة KPI", "عدد 3 شهور فأكثر", "3 شهور فأكثر مخلص 21", "3 شهور فأكثر لسه", "متوسط 3 شهور فأكثر KPI", "KPI المشرف"],
-            less3: ["الإقليم", "مدير الإقليم", "المشرف", "الرقم الوظيفي", "اسم الموظف", "المستهدف", "إجمالي الدورات", "عدد الموظفين", "مخلص 10", "لسه", "KPI أقل من 3"],
+            supervisors: [
+                "الإقليم", "مدير الإقليم", "المشرف", "إجمالي الموظفين الفريد",
+                "عدد أقل من 3 شهور", "أقل من 3 محقق الهدف", "أقل من 3 لسه", "KPI أقل من 3 شهور",
+                "عدد النخبة", "النخبة مكمل 4", "KPI النخبة",
+                "عدد 3 شهور فأكثر", "3 شهور فأكثر محقق الهدف", "3 شهور فأكثر لسه", "KPI 3 شهور فأكثر",
+                "عدد موظفي BOT", "BOT مكتمل", "BOT غير مكتمل", "KPI Back on Track",
+                "عدد المحاور المتاحة", "KPI المشرف"
+            ],
+            less3: ["الإقليم", "مدير الإقليم", "المشرف", "الرقم الوظيفي", "اسم الموظف", "المستهدف", "إجمالي الدورات", "عدد الموظفين", "محقق الهدف", "لسه", "KPI أقل من 3"],
             elite: ["الإقليم", "مدير الإقليم", "المشرف", "الرقم الوظيفي", "اسم الموظف", "دورات النخبة المنجزة", "دورات النخبة المتبقية", "مكمل 4 نخبة", "KPI النخبة"],
-            more3: ["الإقليم", "مدير الإقليم", "المشرف", "الرقم الوظيفي", "اسم الموظف", "الهدف الشهري", "إجمالي الدورات", "عدد الموظفين", "مخلص 21", "لسه", "KPI 3 شهور فأكثر"]
+            more3: ["الإقليم", "مدير الإقليم", "المشرف", "الرقم الوظيفي", "اسم الموظف", "المستهدف الحالي", "إجمالي الدورات", "عدد الموظفين", "محقق الهدف", "لسه", "KPI 3 شهور فأكثر"],
+            bot: ["الإقليم", "مدير الإقليم", "المشرف", "الرقم الوظيفي", "اسم الموظف", "دورات BOT المسجل عليها", "دورات BOT المكتملة", "دورات BOT المتبقية", "أكمل كل دورات BOT", "KPI Back on Track"]
         };
 
         function getKpiManagerName(emp) {
@@ -3316,6 +3326,7 @@
             let less3Rows = [];
             let eliteRows = [];
             let more3Rows = [];
+            let botRows = [];
 
             active.forEach(emp => {
                 let region = cleanString(emp.region) || "غير محدد";
@@ -3342,28 +3353,47 @@
                     let done21 = emp.totalCerts >= targetCertsCount ? 1 : 0;
                     more3Rows.push([region, manager, supervisor, emp.id, emp.name, targetCertsCount, emp.totalCerts, 1, done21, done21 ? 0 : 1, done21 ? 100 : 0]);
                 }
+
+                const botSummary = getBotImprovementSummary(emp);
+                if (botSummary.assignedCount > 0) {
+                    botRows.push([
+                        region, manager, supervisor, emp.id, emp.name,
+                        botSummary.assignedCount,
+                        botSummary.completedCount,
+                        Math.max(0, botSummary.assignedCount - botSummary.completedCount),
+                        botSummary.score === 100 ? 1 : 0,
+                        botSummary.score
+                    ]);
+                }
             });
 
             let supervisorRows = Object.values(supervisors).map(group => {
                 let less3 = group.employees.filter(e => e.tenureMonths >= 0 && e.tenureMonths < 3);
                 let elite = group.employees.filter(e => e.isEliteTarget);
                 let more3 = group.employees.filter(e => e.tenureMonths >= 3);
+                let improvement = group.employees.filter(hasBotEnrollment);
                 const kpiSummary = getSupervisorKpiSummary(group.employees);
 
                 let less3Completed = less3.filter(e => e.totalCerts >= less3KpiTarget).length;
                 let eliteFull = elite.filter(e => getEliteCompletedCount(e) === ELITE_TARGET_COUNT).length;
                 let more3Completed = more3.filter(e => e.totalCerts >= targetCertsCount).length;
+                let botCompleted = improvement.filter(e => getBotImprovementSummary(e).score === 100).length;
+                let less3Avg = kpiSummary.less3 === null ? 0 : kpiSummary.less3;
                 let eliteAvg = kpiSummary.elite === null ? 0 : kpiSummary.elite;
                 let more3Avg = kpiSummary.more3 === null ? 0 : kpiSummary.more3;
+                let improvementAvg = kpiSummary.improvement === null ? 0 : kpiSummary.improvement;
+                let availableAxesCount = [kpiSummary.less3, kpiSummary.elite, kpiSummary.more3, kpiSummary.improvement].filter(value => value !== null).length;
                 let supervisorKpi = kpiSummary.overall;
 
                 return [
                     group.region,
                     group.manager,
                     group.supervisor,
+                    group.employees.length,
                     less3.length,
                     less3Completed,
                     less3.length - less3Completed,
+                    roundKpiValue(less3Avg),
                     elite.length,
                     eliteFull,
                     roundKpiValue(eliteAvg),
@@ -3371,6 +3401,11 @@
                     more3Completed,
                     more3.length - more3Completed,
                     roundKpiValue(more3Avg),
+                    improvement.length,
+                    botCompleted,
+                    improvement.length - botCompleted,
+                    roundKpiValue(improvementAvg),
+                    availableAxesCount,
                     roundKpiValue(supervisorKpi)
                 ];
             });
@@ -3379,7 +3414,8 @@
                 supervisors: supervisorRows,
                 less3: less3Rows,
                 elite: eliteRows,
-                more3: more3Rows
+                more3: more3Rows,
+                bot: botRows
             };
         }
 
@@ -3431,6 +3467,49 @@
 
             return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><dimension ref="A1:${lastCol}${allRows.length}"/><sheetViews><sheetView workbookViewId="0"/></sheetViews><sheetFormatPr defaultRowHeight="15"/><sheetData>${sheetRows}</sheetData><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>`;
+        }
+
+        function buildMinimalPivotCacheDefinitionXml(sheetName, headers, rowCount, stringFieldIndexes = []) {
+            const stringFields = new Set(stringFieldIndexes);
+            const cacheFields = headers.map((header, index) => {
+                if (stringFields.has(index)) {
+                    return `<cacheField name="${xmlEscape(header)}" numFmtId="0"><sharedItems containsBlank="1" count="2"><s v="مثال"/><m/></sharedItems></cacheField>`;
+                }
+                return `<cacheField name="${xmlEscape(header)}" numFmtId="0"><sharedItems containsString="0" containsBlank="1" containsNumber="1" minValue="0" maxValue="1000000"/></cacheField>`;
+            }).join("");
+            const sourceRef = `A1:${excelColumnName(headers.length)}${Math.max(2, rowCount + 1)}`;
+            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<pivotCacheDefinition xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:id="rId1" refreshOnLoad="1" enableRefresh="1" refreshedBy="Academy KPI" createdVersion="8" refreshedVersion="8" minRefreshableVersion="3" recordCount="2"><cacheSource type="worksheet"><worksheetSource ref="${sourceRef}" sheet="${xmlEscape(sheetName)}"/></cacheSource><cacheFields count="${headers.length}">${cacheFields}</cacheFields></pivotCacheDefinition>`;
+        }
+
+        function buildMinimalPivotCacheRecordsXml(fieldCount, stringFieldIndexes = []) {
+            const stringFields = new Set(stringFieldIndexes);
+            const exampleRecord = Array.from({ length: fieldCount }, (_, index) => stringFields.has(index) ? '<x v="0"/>' : '<n v="0"/>').join("");
+            const blankRecord = Array.from({ length: fieldCount }, () => "<m/>").join("");
+            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<pivotCacheRecords xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="2"><r>${exampleRecord}</r><r>${blankRecord}</r></pivotCacheRecords>`;
+        }
+
+        function buildPivotTableDefinitionXml(options) {
+            const pageFields = options.pageFields || [];
+            const rowField = options.rowField;
+            const dataFields = options.dataFields || [];
+            const dataFieldIndexes = new Set(dataFields.map(field => field.fld));
+            const axisItems = '<items count="3"><item x="0"/><item x="1"/><item t="default"/></items>';
+            const pivotFields = Array.from({ length: options.fieldCount }, (_, index) => {
+                if (pageFields.includes(index)) return `<pivotField axis="axisPage" showAll="0">${axisItems}</pivotField>`;
+                if (index === rowField) return `<pivotField axis="axisRow" showAll="0">${axisItems}</pivotField>`;
+                if (dataFieldIndexes.has(index)) return '<pivotField dataField="1" showAll="0"/>';
+                return '<pivotField showAll="0"/>';
+            }).join("");
+            const colItems = dataFields.map((field, index) => index === 0 ? '<i><x/></i>' : `<i i="${index}"><x v="${index}"/></i>`).join("");
+            const dataFieldsXml = dataFields.map(field => {
+                const subtotal = field.subtotal ? ` subtotal="${field.subtotal}"` : "";
+                return `<dataField name="${xmlEscape(field.name)}" fld="${field.fld}"${subtotal} baseField="0" baseItem="0"/>`;
+            }).join("");
+            const pageFieldsXml = pageFields.map(field => `<pageField fld="${field}" hier="-1"/>`).join("");
+            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<pivotTableDefinition xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" name="${xmlEscape(options.name)}" cacheId="${options.cacheId}" applyNumberFormats="0" applyBorderFormats="0" applyFontFormats="0" applyPatternFormats="0" applyAlignmentFormats="0" applyWidthHeightFormats="1" dataCaption="Values" updatedVersion="8" minRefreshableVersion="3" createdVersion="8" indent="0" outline="1" outlineData="1"><location ref="${options.locationRef}" firstHeaderRow="0" firstDataRow="0" firstDataCol="0"/><pivotFields count="${options.fieldCount}">${pivotFields}</pivotFields><rowFields count="1"><field x="${rowField}"/></rowFields><rowItems count="3"><i><x/></i><i><x v="1"/></i><i t="grand"><x/></i></rowItems><colFields count="1"><field x="-2"/></colFields><colItems count="${dataFields.length}">${colItems}</colItems><pageFields count="${pageFields.length}">${pageFieldsXml}</pageFields><dataFields count="${dataFields.length}">${dataFieldsXml}</dataFields><pivotTableStyleInfo name="PivotStyleLight16" showRowHeaders="1" showColHeaders="1" showRowStripes="1" showColStripes="0" showLastColumn="0"/></pivotTableDefinition>`;
         }
 
         function isWorkbookCell(value) {
@@ -3633,13 +3712,14 @@
                 [],
                 [styledCell("شرح التابات", styles.section)],
                 [styledCell("التاب", styles.header), styledCell("الشرح", styles.header)],
-                ["احصائيات مدير الاقليم والمشرفين", "PivotTable حقيقي لاختيار الإقليم أو مدير الإقليم ومراجعة متوسط KPI المشرفين."],
+                ["احصائيات مدير الاقليم والمشرفين", "PivotTable حقيقي يعرض KPI المحاور الأربعة وKPI المشرف النهائي، مع فلاتر الإقليم ومدير الإقليم."],
                 ["أقل من 3 شهور", `PivotTable للأسماء الأقل من 3 شهور وموقف كل موظف من مستهدف ${less3KpiTarget} شهادات.`],
                 ["النخبة", "PivotTable لمسار النخبة: كام دورة اتعملت، كام دورة فاضلة، ونسبة KPI."],
                 ["3 شهور فأكثر", `PivotTable لمن أكمل 3 شهور فأكثر وموقفه من ${targetCertsCount} دورة أو المستهدف الحالي.`],
-                ["الأقاليم والمشرفين", "كل إقليم وتحته المشرفين، ولكل مشرف عدد الموظفين في كل مسار."],
-                ["تارجت الدورات الجديدة", "اكتب 1 بجانب المسار المطلوب، وسيحسب Excel التارجت الشهري لكل مشرف حسب عدد الناس في المسار."],
-                ["بحث النواقص", "جدول نواقص فقط، استخدم فلتر اسم المشرف أو اسم الموظف للوصول للنتيجة بسرعة."]
+                ["Back on Track", "PivotTable لمسجلي BOT: عدد الدورات المسجل عليها والمنجزة والمتبقية وKPI الموظف."],
+                ["الأقاليم والمشرفين", "كل إقليم وتحته المشرفون، ولكل مشرف عدد الموظفين الفريد ومحاور KPI الأربعة."],
+                ["تارجت الدورات الجديدة", "اكتب 1 بجانب المسار المطلوب، وسيحسب Excel التارجت الشهري لكل مشرف حسب عدد الناس في المسار، بما في ذلك BOT."],
+                ["بحث النواقص", "جدول نواقص المحاور الأربعة فقط، استخدم فلتر اسم المشرف أو اسم الموظف للوصول للنتيجة بسرعة."]
             ];
 
             return buildCustomWorksheetXml(rows, {
@@ -3653,9 +3733,11 @@
 
         function getSupervisorTrackRecords(supervisorRows) {
             return supervisorRows.map(row => {
-                let less3 = Number(row[3]) || 0;
-                let elite = Number(row[6]) || 0;
-                let more3 = Number(row[9]) || 0;
+                let total = Number(row[3]) || 0;
+                let less3 = Number(row[4]) || 0;
+                let elite = Number(row[8]) || 0;
+                let more3 = Number(row[11]) || 0;
+                let bot = Number(row[15]) || 0;
                 return {
                     region: row[0] || "غير محدد",
                     manager: row[1] || "غير محدد",
@@ -3663,8 +3745,9 @@
                     less3,
                     elite,
                     more3,
-                    total: less3 + elite + more3,
-                    kpi: Number(row[13]) || 0
+                    bot,
+                    total,
+                    kpi: Number(row[20]) || 0
                 };
             }).sort((a, b) =>
                 String(a.region).localeCompare(String(b.region), "ar") ||
@@ -3677,11 +3760,11 @@
             let records = getSupervisorTrackRecords(supervisorRows);
             let rows = [
                 [styledCell("الأقاليم والمشرفين", styles.title)],
-                [styledCell("كل إقليم وتحته المشرفين، ولكل مشرف عدد الأشخاص في كل مسار ونسبة KPI الحالية.", styles.note)],
+                [styledCell("كل إقليم وتحته المشرفون، مع عدد الموظفين الفريد ومحاور KPI الأربعة ونسبة KPI الحالية.", styles.note)],
                 [],
-                ["الإقليم", "مدير الإقليم", "المشرف", "أقل من 3 شهور", "النخبة", "3 شهور فأكثر", "إجمالي الموظفين", "KPI المشرف"].map(header => styledCell(header, styles.header))
+                ["الإقليم", "مدير الإقليم", "المشرف", "أقل من 3 شهور", "النخبة", "3 شهور فأكثر", "Back on Track", "إجمالي الموظفين الفريد", "KPI المشرف"].map(header => styledCell(header, styles.header))
             ];
-            let merges = ["A1:H1", "A2:H2"];
+            let merges = ["A1:I1", "A2:I2"];
             let currentRegion = null;
 
             records.forEach(record => {
@@ -3689,7 +3772,7 @@
                     currentRegion = record.region;
                     let rowNumber = rows.length + 1;
                     rows.push([styledCell(`الإقليم: ${currentRegion}`, styles.section)]);
-                    merges.push(`A${rowNumber}:H${rowNumber}`);
+                    merges.push(`A${rowNumber}:I${rowNumber}`);
                 }
                 rows.push([
                     record.region,
@@ -3698,14 +3781,15 @@
                     styledCell(record.less3, styles.center),
                     styledCell(record.elite, styles.center),
                     styledCell(record.more3, styles.center),
+                    styledCell(record.bot, styles.center),
                     styledCell(record.total, styles.center),
                     styledCell(roundKpiValue(record.kpi), styles.center)
                 ]);
             });
 
             return buildCustomWorksheetXml(rows, {
-                colCount: 8,
-                colWidths: [20, 24, 28, 16, 14, 18, 18, 14],
+                colCount: 9,
+                colWidths: [20, 24, 28, 16, 14, 18, 18, 22, 14],
                 merges,
                 freezeRows: 4
             });
@@ -3721,9 +3805,10 @@
                 ["النخبة", styledCell(0, styles.input), "دورة النخبة 1", "لو كتبت 1 هنا، تارجت المشرف = عدد موظفي النخبة معه."],
                 ["أقل من 3 شهور", styledCell(0, styles.input), "دورة تأسيسية جديدة", "لو كتبت 1 هنا، تارجت المشرف = عدد الأقل من 3 شهور معه."],
                 ["3 شهور فأكثر", styledCell(0, styles.input), "دورة عامة جديدة", "لو كتبت 1 هنا، تارجت المشرف = عدد 3 شهور فأكثر معه."],
+                ["Back on Track", styledCell(0, styles.input), "دورة تحسين جديدة", "لو كتبت 1 هنا، تارجت المشرف = عدد موظفي BOT المسجلين معه."],
                 [],
                 [styledCell("تارجت المشرفين", styles.section)],
-                ["الإقليم", "مدير الإقليم", "المشرف", "عدد أقل من 3", "عدد النخبة", "عدد 3 شهور فأكثر", "تارجت أقل من 3", "تارجت النخبة", "تارجت 3 شهور فأكثر", "إجمالي التارجت", "الحالة", "ملاحظة"].map(header => styledCell(header, styles.header))
+                ["الإقليم", "مدير الإقليم", "المشرف", "عدد أقل من 3", "عدد النخبة", "عدد 3 شهور فأكثر", "عدد BOT", "تارجت أقل من 3", "تارجت النخبة", "تارجت 3 شهور فأكثر", "تارجت BOT", "إجمالي التارجت", "الحالة", "ملاحظة"].map(header => styledCell(header, styles.header))
             ];
 
             let dataStart = rows.length + 1;
@@ -3736,28 +3821,30 @@
                     styledCell(record.less3, styles.center),
                     styledCell(record.elite, styles.center),
                     styledCell(record.more3, styles.center),
+                    styledCell(record.bot, styles.center),
                     formulaCell(`IF($B$6=1,D${rowNumber},0)`, 0, styles.center),
                     formulaCell(`IF($B$5=1,E${rowNumber},0)`, 0, styles.center),
                     formulaCell(`IF($B$7=1,F${rowNumber},0)`, 0, styles.center),
-                    formulaCell(`SUM(G${rowNumber}:I${rowNumber})`, 0, styles.center),
-                    formulaCell(`IF(J${rowNumber}>0,"عليه تارجت","بدون تارجت")`, "بدون تارجت", styles.center, "str"),
-                    formulaCell(`IF(J${rowNumber}>0,"تابع تنفيذ الدورة الجديدة لهذا المشرف","")`, "", styles.center, "str")
+                    formulaCell(`IF($B$8=1,G${rowNumber},0)`, 0, styles.center),
+                    formulaCell(`SUM(H${rowNumber}:K${rowNumber})`, 0, styles.center),
+                    formulaCell(`IF(L${rowNumber}>0,"عليه تارجت","بدون تارجت")`, "بدون تارجت", styles.center, "str"),
+                    formulaCell(`IF(L${rowNumber}>0,"تابع تنفيذ الدورة الجديدة لهذا المشرف","")`, "", styles.center, "str")
                 ]);
             });
 
             let dataEnd = Math.max(dataStart, rows.length);
             let conditionalFormattingXml = records.length
-                ? `<conditionalFormatting sqref="G${dataStart}:J${dataEnd}"><cfRule type="cellIs" priority="1" operator="greaterThan" dxfId="${styles.targetDxf}"><formula>0</formula></cfRule></conditionalFormatting>`
+                ? `<conditionalFormatting sqref="H${dataStart}:L${dataEnd}"><cfRule type="cellIs" priority="1" operator="greaterThan" dxfId="${styles.targetDxf}"><formula>0</formula></cfRule></conditionalFormatting>`
                 : "";
-            let dataValidationsXml = '<dataValidations count="1"><dataValidation type="whole" allowBlank="1" showErrorMessage="1" showInputMessage="1" sqref="B5:B7" operator="between"><formula1>0</formula1><formula2>1</formula2></dataValidation></dataValidations>';
+            let dataValidationsXml = '<dataValidations count="1"><dataValidation type="whole" allowBlank="1" showErrorMessage="1" showInputMessage="1" sqref="B5:B8" operator="between"><formula1>0</formula1><formula2>1</formula2></dataValidation></dataValidations>';
 
             return buildCustomWorksheetXml(rows, {
-                colCount: 12,
-                colWidths: [18, 24, 28, 16, 14, 18, 16, 16, 18, 16, 16, 36],
+                colCount: 14,
+                colWidths: [18, 24, 28, 16, 14, 18, 14, 16, 16, 18, 16, 16, 16, 36],
                 rowHeights: { 1: 30, 2: 38 },
-                merges: ["A1:L1", "A2:L2", "A9:L9"],
-                freezeRows: 10,
-                autoFilterRef: records.length ? `A10:L${dataEnd}` : "",
+                merges: ["A1:N1", "A2:N2", "A10:N10"],
+                freezeRows: 11,
+                autoFilterRef: records.length ? `A11:N${dataEnd}` : "",
                 conditionalFormattingXml,
                 dataValidationsXml
             });
@@ -3818,6 +3905,30 @@
                         targetCertsCount,
                         `باقي ${Math.max(0, targetCertsCount - emp.totalCerts)} دورة للوصول إلى ${targetCertsCount}`,
                         0
+                    ]);
+                }
+
+                const botSummary = getBotImprovementSummary(emp);
+                if (botSummary.assignedCount > 0 && botSummary.score < 100) {
+                    const incompleteBotCourses = botCoursesKeys.filter(course => {
+                        const record = emp.botCourses && emp.botCourses[course];
+                        return record && record.enrolled && record.progress !== 100;
+                    }).map(course => {
+                        const record = emp.botCourses[course];
+                        const progress = record.progress === null || record.progress === undefined ? "بدون تقدم" : `${formatKpiValue(record.progress)}%`;
+                        return `${course} (${progress})`;
+                    });
+                    rows.push([
+                        region,
+                        manager,
+                        supervisor,
+                        emp.id,
+                        emp.name,
+                        "Back on Track",
+                        botSummary.completedCount,
+                        botSummary.assignedCount,
+                        incompleteBotCourses.join("، ") || "لم تكتمل كل دورات BOT المسجل عليها",
+                        botSummary.score
                     ]);
                 }
             });
@@ -3952,7 +4063,8 @@
                 { sheet: KPI_PIVOT_SHEETS.supervisorsPivot, pivot: "xl/pivotTables/pivotTable1.xml", ref: "A1:N80", options: {} },
                 { sheet: KPI_PIVOT_SHEETS.less3Pivot, pivot: "xl/pivotTables/pivotTable2.xml", ref: "A1:K120", options: { onlyEmployeeName: true } },
                 { sheet: KPI_PIVOT_SHEETS.elitePivot, pivot: "xl/pivotTables/pivotTable3.xml", ref: "A1:I120", options: { onlyEmployeeName: true } },
-                { sheet: KPI_PIVOT_SHEETS.more3Pivot, pivot: "xl/pivotTables/pivotTable4.xml", ref: "A1:K120", options: { onlyEmployeeName: true } }
+                { sheet: KPI_PIVOT_SHEETS.more3Pivot, pivot: "xl/pivotTables/pivotTable4.xml", ref: "A1:K120", options: { onlyEmployeeName: true } },
+                { sheet: KPI_PIVOT_SHEETS.botPivot, pivot: "xl/pivotTables/pivotTable5.xml", ref: "A1:E160", options: {} }
             ];
 
             for (const item of pivotSheets) {
@@ -3986,6 +4098,151 @@
             if (target.startsWith("/")) target = target.slice(1);
             else if (!target.startsWith("xl/")) target = "xl/" + target;
             return target;
+        }
+
+        async function findPivotCacheDefinitionPath(zip, sheetName) {
+            const cacheFiles = Object.keys(zip.files).filter(path => /^xl\/pivotCache\/pivotCacheDefinition\d+\.xml$/.test(path));
+            for (const path of cacheFiles) {
+                const xml = await zip.file(path).async("string");
+                if (xml.includes(`sheet="${sheetName}"`)) return path;
+            }
+            throw new Error(`لم يتم العثور على Pivot Cache لورقة ${sheetName}.`);
+        }
+
+        async function replacePivotCacheSchema(zip, sheetName, headers, rows, stringFieldIndexes) {
+            const definitionPath = await findPivotCacheDefinitionPath(zip, sheetName);
+            const cacheNumberMatch = definitionPath.match(/pivotCacheDefinition(\d+)\.xml$/);
+            if (!cacheNumberMatch) throw new Error(`مسار Pivot Cache غير صالح: ${definitionPath}`);
+            const cacheNumber = cacheNumberMatch[1];
+            zip.file(definitionPath, buildMinimalPivotCacheDefinitionXml(sheetName, headers, rows.length, stringFieldIndexes));
+            zip.file(`xl/pivotCache/pivotCacheRecords${cacheNumber}.xml`, buildMinimalPivotCacheRecordsXml(headers.length, stringFieldIndexes));
+        }
+
+        async function updatePivotCacheFieldNames(zip, sheetName, headers, rows) {
+            const definitionPath = await findPivotCacheDefinitionPath(zip, sheetName);
+            let xml = await zip.file(definitionPath).async("string");
+            let fieldIndex = 0;
+            xml = xml.replace(/<cacheField\b[^>]*\bname="[^"]*"/g, tag => {
+                if (fieldIndex >= headers.length) return tag;
+                const header = xmlEscape(headers[fieldIndex++]);
+                return tag.replace(/\bname="[^"]*"/, `name="${header}"`);
+            });
+            const ref = `A1:${excelColumnName(headers.length)}${rows.length + 1}`;
+            xml = xml.replace(/<worksheetSource[^>]*\/>/, `<worksheetSource ref="${ref}" sheet="${xmlEscape(sheetName)}"/>`);
+            if (!/refreshOnLoad="1"/.test(xml)) xml = xml.replace("<pivotCacheDefinition ", '<pivotCacheDefinition refreshOnLoad="1" ');
+            zip.file(definitionPath, xml);
+        }
+
+        async function rebuildSupervisorPivotTableDefinition(zip, percentNumFmtId = null) {
+            const pivotPath = "xl/pivotTables/pivotTable1.xml";
+            const oldXml = await zip.file(pivotPath).async("string");
+            const cacheIdMatch = oldXml.match(/\bcacheId="(\d+)"/);
+            const cacheId = cacheIdMatch ? Number(cacheIdMatch[1]) : 6;
+            let xml = buildPivotTableDefinitionXml({
+                name: "Pivot_Supervisors_4_Axes",
+                cacheId,
+                fieldCount: KPI_PIVOT_HEADERS.supervisors.length,
+                pageFields: [0, 1],
+                rowField: 2,
+                locationRef: "A1:K120",
+                dataFields: [
+                    { name: "متوسط KPI المشرف", fld: 20, subtotal: "average" },
+                    { name: "متوسط KPI أقل من 3 شهور", fld: 7, subtotal: "average" },
+                    { name: "متوسط KPI النخبة", fld: 10, subtotal: "average" },
+                    { name: "متوسط KPI 3 شهور فأكثر", fld: 14, subtotal: "average" },
+                    { name: "متوسط KPI Back on Track", fld: 18, subtotal: "average" },
+                    { name: "مجموع إجمالي الموظفين الفريد", fld: 3 },
+                    { name: "مجموع عدد أقل من 3 شهور", fld: 4 },
+                    { name: "مجموع عدد النخبة", fld: 8 },
+                    { name: "مجموع عدد 3 شهور فأكثر", fld: 11 },
+                    { name: "مجموع عدد موظفي BOT", fld: 15 }
+                ]
+            });
+            xml = customizePivotTableXml(xml, {}, percentNumFmtId);
+            zip.file(pivotPath, xml);
+        }
+
+        async function addBotPivotToTemplate(zip, botRows, percentNumFmtId = null) {
+            let workbookXml = await zip.file("xl/workbook.xml").async("string");
+            if (workbookXml.includes(`name="${KPI_PIVOT_SHEETS.botPivot}"`)) return;
+
+            let workbookRelsXml = await zip.file("xl/_rels/workbook.xml.rels").async("string");
+            let contentTypesXml = await zip.file("[Content_Types].xml").async("string");
+            const sheetNumbers = Object.keys(zip.files).map(path => (path.match(/^xl\/worksheets\/sheet(\d+)\.xml$/) || [])[1]).filter(Boolean).map(Number);
+            const pivotNumbers = Object.keys(zip.files).map(path => (path.match(/^xl\/pivotTables\/pivotTable(\d+)\.xml$/) || [])[1]).filter(Boolean).map(Number);
+            const cacheNumbers = Object.keys(zip.files).map(path => (path.match(/^xl\/pivotCache\/pivotCacheDefinition(\d+)\.xml$/) || [])[1]).filter(Boolean).map(Number);
+            const pivotSheetNumber = Math.max(0, ...sheetNumbers) + 1;
+            const dataSheetNumber = pivotSheetNumber + 1;
+            const pivotNumber = Math.max(0, ...pivotNumbers) + 1;
+            const cacheNumber = Math.max(0, ...cacheNumbers) + 1;
+            const sheetIds = Array.from(workbookXml.matchAll(/\bsheetId="(\d+)"/g), match => Number(match[1]));
+            const cacheIds = Array.from(workbookXml.matchAll(/\bcacheId="(\d+)"/g), match => Number(match[1]));
+            const relationshipIds = Array.from(workbookRelsXml.matchAll(/\bId="rId(\d+)"/g), match => Number(match[1]));
+            const pivotSheetId = Math.max(0, ...sheetIds) + 1;
+            const dataSheetId = pivotSheetId + 1;
+            const cacheId = Math.max(0, ...cacheIds) + 1;
+            const pivotSheetRelId = Math.max(0, ...relationshipIds) + 1;
+            const dataSheetRelId = pivotSheetRelId + 1;
+            const cacheRelId = pivotSheetRelId + 2;
+
+            const pivotSheetTag = `<sheet name="${xmlEscape(KPI_PIVOT_SHEETS.botPivot)}" sheetId="${pivotSheetId}" r:id="rId${pivotSheetRelId}"/>`;
+            const more3SheetRegex = new RegExp(`(<sheet[^>]*name="${escapeRegExp(KPI_PIVOT_SHEETS.more3Pivot)}"[^>]*/>)`);
+            workbookXml = more3SheetRegex.test(workbookXml)
+                ? workbookXml.replace(more3SheetRegex, `$1${pivotSheetTag}`)
+                : workbookXml.replace("</sheets>", `${pivotSheetTag}</sheets>`);
+            workbookXml = workbookXml.replace("</sheets>", `<sheet name="${xmlEscape(KPI_PIVOT_SHEETS.dataBot)}" sheetId="${dataSheetId}" state="veryHidden" r:id="rId${dataSheetRelId}"/></sheets>`);
+            workbookXml = workbookXml.replace("</pivotCaches>", `<pivotCache cacheId="${cacheId}" r:id="rId${cacheRelId}"/></pivotCaches>`);
+            zip.file("xl/workbook.xml", workbookXml);
+
+            workbookRelsXml = workbookRelsXml.replace("</Relationships>", [
+                `<Relationship Id="rId${pivotSheetRelId}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${pivotSheetNumber}.xml"/>`,
+                `<Relationship Id="rId${dataSheetRelId}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${dataSheetNumber}.xml"/>`,
+                `<Relationship Id="rId${cacheRelId}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/pivotCacheDefinition" Target="pivotCache/pivotCacheDefinition${cacheNumber}.xml"/>`,
+                "</Relationships>"
+            ].join(""));
+            zip.file("xl/_rels/workbook.xml.rels", workbookRelsXml);
+
+            const overrides = [
+                `<Override PartName="/xl/worksheets/sheet${pivotSheetNumber}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`,
+                `<Override PartName="/xl/worksheets/sheet${dataSheetNumber}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`,
+                `<Override PartName="/xl/pivotTables/pivotTable${pivotNumber}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.pivotTable+xml"/>`,
+                `<Override PartName="/xl/pivotCache/pivotCacheDefinition${cacheNumber}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.pivotCacheDefinition+xml"/>`,
+                `<Override PartName="/xl/pivotCache/pivotCacheRecords${cacheNumber}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.pivotCacheRecords+xml"/>`
+            ].join("");
+            contentTypesXml = contentTypesXml.replace("</Types>", `${overrides}</Types>`);
+            zip.file("[Content_Types].xml", contentTypesXml);
+
+            zip.file(`xl/worksheets/sheet${pivotSheetNumber}.xml`, buildCleanPivotWorksheetXml("rId1"));
+            zip.file(`xl/worksheets/_rels/sheet${pivotSheetNumber}.xml.rels`, `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/pivotTable" Target="../pivotTables/pivotTable${pivotNumber}.xml"/></Relationships>`);
+            zip.file(`xl/worksheets/sheet${dataSheetNumber}.xml`, buildWorksheetXml(KPI_PIVOT_HEADERS.bot, botRows));
+            zip.file(`xl/pivotTables/_rels/pivotTable${pivotNumber}.xml.rels`, `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/pivotCacheDefinition" Target="../pivotCache/pivotCacheDefinition${cacheNumber}.xml"/></Relationships>`);
+            let pivotXml = buildPivotTableDefinitionXml({
+                name: "Pivot_Back_on_Track",
+                cacheId,
+                fieldCount: KPI_PIVOT_HEADERS.bot.length,
+                pageFields: [0, 1, 2],
+                rowField: 4,
+                locationRef: "A1:E160",
+                dataFields: [
+                    { name: "مجموع دورات BOT المسجل عليها", fld: 5 },
+                    { name: "مجموع دورات BOT المكتملة", fld: 6 },
+                    { name: "مجموع دورات BOT المتبقية", fld: 7 },
+                    { name: "متوسط KPI Back on Track", fld: 9, subtotal: "average" }
+                ]
+            });
+            pivotXml = customizePivotTableXml(pivotXml, {}, percentNumFmtId);
+            zip.file(`xl/pivotTables/pivotTable${pivotNumber}.xml`, pivotXml);
+            zip.file(`xl/pivotCache/pivotCacheDefinition${cacheNumber}.xml`, buildMinimalPivotCacheDefinitionXml(KPI_PIVOT_SHEETS.dataBot, KPI_PIVOT_HEADERS.bot, botRows.length, [0, 1, 2, 3, 4]));
+            zip.file(`xl/pivotCache/pivotCacheRecords${cacheNumber}.xml`, buildMinimalPivotCacheRecordsXml(KPI_PIVOT_HEADERS.bot.length, [0, 1, 2, 3, 4]));
+            zip.file(`xl/pivotCache/_rels/pivotCacheDefinition${cacheNumber}.xml.rels`, `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/pivotCacheRecords" Target="pivotCacheRecords${cacheNumber}.xml"/></Relationships>`);
+
+            const appFile = zip.file("docProps/app.xml");
+            if (appFile) {
+                let appXml = await appFile.async("string");
+                appXml = appXml.replace(/(<HeadingPairs>[\s\S]*?<vt:i4>)(\d+)(<\/vt:i4>)/, (match, before, count, after) => `${before}${Number(count) + 1}${after}`);
+                appXml = appXml.replace(/(<TitlesOfParts><vt:vector size=")(\d+)(" baseType="lpstr">)([\s\S]*?)(<\/vt:vector><\/TitlesOfParts>)/, (match, before, count, after, body, close) => `${before}${Number(count) + 1}${after}${body}<vt:lpstr>${xmlEscape(KPI_PIVOT_SHEETS.botPivot)}</vt:lpstr>${close}`);
+                zip.file("docProps/app.xml", appXml);
+            }
         }
 
         async function updatePivotCacheSource(zip, sheetName, headers, rows) {
@@ -4033,7 +4290,9 @@
                 const updated = xml
                     .replace(/النخبة مكمل 3/g, 'النخبة مكمل 4')
                     .replace(/مكمل 3 نخبة/g, 'مكمل 4 نخبة')
-                    .replace(/النخبة[^<]{0,80}3\/3/g, match => match.replace(/3\/3/g, '4/4'));
+                    .replace(/النخبة[^<]{0,80}3\/3/g, match => match.replace(/3\/3/g, '4/4'))
+                    .replace(/مخلص\s*(?:10|21)/g, 'محقق الهدف')
+                    .replace(/الهدف الشهري/g, 'المستهدف الحالي');
                 if (updated !== xml) zip.file(path, updated);
             }
         }
@@ -4058,9 +4317,10 @@
             rows.less3 = ensurePivotRows(rows.less3, KPI_PIVOT_HEADERS.less3, "لا يوجد موظفين أقل من 3 شهور");
             rows.elite = ensurePivotRows(rows.elite, KPI_PIVOT_HEADERS.elite, "لا يوجد مستهدفين نخبة");
             rows.more3 = ensurePivotRows(rows.more3, KPI_PIVOT_HEADERS.more3, "لا يوجد موظفين 3 شهور فأكثر");
+            rows.bot = ensurePivotRows(rows.bot, KPI_PIVOT_HEADERS.bot, "لا يوجد موظفون مسجلون في Back on Track");
 
             let maxRows = 19999;
-            if ([rows.supervisors, rows.less3, rows.elite, rows.more3].some(arr => arr.length > maxRows)) {
+            if ([rows.supervisors, rows.less3, rows.elite, rows.more3, rows.bot].some(arr => arr.length > maxRows)) {
                 alert(`عدد الصفوف أكبر من نطاق قالب Pivot الحالي (${maxRows} صف). قلل البيانات أو وسع القالب.`);
                 return;
             }
@@ -4069,18 +4329,28 @@
                 let zip = await JSZip.loadAsync(base64ToUint8Array(KPI_PIVOT_TEMPLATE_BASE64));
                 await updateKpiPivotEliteTargetLabels(zip);
                 let styles = await ensureKpiWorkbookStyles(zip);
+                await addBotPivotToTemplate(zip, rows.bot, styles.percentNumFmtId);
+                await rebuildSupervisorPivotTableDefinition(zip, styles.percentNumFmtId);
                 await repairKpiPivotTemplate(zip, styles.percentNumFmtId);
                 let replacements = [
                     { sheet: KPI_PIVOT_SHEETS.dataSup, headers: KPI_PIVOT_HEADERS.supervisors, rows: rows.supervisors },
                     { sheet: KPI_PIVOT_SHEETS.dataLess3, headers: KPI_PIVOT_HEADERS.less3, rows: rows.less3 },
                     { sheet: KPI_PIVOT_SHEETS.dataElite, headers: KPI_PIVOT_HEADERS.elite, rows: rows.elite },
-                    { sheet: KPI_PIVOT_SHEETS.dataMore3, headers: KPI_PIVOT_HEADERS.more3, rows: rows.more3 }
+                    { sheet: KPI_PIVOT_SHEETS.dataMore3, headers: KPI_PIVOT_HEADERS.more3, rows: rows.more3 },
+                    { sheet: KPI_PIVOT_SHEETS.dataBot, headers: KPI_PIVOT_HEADERS.bot, rows: rows.bot }
                 ];
 
                 for (let item of replacements) {
                     let path = await getSheetTargetPath(zip, item.sheet);
                     zip.file(path, buildWorksheetXml(item.headers, item.rows));
-                    await updatePivotCacheSource(zip, item.sheet, item.headers, item.rows);
+                    if (item.sheet === KPI_PIVOT_SHEETS.dataSup) {
+                        await replacePivotCacheSchema(zip, item.sheet, item.headers, item.rows, [0, 1, 2]);
+                    } else if (item.sheet === KPI_PIVOT_SHEETS.dataBot) {
+                        await replacePivotCacheSchema(zip, item.sheet, item.headers, item.rows, [0, 1, 2, 3, 4]);
+                    } else {
+                        await updatePivotCacheSource(zip, item.sheet, item.headers, item.rows);
+                        await updatePivotCacheFieldNames(zip, item.sheet, item.headers, item.rows);
+                    }
                 }
 
                 for (let item of buildKpiReportSheets(supervisorRowsForReports, styles)) {
@@ -6892,8 +7162,8 @@
             XLSX.utils.book_append_sheet(wb, buildExecutiveKpiWorksheet(region, employees), CENTRAL_EXECUTIVE_SHEETS.kpi);
 
             const safeRegion = region.replace(/[\\/:*?"<>|]+/g, '_').replace(/\s+/g, '_');
-            const languageSuffix = courseLanguage === 'ar' ? 'عربي' : 'English';
-            const styledFilename = `تقرير_الإقليم_${safeRegion}_${languageSuffix}.xlsx`;
+            const languageSuffix = courseLanguage === 'en' ? '_English' : '';
+            const styledFilename = `تقرير_الإقليم_${safeRegion}${languageSuffix}.xlsx`;
             if (typeof JSZip === 'undefined' || !REGION_REPORT_NAVIGATION_TEMPLATE_BASE64) {
                 XLSX.writeFile(wb, styledFilename);
                 return;
