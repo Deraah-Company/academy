@@ -524,9 +524,9 @@
                                 </select>
                                 <button id="exportCentralRegionWorkbookBtn" type="button" onclick="openExecutiveExportLanguageDialog()" class="w-full mt-3 bg-emerald-500 hover:bg-emerald-400 disabled:bg-white/10 disabled:text-indigo-200 disabled:cursor-not-allowed text-white rounded-xl px-4 py-3 font-extrabold transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/20">
                                     <i class="fas fa-file-excel"></i>
-                                    <span>تصدير ملف Excel للإقليم</span>
+                                    <span id="centralExportButtonLabel">تصدير ملف Excel للإقليم</span>
                                 </button>
-                                <p id="centralExportRegionHint" class="text-[11px] text-indigo-100 mt-2 text-center">اختر إقليماً محدداً لتنزيل ملف XLSX عادي بأزرار تنقّل بارزة.</p>
+                                <p id="centralExportRegionHint" class="text-[11px] text-indigo-100 mt-2 text-center">عند اختيار كل الأقاليم سيتم إنشاء ملف واحد به زر لكل إقليم وزر لكل الأقاليم.</p>
                             </div>
                         </div>
                     </div>
@@ -2173,11 +2173,13 @@
             });
 
             const exportButton = document.getElementById('exportCentralRegionWorkbookBtn');
+            const exportButtonLabel = document.getElementById('centralExportButtonLabel');
             const exportHint = document.getElementById('centralExportRegionHint');
-            if (exportButton) exportButton.disabled = !selectedGlobalRegion;
+            if (exportButton) exportButton.disabled = !getStandardActiveEmployees().length;
+            if (exportButtonLabel) exportButtonLabel.innerText = selectedGlobalRegion ? 'تصدير ملف Excel للإقليم' : 'تصدير كل الأقاليم في ملف Excel واحد';
             if (exportHint) exportHint.innerText = selectedGlobalRegion
                 ? `سيتم إنشاء ملف Excel عادي لإقليم ${selectedGlobalRegion} فقط — بدون ماكرو أو رسائل أمان.`
-                : 'اختر إقليماً محدداً لتنزيل ملف XLSX عادي بأزرار تنقّل بارزة.';
+                : 'سيتم إنشاء ملف Excel واحد منظم به زر «كل الأقاليم» وزر لكل إقليم موجود فعلياً في البيانات.';
 
             const cards = document.getElementById('globalRegionCards');
             if (cards) {
@@ -6596,7 +6598,8 @@
                 }
             }
 
-            const homeCell = setExecutiveInternalLink(ws, 'A1', CENTRAL_EXECUTIVE_SHEETS.home, '⌂  Home | الرئيسية');
+            const homeSheet = options.homeSheet || CENTRAL_EXECUTIVE_SHEETS.home;
+            const homeCell = setExecutiveInternalLink(ws, 'A1', homeSheet, '⌂  Home | الرئيسية');
             executiveExcelStyleCell(homeCell, {
                 // The raised drawing carries the visible Home button. Keep the
                 // linked cell underneath neutral so no oversized rectangle can
@@ -6675,6 +6678,7 @@
                 headerRows: [4],
                 colWidths: options.colWidths,
                 tabColor: options.tabColor,
+                homeSheet: options.homeSheet,
                 autoFilterRef: `A5:${endCol}${5 + bodyRows.length}`
             });
         }
@@ -6793,7 +6797,7 @@
             return ws;
         }
 
-        function buildExecutiveAnalysisWorksheet(region, employees, courseLanguage = 'ar') {
+        function buildExecutiveAnalysisWorksheet(region, employees, courseLanguage = 'ar', options = {}) {
             const trackKey = employees.length ? getEmployeeAcademyTrack(employees[0]) : getEmployeeAcademyTrack({ region });
             const certCourses = getAcademyTrackCourses(trackKey);
             const total = employees.length;
@@ -6833,11 +6837,12 @@
                 headerRows: [5, 14],
                 colWidths: [18, 44, 24, 24, 20],
                 tabColor: '0891B2',
+                homeSheet: options.homeSheet,
                 autoFilterRef: certCourses.length ? `A15:E${15 + certCourses.length}` : undefined
             });
         }
 
-        function buildExecutiveKpiWorksheet(region, employees) {
+        function buildExecutiveKpiWorksheet(region, employees, options = {}) {
             const groups = new Map();
             employees.forEach(emp => {
                 const manager = getKpiManagerName(emp);
@@ -6902,7 +6907,300 @@
                 sectionRows: [4, detailsSectionRow],
                 headerRows: [5, detailHeaderRow],
                 colWidths: [24, 28, 16, 28, 22, 18, 18, 18, 18, 18, 20, 22],
+                homeSheet: options.homeSheet,
                 tabColor: EXECUTIVE_EXCEL_COLORS.teal
+            });
+        }
+
+        function getCombinedExecutiveScopeSheetNames(scopeIndex) {
+            const prefix = scopeIndex === 0 ? 'الكل' : `ر${String(scopeIndex).padStart(2, '0')}`;
+            return {
+                home: `${prefix}-الرئيسية`,
+                less3: `${prefix}-أقل 3`,
+                more3: `${prefix}-3 فأكثر`,
+                nonCert: `${prefix}-بدون شهادات`,
+                path: `${prefix}-المسار`,
+                analysis: `${prefix}-التحليل`,
+                elite: `${prefix}-النخبة`,
+                bot: `${prefix}-BOT`,
+                kpi: `${prefix}-KPI`
+            };
+        }
+
+        function buildExecutiveRegionSelectorWorksheet(regions, employees, scopeButtons) {
+            const buttonRows = Math.ceil(scopeButtons.length / 2);
+            const totalRows = Math.max(22, 10 + (buttonRows * 3));
+            const aoa = Array.from({ length: totalRows }, () => Array(11).fill(''));
+            const ws = XLSX.utils.aoa_to_sheet(aoa);
+            ws['!ref'] = `A1:K${totalRows}`;
+            ws['!merges'] = [
+                { s: { r: 0, c: 0 }, e: { r: 1, c: 10 } },
+                { s: { r: 2, c: 0 }, e: { r: 2, c: 10 } },
+                { s: { r: 4, c: 0 }, e: { r: 5, c: 1 } },
+                { s: { r: 4, c: 3 }, e: { r: 5, c: 4 } },
+                { s: { r: 4, c: 6 }, e: { r: 5, c: 7 } },
+                { s: { r: 4, c: 9 }, e: { r: 5, c: 10 } },
+                { s: { r: 6, c: 0 }, e: { r: 6, c: 10 } },
+                { s: { r: totalRows - 2, c: 0 }, e: { r: totalRows - 2, c: 10 } }
+            ];
+
+            for (let row = 0; row < totalRows; row++) {
+                for (let col = 0; col < 11; col++) {
+                    const ref = XLSX.utils.encode_cell({ r: row, c: col });
+                    executiveExcelStyleCell(ws[ref], {
+                        font: { name: 'Arial', sz: 10, color: { rgb: '334155' }, underline: false },
+                        fill: { patternType: 'solid', fgColor: { rgb: 'F8FAFC' } },
+                        alignment: { vertical: 'center', horizontal: 'center', wrapText: true }
+                    });
+                }
+            }
+
+            const totalCertificates = employees.reduce((sum, emp) => sum + (Number(emp.totalCerts) || 0), 0);
+            const supervisorsCount = new Set(employees.map(emp => cleanString(emp.supervisor)).filter(Boolean)).size;
+            const mediumBorder = color => ({
+                top: { style: 'medium', color: { rgb: color } },
+                bottom: { style: 'medium', color: { rgb: color } },
+                left: { style: 'medium', color: { rgb: color } },
+                right: { style: 'medium', color: { rgb: color } }
+            });
+
+            setExecutiveExcelCell(ws, 'A1', 'تقارير الأكاديمية  |  كل الأقاليم');
+            setExecutiveExcelCell(ws, 'A3', 'اختر كل الأقاليم أو الإقليم المطلوب من الأزرار بالأسفل');
+            executiveExcelStyleCell(ws['A1'], {
+                font: { name: 'Arial', bold: true, sz: 23, color: { rgb: 'FFFFFF' }, underline: false },
+                fill: { patternType: 'solid', fgColor: { rgb: '201A4F' } },
+                alignment: { vertical: 'center', horizontal: 'center' },
+                border: { bottom: { style: 'medium', color: { rgb: '4F46E5' } } }
+            });
+            executiveExcelStyleCell(ws['A3'], {
+                font: { name: 'Arial', bold: true, sz: 12, color: { rgb: 'E0E7FF' }, underline: false },
+                fill: { patternType: 'solid', fgColor: { rgb: '312E81' } },
+                alignment: { vertical: 'center', horizontal: 'center' }
+            });
+            for (let col = 0; col < 11; col++) {
+                executiveExcelStyleCell(ws[XLSX.utils.encode_cell({ r: 3, c: col })], { fill: { patternType: 'solid', fgColor: { rgb: '201A4F' } } });
+            }
+
+            [
+                { ref: 'A5', value: `الأقاليم\n${regions.length}`, border: '818CF8' },
+                { ref: 'D5', value: `الموظفون\n${employees.length}`, border: 'A78BFA' },
+                { ref: 'G5', value: `المشرفون\n${supervisorsCount}`, border: '34D399' },
+                { ref: 'J5', value: `إجمالي الشهادات\n${totalCertificates}`, border: 'FBBF24' }
+            ].forEach(card => {
+                const cell = setExecutiveExcelCell(ws, card.ref, card.value);
+                executiveExcelStyleCell(cell, {
+                    font: { name: 'Arial', bold: true, sz: 13, color: { rgb: '1E1B4B' }, underline: false },
+                    fill: { patternType: 'solid', fgColor: { rgb: 'FFFFFF' } },
+                    alignment: { vertical: 'center', horizontal: 'center', wrapText: true },
+                    border: mediumBorder(card.border)
+                });
+            });
+
+            setExecutiveExcelCell(ws, 'A7', 'اختر نطاق التقرير');
+            executiveExcelStyleCell(ws['A7'], {
+                font: { name: 'Arial', bold: true, sz: 12, color: { rgb: 'FFFFFF' }, underline: false },
+                fill: { patternType: 'solid', fgColor: { rgb: '37306D' } },
+                alignment: { vertical: 'center', horizontal: 'center' }
+            });
+
+            const buttonFills = ['ECFDF5', 'EFF6FF', 'F5F3FF', 'FFFBEB', 'ECFEFF', 'FEFCE8', 'FAF5FF', 'FFF7ED'];
+            const buttonBorders = ['34D399', '60A5FA', 'A78BFA', 'FBBF24', '22D3EE', 'FACC15', 'C084FC', 'FB923C'];
+            const buttonFonts = ['065F46', '1E40AF', '5B21B6', '92400E', '155E75', '854D0E', '6B21A8', '9A3412'];
+            scopeButtons.forEach((item, index) => {
+                const row = 8 + (Math.floor(index / 2) * 3);
+                const startCol = index % 2 ? 6 : 0;
+                const endCol = index % 2 ? 10 : 4;
+                const range = { s: { r: row, c: startCol }, e: { r: row + 1, c: endCol } };
+                ws['!merges'].push(range);
+                const ref = XLSX.utils.encode_cell(range.s);
+                const cell = setExecutiveInternalLink(ws, ref, item.sheet, item.label);
+                executiveExcelStyleCell(cell, {
+                    font: { name: 'Arial', bold: true, sz: 15, color: { rgb: buttonFonts[index % buttonFonts.length] }, underline: false },
+                    fill: { patternType: 'solid', fgColor: { rgb: buttonFills[index % buttonFills.length] } },
+                    alignment: { vertical: 'center', horizontal: 'center', wrapText: true },
+                    border: mediumBorder(buttonBorders[index % buttonBorders.length])
+                });
+            });
+
+            const footerRef = `A${totalRows - 1}`;
+            setExecutiveExcelCell(ws, footerRef, `ملف موحّد يضم ${regions.length} إقليم  •  ${new Date().toLocaleDateString('ar-EG')}`);
+            executiveExcelStyleCell(ws[footerRef], {
+                font: { name: 'Arial', sz: 9, color: { rgb: '64748B' }, underline: false },
+                fill: { patternType: 'solid', fgColor: { rgb: 'EEF2FF' } },
+                alignment: { vertical: 'center', horizontal: 'center' }
+            });
+
+            ws['!cols'] = [13, 13, 3, 13, 13, 3, 13, 13, 3, 13, 13].map(width => ({ wch: width }));
+            ws['!rows'] = Array.from({ length: totalRows }, (_, row) => {
+                if (row < 2) return { hpt: 34 };
+                if ([4, 5].includes(row)) return { hpt: 31 };
+                if (row >= 8 && (row - 8) % 3 < 2) return { hpt: 34 };
+                if ([3, 7].includes(row) || (row >= 10 && (row - 10) % 3 === 0)) return { hpt: 10 };
+                return { hpt: 25 };
+            });
+            ws['!views'] = [{ rightToLeft: true, showGridLines: false }];
+            ws['!tabColor'] = { rgb: '059669' };
+            return ws;
+        }
+
+        function appendExecutiveScopeWorksheets(wb, region, employees, courseLanguage, sheetNames) {
+            const commonEmployeeHeaders = ['الرقم الوظيفي', 'الاسم', 'الإيميل', 'المشرف', 'مدير الإقليم', 'تاريخ التعيين', 'إجمالي الشهادات', 'المستهدف', 'الحالة', 'KPI'];
+            const makeTenureRows = (list, target) => list.map(emp => {
+                const achieved = emp.totalCerts >= target;
+                return [emp.id, emp.name, emp.email || '', emp.supervisor || 'بدون مشرف', emp.manager || region, formatDateDisplay(emp.hireDate), emp.totalCerts, target, achieved ? 'محقق' : 'غير محقق', achieved ? '100%' : '0%'];
+            });
+            const less3Employees = employees.filter(emp => emp.tenureMonths >= 0 && emp.tenureMonths < 3);
+            const more3Employees = employees.filter(emp => emp.tenureMonths >= 3);
+
+            const nonCertHeaders = ['الرقم الوظيفي', 'الاسم', 'المشرف', 'مدير الإقليم', 'عدد الدورات المكتملة', ...nonCertCoursesKeys.map(course => `${getExecutiveCourseDisplayName(course, courseLanguage)} — التقدم`)];
+            const nonCertRows = employees.map(emp => {
+                const progressValues = nonCertCoursesKeys.map(course => {
+                    const progress = emp.nonCertProgress ? emp.nonCertProgress[course] : null;
+                    return progress === null || progress === undefined ? '-' : `${formatKpiValue(Number(progress))}%`;
+                });
+                const completed = nonCertCoursesKeys.filter(course => emp.nonCertProgress && emp.nonCertProgress[course] === 100).length;
+                return [emp.id, emp.name, emp.supervisor || 'بدون مشرف', emp.manager || region, completed, ...progressValues];
+            });
+
+            const academyTrackKey = employees.length ? getEmployeeAcademyTrack(employees[0]) : getEmployeeAcademyTrack({ region });
+            const certCourses = getAcademyTrackCourses(academyTrackKey);
+            const pathHeaders = ['الرقم الوظيفي', 'الاسم', 'المشرف', 'مدير الإقليم', 'المسار الحالي (نقطة التوقف)', 'إجمالي الشهادات', 'المنجز من المسار', ...certCourses.map(course => `${course.certId}- ${getExecutiveCourseDisplayName(course, courseLanguage)}`)];
+            const pathRows = employees.map(emp => {
+                const trackSummary = getAcademyTrackSummary(emp, academyTrackKey);
+                const stopper = trackSummary.stopper;
+                const stopperName = stopper ? `${stopper.certId}. ${getExecutiveCourseDisplayName(stopper, courseLanguage)}` : 'أتم المسار بالكامل';
+                return [emp.id, emp.name, emp.supervisor || 'بدون مشرف', emp.manager || region, stopperName, emp.totalCerts, `${trackSummary.completedCount} / ${trackSummary.totalCount}`, ...certCourses.map(course => {
+                    const done = isAcademyTrackCourseCompleted(emp, course, academyTrackKey);
+                    if (done) return 'منجز';
+                    return stopper && stopper.en === course.en ? 'واقف عليها' : 'لم يصلها';
+                })];
+            });
+
+            const eliteEmployees = employees.filter(emp => emp.isEliteTarget);
+            const eliteHeaders = ['الرقم الوظيفي', 'الاسم', 'المشرف', 'مدير الإقليم', 'الفئة', ...eliteCoursesKeys.map(course => getExecutiveCourseDisplayName(course, courseLanguage)), 'عدد الدورات المكتملة', 'الحالة', 'KPI النخبة'];
+            const eliteRows = eliteEmployees.map(emp => {
+                const completed = getEliteCompletedCount(emp);
+                return [emp.id, emp.name, emp.supervisor || 'بدون مشرف', emp.manager || region, getEliteCohortLabel(emp), ...eliteCoursesKeys.map(course => emp.eliteProgress && emp.eliteProgress[course] ? 'منجز' : 'غير منجز'), completed, completed === ELITE_TARGET_COUNT ? 'مكتمل' : 'غير مكتمل', completed === ELITE_TARGET_COUNT ? '100%' : '0%'];
+            });
+
+            const [rawBotHeaders, ...allBotRows] = buildBotCombinedRows();
+            const botHeaders = rawBotHeaders.map(header => botCoursesKeys.includes(header) ? getExecutiveCourseDisplayName(header, courseLanguage) : header);
+            const includedRegions = new Set(employees.map(emp => cleanString(emp.region)));
+            const botRows = allBotRows.filter(row => includedRegions.has(cleanString(row[3])));
+            const menuItems = [
+                { label: CENTRAL_EXECUTIVE_SHEETS.less3, sheet: sheetNames.less3 },
+                { label: CENTRAL_EXECUTIVE_SHEETS.more3, sheet: sheetNames.more3 },
+                { label: CENTRAL_EXECUTIVE_SHEETS.nonCert, sheet: sheetNames.nonCert },
+                { label: CENTRAL_EXECUTIVE_SHEETS.path, sheet: sheetNames.path },
+                { label: CENTRAL_EXECUTIVE_SHEETS.analysis, sheet: sheetNames.analysis },
+                { label: CENTRAL_EXECUTIVE_SHEETS.elite, sheet: sheetNames.elite },
+                { label: CENTRAL_EXECUTIVE_SHEETS.bot, sheet: sheetNames.bot },
+                { label: CENTRAL_EXECUTIVE_SHEETS.kpi, sheet: sheetNames.kpi }
+            ];
+
+            const homeSheetIndex = wb.SheetNames.length + 1;
+            XLSX.utils.book_append_sheet(wb, buildExecutiveHomeWorksheet(region, employees, menuItems), sheetNames.home);
+            XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.less3, region, commonEmployeeHeaders, makeTenureRows(less3Employees, less3KpiTarget), { homeSheet: sheetNames.home, colWidths: [15, 28, 28, 28, 24, 18, 18, 16, 18, 14], tabColor: 'EA580C' }), sheetNames.less3);
+            XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.more3, region, commonEmployeeHeaders, makeTenureRows(more3Employees, targetCertsCount), { homeSheet: sheetNames.home, colWidths: [15, 28, 28, 28, 24, 18, 18, 16, 18, 14], tabColor: '2563EB' }), sheetNames.more3);
+            XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.nonCert, region, nonCertHeaders, nonCertRows, { homeSheet: sheetNames.home, colWidths: [15, 28, 28, 24, 20, ...nonCertCoursesKeys.map(() => 30)], tabColor: '7C3AED' }), sheetNames.nonCert);
+            XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.path, region, pathHeaders, pathRows, { homeSheet: sheetNames.home, colWidths: [15, 28, 28, 24, 38, 18, 18, ...certCourses.map(() => 30)], tabColor: EXECUTIVE_EXCEL_COLORS.amber }), sheetNames.path);
+            XLSX.utils.book_append_sheet(wb, buildExecutiveAnalysisWorksheet(region, employees, courseLanguage, { homeSheet: sheetNames.home }), sheetNames.analysis);
+            XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.elite, region, eliteHeaders, eliteRows, { homeSheet: sheetNames.home, colWidths: [15, 28, 28, 24, 20, ...eliteCoursesKeys.map(() => 34), 22, 20, 16], tabColor: 'CA8A04' }), sheetNames.elite);
+            XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.bot, region, botHeaders, botRows, { homeSheet: sheetNames.home, colWidths: [15, 28, 28, 22, 24, 28, 18, 28, ...botCoursesKeys.map(() => 34), 22, 22, 42], tabColor: '7C3AED' }), sheetNames.bot);
+            XLSX.utils.book_append_sheet(wb, buildExecutiveKpiWorksheet(region, employees, { homeSheet: sheetNames.home }), sheetNames.kpi);
+
+            return {
+                homeSheetIndex,
+                menuItems,
+                detailSheetIndexes: Array.from({ length: 8 }, (_, index) => homeSheetIndex + index + 1),
+                homeSheet: sheetNames.home
+            };
+        }
+
+        function customizeExecutiveMenuDrawingXml(drawingXml, buttons) {
+            const anchorMatches = Array.from(String(drawingXml).matchAll(/<xdr:twoCellAnchor>[\s\S]*?<\/xdr:twoCellAnchor>/g));
+            if (!anchorMatches.length) throw new Error('Navigation button template is missing');
+            const setCoordinate = (xml, section, name, value) => xml.replace(new RegExp(`(<xdr:${section}>[\\s\\S]*?<xdr:${name}>)\\d+(<\\/xdr:${name}>)`), `$1${value}$2`);
+            const customizedAnchors = buttons.map((button, index) => {
+                const row = 8 + (Math.floor(index / 2) * 3);
+                const startCol = index % 2 ? 6 : 0;
+                const endCol = index % 2 ? 10 : 4;
+                let anchor = anchorMatches[index % anchorMatches.length][0]
+                    .replace(/(<xdr:cNvPr\b[^>]*\bid=")\d+("[^>]*>)/, `$1${index + 2}$2`)
+                    .replace(/\bname="[^"]*"/, `name="btnExecutiveNavigation${index + 1}"`)
+                    .replace(/<a:hlinkClick\b[^>]*\/>/, `<a:hlinkClick xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:id="rId${index + 1}" tooltip="${escapeExecutiveXml(`فتح ${button.sheet}`)}"/>`)
+                    .replace(/<a:t>[\s\S]*?<\/a:t>/, `<a:t>${escapeExecutiveXml(button.label)}</a:t>`);
+                anchor = setCoordinate(anchor, 'from', 'col', startCol);
+                anchor = setCoordinate(anchor, 'from', 'row', row);
+                anchor = setCoordinate(anchor, 'to', 'col', endCol);
+                anchor = setCoordinate(anchor, 'to', 'row', row + 1);
+                return anchor;
+            });
+            const firstAnchorStart = anchorMatches[0].index;
+            const lastAnchor = anchorMatches[anchorMatches.length - 1];
+            const lastAnchorEnd = lastAnchor.index + lastAnchor[0].length;
+            return `${drawingXml.slice(0, firstAnchorStart)}${customizedAnchors.join('')}${drawingXml.slice(lastAnchorEnd)}`;
+        }
+
+        async function addExecutiveMultiScopeShapeNavigation(wb, drawingPlans) {
+            if (typeof JSZip === 'undefined') throw new Error('JSZip is not available');
+            const workbookBytes = XLSX.write(wb, { bookType: 'xlsx', type: 'array', cellStyles: true });
+            const [outputZip, templateZip] = await Promise.all([
+                JSZip.loadAsync(workbookBytes),
+                JSZip.loadAsync(base64ToUint8Array(REGION_REPORT_NAVIGATION_TEMPLATE_BASE64))
+            ]);
+            const menuDrawingXml = await templateZip.file('xl/drawings/drawing1.xml').async('string');
+            const homeDrawingXml = await templateZip.file('xl/drawings/drawing2.xml').async('string');
+            const menuRelationXml = await templateZip.file('xl/drawings/_rels/drawing1.xml.rels').async('string');
+            const relationshipType = (menuRelationXml.match(/\bType=["']([^"']*\/hyperlink)["']/i) || [])[1]
+                || 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink';
+            const relationRoot = (menuRelationXml.match(/^[\s\S]*?<Relationships\b[^>]*>/i) || ['<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'])[0];
+
+            Object.keys(outputZip.files).filter(path => path.startsWith('xl/drawings/')).forEach(path => outputZip.remove(path));
+            for (const plan of drawingPlans) {
+                const drawingIndex = plan.sheetIndex;
+                let drawingXml;
+                let drawingRelations;
+                if (plan.type === 'menu') {
+                    drawingXml = customizeExecutiveMenuDrawingXml(menuDrawingXml, plan.buttons);
+                    drawingRelations = plan.buttons.map((button, index) => `<Relationship Id="rId${index + 1}" Type="${relationshipType}" Target="#&apos;${escapeExecutiveXml(button.sheet)}&apos;!A1"/>`).join('');
+                } else {
+                    drawingXml = homeDrawingXml.replace(/\bname="[^"]*"/, `name="btnExecutiveHome${drawingIndex}"`);
+                    drawingRelations = `<Relationship Id="rId1" Type="${relationshipType}" Target="#&apos;${escapeExecutiveXml(plan.homeSheet)}&apos;!A1"/>`;
+                }
+                outputZip.file(`xl/drawings/drawing${drawingIndex}.xml`, drawingXml);
+                outputZip.file(`xl/drawings/_rels/drawing${drawingIndex}.xml.rels`, `${relationRoot}${drawingRelations}</Relationships>`);
+
+                const outputRelPath = `xl/worksheets/_rels/sheet${drawingIndex}.xml.rels`;
+                const outputRelFile = outputZip.file(outputRelPath);
+                let outputRelXml = outputRelFile
+                    ? await outputRelFile.async('string')
+                    : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>';
+                const drawingRelId = getNextExecutiveRelationshipId(outputRelXml);
+                outputRelXml = appendExecutiveRelationship(outputRelXml, `<Relationship Id="${drawingRelId}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing${drawingIndex}.xml"/>`);
+                outputZip.file(outputRelPath, outputRelXml);
+
+                const sheetPath = `xl/worksheets/sheet${drawingIndex}.xml`;
+                const outputSheetFile = outputZip.file(sheetPath);
+                if (!outputSheetFile) continue;
+                let sheetXml = await outputSheetFile.async('string');
+                if (!/\bxmlns:r=/.test(sheetXml)) sheetXml = sheetXml.replace('<worksheet ', '<worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" ');
+                sheetXml = sheetXml.replace('</worksheet>', `<drawing r:id="${drawingRelId}"/></worksheet>`);
+                outputZip.file(sheetPath, sheetXml);
+            }
+
+            let contentTypes = await outputZip.file('[Content_Types].xml').async('string');
+            for (const plan of drawingPlans) {
+                const partName = `/xl/drawings/drawing${plan.sheetIndex}.xml`;
+                if (!contentTypes.includes(`PartName="${partName}"`)) {
+                    contentTypes = contentTypes.replace('</Types>', `<Override PartName="${partName}" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/></Types>`);
+                }
+            }
+            outputZip.file('[Content_Types].xml', contentTypes);
+            return outputZip.generateAsync({
+                type: 'blob',
+                compression: 'DEFLATE',
+                mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             });
         }
 
@@ -7051,13 +7349,9 @@
 
         function openExecutiveExportLanguageDialog() {
             const region = cleanString(selectedGlobalRegion);
-            if (!region) {
-                alert('اختر إقليماً محدداً من الفلتر المركزي أولاً.');
-                return;
-            }
-            const hasEmployees = globalData.allActive.some(emp => getEmployeeAcademyTrack(emp) === 'standard' && cleanString(emp.region) === region);
+            const hasEmployees = globalData.allActive.some(emp => getEmployeeAcademyTrack(emp) === 'standard' && (!region || cleanString(emp.region) === region));
             if (!hasEmployees) {
-                alert('لا توجد بيانات موظفين نشطين في الإقليم المختار.');
+                alert(region ? 'لا توجد بيانات موظفين نشطين في الإقليم المختار.' : 'لا توجد بيانات موظفين نشطين للتصدير.');
                 return;
             }
             const modal = document.getElementById('executiveExportLanguageModal');
@@ -7069,12 +7363,82 @@
             if (modal) modal.style.display = 'none';
         }
 
+        async function exportAllRegionsExecutiveWorkbook(courseLanguage = 'ar') {
+            courseLanguage = courseLanguage === 'en' ? 'en' : 'ar';
+            if (typeof XLSX === 'undefined' || !XLSX.utils) {
+                alert('مكتبة Excel غير متاحة حالياً. تأكد من الاتصال ثم أعد تحميل الصفحة.');
+                return;
+            }
+
+            const allEmployees = globalData.allActive
+                .filter(emp => getEmployeeAcademyTrack(emp) === 'standard')
+                .sort((a, b) => cleanString(a.region).localeCompare(cleanString(b.region), 'ar') || cleanString(a.supervisor).localeCompare(cleanString(b.supervisor), 'ar') || cleanString(a.name).localeCompare(cleanString(b.name), 'ar'));
+            if (!allEmployees.length) {
+                alert('لا توجد بيانات موظفين نشطين للتصدير.');
+                return;
+            }
+
+            const regions = Array.from(new Set(allEmployees.map(emp => cleanString(emp.region)).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'ar'));
+            const scopes = [
+                { label: 'كل الأقاليم', employees: allEmployees, sheetNames: getCombinedExecutiveScopeSheetNames(0) },
+                ...regions.map((region, index) => ({
+                    label: region,
+                    employees: allEmployees.filter(emp => cleanString(emp.region) === region),
+                    sheetNames: getCombinedExecutiveScopeSheetNames(index + 1)
+                }))
+            ];
+            const scopeButtons = scopes.map(scope => ({ label: scope.label, sheet: scope.sheetNames.home }));
+
+            const wb = XLSX.utils.book_new();
+            wb.Props = {
+                Title: 'تقرير كل الأقاليم المجمّع',
+                Subject: 'تقارير الأكاديمية المجمعة مع اختيار كل إقليم',
+                Author: 'منظومة الأكاديمية',
+                CreatedDate: new Date()
+            };
+            XLSX.utils.book_append_sheet(wb, buildExecutiveRegionSelectorWorksheet(regions, allEmployees, scopeButtons), 'اختيار الإقليم');
+
+            const drawingPlans = [{ sheetIndex: 1, type: 'menu', buttons: scopeButtons }];
+            scopes.forEach(scope => {
+                const result = appendExecutiveScopeWorksheets(wb, scope.label, scope.employees, courseLanguage, scope.sheetNames);
+                drawingPlans.push({ sheetIndex: result.homeSheetIndex, type: 'menu', buttons: result.menuItems });
+                result.detailSheetIndexes.forEach(sheetIndex => drawingPlans.push({ sheetIndex, type: 'home', homeSheet: result.homeSheet }));
+            });
+
+            const languageSuffix = courseLanguage === 'en' ? '_English' : '';
+            const filename = `تقرير_كل_الأقاليم_المجمع${languageSuffix}.xlsx`;
+            const exportButton = document.getElementById('exportCentralRegionWorkbookBtn');
+            const originalButtonHtml = exportButton ? exportButton.innerHTML : '';
+            if (exportButton) {
+                exportButton.disabled = true;
+                exportButton.innerHTML = '<span class="inline-block animate-spin">◌</span><span>جاري تجهيز كل الأقاليم...</span>';
+            }
+
+            try {
+                if (typeof JSZip === 'undefined' || !REGION_REPORT_NAVIGATION_TEMPLATE_BASE64) {
+                    XLSX.writeFile(wb, filename);
+                    return;
+                }
+                const styledBlob = await addExecutiveMultiScopeShapeNavigation(wb, drawingPlans);
+                saveBlob(styledBlob, filename);
+            } catch (error) {
+                console.error('Combined regions workbook export failed:', error);
+                alert('تعذر إضافة الأزرار البارزة. سيتم تنزيل نفس الملف بروابط تنقّل منسّقة داخل الخلايا.');
+                XLSX.writeFile(wb, filename);
+            } finally {
+                if (exportButton) {
+                    exportButton.disabled = false;
+                    exportButton.innerHTML = originalButtonHtml;
+                }
+            }
+        }
+
         async function exportSelectedRegionExecutiveWorkbook(courseLanguage = 'ar') {
             courseLanguage = courseLanguage === 'en' ? 'en' : 'ar';
             closeExecutiveExportLanguageDialog();
             const region = cleanString(selectedGlobalRegion);
             if (!region) {
-                alert('اختر إقليماً محدداً من الفلتر المركزي أولاً.');
+                await exportAllRegionsExecutiveWorkbook(courseLanguage);
                 return;
             }
             if (typeof XLSX === 'undefined' || !XLSX.utils) {
