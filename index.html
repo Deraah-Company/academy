@@ -6683,6 +6683,59 @@
             });
         }
 
+
+        function getExecutiveHomeTopicMetrics(employees) {
+            const list = Array.isArray(employees) ? employees : [];
+            const kpiSummary = getSupervisorKpiSummary(list);
+            const asPercent = value => value === null || value === undefined || !isFinite(Number(value))
+                ? '—'
+                : `${formatKpiValue(Number(value))}%`;
+
+            const nonCertProgressValues = [];
+            list.forEach(emp => {
+                nonCertCoursesKeys.forEach(course => {
+                    const progress = emp && emp.nonCertProgress ? emp.nonCertProgress[course] : null;
+                    if (progress !== null && progress !== undefined && isFinite(Number(progress))) nonCertProgressValues.push(Number(progress));
+                });
+            });
+            const nonCertAverage = nonCertProgressValues.length ? averageNumber(nonCertProgressValues) : null;
+
+            const pathScores = list.map(emp => getAcademyTrackSummary(emp).score).filter(value => isFinite(Number(value)));
+            const pathAverage = pathScores.length ? averageNumber(pathScores) : null;
+
+            const achievedTargetRate = list.length
+                ? (list.filter(emp => {
+                    const applicableTarget = emp.tenureMonths >= 0 && emp.tenureMonths < 3 ? less3KpiTarget : targetCertsCount;
+                    return Number(emp.totalCerts) >= applicableTarget;
+                }).length / list.length) * 100
+                : null;
+
+            return {
+                less3: asPercent(kpiSummary.less3),
+                more3: asPercent(kpiSummary.more3),
+                nonCert: asPercent(nonCertAverage),
+                path: asPercent(pathAverage),
+                analysis: asPercent(achievedTargetRate),
+                elite: asPercent(kpiSummary.elite),
+                bot: asPercent(kpiSummary.improvement),
+                kpi: asPercent(kpiSummary.overall)
+            };
+        }
+
+        function buildExecutiveMenuItems(employees, sheetNames) {
+            const metrics = getExecutiveHomeTopicMetrics(employees);
+            return [
+                { label: `${CENTRAL_EXECUTIVE_SHEETS.less3}\nKPI: ${metrics.less3}`, sheet: sheetNames.less3 },
+                { label: `${CENTRAL_EXECUTIVE_SHEETS.more3}\nKPI: ${metrics.more3}`, sheet: sheetNames.more3 },
+                { label: `${CENTRAL_EXECUTIVE_SHEETS.nonCert}\nمتوسط التقدم: ${metrics.nonCert}`, sheet: sheetNames.nonCert },
+                { label: `${CENTRAL_EXECUTIVE_SHEETS.path}\nمتوسط الإنجاز: ${metrics.path}`, sheet: sheetNames.path },
+                { label: `${CENTRAL_EXECUTIVE_SHEETS.analysis}\nتحقيق المستهدف: ${metrics.analysis}`, sheet: sheetNames.analysis },
+                { label: `${CENTRAL_EXECUTIVE_SHEETS.elite}\nKPI: ${metrics.elite}`, sheet: sheetNames.elite },
+                { label: `${CENTRAL_EXECUTIVE_SHEETS.bot}\nKPI: ${metrics.bot}`, sheet: sheetNames.bot },
+                { label: `${CENTRAL_EXECUTIVE_SHEETS.kpi}\nالمتوسط الكلي: ${metrics.kpi}`, sheet: sheetNames.kpi }
+            ];
+        }
+
         function buildExecutiveHomeWorksheet(region, employees, menuItems, options = {}) {
             const aoa = Array.from({ length: 22 }, () => Array(11).fill(''));
             const ws = XLSX.utils.aoa_to_sheet(aoa);
@@ -6770,9 +6823,9 @@
                 const ref = XLSX.utils.encode_cell(range.s);
                 const cell = setExecutiveInternalLink(ws, ref, item.sheet, item.label);
                 executiveExcelStyleCell(cell, {
-                    font: { name: 'Arial', bold: true, sz: 15, color: { rgb: buttonFonts[index] }, underline: false },
+                    font: { name: 'Arial', bold: true, sz: 12, color: { rgb: buttonFonts[index] }, underline: false },
                     fill: { patternType: 'solid', fgColor: { rgb: buttonFills[index] } },
-                    alignment: { vertical: 'center', horizontal: 'center', wrapText: false },
+                    alignment: { vertical: 'center', horizontal: 'center', wrapText: true },
                     border: mediumBorder(buttonBorders[index])
                 });
             });
@@ -6845,32 +6898,73 @@
 
         function buildExecutiveKpiWorksheet(region, employees, options = {}) {
             const groups = new Map();
+            const regionGroups = new Map();
+
             employees.forEach(emp => {
+                const employeeRegion = cleanString(emp.region) || cleanString(region) || 'غير محدد';
                 const manager = getKpiManagerName(emp);
                 const supervisor = getKpiSupervisorName(emp);
-                const key = `${manager}||${supervisor}`;
-                if (!groups.has(key)) groups.set(key, { manager, supervisor, employees: [] });
+                const key = `${employeeRegion}||${manager}||${supervisor}`;
+                if (!groups.has(key)) groups.set(key, { region: employeeRegion, manager, supervisor, employees: [] });
                 groups.get(key).employees.push(emp);
+
+                if (!regionGroups.has(employeeRegion)) regionGroups.set(employeeRegion, []);
+                regionGroups.get(employeeRegion).push(emp);
             });
 
+            const axis = value => value === null ? 'لا ينطبق' : `${formatKpiValue(value)}%`;
+            const countAxes = list => ({
+                less3: list.filter(emp => emp.tenureMonths >= 0 && emp.tenureMonths < 3).length,
+                elite: list.filter(emp => emp.isEliteTarget).length,
+                more3: list.filter(emp => emp.tenureMonths >= 3).length,
+                improvement: list.filter(emp => getBotImprovementSummary(emp).assignedCount > 0).length
+            });
+
+            const regionHeaders = [
+                'الإقليم', 'عدد المشرفين', 'عدد الموظفين', 'عدد أقل من 3', 'KPI أقل من 3',
+                'عدد النخبة', 'KPI النخبة', 'عدد 3 شهور فأكثر', 'KPI 3 شهور فأكثر',
+                'عدد موظفي BOT', 'KPI Back on Track', 'متوسط KPI الإقليم'
+            ];
+            const regionRows = Array.from(regionGroups.entries())
+                .sort((a, b) => a[0].localeCompare(b[0], 'ar'))
+                .map(([regionName, regionEmployees]) => {
+                    const summary = getSupervisorKpiSummary(regionEmployees);
+                    const counts = countAxes(regionEmployees);
+                    const supervisorsCount = new Set(regionEmployees.map(emp => getKpiSupervisorName(emp))).size;
+                    return [
+                        regionName, supervisorsCount, regionEmployees.length,
+                        counts.less3, axis(summary.less3),
+                        counts.elite, axis(summary.elite),
+                        counts.more3, axis(summary.more3),
+                        counts.improvement, axis(summary.improvement),
+                        `${formatKpiValue(summary.overall)}%`
+                    ];
+                });
+
             const summaryHeaders = [
-                'مدير الإقليم', 'المشرف', 'عدد الموظفين', 'عدد أقل من 3', 'KPI أقل من 3',
+                'الإقليم', 'مدير الإقليم', 'المشرف', 'عدد الموظفين', 'عدد أقل من 3', 'KPI أقل من 3',
                 'عدد النخبة', 'KPI النخبة', 'عدد 3 شهور فأكثر', 'KPI 3 شهور فأكثر',
                 'عدد موظفي BOT', 'KPI Back on Track', 'متوسط KPI المشرف'
             ];
-            const summaryRows = Array.from(groups.values()).sort((a, b) => a.supervisor.localeCompare(b.supervisor, 'ar')).map(group => {
-                const summary = getSupervisorKpiSummary(group.employees);
-                const less3 = group.employees.filter(emp => emp.tenureMonths >= 0 && emp.tenureMonths < 3).length;
-                const elite = group.employees.filter(emp => emp.isEliteTarget).length;
-                const more3 = group.employees.filter(emp => emp.tenureMonths >= 3).length;
-                const improvement = group.employees.filter(emp => getBotImprovementSummary(emp).assignedCount > 0).length;
-                const axis = value => value === null ? 'لا ينطبق' : `${formatKpiValue(value)}%`;
-                return [group.manager, group.supervisor, group.employees.length, less3, axis(summary.less3), elite, axis(summary.elite), more3, axis(summary.more3), improvement, axis(summary.improvement), `${formatKpiValue(summary.overall)}%`];
-            });
+            const summaryRows = Array.from(groups.values())
+                .sort((a, b) => a.region.localeCompare(b.region, 'ar') || a.supervisor.localeCompare(b.supervisor, 'ar'))
+                .map(group => {
+                    const summary = getSupervisorKpiSummary(group.employees);
+                    const counts = countAxes(group.employees);
+                    return [
+                        group.region, group.manager, group.supervisor, group.employees.length,
+                        counts.less3, axis(summary.less3),
+                        counts.elite, axis(summary.elite),
+                        counts.more3, axis(summary.more3),
+                        counts.improvement, axis(summary.improvement),
+                        `${formatKpiValue(summary.overall)}%`
+                    ];
+                });
 
-            const detailHeaders = ['مدير الإقليم', 'المشرف', 'الرقم الوظيفي', 'اسم الموظف', 'المسار', 'المنجز', 'المستهدف', 'الحالة', 'KPI الموظف'];
+            const detailHeaders = ['الإقليم', 'مدير الإقليم', 'المشرف', 'الرقم الوظيفي', 'اسم الموظف', 'المسار', 'المنجز', 'المستهدف', 'الحالة', 'KPI الموظف'];
             const detailRows = [];
             const addDetail = (emp, track, completed, target, score) => detailRows.push([
+                cleanString(emp.region) || cleanString(region) || 'غير محدد',
                 getKpiManagerName(emp), getKpiSupervisorName(emp), emp.id, emp.name, track, completed, target,
                 score === 100 ? 'محقق' : 'غير محقق', `${formatKpiValue(score)}%`
             ]);
@@ -6885,19 +6979,37 @@
                 if (improvement.assignedCount > 0) addDetail(emp, 'Back on Track (BOT)', `${improvement.completedCount} من ${improvement.assignedCount}`, `إكمال ${improvement.assignedCount}`, improvement.score);
             });
 
+            const isAllRegionsScope = cleanString(region).includes('كل الأقاليم') || regionGroups.size > 1;
             const aoa = [
                 ['⌂  Home | الرئيسية'],
                 [CENTRAL_EXECUTIVE_SHEETS.kpi],
-                [`الإقليم: ${region}  |  متوسط المشرف هو المتوسط الحسابي لمحاور KPI المتاحة فقط وبنفس معادلات البرنامج`],
-                [],
-                ['ملخص KPI المشرفين'],
-                summaryHeaders,
-                ...(summaryRows.length ? summaryRows : [summaryHeaders.map((_, index) => index === 0 ? 'لا توجد بيانات KPI' : '')]),
-                [],
-                ['تفاصيل الموظفين والمحاور']
+                [isAllRegionsScope
+                    ? 'النطاق: كل الأقاليم  |  يبدأ التقرير بملخص KPI لكل إقليم، ثم تفاصيل جميع المشرفين مع توضيح الإقليم'
+                    : `الإقليم: ${region}  |  متوسط المشرف هو المتوسط الحسابي لمحاور KPI المتاحة فقط وبنفس معادلات البرنامج`],
+                []
             ];
-            const detailsSectionRow = aoa.length - 1;
-            const detailHeaderRow = aoa.length;
+            const sectionRows = [];
+            const headerRows = [];
+
+            if (isAllRegionsScope) {
+                sectionRows.push(aoa.length);
+                aoa.push(['ملخص KPI الأقاليم']);
+                headerRows.push(aoa.length);
+                aoa.push(regionHeaders);
+                aoa.push(...(regionRows.length ? regionRows : [regionHeaders.map((_, index) => index === 0 ? 'لا توجد بيانات KPI للأقاليم' : '')]));
+                aoa.push([]);
+            }
+
+            sectionRows.push(aoa.length);
+            aoa.push(['ملخص KPI المشرفين']);
+            headerRows.push(aoa.length);
+            aoa.push(summaryHeaders);
+            aoa.push(...(summaryRows.length ? summaryRows : [summaryHeaders.map((_, index) => index === 0 ? 'لا توجد بيانات KPI للمشرفين' : '')]));
+            aoa.push([]);
+
+            sectionRows.push(aoa.length);
+            aoa.push(['تفاصيل الموظفين والمحاور']);
+            headerRows.push(aoa.length);
             aoa.push(detailHeaders);
             aoa.push(...(detailRows.length ? detailRows : [detailHeaders.map((_, index) => index === 0 ? 'لا توجد تفاصيل KPI' : '')]));
 
@@ -6905,9 +7017,9 @@
             return finalizeExecutiveWorksheet(ws, {
                 titleRow: 1,
                 metaRow: 2,
-                sectionRows: [4, detailsSectionRow],
-                headerRows: [5, detailHeaderRow],
-                colWidths: [24, 28, 16, 28, 22, 18, 18, 18, 18, 18, 20, 22],
+                sectionRows,
+                headerRows,
+                colWidths: [20, 24, 28, 16, 16, 18, 16, 18, 20, 20, 18, 22, 22],
                 homeSheet: options.homeSheet,
                 tabColor: EXECUTIVE_EXCEL_COLORS.teal
             });
@@ -7104,16 +7216,7 @@
             const botHeaders = rawBotHeaders.map(header => botCoursesKeys.includes(header) ? getExecutiveCourseDisplayName(header, courseLanguage) : header);
             const includedRegions = new Set(employees.map(emp => cleanString(emp.region)));
             const botRows = allBotRows.filter(row => includedRegions.has(cleanString(row[3])));
-            const menuItems = [
-                { label: CENTRAL_EXECUTIVE_SHEETS.less3, sheet: sheetNames.less3 },
-                { label: CENTRAL_EXECUTIVE_SHEETS.more3, sheet: sheetNames.more3 },
-                { label: CENTRAL_EXECUTIVE_SHEETS.nonCert, sheet: sheetNames.nonCert },
-                { label: CENTRAL_EXECUTIVE_SHEETS.path, sheet: sheetNames.path },
-                { label: CENTRAL_EXECUTIVE_SHEETS.analysis, sheet: sheetNames.analysis },
-                { label: CENTRAL_EXECUTIVE_SHEETS.elite, sheet: sheetNames.elite },
-                { label: CENTRAL_EXECUTIVE_SHEETS.bot, sheet: sheetNames.bot },
-                { label: CENTRAL_EXECUTIVE_SHEETS.kpi, sheet: sheetNames.kpi }
-            ];
+            const menuItems = buildExecutiveMenuItems(employees, sheetNames);
 
             const homeSheetIndex = wb.SheetNames.length + 1;
             XLSX.utils.book_append_sheet(wb, buildExecutiveHomeWorksheet(region, employees, menuItems, options), sheetNames.home);
@@ -7148,13 +7251,16 @@
                 { fill: '115E59', border: '99F6E4', text: 'FFFFFF' },
                 { fill: '166534', border: 'BBF7D0', text: 'FFFFFF' }
             ];
-            const buildSelectorTextBody = (label, color) => {
-                const lines = String(label || '').split(/\r?\n/).filter(Boolean).slice(0, 4);
+            const buildTextBody = (label, color, variant) => {
+                const maxLines = variant === 'selector' ? 4 : 3;
+                const lines = String(label || '').split(/\r?\n/).filter(Boolean).slice(0, maxLines);
                 const paragraphs = lines.map((line, lineIndex) => {
-                    const fontSize = lineIndex === 0 ? 1250 : 900;
+                    const fontSize = variant === 'selector'
+                        ? (lineIndex === 0 ? 1250 : 900)
+                        : (lineIndex === 0 ? 1200 : 850);
                     return `<a:p><a:pPr algn="ctr" rtl="1"/><a:r><a:rPr lang="ar-EG" sz="${fontSize}" b="1"><a:solidFill><a:srgbClr val="${color}"/></a:solidFill><a:latin typeface="Arial"/></a:rPr><a:t xml:space="preserve">${escapeExecutiveXml(line)}</a:t></a:r><a:endParaRPr lang="ar-EG" sz="${fontSize}" b="1"><a:solidFill><a:srgbClr val="${color}"/></a:solidFill><a:latin typeface="Arial"/></a:endParaRPr></a:p>`;
                 }).join('');
-                return `<xdr:txBody><a:bodyPr vertOverflow="clip" horzOverflow="clip" lIns="76200" tIns="38100" rIns="76200" bIns="38100" rtlCol="0" anchor="ctr" wrap="square"/><a:lstStyle/>${paragraphs}</xdr:txBody>`;
+                return `<xdr:txBody><a:bodyPr vertOverflow="clip" horzOverflow="clip" lIns="76200" tIns="25400" rIns="76200" bIns="25400" rtlCol="0" anchor="ctr" wrap="square"/><a:lstStyle/>${paragraphs}</xdr:txBody>`;
             };
             const setCoordinate = (xml, section, name, value) => xml.replace(new RegExp(`(<xdr:${section}>[\\s\\S]*?<xdr:${name}>)\\d+(<\\/xdr:${name}>)`), `$1${value}$2`);
             const customizedAnchors = buttons.map((button, index) => {
@@ -7164,19 +7270,23 @@
                 let anchor = anchorMatches[index % anchorMatches.length][0]
                     .replace(/(<xdr:cNvPr\b[^>]*\bid=")\d+("[^>]*>)/, `$1${index + 2}$2`)
                     .replace(/\bname="[^"]*"/, `name="btnExecutiveNavigation${index + 1}"`)
-                    .replace(/<a:hlinkClick\b[^>]*\/>/, `<a:hlinkClick xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:id="rId${index + 1}" tooltip="${escapeExecutiveXml(`فتح ${button.sheet}`)}"/>`)
-                    .replace(/<a:t>[\s\S]*?<\/a:t>/, `<a:t xml:space="preserve">${escapeExecutiveXml(button.label)}</a:t>`);
+                    .replace(/<a:hlinkClick\b[^>]*\/>/, `<a:hlinkClick xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:id="rId${index + 1}" tooltip="${escapeExecutiveXml(`فتح ${button.sheet}`)}"/>`);
+
                 if (selectorVariant) {
                     const palette = selectorPalette[index % selectorPalette.length];
                     anchor = anchor
                         .replace(/(<xdr:spPr>[\s\S]*?<a:solidFill><a:srgbClr\s+val=")[^"]+("\/>)/, `$1${palette.fill}$2`)
                         .replace(/(<a:ln\b[\s\S]*?<a:solidFill><a:srgbClr\s+val=")[^"]+("\/>)/, `$1${palette.border}$2`)
-                        .replace(/<xdr:txBody>[\s\S]*?<\/xdr:txBody>/, buildSelectorTextBody(button.label, palette.text));
+                        .replace(/<xdr:txBody>[\s\S]*?<\/xdr:txBody>/, buildTextBody(button.label, palette.text, 'selector'));
+                } else {
+                    const textColor = (anchor.match(/<a:rPr\b[\s\S]*?<a:solidFill><a:srgbClr\s+val="([^"]+)"/) || [])[1] || '1E293B';
+                    anchor = anchor.replace(/<xdr:txBody>[\s\S]*?<\/xdr:txBody>/, buildTextBody(button.label, textColor, 'menu'));
                 }
+
                 anchor = setCoordinate(anchor, 'from', 'col', startCol);
                 anchor = setCoordinate(anchor, 'from', 'row', row);
                 anchor = setCoordinate(anchor, 'to', 'col', endCol);
-                anchor = setCoordinate(anchor, 'to', 'row', row + (selectorVariant ? 3 : 1));
+                anchor = setCoordinate(anchor, 'to', 'row', row + (selectorVariant ? 3 : 2));
                 return anchor;
             });
             const firstAnchorStart = anchorMatches[0].index;
@@ -7301,22 +7411,7 @@
             const drawingFile = templateZip.file(drawingPath);
             if (!drawingFile) throw new Error('Home navigation drawing is missing');
             const drawingXml = await drawingFile.async('string');
-            const anchorMatches = Array.from(drawingXml.matchAll(/<xdr:twoCellAnchor>[\s\S]*?<\/xdr:twoCellAnchor>/g));
-            if (anchorMatches.length < homeButtons.length) throw new Error('Home navigation template does not have enough buttons');
-
-            const customizedAnchors = homeButtons.map((button, index) => {
-                const relationId = `rId${index + 1}`;
-                const label = escapeExecutiveXml(button.label);
-                const tooltip = escapeExecutiveXml(`فتح ${button.sheet}`);
-                return anchorMatches[index][0]
-                    .replace(/\bname="[^"]*"/, `name="btnGulfNavigation${index + 1}"`)
-                    .replace(/<a:hlinkClick\b[^>]*\/>/, `<a:hlinkClick xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:id="${relationId}" tooltip="${tooltip}"/>`)
-                    .replace(/<a:t>[\s\S]*?<\/a:t>/, `<a:t>${label}</a:t>`);
-            });
-            const firstAnchorStart = anchorMatches[0].index;
-            const lastAnchor = anchorMatches[anchorMatches.length - 1];
-            const lastAnchorEnd = lastAnchor.index + lastAnchor[0].length;
-            outputZip.file(drawingPath, `${drawingXml.slice(0, firstAnchorStart)}${customizedAnchors.join('')}${drawingXml.slice(lastAnchorEnd)}`);
+            outputZip.file(drawingPath, customizeExecutiveMenuDrawingXml(drawingXml, homeButtons));
 
             const relationPath = 'xl/drawings/_rels/drawing1.xml.rels';
             const relationFile = templateZip.file(relationPath);
@@ -7561,16 +7656,7 @@
             const botHeaders = rawBotHeaders.map(header => botCoursesKeys.includes(header) ? getExecutiveCourseDisplayName(header, courseLanguage) : header);
             const botRows = allBotRows.filter(row => cleanString(row[3]) === region);
 
-            const menuItems = [
-                { label: CENTRAL_EXECUTIVE_SHEETS.less3, sheet: CENTRAL_EXECUTIVE_SHEETS.less3 },
-                { label: CENTRAL_EXECUTIVE_SHEETS.more3, sheet: CENTRAL_EXECUTIVE_SHEETS.more3 },
-                { label: CENTRAL_EXECUTIVE_SHEETS.nonCert, sheet: CENTRAL_EXECUTIVE_SHEETS.nonCert },
-                { label: CENTRAL_EXECUTIVE_SHEETS.path, sheet: CENTRAL_EXECUTIVE_SHEETS.path },
-                { label: CENTRAL_EXECUTIVE_SHEETS.analysis, sheet: CENTRAL_EXECUTIVE_SHEETS.analysis },
-                { label: CENTRAL_EXECUTIVE_SHEETS.elite, sheet: CENTRAL_EXECUTIVE_SHEETS.elite },
-                { label: CENTRAL_EXECUTIVE_SHEETS.bot, sheet: CENTRAL_EXECUTIVE_SHEETS.bot },
-                { label: CENTRAL_EXECUTIVE_SHEETS.kpi, sheet: CENTRAL_EXECUTIVE_SHEETS.kpi }
-            ];
+            const menuItems = buildExecutiveMenuItems(employees, CENTRAL_EXECUTIVE_SHEETS);
 
             const wb = XLSX.utils.book_new();
             wb.Props = {
@@ -7604,7 +7690,7 @@
                 exportButton.innerHTML = '<span class="inline-block animate-spin">◌</span><span>جاري تجهيز ملف Excel...</span>';
             }
             try {
-                const styledBlob = await addExecutiveShapeNavigation(wb);
+                const styledBlob = await addExecutiveShapeNavigation(wb, { homeButtons: menuItems });
                 saveBlob(styledBlob, styledFilename);
             } catch (error) {
                 console.error('Styled workbook export failed:', error);
