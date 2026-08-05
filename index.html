@@ -6683,7 +6683,7 @@
             });
         }
 
-        function buildExecutiveHomeWorksheet(region, employees, menuItems) {
+        function buildExecutiveHomeWorksheet(region, employees, menuItems, options = {}) {
             const aoa = Array.from({ length: 22 }, () => Array(11).fill(''));
             const ws = XLSX.utils.aoa_to_sheet(aoa);
             ws['!ref'] = 'A1:K22';
@@ -6703,7 +6703,7 @@
                     const ref = XLSX.utils.encode_cell({ r: row, c: col });
                     executiveExcelStyleCell(ws[ref], {
                         font: { name: 'Arial', sz: 10, color: { rgb: '334155' }, underline: false },
-                        fill: { patternType: 'solid', fgColor: { rgb: 'F8FAFC' } },
+                        fill: { patternType: 'solid', fgColor: { rgb: 'F5F3FF' } },
                         alignment: { vertical: 'center', horizontal: 'center', wrapText: true }
                     });
                 }
@@ -6789,7 +6789,8 @@
                 if (row < 2) return { hpt: 34 };
                 if ([4, 5].includes(row)) return { hpt: 31 };
                 if ([8, 9, 11, 12, 14, 15, 17, 18].includes(row)) return { hpt: 34 };
-                if ([3, 7, 10, 13, 16, 19, 21].includes(row)) return { hpt: 10 };
+                if (row === 3) return { hpt: 10 };
+                if ([7, 10, 13, 16, 19, 21].includes(row)) return { hpt: 10 };
                 return { hpt: 25 };
             });
             ws['!views'] = [{ rightToLeft: true, showGridLines: false }];
@@ -6927,9 +6928,26 @@
             };
         }
 
+        function getExecutiveScopeSelectorButton(scope) {
+            const employees = scope.employees || [];
+            const summary = getSupervisorKpiSummary(employees);
+            const achievedCount = employees.filter(emp => Number(emp.totalCerts) >= targetCertsCount).length;
+            const axis = value => value === null || value === undefined ? '—' : `${formatKpiValue(value)}%`;
+            return {
+                sheet: scope.sheetNames.home,
+                shortLabel: scope.label,
+                label: [
+                    `✦ ${scope.label} ✦`,
+                    `البائعون: ${employees.length}  |  المحققون: ${achievedCount}`,
+                    `KPI الكلي: ${formatKpiValue(summary.overall)}%  |  أقل 3: ${axis(summary.less3)}`,
+                    `النخبة: ${axis(summary.elite)}  |  3+ شهور: ${axis(summary.more3)}  |  BOT: ${axis(summary.improvement)}`
+                ].join('\n')
+            };
+        }
+
         function buildExecutiveRegionSelectorWorksheet(regions, employees, scopeButtons) {
             const buttonRows = Math.ceil(scopeButtons.length / 2);
-            const totalRows = Math.max(22, 10 + (buttonRows * 3));
+            const totalRows = Math.max(24, 10 + (buttonRows * 5));
             const aoa = Array.from({ length: totalRows }, () => Array(11).fill(''));
             const ws = XLSX.utils.aoa_to_sheet(aoa);
             ws['!ref'] = `A1:K${totalRows}`;
@@ -6945,11 +6963,11 @@
             ];
 
             for (let row = 0; row < totalRows; row++) {
-                for (let col = 0; col < 11; col++) {
+                for (let col = 0; col < 15; col++) {
                     const ref = XLSX.utils.encode_cell({ r: row, c: col });
                     executiveExcelStyleCell(ws[ref], {
                         font: { name: 'Arial', sz: 10, color: { rgb: '334155' }, underline: false },
-                        fill: { patternType: 'solid', fgColor: { rgb: 'F8FAFC' } },
+                        fill: { patternType: 'solid', fgColor: { rgb: 'ECFDF5' } },
                         alignment: { vertical: 'center', horizontal: 'center', wrapText: true }
                     });
                 }
@@ -6968,17 +6986,17 @@
             setExecutiveExcelCell(ws, 'A3', 'اختر كل الأقاليم أو الإقليم المطلوب من الأزرار بالأسفل');
             executiveExcelStyleCell(ws['A1'], {
                 font: { name: 'Arial', bold: true, sz: 23, color: { rgb: 'FFFFFF' }, underline: false },
-                fill: { patternType: 'solid', fgColor: { rgb: '201A4F' } },
+                fill: { patternType: 'solid', fgColor: { rgb: '064E3B' } },
                 alignment: { vertical: 'center', horizontal: 'center' },
-                border: { bottom: { style: 'medium', color: { rgb: '4F46E5' } } }
+                border: { bottom: { style: 'medium', color: { rgb: '2DD4BF' } } }
             });
             executiveExcelStyleCell(ws['A3'], {
-                font: { name: 'Arial', bold: true, sz: 12, color: { rgb: 'E0E7FF' }, underline: false },
-                fill: { patternType: 'solid', fgColor: { rgb: '312E81' } },
+                font: { name: 'Arial', bold: true, sz: 12, color: { rgb: 'CCFBF1' }, underline: false },
+                fill: { patternType: 'solid', fgColor: { rgb: '0F766E' } },
                 alignment: { vertical: 'center', horizontal: 'center' }
             });
-            for (let col = 0; col < 11; col++) {
-                executiveExcelStyleCell(ws[XLSX.utils.encode_cell({ r: 3, c: col })], { fill: { patternType: 'solid', fgColor: { rgb: '201A4F' } } });
+            for (let col = 0; col < 15; col++) {
+                executiveExcelStyleCell(ws[XLSX.utils.encode_cell({ r: 3, c: col })], { fill: { patternType: 'solid', fgColor: { rgb: '064E3B' } } });
             }
 
             [
@@ -6999,23 +7017,22 @@
             setExecutiveExcelCell(ws, 'A7', 'اختر نطاق التقرير');
             executiveExcelStyleCell(ws['A7'], {
                 font: { name: 'Arial', bold: true, sz: 12, color: { rgb: 'FFFFFF' }, underline: false },
-                fill: { patternType: 'solid', fgColor: { rgb: '37306D' } },
+                fill: { patternType: 'solid', fgColor: { rgb: '115E59' } },
                 alignment: { vertical: 'center', horizontal: 'center' }
             });
 
-            const buttonFills = ['ECFDF5', 'EFF6FF', 'F5F3FF', 'FFFBEB', 'ECFEFF', 'FEFCE8', 'FAF5FF', 'FFF7ED'];
-            const buttonBorders = ['34D399', '60A5FA', 'A78BFA', 'FBBF24', '22D3EE', 'FACC15', 'C084FC', 'FB923C'];
-            const buttonFonts = ['065F46', '1E40AF', '5B21B6', '92400E', '155E75', '854D0E', '6B21A8', '9A3412'];
+            const buttonFills = ['047857', '0F766E', '065F46', '0E7490', '15803D', '0369A1', '115E59', '166534'];
+            const buttonBorders = ['6EE7B7', '5EEAD4', 'A7F3D0', '67E8F9', '86EFAC', '7DD3FC', '99F6E4', 'BBF7D0'];
             scopeButtons.forEach((item, index) => {
-                const row = 8 + (Math.floor(index / 2) * 3);
+                const row = 8 + (Math.floor(index / 2) * 5);
                 const startCol = index % 2 ? 6 : 0;
                 const endCol = index % 2 ? 10 : 4;
-                const range = { s: { r: row, c: startCol }, e: { r: row + 1, c: endCol } };
+                const range = { s: { r: row, c: startCol }, e: { r: row + 3, c: endCol } };
                 ws['!merges'].push(range);
                 const ref = XLSX.utils.encode_cell(range.s);
                 const cell = setExecutiveInternalLink(ws, ref, item.sheet, item.label);
                 executiveExcelStyleCell(cell, {
-                    font: { name: 'Arial', bold: true, sz: 15, color: { rgb: buttonFonts[index % buttonFonts.length] }, underline: false },
+                    font: { name: 'Arial', bold: true, sz: 11, color: { rgb: 'F8FAFC' }, underline: false },
                     fill: { patternType: 'solid', fgColor: { rgb: buttonFills[index % buttonFills.length] } },
                     alignment: { vertical: 'center', horizontal: 'center', wrapText: true },
                     border: mediumBorder(buttonBorders[index % buttonBorders.length])
@@ -7034,16 +7051,16 @@
             ws['!rows'] = Array.from({ length: totalRows }, (_, row) => {
                 if (row < 2) return { hpt: 34 };
                 if ([4, 5].includes(row)) return { hpt: 31 };
-                if (row >= 8 && (row - 8) % 3 < 2) return { hpt: 34 };
-                if ([3, 7].includes(row) || (row >= 10 && (row - 10) % 3 === 0)) return { hpt: 10 };
+                if (row >= 8 && (row - 8) % 5 < 4) return { hpt: 26 };
+                if ([3, 7].includes(row) || (row >= 12 && (row - 12) % 5 === 0)) return { hpt: 10 };
                 return { hpt: 25 };
             });
             ws['!views'] = [{ rightToLeft: true, showGridLines: false }];
-            ws['!tabColor'] = { rgb: '059669' };
+            ws['!tabColor'] = { rgb: '14B8A6' };
             return ws;
         }
 
-        function appendExecutiveScopeWorksheets(wb, region, employees, courseLanguage, sheetNames) {
+        function appendExecutiveScopeWorksheets(wb, region, employees, courseLanguage, sheetNames, options = {}) {
             const commonEmployeeHeaders = ['الرقم الوظيفي', 'الاسم', 'الإيميل', 'المشرف', 'مدير الإقليم', 'تاريخ التعيين', 'إجمالي الشهادات', 'المستهدف', 'الحالة', 'KPI'];
             const makeTenureRows = (list, target) => list.map(emp => {
                 const achieved = emp.totalCerts >= target;
@@ -7099,7 +7116,7 @@
             ];
 
             const homeSheetIndex = wb.SheetNames.length + 1;
-            XLSX.utils.book_append_sheet(wb, buildExecutiveHomeWorksheet(region, employees, menuItems), sheetNames.home);
+            XLSX.utils.book_append_sheet(wb, buildExecutiveHomeWorksheet(region, employees, menuItems, options), sheetNames.home);
             XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.less3, region, commonEmployeeHeaders, makeTenureRows(less3Employees, less3KpiTarget), { homeSheet: sheetNames.home, colWidths: [15, 28, 28, 28, 24, 18, 18, 16, 18, 14], tabColor: 'EA580C' }), sheetNames.less3);
             XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.more3, region, commonEmployeeHeaders, makeTenureRows(more3Employees, targetCertsCount), { homeSheet: sheetNames.home, colWidths: [15, 28, 28, 28, 24, 18, 18, 16, 18, 14], tabColor: '2563EB' }), sheetNames.more3);
             XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.nonCert, region, nonCertHeaders, nonCertRows, { homeSheet: sheetNames.home, colWidths: [15, 28, 28, 24, 20, ...nonCertCoursesKeys.map(() => 30)], tabColor: '7C3AED' }), sheetNames.nonCert);
@@ -7117,29 +7134,71 @@
             };
         }
 
-        function customizeExecutiveMenuDrawingXml(drawingXml, buttons) {
+        function customizeExecutiveMenuDrawingXml(drawingXml, buttons, options = {}) {
             const anchorMatches = Array.from(String(drawingXml).matchAll(/<xdr:twoCellAnchor>[\s\S]*?<\/xdr:twoCellAnchor>/g));
             if (!anchorMatches.length) throw new Error('Navigation button template is missing');
+            const selectorVariant = options.variant === 'selector';
+            const selectorPalette = [
+                { fill: '047857', border: '6EE7B7', text: 'FFFFFF' },
+                { fill: '0F766E', border: '5EEAD4', text: 'FFFFFF' },
+                { fill: '065F46', border: 'A7F3D0', text: 'FFFFFF' },
+                { fill: '0E7490', border: '67E8F9', text: 'FFFFFF' },
+                { fill: '15803D', border: '86EFAC', text: 'FFFFFF' },
+                { fill: '0369A1', border: '7DD3FC', text: 'FFFFFF' },
+                { fill: '115E59', border: '99F6E4', text: 'FFFFFF' },
+                { fill: '166534', border: 'BBF7D0', text: 'FFFFFF' }
+            ];
+            const buildSelectorTextBody = (label, color) => {
+                const lines = String(label || '').split(/\r?\n/).filter(Boolean).slice(0, 4);
+                const paragraphs = lines.map((line, lineIndex) => {
+                    const fontSize = lineIndex === 0 ? 1250 : 900;
+                    return `<a:p><a:pPr algn="ctr" rtl="1"/><a:r><a:rPr lang="ar-EG" sz="${fontSize}" b="1"><a:solidFill><a:srgbClr val="${color}"/></a:solidFill><a:latin typeface="Arial"/></a:rPr><a:t xml:space="preserve">${escapeExecutiveXml(line)}</a:t></a:r><a:endParaRPr lang="ar-EG" sz="${fontSize}" b="1"><a:solidFill><a:srgbClr val="${color}"/></a:solidFill><a:latin typeface="Arial"/></a:endParaRPr></a:p>`;
+                }).join('');
+                return `<xdr:txBody><a:bodyPr vertOverflow="clip" horzOverflow="clip" lIns="76200" tIns="38100" rIns="76200" bIns="38100" rtlCol="0" anchor="ctr" wrap="square"/><a:lstStyle/>${paragraphs}</xdr:txBody>`;
+            };
             const setCoordinate = (xml, section, name, value) => xml.replace(new RegExp(`(<xdr:${section}>[\\s\\S]*?<xdr:${name}>)\\d+(<\\/xdr:${name}>)`), `$1${value}$2`);
             const customizedAnchors = buttons.map((button, index) => {
-                const row = 8 + (Math.floor(index / 2) * 3);
+                const row = 8 + (Math.floor(index / 2) * (selectorVariant ? 5 : 3));
                 const startCol = index % 2 ? 6 : 0;
                 const endCol = index % 2 ? 10 : 4;
                 let anchor = anchorMatches[index % anchorMatches.length][0]
                     .replace(/(<xdr:cNvPr\b[^>]*\bid=")\d+("[^>]*>)/, `$1${index + 2}$2`)
                     .replace(/\bname="[^"]*"/, `name="btnExecutiveNavigation${index + 1}"`)
                     .replace(/<a:hlinkClick\b[^>]*\/>/, `<a:hlinkClick xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:id="rId${index + 1}" tooltip="${escapeExecutiveXml(`فتح ${button.sheet}`)}"/>`)
-                    .replace(/<a:t>[\s\S]*?<\/a:t>/, `<a:t>${escapeExecutiveXml(button.label)}</a:t>`);
+                    .replace(/<a:t>[\s\S]*?<\/a:t>/, `<a:t xml:space="preserve">${escapeExecutiveXml(button.label)}</a:t>`);
+                if (selectorVariant) {
+                    const palette = selectorPalette[index % selectorPalette.length];
+                    anchor = anchor
+                        .replace(/(<xdr:spPr>[\s\S]*?<a:solidFill><a:srgbClr\s+val=")[^"]+("\/>)/, `$1${palette.fill}$2`)
+                        .replace(/(<a:ln\b[\s\S]*?<a:solidFill><a:srgbClr\s+val=")[^"]+("\/>)/, `$1${palette.border}$2`)
+                        .replace(/<xdr:txBody>[\s\S]*?<\/xdr:txBody>/, buildSelectorTextBody(button.label, palette.text));
+                }
                 anchor = setCoordinate(anchor, 'from', 'col', startCol);
                 anchor = setCoordinate(anchor, 'from', 'row', row);
                 anchor = setCoordinate(anchor, 'to', 'col', endCol);
-                anchor = setCoordinate(anchor, 'to', 'row', row + 1);
+                anchor = setCoordinate(anchor, 'to', 'row', row + (selectorVariant ? 3 : 1));
                 return anchor;
             });
             const firstAnchorStart = anchorMatches[0].index;
             const lastAnchor = anchorMatches[anchorMatches.length - 1];
             const lastAnchorEnd = lastAnchor.index + lastAnchor[0].length;
             return `${drawingXml.slice(0, firstAnchorStart)}${customizedAnchors.join('')}${drawingXml.slice(lastAnchorEnd)}`;
+        }
+
+        function appendExecutiveSelectorHomeButton(drawingXml, homeDrawingXml, relationId) {
+            const match = String(homeDrawingXml).match(/<xdr:twoCellAnchor>[\s\S]*?<\/xdr:twoCellAnchor>/);
+            if (!match) return drawingXml;
+            const setCoordinate = (xml, section, name, value) => xml.replace(new RegExp(`(<xdr:${section}>[\\s\\S]*?<xdr:${name}>)\\d+(<\\/xdr:${name}>)`), `$1${value}$2`);
+            let anchor = match[0]
+                .replace(/(<xdr:cNvPr\b[^>]*\bid=")\d+("[^>]*>)/, (whole, start, end) => `${start}99${end}`)
+                .replace(/\bname="[^"]*"/, 'name="btnRegionSelectorHome"')
+                .replace(/<a:hlinkClick\b[^>]*\/>/, `<a:hlinkClick xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:id="rId${relationId}" tooltip="الرجوع إلى اختيار الإقليم"/>`)
+                .replace(/<a:t>[\s\S]*?<\/a:t>/, '<a:t>⌂  الرئيسية | اختيار الأقاليم</a:t>');
+            anchor = setCoordinate(anchor, 'from', 'col', 12);
+            anchor = setCoordinate(anchor, 'from', 'row', 3);
+            anchor = setCoordinate(anchor, 'to', 'col', 14);
+            anchor = setCoordinate(anchor, 'to', 'row', 4);
+            return String(drawingXml).replace('</xdr:wsDr>', `${anchor}</xdr:wsDr>`);
         }
 
         async function addExecutiveMultiScopeShapeNavigation(wb, drawingPlans) {
@@ -7162,8 +7221,13 @@
                 let drawingXml;
                 let drawingRelations;
                 if (plan.type === 'menu') {
-                    drawingXml = customizeExecutiveMenuDrawingXml(menuDrawingXml, plan.buttons);
+                    drawingXml = customizeExecutiveMenuDrawingXml(menuDrawingXml, plan.buttons, { variant: plan.variant });
                     drawingRelations = plan.buttons.map((button, index) => `<Relationship Id="rId${index + 1}" Type="${relationshipType}" Target="#&apos;${escapeExecutiveXml(button.sheet)}&apos;!A1"/>`).join('');
+                    if (plan.selectorHomeSheet) {
+                        const selectorRelationId = plan.buttons.length + 1;
+                        drawingXml = appendExecutiveSelectorHomeButton(drawingXml, homeDrawingXml, selectorRelationId);
+                        drawingRelations += `<Relationship Id="rId${selectorRelationId}" Type="${relationshipType}" Target="#&apos;${escapeExecutiveXml(plan.selectorHomeSheet)}&apos;!A1"/>`;
+                    }
                 } else {
                     drawingXml = homeDrawingXml.replace(/\bname="[^"]*"/, `name="btnExecutiveHome${drawingIndex}"`);
                     drawingRelations = `<Relationship Id="rId1" Type="${relationshipType}" Target="#&apos;${escapeExecutiveXml(plan.homeSheet)}&apos;!A1"/>`;
@@ -7387,7 +7451,7 @@
                     sheetNames: getCombinedExecutiveScopeSheetNames(index + 1)
                 }))
             ];
-            const scopeButtons = scopes.map(scope => ({ label: scope.label, sheet: scope.sheetNames.home }));
+            const scopeButtons = scopes.map(getExecutiveScopeSelectorButton);
 
             const wb = XLSX.utils.book_new();
             wb.Props = {
@@ -7398,10 +7462,10 @@
             };
             XLSX.utils.book_append_sheet(wb, buildExecutiveRegionSelectorWorksheet(regions, allEmployees, scopeButtons), 'اختيار الإقليم');
 
-            const drawingPlans = [{ sheetIndex: 1, type: 'menu', buttons: scopeButtons }];
+            const drawingPlans = [{ sheetIndex: 1, type: 'menu', variant: 'selector', buttons: scopeButtons }];
             scopes.forEach(scope => {
-                const result = appendExecutiveScopeWorksheets(wb, scope.label, scope.employees, courseLanguage, scope.sheetNames);
-                drawingPlans.push({ sheetIndex: result.homeSheetIndex, type: 'menu', buttons: result.menuItems });
+                const result = appendExecutiveScopeWorksheets(wb, scope.label, scope.employees, courseLanguage, scope.sheetNames, { selectorHomeSheet: 'اختيار الإقليم' });
+                drawingPlans.push({ sheetIndex: result.homeSheetIndex, type: 'menu', buttons: result.menuItems, selectorHomeSheet: 'اختيار الإقليم' });
                 result.detailSheetIndexes.forEach(sheetIndex => drawingPlans.push({ sheetIndex, type: 'home', homeSheet: result.homeSheet }));
             });
 
