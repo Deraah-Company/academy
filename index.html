@@ -357,7 +357,7 @@
             </div>
             <div class="flex items-center gap-3 bg-indigo-50 p-2 rounded-xl border border-indigo-100">
                 <label for="targetCertsInput" class="font-bold text-indigo-900 pr-2">العدد المستهدف:</label>
-                <input type="number" id="targetCertsInput" min="1" max="100" value="21" class="w-24 px-3 py-2 border border-indigo-200 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-extrabold text-center text-indigo-700 bg-white" oninput="changeTargetCerts(this.value)" onchange="changeTargetCerts(this.value, true)">
+                <input type="number" id="targetCertsInput" min="1" max="100" value="22" class="w-24 px-3 py-2 border border-indigo-200 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-extrabold text-center text-indigo-700 bg-white" oninput="changeTargetCerts(this.value)" onchange="changeTargetCerts(this.value, true)">
                 <span class="text-indigo-700 font-bold pl-2">شهادة</span>
             </div>
         </div>
@@ -1075,7 +1075,7 @@
 
                     <div class="flex border-b border-slate-200 mb-6 bg-slate-50 rounded-t-xl overflow-hidden">
                         <button class="path-sub-tab-btn active px-6 py-3 font-bold text-orange-600 border-b-2 border-orange-600 bg-orange-50 transition focus:outline-none" onclick="switchPathSubTab(event, 'pathCertSection')">
-                            <i class="fas fa-certificate ml-2"></i> الدورات الأساسية (بشهادة وتوقف - 21 دورة)
+                            <i class="fas fa-certificate ml-2"></i> الدورات الأساسية (بشهادة وتوقف - 22 دورة)
                         </button>
                         <button class="path-sub-tab-btn px-6 py-3 font-semibold text-slate-500 border-b-2 border-transparent hover:bg-slate-100 transition focus:outline-none" onclick="switchPathSubTab(event, 'pathNonCertSection')">
                             <i class="fas fa-plus-circle ml-2"></i> الدورات الداعمة (بدون شهادة - 8 دورات)
@@ -1115,6 +1115,11 @@
                                 <p class="text-emerald-50 mt-2">تقارير كاملة لموظفي الخليج ودوراتهم الخاصة: الموظفون، المشرفون، KPI، الإحصائيات والتقييم الشهري.</p>
                             </div>
                             <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                                <div class="bg-white rounded-xl px-3 py-1 flex items-center gap-2 text-slate-700">
+                                    <label for="gulfTargetCoursesInput" class="text-xs font-extrabold whitespace-nowrap">المستهدف:</label>
+                                    <input id="gulfTargetCoursesInput" type="number" min="1" max="15" value="15" oninput="changeGulfTargetCourses(this.value)" onchange="changeGulfTargetCourses(this.value, true)" class="w-16 px-2 py-2 text-center font-extrabold text-emerald-800 outline-none rounded-lg border border-emerald-200">
+                                    <span class="text-xs font-bold whitespace-nowrap">دورة</span>
+                                </div>
                                 <div class="bg-white rounded-xl p-1 flex items-center min-w-[270px]">
                                     <i class="fas fa-search text-slate-400 px-3"></i>
                                     <input id="gulfTrackSearch" type="search" oninput="renderGulfRegionDashboard()" placeholder="بحث بالاسم أو الرقم أو المشرف" class="w-full px-2 py-2 text-slate-800 outline-none rounded-xl">
@@ -1126,9 +1131,9 @@
                     <div class="grid grid-cols-2 xl:grid-cols-5 gap-4 mb-6">
                         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-xs font-bold text-slate-500">موظفو الخليج</p><p id="gulfTrackEmployeeCount" class="text-3xl font-extrabold text-slate-900 mt-2">0</p></div>
                         <div class="rounded-2xl border border-cyan-200 bg-cyan-50 p-5 shadow-sm"><p class="text-xs font-bold text-cyan-700">المشرفون</p><p id="gulfSupervisorCount" class="text-3xl font-extrabold text-cyan-900 mt-2">0</p></div>
-                        <div class="rounded-2xl border border-teal-200 bg-teal-50 p-5 shadow-sm"><p class="text-xs font-bold text-teal-700">إجمالي الدورات المنجزة</p><p id="gulfTotalCompletions" class="text-3xl font-extrabold text-teal-900 mt-2">0</p><p class="text-[10px] text-teal-600 mt-1">من 11 دورة خليجية لكل موظف</p></div>
-                        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm"><p class="text-xs font-bold text-emerald-700">أكملوا الـ11 دورة</p><p id="gulfTrackCompletedCount" class="text-3xl font-extrabold text-emerald-900 mt-2">0</p></div>
-                        <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm"><p class="text-xs font-bold text-indigo-700">KPI الإقليم</p><p id="gulfRegionKpi" class="text-3xl font-extrabold text-indigo-900 mt-2">0%</p><p class="text-[10px] text-indigo-600 mt-1">متوسط تقدم الموظفين من 11 دورة</p></div>
+                        <div class="rounded-2xl border border-teal-200 bg-teal-50 p-5 shadow-sm"><p class="text-xs font-bold text-teal-700">إجمالي الدورات المنجزة</p><p id="gulfTotalCompletions" class="text-3xl font-extrabold text-teal-900 mt-2">0</p><p id="gulfCourseCountHint" class="text-[10px] text-teal-600 mt-1">من 15 دورة خليجية لكل موظف</p></div>
+                        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm"><p id="gulfCompletedTargetLabel" class="text-xs font-bold text-emerald-700">أكملوا المستهدف (15 دورة)</p><p id="gulfTrackCompletedCount" class="text-3xl font-extrabold text-emerald-900 mt-2">0</p></div>
+                        <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm"><p class="text-xs font-bold text-indigo-700">KPI الإقليم</p><p id="gulfRegionKpi" class="text-3xl font-extrabold text-indigo-900 mt-2">0%</p><p id="gulfKpiHint" class="text-[10px] text-indigo-600 mt-1">متوسط تقدم الموظفين على مستهدف 15 دورة</p></div>
                     </div>
 
                     <div class="rounded-2xl border border-emerald-100 bg-white shadow-sm p-2 mb-6 overflow-x-auto">
@@ -1157,12 +1162,12 @@
                     </div>
 
                     <div id="gulfSupervisorsSection" class="gulf-subsection hidden">
-                        <div class="rounded-2xl border border-slate-200 overflow-hidden shadow-sm mb-5"><div class="bg-cyan-900 text-white px-5 py-4 font-extrabold"><i class="fas fa-user-tie ml-2"></i>تقييم مشرفي الخليج</div><div class="table-container"><table class="min-w-full text-sm text-right"><thead class="bg-slate-100"><tr><th class="px-4 py-3">المشرف</th><th class="px-4 py-3">عدد الموظفين</th><th class="px-4 py-3">إجمالي المنجز</th><th class="px-4 py-3">أكملوا 11</th><th class="px-4 py-3">متوسط التقدم</th><th class="px-4 py-3">KPI المشرف</th><th class="px-4 py-3">التفاصيل</th></tr></thead><tbody id="gulfSupervisorsTableBody" class="divide-y divide-slate-100"></tbody></table></div></div>
+                        <div class="rounded-2xl border border-slate-200 overflow-hidden shadow-sm mb-5"><div class="bg-cyan-900 text-white px-5 py-4 font-extrabold"><i class="fas fa-user-tie ml-2"></i>تقييم مشرفي الخليج</div><div class="table-container"><table class="min-w-full text-sm text-right"><thead class="bg-slate-100"><tr><th class="px-4 py-3">المشرف</th><th class="px-4 py-3">عدد الموظفين</th><th class="px-4 py-3">إجمالي المنجز</th><th id="gulfSupervisorCompletedHeader" class="px-4 py-3">أكملوا 15</th><th class="px-4 py-3">متوسط التقدم</th><th class="px-4 py-3">KPI المشرف</th><th class="px-4 py-3">التفاصيل</th></tr></thead><tbody id="gulfSupervisorsTableBody" class="divide-y divide-slate-100"></tbody></table></div></div>
                         <div id="gulfSupervisorDetail" class="hidden rounded-2xl border border-emerald-200 bg-emerald-50/40 overflow-hidden"><div class="px-5 py-4 bg-emerald-900 text-white flex items-center justify-between"><div><p class="text-xs text-emerald-200">تفاصيل فريق المشرف</p><h3 id="gulfSupervisorDetailName" class="text-xl font-extrabold mt-1"></h3></div><button type="button" onclick="closeGulfSupervisorDetail()" class="w-9 h-9 rounded-lg bg-white/10 hover:bg-white/20"><i class="fas fa-times"></i></button></div><div class="table-container"><table class="min-w-full text-sm text-right"><thead class="bg-white"><tr><th class="px-4 py-3">الرقم</th><th class="px-4 py-3">الموظف</th><th class="px-4 py-3">المنجز</th><th class="px-4 py-3">نسبة التقدم</th><th class="px-4 py-3">الحالة</th></tr></thead><tbody id="gulfSupervisorTeamBody" class="bg-white divide-y divide-slate-100"></tbody></table></div></div>
                     </div>
 
                     <div id="gulfMonthlySection" class="gulf-subsection hidden">
-                        <div class="rounded-2xl border border-indigo-100 bg-indigo-50 px-5 py-4 mb-4"><h3 class="font-extrabold text-indigo-900"><i class="fas fa-calendar-check ml-2"></i>التقييم الشهري لدورات الخليج فقط</h3><p class="text-xs text-indigo-700 mt-1">المستهدف ثابت: 11 دورة خليجية. مثال: إنجاز دورة واحدة = 9.09%، وKPI المشرف هو متوسط نسب موظفيه.</p></div>
+                        <div class="rounded-2xl border border-indigo-100 bg-indigo-50 px-5 py-4 mb-4"><h3 class="font-extrabold text-indigo-900"><i class="fas fa-calendar-check ml-2"></i>التقييم الشهري لدورات الخليج فقط</h3><p id="gulfMonthlyTargetHint" class="text-xs text-indigo-700 mt-1">المستهدف الحالي: 15 دورة خليجية، ويمكن تغييره من أعلى الصفحة. KPI المشرف هو متوسط نسب موظفيه.</p></div>
                         <div class="table-container border border-slate-200 rounded-2xl shadow-sm" style="max-height:68vh"><table class="min-w-full divide-y divide-slate-200 text-sm text-right whitespace-nowrap"><thead id="gulfMonthlyTableHead" class="bg-slate-100 text-slate-800"></thead><tbody id="gulfMonthlyTableBody" class="bg-white divide-y divide-slate-100"></tbody></table></div>
                         <div id="gulfMonthlyEmpty" class="hidden text-center py-12 text-slate-500 rounded-2xl border border-dashed border-slate-300 mt-4"><i class="fas fa-calendar-xmark text-4xl text-slate-300 mb-3"></i><p class="font-bold">لا توجد شهادات مؤرخة لدورات الخليج حتى الآن.</p></div>
                     </div>
@@ -1783,12 +1788,16 @@
         let explicitExcludedMonths = new Set(); // Store as "YYYY-MM"
 
         // --- Target Certs Logic ---
-        let targetCertsCount = parseInt(localStorage.getItem('targetCertsCount')) || 21;
+        const TARGET_CERTS_STORAGE_KEY = 'targetCertsCountV22';
+        let targetCertsCount = parseInt(localStorage.getItem(TARGET_CERTS_STORAGE_KEY), 10) || 22;
         const less3KpiTarget = 10;
 
         window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('targetCertsInput').value = targetCertsCount;
+            const gulfTargetInput = document.getElementById('gulfTargetCoursesInput');
+            if (gulfTargetInput) gulfTargetInput.value = gulfTargetCoursesCount;
             updateDynamicLabels();
+            updateGulfTargetLabels();
             updateLayoutModeUI();
         });
 
@@ -1803,7 +1812,7 @@
                 return;
             }
             targetCertsCount = val;
-            localStorage.setItem('targetCertsCount', targetCertsCount);
+            localStorage.setItem(TARGET_CERTS_STORAGE_KEY, targetCertsCount);
             const input = document.getElementById('targetCertsInput');
             if (input && input.value !== String(targetCertsCount)) input.value = targetCertsCount;
             updateDynamicLabels();
@@ -1828,6 +1837,40 @@
             const thRegOver = document.getElementById('thRegOver'); if(thRegOver) thRegOver.innerText = `${targetCertsCount} شهادة فأكثر`;
             const thRegLess = document.getElementById('thRegLess'); if(thRegLess) thRegLess.innerText = `أقل من ${targetCertsCount}`;
             const cmpDesc = document.getElementById('lblCmpDesc'); if(cmpDesc) cmpDesc.innerHTML = `يقارن عدد ونسبة الموظفين الحاصلين على <span class="font-bold">${targetCertsCount} شهادة فأكثر</span> بين التقرير الحالي والتقرير السابق.`;
+        }
+
+        function getGulfTargetCoursesCount() {
+            return Math.min(gulfTrainingPathDef.length, Math.max(1, Number(gulfTargetCoursesCount) || gulfTrainingPathDef.length));
+        }
+
+        function changeGulfTargetCourses(value, forceNormalize = false) {
+            const parsed = parseInt(value, 10);
+            if (!Number.isFinite(parsed) || parsed < 1) {
+                if (forceNormalize) {
+                    const input = document.getElementById('gulfTargetCoursesInput');
+                    if (input) input.value = getGulfTargetCoursesCount();
+                }
+                return;
+            }
+            gulfTargetCoursesCount = Math.min(gulfTrainingPathDef.length, parsed);
+            localStorage.setItem(GULF_TARGET_STORAGE_KEY, gulfTargetCoursesCount);
+            const input = document.getElementById('gulfTargetCoursesInput');
+            if (input && input.value !== String(gulfTargetCoursesCount)) input.value = gulfTargetCoursesCount;
+            updateGulfTargetLabels();
+            if (globalData.allActive && globalData.allActive.length) renderGulfRegionDashboard();
+        }
+
+        function updateGulfTargetLabels() {
+            const target = getGulfTargetCoursesCount();
+            const setText = (id, value) => {
+                const element = document.getElementById(id);
+                if (element) element.innerText = value;
+            };
+            setText('gulfCourseCountHint', `من ${gulfTrainingPathDef.length} دورة خليجية متاحة لكل موظف`);
+            setText('gulfCompletedTargetLabel', `أكملوا المستهدف (${target} دورة)`);
+            setText('gulfKpiHint', `متوسط تقدم الموظفين على مستهدف ${target} دورة`);
+            setText('gulfSupervisorCompletedHeader', `أكملوا ${target}`);
+            setText('gulfMonthlyTargetHint', `المستهدف الحالي: ${target} دورة من أصل ${gulfTrainingPathDef.length} دورة خليجية، ويمكن تغييره من أعلى الصفحة. KPI المشرف هو متوسط نسب موظفيه.`);
         }
 
         // --- Setup Drag and Drop ---
@@ -1963,8 +2006,14 @@
             { certId: 8, ar: "البيع باحتراف (الخليج)", en: "Sell Like A Pro (Gulf)", hasCert: true },
             { certId: 9, ar: "تجربة العملاء (الخليج)", en: "Customer Experience (Gulf)", hasCert: true },
             { certId: 10, ar: "برنامج ولاء مكافآتي - الخليج", en: '"My Rewards-Gulf" Loyalty Program', hasCert: true },
-            { certId: 11, ar: "سياسات الشركة (الخليج)", en: "Company policies (Gulf)", hasCert: true }
+            { certId: 11, ar: "سياسات الشركة (الخليج)", en: "Company policies (Gulf)", hasCert: true },
+            { certId: 12, ar: "العناية بالشعر (الخليج)", en: "Hair care ( GULF )", hasCert: true },
+            { certId: 13, ar: "منتجات العطور الاستراتيجية (الخليج)", en: "Key strategic perfume products ( GULF )", hasCert: true },
+            { certId: 14, ar: "منتجات العود الاستراتيجية (الخليج)", en: "Key strategic Oud products ( GULF )", hasCert: true },
+            { certId: 15, ar: "مهارات البيع المتقدمة (الخليج)", en: "Advanced Sales Skills (Gulf)", hasCert: true }
         ];
+        const GULF_TARGET_STORAGE_KEY = 'academyGulfTargetCoursesV15';
+        let gulfTargetCoursesCount = Math.min(gulfTrainingPathDef.length, Math.max(1, parseInt(localStorage.getItem(GULF_TARGET_STORAGE_KEY), 10) || gulfTrainingPathDef.length));
 
         const botCoursesKeys = [
             "Communication Skills ( BOT)",
@@ -2017,6 +2066,7 @@
             { ar: "عرض رمضان 1+2", en: "1+2 Offer", hasCert: false },
             { ar: "تطبيقات التوصيل", en: "delivery order software", hasCert: false },
             { certId: 21, ar: "الاستعداد لموسم الحج", en: "Preparations for the Hajj season", hasCert: true },
+            { certId: 22, ar: "بناء تجربة العملاء", en: "Building the Customer Experience", hasCert: true },
             { ar: "سيناريوهات بيعية باللغة الانجليزية", en: "Sales Scenario By English", hasCert: false },
             { ar: "الكبسولة", en: "Capsule", hasCert: false }
         ];
@@ -2259,7 +2309,9 @@
             if(targetSec) targetSec.style.display = 'block';
         }
 
-        function cleanString(str) { return str == null ? "" : str.toString().trim(); }
+        function cleanString(str) {
+            return str == null ? "" : str.toString().replace(/[\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]/g, '').trim();
+        }
 
         function normalizeBotCourseName(name) {
             return cleanString(name)
@@ -2291,6 +2343,20 @@
             }) || null;
         }
 
+        function findStandardTrainingCourse(courseName) {
+            const normalizedName = normalizeAcademyCourseName(courseName);
+            if (!normalizedName) return null;
+            const candidates = trainingPathDef
+                .map(course => ({ course, normalizedCourse: normalizeAcademyCourseName(course.en) }))
+                .filter(item => item.normalizedCourse);
+            const exactMatch = candidates.find(item => item.normalizedCourse === normalizedName);
+            if (exactMatch) return exactMatch.course;
+            const partialMatches = candidates
+                .filter(item => normalizedName.includes(item.normalizedCourse) || item.normalizedCourse.includes(normalizedName))
+                .sort((a, b) => b.normalizedCourse.length - a.normalizedCourse.length);
+            return partialMatches.length ? partialMatches[0].course : null;
+        }
+
         function findEliteCourse(courseName) {
             const normalizedName = normalizeAcademyCourseName(courseName);
             if (!normalizedName) return null;
@@ -2319,14 +2385,17 @@
         function getAcademyTrackSummary(employee, trackKey = getEmployeeAcademyTrack(employee)) {
             const courses = getAcademyTrackCourses(trackKey);
             const completedCount = courses.filter(course => isAcademyTrackCourseCompleted(employee, course, trackKey)).length;
-            const stopper = courses.find(course => !isAcademyTrackCourseCompleted(employee, course, trackKey)) || null;
+            const targetCount = trackKey === 'gulf' ? getGulfTargetCoursesCount() : courses.length;
+            const isComplete = completedCount >= targetCount;
+            const stopper = isComplete ? null : (courses.find(course => !isAcademyTrackCourseCompleted(employee, course, trackKey)) || null);
             return {
                 courses,
                 completedCount,
-                totalCount: courses.length,
-                score: courses.length ? roundKpiValue((completedCount / courses.length) * 100) : 0,
+                totalCount: targetCount,
+                availableCourseCount: courses.length,
+                score: targetCount ? Math.min(100, roundKpiValue((completedCount / targetCount) * 100)) : 0,
                 stopper,
-                isComplete: completedCount === courses.length
+                isComplete
             };
         }
 
@@ -2742,7 +2811,7 @@
                         globalData.allExtractedMonths.add(certInfo.key);
                     }
 
-                    let matchedPathCourse = (matchedBotCourse || matchedGulfCourse) ? null : trainingPathDef.find(c => courseLower.includes(c.en.toLowerCase()));
+                    let matchedPathCourse = (matchedBotCourse || matchedGulfCourse) ? null : findStandardTrainingCourse(courseName);
                     if (matchedPathCourse) {
                         if (hasEffectiveCourseCompletion) {
                             employeeMap[id].pathProgress[matchedPathCourse.en] = true;
@@ -2788,7 +2857,7 @@
                         }
                     }
 
-                    let matchedPathCourse = (matchedBotCourse || matchedGulfCourse) ? null : trainingPathDef.find(c => courseLower.includes(c.en.toLowerCase()));
+                    let matchedPathCourse = (matchedBotCourse || matchedGulfCourse) ? null : findStandardTrainingCourse(courseName);
                     if (matchedPathCourse) {
                         if (hasEffectiveCourseCompletion) {
                             missingMap[id].pathProgress[matchedPathCourse.en] = true;
@@ -7873,7 +7942,7 @@
             if (body) {
                 body.innerHTML = employees.length ? employees.map(employee => {
                     const summary = getAcademyTrackSummary(employee, trackKey);
-                    const stopperName = summary.stopper ? `${summary.stopper.certId}. ${summary.stopper.ar}` : 'أتم المسار بالكامل';
+                    const stopperName = summary.stopper ? `${summary.stopper.certId}. ${summary.stopper.ar}` : (trackKey === 'gulf' ? 'أتم المستهدف' : 'أتم المسار بالكامل');
                     return `<tr class="hover:bg-slate-50 transition">
                         <td class="px-4 py-3 sticky-id font-bold text-slate-700">${safeBotText(employee.id)}</td>
                         <td class="px-4 py-3 sticky-name font-bold text-slate-800" title="${safeBotText(employee.name)}">${safeBotText(employee.name)}</td>
@@ -8124,6 +8193,7 @@
         }
 
         function renderGulfRegionDashboard() {
+            updateGulfTargetLabels();
             renderSpecialAcademyTrack('gulf');
             const employees = getSpecialTrackEmployees('gulf');
             const summaries = employees.map(employee => getAcademyTrackSummary(employee, 'gulf'));
@@ -8168,7 +8238,7 @@
             const body = document.getElementById('gulfSupervisorTeamBody');
             if (body) body.innerHTML = group.employees.slice().sort((a, b) => cleanString(a.name).localeCompare(cleanString(b.name), 'ar')).map(employee => {
                 const summary = getAcademyTrackSummary(employee, 'gulf');
-                return `<tr><td class="px-4 py-3 font-bold">${safeBotText(employee.id)}</td><td class="px-4 py-3 font-extrabold text-slate-800">${safeBotText(employee.name)}</td><td class="px-4 py-3">${summary.completedCount} / ${summary.totalCount}</td><td class="px-4 py-3 font-extrabold text-indigo-700">${formatKpiValue(summary.score)}%</td><td class="px-4 py-3 font-bold ${summary.isComplete ? 'text-emerald-700' : 'text-orange-700'}">${summary.isComplete ? 'أكمل المستهدف' : `متبقي ${summary.totalCount - summary.completedCount}`}</td></tr>`;
+                return `<tr><td class="px-4 py-3 font-bold">${safeBotText(employee.id)}</td><td class="px-4 py-3 font-extrabold text-slate-800">${safeBotText(employee.name)}</td><td class="px-4 py-3">${summary.completedCount} / ${summary.totalCount}</td><td class="px-4 py-3 font-extrabold text-indigo-700">${formatKpiValue(summary.score)}%</td><td class="px-4 py-3 font-bold ${summary.isComplete ? 'text-emerald-700' : 'text-orange-700'}">${summary.isComplete ? 'أكمل المستهدف' : `متبقي ${Math.max(0, summary.totalCount - summary.completedCount)}`}</td></tr>`;
             }).join('');
             const detail = document.getElementById('gulfSupervisorDetail');
             if (detail) detail.classList.remove('hidden');
@@ -8199,7 +8269,7 @@
         }
 
         function getGulfMonthlyTarget(monthKey, employees = getSpecialTrackEmployees('gulf')) {
-            return gulfTrainingPathDef.length;
+            return getGulfTargetCoursesCount();
         }
 
         function renderGulfMonthlyEvaluation() {
@@ -8229,17 +8299,19 @@
 
         function buildGulfExecutiveHomeWorksheet(employees, menuItems) {
             const ws = buildExecutiveHomeWorksheet('إقليم الخليج', employees, menuItems);
+            const target = getGulfTargetCoursesCount();
             const summaries = employees.map(employee => getAcademyTrackSummary(employee, 'gulf'));
             const totalCompletions = summaries.reduce((sum, summary) => sum + summary.completedCount, 0);
             const completedPaths = summaries.filter(summary => summary.isComplete).length;
             setExecutiveExcelCell(ws, 'A1', 'تقارير الأكاديمية  |  إقليم الخليج');
             setExecutiveExcelCell(ws, 'G5', `دورات الخليج المنجزة\n${totalCompletions}`);
-            setExecutiveExcelCell(ws, 'J5', `أكملوا 11 دورة\n${completedPaths}`);
-            setExecutiveExcelCell(ws, 'A21', `تقرير إقليم الخليج  •  KPI المشرف = متوسط تقدم موظفيه من 11 دورة  •  ${new Date().toLocaleDateString('ar-EG')}`);
+            setExecutiveExcelCell(ws, 'J5', `أكملوا ${target} دورة\n${completedPaths}`);
+            setExecutiveExcelCell(ws, 'A21', `تقرير إقليم الخليج  •  KPI المشرف = متوسط تقدم موظفيه على مستهدف ${target} دورة من أصل ${gulfTrainingPathDef.length}  •  ${new Date().toLocaleDateString('ar-EG')}`);
             return ws;
         }
 
         function buildGulfExecutiveAnalysisWorksheet(employees) {
+            const target = getGulfTargetCoursesCount();
             const summaries = employees.map(employee => getAcademyTrackSummary(employee, 'gulf'));
             const supervisorGroups = getGulfSupervisorGroups(employees);
             const total = employees.length;
@@ -8250,14 +8322,14 @@
             const aoa = [
                 ['⌂  Home | الرئيسية'],
                 [GULF_EXECUTIVE_SHEETS.analysis],
-                ['إقليم الخليج  |  الإحصائيات تخص دورات الخليج الـ11 فقط'],
+                [`إقليم الخليج  |  ${gulfTrainingPathDef.length} دورة متاحة والمستهدف الحالي ${target}`],
                 [],
                 ['ملخص الإقليم'],
                 ['المؤشر', 'العدد / القيمة', 'النسبة'],
                 ['إجمالي الموظفين النشطين', total, total ? '100%' : '0%'],
                 ['عدد المشرفين', supervisorGroups.length, '-'],
                 ['إجمالي دورات الخليج المنجزة', totalCompletions, '-'],
-                ['أكملوا 11 دورة', completedPaths, percentage(completedPaths)],
+                [`أكملوا مستهدف ${target} دورة`, completedPaths, percentage(completedPaths)],
                 ['متوسط الدورات المنجزة لكل موظف', total ? roundKpiValue(totalCompletions / total) : 0, '-'],
                 ['KPI إقليم الخليج', `${formatKpiValue(regionKpi)}%`, 'متوسط نسب الموظفين'],
                 [],
@@ -8281,8 +8353,9 @@
         }
 
         function buildGulfExecutiveKpiWorksheet(employees) {
+            const target = getGulfTargetCoursesCount();
             const groups = getGulfSupervisorGroups(employees);
-            const summaryHeaders = ['مدير الإقليم', 'المشرف', 'عدد الموظفين', 'إجمالي الدورات المنجزة', 'متوسط المنجز لكل موظف', 'أكملوا 11 دورة', 'KPI المشرف'];
+            const summaryHeaders = ['مدير الإقليم', 'المشرف', 'عدد الموظفين', 'إجمالي الدورات المنجزة', 'متوسط المنجز لكل موظف', `أكملوا ${target} دورة`, 'KPI المشرف'];
             const summaryRows = groups.map(group => {
                 const manager = cleanString(group.employees[0] && group.employees[0].manager) || 'إقليم الخليج';
                 return [manager, group.name, group.totalEmployees, group.totalCompletions, roundKpiValue(group.totalCompletions / group.totalEmployees), group.completedPaths, `${formatKpiValue(group.kpi)}%`];
@@ -8290,12 +8363,12 @@
             const detailHeaders = ['مدير الإقليم', 'المشرف', 'الرقم الوظيفي', 'اسم الموظف', 'المنجز من دورات الخليج', 'المستهدف', 'المتبقي', 'الحالة', 'KPI الموظف'];
             const detailRows = employees.map(employee => {
                 const summary = getAcademyTrackSummary(employee, 'gulf');
-                return [employee.manager || 'إقليم الخليج', employee.supervisor || 'بدون مشرف', employee.id, employee.name, summary.completedCount, 11, Math.max(0, 11 - summary.completedCount), summary.isComplete ? 'مكتمل' : 'قيد الإنجاز', `${formatKpiValue(summary.score)}%`];
+                return [employee.manager || 'إقليم الخليج', employee.supervisor || 'بدون مشرف', employee.id, employee.name, summary.completedCount, target, Math.max(0, target - summary.completedCount), summary.isComplete ? 'مكتمل' : 'قيد الإنجاز', `${formatKpiValue(summary.score)}%`];
             });
             const aoa = [
                 ['⌂  Home | الرئيسية'],
                 [GULF_EXECUTIVE_SHEETS.kpi],
-                ['إقليم الخليج  |  KPI الموظف = المنجز ÷ 11  |  KPI المشرف = المتوسط الحسابي لنسب جميع موظفيه'],
+                [`إقليم الخليج  |  KPI الموظف = المنجز ÷ ${target} (بحد أقصى 100%)  |  KPI المشرف = المتوسط الحسابي لنسب جميع موظفيه`],
                 [],
                 ['ملخص KPI مشرفي الخليج'],
                 summaryHeaders,
@@ -8356,6 +8429,7 @@
                 alert('لا توجد بيانات موظفين نشطين في إقليم الخليج.');
                 return;
             }
+            const target = getGulfTargetCoursesCount();
 
             const menuItems = [
                 { label: GULF_EXECUTIVE_SHEETS.employees, sheet: GULF_EXECUTIVE_SHEETS.employees },
@@ -8367,10 +8441,10 @@
             const employeeHeaders = ['الرقم الوظيفي', 'الاسم', 'الإيميل', 'المشرف', 'مدير الإقليم', 'تاريخ التعيين', 'إجمالي الشهادات', 'المنجز من الخليج', 'المستهدف', 'الحالة', 'KPI الخليج'];
             const employeeRows = employees.map(employee => {
                 const summary = getAcademyTrackSummary(employee, 'gulf');
-                return [employee.id, employee.name, employee.email || '', employee.supervisor || 'بدون مشرف', employee.manager || 'إقليم الخليج', formatDateDisplay(employee.hireDate), employee.totalCerts, summary.completedCount, 11, summary.isComplete ? 'مكتمل' : 'قيد الإنجاز', `${formatKpiValue(summary.score)}%`];
+                return [employee.id, employee.name, employee.email || '', employee.supervisor || 'بدون مشرف', employee.manager || 'إقليم الخليج', formatDateDisplay(employee.hireDate), employee.totalCerts, summary.completedCount, target, summary.isComplete ? 'مكتمل' : 'قيد الإنجاز', `${formatKpiValue(summary.score)}%`];
             });
 
-            const progressHeaders = ['الرقم الوظيفي', 'الاسم', 'المشرف', 'مدير الإقليم', 'المنجز من 11', 'KPI الخليج', ...gulfTrainingPathDef.map(course => `${course.certId}- ${course.ar}`)];
+            const progressHeaders = ['الرقم الوظيفي', 'الاسم', 'المشرف', 'مدير الإقليم', `المنجز / المستهدف (${target})`, 'KPI الخليج', ...gulfTrainingPathDef.map(course => `${course.certId}- ${course.ar}`)];
             const progressRows = employees.map(employee => {
                 const summary = getAcademyTrackSummary(employee, 'gulf');
                 return [
@@ -8378,7 +8452,7 @@
                     employee.name,
                     employee.supervisor || 'بدون مشرف',
                     employee.manager || 'إقليم الخليج',
-                    `${summary.completedCount} / 11`,
+                    `${summary.completedCount} / ${target}`,
                     `${formatKpiValue(summary.score)}%`,
                     ...gulfTrainingPathDef.map(course => {
                         const record = getGulfAcademyCourseRecord(employee, course);
@@ -8390,11 +8464,11 @@
                 ];
             });
 
-            const pathHeaders = ['الرقم الوظيفي', 'الاسم', 'المشرف', 'مدير الإقليم', 'المسار الحالي (نقطة التوقف)', 'إجمالي الشهادات', 'المنجز من 11', 'KPI الخليج', ...gulfTrainingPathDef.map(course => `${course.certId}- ${course.ar}`)];
+            const pathHeaders = ['الرقم الوظيفي', 'الاسم', 'المشرف', 'مدير الإقليم', 'المسار الحالي (نقطة التوقف)', 'إجمالي الشهادات', `المنجز / المستهدف (${target})`, 'KPI الخليج', ...gulfTrainingPathDef.map(course => `${course.certId}- ${course.ar}`)];
             const pathRows = employees.map(employee => {
                 const summary = getAcademyTrackSummary(employee, 'gulf');
                 const stopper = summary.stopper;
-                return [employee.id, employee.name, employee.supervisor || 'بدون مشرف', employee.manager || 'إقليم الخليج', stopper ? `${stopper.certId}. ${stopper.ar}` : 'أتم مسار الخليج بالكامل', employee.totalCerts, `${summary.completedCount} / 11`, `${formatKpiValue(summary.score)}%`, ...gulfTrainingPathDef.map(course => {
+                return [employee.id, employee.name, employee.supervisor || 'بدون مشرف', employee.manager || 'إقليم الخليج', stopper ? `${stopper.certId}. ${stopper.ar}` : 'أتم مستهدف الخليج', employee.totalCerts, `${summary.completedCount} / ${target}`, `${formatKpiValue(summary.score)}%`, ...gulfTrainingPathDef.map(course => {
                     if (isAcademyTrackCourseCompleted(employee, course, 'gulf')) return 'منجز';
                     return stopper && stopper.en === course.en ? 'واقف عليها' : 'لم يصلها';
                 })];
@@ -8411,14 +8485,14 @@
             const workbook = XLSX.utils.book_new();
             workbook.Props = {
                 Title: 'تقرير إقليم الخليج',
-                Subject: 'تقارير الأكاديمية لإقليم الخليج — KPI مبني على 11 دورة خليجية',
+                Subject: `تقارير الأكاديمية لإقليم الخليج — KPI مبني على مستهدف ${target} دورة من أصل ${gulfTrainingPathDef.length}`,
                 Author: 'منظومة الأكاديمية',
                 CreatedDate: new Date()
             };
             XLSX.utils.book_append_sheet(workbook, buildGulfExecutiveHomeWorksheet(employees, menuItems), GULF_EXECUTIVE_SHEETS.home);
             XLSX.utils.book_append_sheet(workbook, createExecutiveTableWorksheet(GULF_EXECUTIVE_SHEETS.employees, 'إقليم الخليج', employeeHeaders, employeeRows, { subtitle: 'كل موظفي إقليم الخليج في كشف واحد — بدون تقسيم حسب مدة الخدمة', colWidths: [15, 28, 28, 28, 24, 18, 18, 20, 16, 18, 16], tabColor: '2563EB' }), GULF_EXECUTIVE_SHEETS.employees);
-            XLSX.utils.book_append_sheet(workbook, createExecutiveTableWorksheet(GULF_EXECUTIVE_SHEETS.progress, 'إقليم الخليج', progressHeaders, progressRows, { subtitle: 'نسبة تقدم كل موظف في كل دورة من دورات الخليج الـ11 — الدورة المكتملة تظهر 100%', colWidths: [15, 28, 28, 24, 18, 16, ...gulfTrainingPathDef.map(() => 30)], tabColor: '7C3AED' }), GULF_EXECUTIVE_SHEETS.progress);
-            XLSX.utils.book_append_sheet(workbook, createExecutiveTableWorksheet(GULF_EXECUTIVE_SHEETS.path, 'إقليم الخليج', pathHeaders, pathRows, { subtitle: 'مسار الخليج المستقل — 11 دورة', colWidths: [15, 28, 28, 24, 38, 18, 18, 16, ...gulfTrainingPathDef.map(() => 30)], tabColor: EXECUTIVE_EXCEL_COLORS.amber }), GULF_EXECUTIVE_SHEETS.path);
+            XLSX.utils.book_append_sheet(workbook, createExecutiveTableWorksheet(GULF_EXECUTIVE_SHEETS.progress, 'إقليم الخليج', progressHeaders, progressRows, { subtitle: `نسبة تقدم كل موظف في ${gulfTrainingPathDef.length} دورة خليجية — المستهدف الحالي ${target} والدورة المكتملة تظهر 100%`, colWidths: [15, 28, 28, 24, 18, 16, ...gulfTrainingPathDef.map(() => 30)], tabColor: '7C3AED' }), GULF_EXECUTIVE_SHEETS.progress);
+            XLSX.utils.book_append_sheet(workbook, createExecutiveTableWorksheet(GULF_EXECUTIVE_SHEETS.path, 'إقليم الخليج', pathHeaders, pathRows, { subtitle: `مسار الخليج المستقل — ${gulfTrainingPathDef.length} دورة متاحة، المستهدف الحالي ${target}`, colWidths: [15, 28, 28, 24, 38, 18, 18, 16, ...gulfTrainingPathDef.map(() => 30)], tabColor: EXECUTIVE_EXCEL_COLORS.amber }), GULF_EXECUTIVE_SHEETS.path);
             XLSX.utils.book_append_sheet(workbook, buildGulfExecutiveAnalysisWorksheet(employees), GULF_EXECUTIVE_SHEETS.analysis);
             XLSX.utils.book_append_sheet(workbook, buildGulfExecutiveKpiWorksheet(employees), GULF_EXECUTIVE_SHEETS.kpi);
             XLSX.utils.book_append_sheet(workbook, removeExecutiveSheetNavigation(createExecutiveTableWorksheet(GULF_EXECUTIVE_SHEETS.elite, 'إقليم الخليج', eliteHeaders, eliteRows, { subtitle: 'شيت مخفي اختياري — استخدم Unhide لعرض بيانات النخبة', colWidths: [15, 28, 28, 24, 20, ...eliteCoursesKeys.map(() => 34), 22, 20], tabColor: 'CA8A04' })), GULF_EXECUTIVE_SHEETS.elite);
