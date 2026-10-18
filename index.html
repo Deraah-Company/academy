@@ -334,7 +334,7 @@
         </div>
     </div>
 
-    <div class="max-w-screen-2xl mx-auto px-4 py-8">
+    <div id="academyWorkspace" class="max-w-screen-2xl mx-auto px-4 py-8">
         
         <header class="bg-white shadow-sm rounded-2xl p-8 mb-6 border border-slate-100 flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
             <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full -mr-10 -mt-10 blur-2xl"></div>
@@ -357,8 +357,8 @@
             </div>
             <div class="flex items-center gap-3 bg-indigo-50 p-2 rounded-xl border border-indigo-100">
                 <label for="targetCertsInput" class="font-bold text-indigo-900 pr-2">العدد المستهدف:</label>
-                <input type="number" id="targetCertsInput" min="1" max="100" value="22" class="w-24 px-3 py-2 border border-indigo-200 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-extrabold text-center text-indigo-700 bg-white" oninput="changeTargetCerts(this.value)" onchange="changeTargetCerts(this.value, true)">
-                <span class="text-indigo-700 font-bold pl-2">شهادة</span>
+                <input type="hidden" id="targetCertsInput"><button type="button" class="course-filter-btn" onclick="openCoursePicker('standard')">فلتر الدورات <span id="standardSelectedCount"></span></button>
+                
             </div>
         </div>
 
@@ -1108,17 +1108,17 @@
 
                 <div id="gulfTrackTab" class="tab-content">
                     <div class="rounded-3xl bg-gradient-to-l from-emerald-900 via-teal-800 to-cyan-700 text-white p-6 md:p-8 mb-6 shadow-xl">
-                        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-5">
+                        <div class="flex flex-col gap-5">
                             <div>
                                 <span class="inline-flex items-center gap-2 rounded-full bg-white/10 border border-white/20 px-3 py-1.5 text-xs font-bold"><i class="fas fa-water"></i> إقليم مستقل داخل الأكاديمية</span>
                                 <h2 class="text-3xl font-extrabold mt-3">لوحة إقليم الخليج</h2>
                                 <p class="text-emerald-50 mt-2">تقارير كاملة لموظفي الخليج ودوراتهم الخاصة: الموظفون، المشرفون، KPI، الإحصائيات والتقييم الشهري.</p>
                             </div>
-                            <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                            <div class="flex flex-wrap gap-3 w-full">
                                 <div class="bg-white rounded-xl px-3 py-1 flex items-center gap-2 text-slate-700">
                                     <label for="gulfTargetCoursesInput" class="text-xs font-extrabold whitespace-nowrap">المستهدف:</label>
-                                    <input id="gulfTargetCoursesInput" type="number" min="1" max="15" value="15" oninput="changeGulfTargetCourses(this.value)" onchange="changeGulfTargetCourses(this.value, true)" class="w-16 px-2 py-2 text-center font-extrabold text-emerald-800 outline-none rounded-lg border border-emerald-200">
-                                    <span class="text-xs font-bold whitespace-nowrap">دورة</span>
+                                    <input type="hidden" id="gulfTargetCoursesInput"><button type="button" class="course-filter-btn" onclick="openCoursePicker('gulf')">فلتر الدورات <span id="gulfSelectedCount"></span></button>
+                                    
                                 </div>
                                 <div class="bg-white rounded-xl p-1 flex items-center min-w-[270px]">
                                     <i class="fas fa-search text-slate-400 px-3"></i>
@@ -1137,7 +1137,7 @@
                     </div>
 
                     <div class="rounded-2xl border border-emerald-100 bg-white shadow-sm p-2 mb-6 overflow-x-auto">
-                        <div class="flex gap-2 min-w-max" id="gulfInternalTabs">
+                        <div class="flex gap-2 min-w-max" id="gulfInternalTabs"><button type="button" data-gulf-section="support" class="gulf-sub-tab course-filter-btn" onclick="switchGulfSubTab('support')">دورات داعمة / بدون شهادة</button>
                             <button type="button" data-gulf-section="overview" onclick="switchGulfSubTab('overview')" class="gulf-sub-tab rounded-xl bg-emerald-700 text-white px-5 py-3 text-sm font-extrabold"><i class="fas fa-gauge-high ml-2"></i>نظرة عامة</button>
                             <button type="button" data-gulf-section="employees" onclick="switchGulfSubTab('employees')" class="gulf-sub-tab rounded-xl text-slate-600 hover:bg-emerald-50 px-5 py-3 text-sm font-extrabold"><i class="fas fa-users ml-2"></i>الموظفون</button>
                             <button type="button" data-gulf-section="courses" onclick="switchGulfSubTab('courses')" class="gulf-sub-tab rounded-xl text-slate-600 hover:bg-emerald-50 px-5 py-3 text-sm font-extrabold"><i class="fas fa-book-open ml-2"></i>دورات الخليج</button>
@@ -1146,6 +1146,7 @@
                         </div>
                     </div>
 
+                    <div id="gulfSupportSection" class="gulf-subsection hidden"><div id="gulfSupportPanel"></div></div>
                     <div id="gulfOverviewSection" class="gulf-subsection">
                         <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
                             <div class="rounded-2xl border border-slate-200 overflow-hidden shadow-sm"><div class="bg-emerald-900 text-white px-5 py-4 font-extrabold"><i class="fas fa-ranking-star ml-2"></i>ملخص أداء المشرفين</div><div class="table-container"><table class="min-w-full text-sm text-right"><thead class="bg-slate-100"><tr><th class="px-4 py-3">المشرف</th><th class="px-4 py-3">الفريق</th><th class="px-4 py-3">متوسط التقدم</th><th class="px-4 py-3">KPI</th></tr></thead><tbody id="gulfOverviewSupervisorsBody" class="divide-y divide-slate-100"></tbody></table></div></div>
@@ -1840,7 +1841,7 @@
         }
 
         function getGulfTargetCoursesCount() {
-            return Math.min(gulfTrainingPathDef.length, Math.max(1, Number(gulfTargetCoursesCount) || gulfTrainingPathDef.length));
+            return getSelectedGulfCourses().length;
         }
 
         function changeGulfTargetCourses(value, forceNormalize = false) {
@@ -1945,6 +1946,7 @@
         }
 
        const regionManagerMap = {
+    "حسان إبراهيم الخرفان": "اقليم الرياض مولات",
     "احمد عمار": "اقليم المدينة والقصيم وحائل",
     "اشرف البركي": "اقليم الشرقية",
     "حسام البني": "اقليم الجنوبية",
@@ -1995,23 +1997,7 @@
         ];
         const ELITE_TARGET_COUNT = eliteCoursesKeys.length;
 
-        const gulfTrainingPathDef = [
-            { certId: 1, ar: "تاريخ درعه (الخليج)", en: "Deraah History ( GULF )", hasCert: true },
-            { certId: 2, ar: "العطور (الخليج)", en: "Perfumes ( GULF )", hasCert: true },
-            { certId: 3, ar: "العود (الخليج)", en: "EL OUD ( GULF )", hasCert: true },
-            { certId: 4, ar: "الإكسسوارات الرجالية (الخليج)", en: "Deraah Men Accessories ( GULF )", hasCert: true },
-            { certId: 5, ar: "الإكسسوارات النسائية (الخليج)", en: "Women’s Accessories ( GULF )", hasCert: true },
-            { certId: 6, ar: "الهدايا (الخليج)", en: "Gifts ( GULF )", hasCert: true },
-            { certId: 7, ar: "الأنظمة (الخليج)", en: "System ( GULF )", hasCert: true },
-            { certId: 8, ar: "البيع باحتراف (الخليج)", en: "Sell Like A Pro (Gulf)", hasCert: true },
-            { certId: 9, ar: "تجربة العملاء (الخليج)", en: "Customer Experience (Gulf)", hasCert: true },
-            { certId: 10, ar: "برنامج ولاء مكافآتي - الخليج", en: '"My Rewards-Gulf" Loyalty Program', hasCert: true },
-            { certId: 11, ar: "سياسات الشركة (الخليج)", en: "Company policies (Gulf)", hasCert: true },
-            { certId: 12, ar: "العناية بالشعر (الخليج)", en: "Hair care ( GULF )", hasCert: true },
-            { certId: 13, ar: "منتجات العطور الاستراتيجية (الخليج)", en: "Key strategic perfume products ( GULF )", hasCert: true },
-            { certId: 14, ar: "منتجات العود الاستراتيجية (الخليج)", en: "Key strategic Oud products ( GULF )", hasCert: true },
-            { certId: 15, ar: "مهارات البيع المتقدمة (الخليج)", en: "Advanced Sales Skills (Gulf)", hasCert: true }
-        ];
+        const gulfTrainingPathDef = [{"certId": 1, "ar": "Building the Customer Experience (Gulf)", "en": "Building the Customer Experience (Gulf)", "hasCert": true}, {"certId": 2, "ar": "Frequently Asked Questions and Answers (Gulf)", "en": "Frequently Asked Questions and Answers (Gulf)", "hasCert": true}, {"certId": 3, "ar": "Time Management and Organization (Gulf)", "en": "Time Management and Organization (Gulf)", "hasCert": true}, {"certId": 4, "ar": "Communication Skills (Gulf)", "en": "Communication Skills (Gulf)", "hasCert": true}, {"certId": 5, "ar": "Sales Scenarios for Deraah Oud's Top Products (Gulf)", "en": "Sales Scenarios for Deraah Oud's Top Products (Gulf)", "hasCert": true}, {"certId": 6, "ar": "Negotiation and Conflict Resolution (Gulf)", "en": "Negotiation and Conflict Resolution (Gulf)", "hasCert": true}, {"certId": 7, "ar": "Sales Scenarios for DERAAH's Top Products (Gulf)", "en": "Sales Scenarios for DERAAH's Top Products (Gulf)", "hasCert": true}, {"certId": 8, "ar": "Advanced Sales Skills (Gulf)", "en": "Advanced Sales Skills (Gulf)", "hasCert": true}, {"certId": 9, "ar": "Key Strategic Oud Products (Gulf)", "en": "Key Strategic Oud Products (Gulf)", "hasCert": true}, {"certId": 10, "ar": "Key Strategic Perfume Products (Gulf)", "en": "Key Strategic Perfume Products (Gulf)", "hasCert": true}, {"certId": 11, "ar": "Hair Care (Gulf)", "en": "Hair Care (Gulf)", "hasCert": true}, {"certId": 12, "ar": "Deraah Men Accessories (Gulf)", "en": "Deraah Men Accessories (Gulf)", "hasCert": true}, {"certId": 13, "ar": "EL OUD (Gulf)", "en": "EL OUD (Gulf)", "hasCert": true}, {"certId": 14, "ar": "Perfumes (Gulf)", "en": "Perfumes (Gulf)", "hasCert": true}, {"certId": 15, "ar": "Company Policies (Gulf)", "en": "Company Policies (Gulf)", "hasCert": true}, {"certId": 16, "ar": "Customer Experience (Gulf)", "en": "Customer Experience (Gulf)", "hasCert": true}, {"certId": 17, "ar": "Sell Like A Pro (Gulf)", "en": "Sell Like A Pro (Gulf)", "hasCert": true}, {"certId": 18, "ar": "System (Gulf)", "en": "System (Gulf)", "hasCert": true}, {"certId": 19, "ar": "\"My Rewards-Gulf\" Loyalty Program", "en": "\"My Rewards-Gulf\" Loyalty Program", "hasCert": true}, {"certId": 20, "ar": "Gifts (Gulf)", "en": "Gifts (Gulf)", "hasCert": true}, {"certId": 21, "ar": "Women’s Accessories (Gulf)", "en": "Women’s Accessories (Gulf)", "hasCert": true}, {"certId": 22, "ar": "Deraah History (Gulf)", "en": "Deraah History (Gulf)", "hasCert": true}, {"certId": 23, "ar": "Delivery Order Software (Gulf)", "en": "Delivery Order Software (Gulf)", "hasCert": true}, {"certId": 24, "ar": "Working Under Pressure (Gulf)", "en": "Working Under Pressure (Gulf)", "hasCert": true}, {"certId": 25, "ar": "Operating Systems Part 2 (Gulf)", "en": "Operating Systems Part 2 (Gulf)", "hasCert": true}, {"certId": 26, "ar": "Air Fresheners (Gulf)", "en": "Air Fresheners (Gulf)", "hasCert": true}];
         const GULF_TARGET_STORAGE_KEY = 'academyGulfTargetCoursesV15';
         let gulfTargetCoursesCount = Math.min(gulfTrainingPathDef.length, Math.max(1, parseInt(localStorage.getItem(GULF_TARGET_STORAGE_KEY), 10) || gulfTrainingPathDef.length));
 
@@ -2067,6 +2053,7 @@
             { ar: "تطبيقات التوصيل", en: "delivery order software", hasCert: false },
             { certId: 21, ar: "الاستعداد لموسم الحج", en: "Preparations for the Hajj season", hasCert: true },
             { certId: 22, ar: "بناء تجربة العملاء", en: "Building the Customer Experience", hasCert: true },
+            { certId: 23, ar: "التعامل مع اعتراضات وشكاوى العملاء", en: "Handling Customer Objections and Complaints", hasCert: true },
             { ar: "سيناريوهات بيعية باللغة الانجليزية", en: "Sales Scenario By English", hasCert: false },
             { ar: "الكبسولة", en: "Capsule", hasCert: false }
         ];
@@ -2102,6 +2089,7 @@
             
             if (tabId === 'trainingPathTab') renderTrainingPathTable();
             if (tabId === 'gulfTrackTab') renderGulfRegionDashboard();
+            if (tabId === 'adminTab') renderAdminTab();
             if (tabId === 'laBeauteTrackTab') renderLaBeauteComingSoon();
             if (tabId === 'kpiTab') {
                 if(Object.keys(kpiManagersData).length === 0) renderKPITab();
@@ -2335,28 +2323,14 @@
         }
 
         function findGulfCourse(courseName) {
-            const normalizedName = normalizeAcademyCourseName(courseName);
-            if (!normalizedName || !normalizedName.includes('gulf')) return null;
-            return gulfTrainingPathDef.find(course => {
-                const normalizedCourse = normalizeAcademyCourseName(course.en);
-                return normalizedName.includes(normalizedCourse) || normalizedCourse.includes(normalizedName);
-            }) || null;
+            const normalized = normalizeAcademyCourseName(courseName);
+            return gulfTrainingPathDef.find(c => normalizeAcademyCourseName(c.en) === normalized) || null;
         }
-
         function findStandardTrainingCourse(courseName) {
-            const normalizedName = normalizeAcademyCourseName(courseName);
-            if (!normalizedName) return null;
-            const candidates = trainingPathDef
-                .map(course => ({ course, normalizedCourse: normalizeAcademyCourseName(course.en) }))
-                .filter(item => item.normalizedCourse);
-            const exactMatch = candidates.find(item => item.normalizedCourse === normalizedName);
-            if (exactMatch) return exactMatch.course;
-            const partialMatches = candidates
-                .filter(item => normalizedName.includes(item.normalizedCourse) || item.normalizedCourse.includes(normalizedName))
-                .sort((a, b) => b.normalizedCourse.length - a.normalizedCourse.length);
-            return partialMatches.length ? partialMatches[0].course : null;
+            const normalized = normalizeAcademyCourseName(courseName);
+            const alias = normalized === 'system' ? 'systems' : normalized;
+            return trainingPathDef.find(c => normalizeAcademyCourseName(c.en) === alias) || null;
         }
-
         function findEliteCourse(courseName) {
             const normalizedName = normalizeAcademyCourseName(courseName);
             if (!normalizedName) return null;
@@ -2372,8 +2346,8 @@
 
         function getAcademyTrackCourses(trackKey) {
             return trackKey === 'gulf'
-                ? gulfTrainingPathDef
-                : trainingPathDef.filter(course => course.hasCert);
+                ? getSelectedGulfCourses()
+                : getSelectedStandardCourses();
         }
 
         function isAcademyTrackCourseCompleted(employee, course, trackKey = getEmployeeAcademyTrack(employee)) {
@@ -2385,8 +2359,8 @@
         function getAcademyTrackSummary(employee, trackKey = getEmployeeAcademyTrack(employee)) {
             const courses = getAcademyTrackCourses(trackKey);
             const completedCount = courses.filter(course => isAcademyTrackCourseCompleted(employee, course, trackKey)).length;
-            const targetCount = trackKey === 'gulf' ? getGulfTargetCoursesCount() : courses.length;
-            const isComplete = completedCount >= targetCount;
+            const targetCount = courses.length;
+            const isComplete = targetCount > 0 && completedCount >= targetCount;
             const stopper = isComplete ? null : (courses.find(course => !isAcademyTrackCourseCompleted(employee, course, trackKey)) || null);
             return {
                 courses,
@@ -2503,6 +2477,11 @@
 
         function determineRegion(managerName) {
             let manager = cleanString(managerName);
+            if (!manager) return 'غير محدد';
+            const normalizeManager = v => cleanString(v).replace(/[إأآ]/g, 'ا').replace(/\s+/g, ' ');
+            const normalizedManager = normalizeManager(manager);
+            const exactManager = Object.keys(regionManagerMap).find(k => normalizeManager(k) === normalizedManager);
+            if (exactManager) return regionManagerMap[exactManager];
             if (regionManagerMap[manager]) return regionManagerMap[manager];
             for (let key in regionManagerMap) {
                 if (manager.includes(key) || key.includes(manager)) return regionManagerMap[key];
@@ -2545,7 +2524,7 @@
             const courseKey = normalizedCourse || `unknown:${certInfo.key}:${certInfo.sortValue || 0}`;
             const existing = employee.certificateRecords[courseKey];
             if (!existing || Number(certInfo.sortValue || 0) < Number(existing.sortValue || 0)) {
-                employee.certificateRecords[courseKey] = { key: certInfo.key, sortValue: Number(certInfo.sortValue || 0) };
+                employee.certificateRecords[courseKey] = { name: courseName, key: certInfo.key, sortValue: Number(certInfo.sortValue || 0) };
             }
         }
 
@@ -2581,7 +2560,7 @@
             employee.monthsData = employee.monthsData || {};
             Object.keys(employee.monthsData).forEach(month => { employee.monthsData[month] = 0; });
             Object.values(employee.certificateRecords || {}).forEach(record => {
-                if (!record) return;
+                if (!record || !isSelectedCertificateRecord(employee, record)) return;
                 employee.totalCerts++;
                 if (employee.monthsData[record.key] === undefined) employee.monthsData[record.key] = 0;
                 employee.monthsData[record.key]++;
@@ -2681,6 +2660,7 @@
         }
 
         function analyzeData(wfRows, acRows, oldAcRows) {
+            latestAcademyRows = acRows; latestOldAcademyRows = oldAcRows || [];
             const best100OnlyIds = buildBest100OnlyIdSet();
             globalData = { 
                 allActive: [], excludedEmployees: [], missingEmployees: [], missingFromAcademy: [], regionsSet: new Set(), excludedRegions: new Set(), allExtractedMonths: new Set(), hasOldData: !!oldAcRows,
@@ -2801,7 +2781,7 @@
                     }
 
                     if (certValue === "-") {
-                        let matchedCourse = nonCertCoursesKeys.find(c => courseLower.includes(c.toLowerCase()));
+                        let matchedCourse = nonCertCoursesKeys.find(c => normalizeAcademyCourseName(courseName) === normalizeAcademyCourseName(c));
                         if (matchedCourse) {
                             let parsedProg = parseProgress(progressRaw);
                             if (parsedProg !== null) employeeMap[id].nonCertProgress[matchedCourse] = parsedProg;
@@ -2907,6 +2887,9 @@
                 globalData.allActive.forEach(emp => { targetMonthsKeys.forEach(m => { if (emp.monthsData[m] === undefined) emp.monthsData[m] = 0; }); });
             }
 
+            recountSelectedCertificates();
+            rebuildSupportProgress();
+            renderAdminTab();
             buildFilterUI();
             populateGlobalRegionFilter();
             legacyExcludedRegions = new Set();
@@ -5762,11 +5745,11 @@
                 <th class="px-4 py-4 font-semibold uppercase w-48">الاسم</th>
                 <th class="px-4 py-4 font-semibold uppercase">الإقليم</th>
             `;
-            nonCertCoursesKeys.forEach(c => headerHtml += `<th class="px-2 py-4 font-medium text-xs bg-indigo-50 border-r border-white">${c}</th>`);
+            getSelectedNonCertKeys().forEach(c => headerHtml += `<th class="px-2 py-4 font-medium text-xs bg-indigo-50 border-r border-white">${c}</th>`);
             const headerEl = document.getElementById('nonCertHeader'); if(headerEl) headerEl.innerHTML = headerHtml;
 
             let bodyHtml = dataArray.map(emp => {
-                let coursesHtml = nonCertCoursesKeys.map(c => {
+                let coursesHtml = getSelectedNonCertKeys().map(c => {
                     let val = emp.nonCertProgress[c];
                     let display = ""; let cls = "text-slate-400";
                     if (val !== null) {
@@ -6242,7 +6225,7 @@
 
         function updateAnalysisUI() {
             let analysis = { active: 0, tenure: { less3: 0, between3and24: 0, over24: 0 }, certs: { overTarget: 0, lessTarget: 0, zero: 0 }, regions: {}, nonCerts: {} };
-            nonCertCoursesKeys.forEach(c => analysis.nonCerts[c] = { totalTaken: 0, p100: 0, p50to99: 0, pLess50: 0, p0: 0, pNull: 0 });
+            getSelectedNonCertKeys().forEach(c => analysis.nonCerts[c] = { totalTaken: 0, p100: 0, p50to99: 0, pLess50: 0, p0: 0, pNull: 0 });
 
             globalData.allActive.forEach(emp => {
                 if (!isEmployeeVisibleInCurrentRegion(emp)) return;
@@ -6267,7 +6250,7 @@
                 else if (emp.totalCerts > 0) regStats.lessTarget++;
                 else regStats.zero++;
 
-                nonCertCoursesKeys.forEach(c => {
+                getSelectedNonCertKeys().forEach(c => {
                     let p = emp.nonCertProgress[c]; let stats = analysis.nonCerts[c];
                     if (p !== null) stats.totalTaken++;
                     if (p === 100) stats.p100++;
@@ -6320,7 +6303,7 @@
             const regionBody = document.getElementById('regionAnalysisTableBody'); if(regionBody) regionBody.innerHTML = regHtml;
 
             let nonCertHtml = '';
-            nonCertCoursesKeys.forEach(c => {
+            getSelectedNonCertKeys().forEach(c => {
                 let s = analysis.nonCerts[c];
                 nonCertHtml += `
                     <tr class="hover:bg-slate-50 transition border-b border-slate-100">
@@ -6762,7 +6745,7 @@
 
             const nonCertProgressValues = [];
             list.forEach(emp => {
-                nonCertCoursesKeys.forEach(course => {
+                getSelectedNonCertKeys().forEach(course => {
                     const progress = emp && emp.nonCertProgress ? emp.nonCertProgress[course] : null;
                     if (progress !== null && progress !== undefined && isFinite(Number(progress))) nonCertProgressValues.push(Number(progress));
                 });
@@ -7250,13 +7233,13 @@
             const less3Employees = employees.filter(emp => emp.tenureMonths >= 0 && emp.tenureMonths < 3);
             const more3Employees = employees.filter(emp => emp.tenureMonths >= 3);
 
-            const nonCertHeaders = ['الرقم الوظيفي', 'الاسم', 'المشرف', 'مدير الإقليم', 'عدد الدورات المكتملة', ...nonCertCoursesKeys.map(course => `${getExecutiveCourseDisplayName(course, courseLanguage)} — التقدم`)];
+            const nonCertHeaders = ['الرقم الوظيفي', 'الاسم', 'المشرف', 'مدير الإقليم', 'عدد الدورات المكتملة', ...getSelectedNonCertKeys().map(course => `${getExecutiveCourseDisplayName(course, courseLanguage)} — التقدم`)];
             const nonCertRows = employees.map(emp => {
-                const progressValues = nonCertCoursesKeys.map(course => {
+                const progressValues = getSelectedNonCertKeys().map(course => {
                     const progress = emp.nonCertProgress ? emp.nonCertProgress[course] : null;
                     return progress === null || progress === undefined ? '-' : `${formatKpiValue(Number(progress))}%`;
                 });
-                const completed = nonCertCoursesKeys.filter(course => emp.nonCertProgress && emp.nonCertProgress[course] === 100).length;
+                const completed = getSelectedNonCertKeys().filter(course => emp.nonCertProgress && emp.nonCertProgress[course] === 100).length;
                 return [emp.id, emp.name, emp.supervisor || 'بدون مشرف', emp.manager || region, completed, ...progressValues];
             });
 
@@ -7291,7 +7274,7 @@
             XLSX.utils.book_append_sheet(wb, buildExecutiveHomeWorksheet(region, employees, menuItems, options), sheetNames.home);
             XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.less3, region, commonEmployeeHeaders, makeTenureRows(less3Employees, less3KpiTarget), { homeSheet: sheetNames.home, colWidths: [15, 28, 28, 28, 24, 18, 18, 16, 18, 14], tabColor: 'EA580C' }), sheetNames.less3);
             XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.more3, region, commonEmployeeHeaders, makeTenureRows(more3Employees, targetCertsCount), { homeSheet: sheetNames.home, colWidths: [15, 28, 28, 28, 24, 18, 18, 16, 18, 14], tabColor: '2563EB' }), sheetNames.more3);
-            XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.nonCert, region, nonCertHeaders, nonCertRows, { homeSheet: sheetNames.home, colWidths: [15, 28, 28, 24, 20, ...nonCertCoursesKeys.map(() => 30)], tabColor: '7C3AED' }), sheetNames.nonCert);
+            XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.nonCert, region, nonCertHeaders, nonCertRows, { homeSheet: sheetNames.home, colWidths: [15, 28, 28, 24, 20, ...getSelectedNonCertKeys().map(() => 30)], tabColor: '7C3AED' }), sheetNames.nonCert);
             XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.path, region, pathHeaders, pathRows, { homeSheet: sheetNames.home, colWidths: [15, 28, 28, 24, 38, 18, 18, ...certCourses.map(() => 30)], tabColor: EXECUTIVE_EXCEL_COLORS.amber }), sheetNames.path);
             XLSX.utils.book_append_sheet(wb, buildExecutiveAnalysisWorksheet(region, employees, courseLanguage, { homeSheet: sheetNames.home }), sheetNames.analysis);
             XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.elite, region, eliteHeaders, eliteRows, { homeSheet: sheetNames.home, colWidths: [15, 28, 28, 24, 20, ...eliteCoursesKeys.map(() => 34), 22, 20, 16], tabColor: 'CA8A04' }), sheetNames.elite);
@@ -7690,13 +7673,13 @@
             const less3Employees = employees.filter(emp => emp.tenureMonths >= 0 && emp.tenureMonths < 3);
             const more3Employees = employees.filter(emp => emp.tenureMonths >= 3);
 
-            const nonCertHeaders = ['الرقم الوظيفي', 'الاسم', 'المشرف', 'مدير الإقليم', 'عدد الدورات المكتملة', ...nonCertCoursesKeys.map(course => `${getExecutiveCourseDisplayName(course, courseLanguage)} — التقدم`)];
+            const nonCertHeaders = ['الرقم الوظيفي', 'الاسم', 'المشرف', 'مدير الإقليم', 'عدد الدورات المكتملة', ...getSelectedNonCertKeys().map(course => `${getExecutiveCourseDisplayName(course, courseLanguage)} — التقدم`)];
             const nonCertRows = employees.map(emp => {
-                const progressValues = nonCertCoursesKeys.map(course => {
+                const progressValues = getSelectedNonCertKeys().map(course => {
                     const progress = emp.nonCertProgress ? emp.nonCertProgress[course] : null;
                     return progress === null || progress === undefined ? '-' : `${formatKpiValue(Number(progress))}%`;
                 });
-                const completed = nonCertCoursesKeys.filter(course => emp.nonCertProgress && emp.nonCertProgress[course] === 100).length;
+                const completed = getSelectedNonCertKeys().filter(course => emp.nonCertProgress && emp.nonCertProgress[course] === 100).length;
                 return [emp.id, emp.name, emp.supervisor || 'بدون مشرف', emp.manager || region, completed, ...progressValues];
             });
 
@@ -7737,7 +7720,7 @@
             XLSX.utils.book_append_sheet(wb, buildExecutiveHomeWorksheet(region, employees, menuItems), CENTRAL_EXECUTIVE_SHEETS.home);
             XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.less3, region, commonEmployeeHeaders, makeTenureRows(less3Employees, less3KpiTarget), { colWidths: [15, 28, 28, 28, 24, 18, 18, 16, 18, 14], tabColor: 'EA580C' }), CENTRAL_EXECUTIVE_SHEETS.less3);
             XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.more3, region, commonEmployeeHeaders, makeTenureRows(more3Employees, targetCertsCount), { colWidths: [15, 28, 28, 28, 24, 18, 18, 16, 18, 14], tabColor: '2563EB' }), CENTRAL_EXECUTIVE_SHEETS.more3);
-            XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.nonCert, region, nonCertHeaders, nonCertRows, { colWidths: [15, 28, 28, 24, 20, ...nonCertCoursesKeys.map(() => 30)], tabColor: '7C3AED' }), CENTRAL_EXECUTIVE_SHEETS.nonCert);
+            XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.nonCert, region, nonCertHeaders, nonCertRows, { colWidths: [15, 28, 28, 24, 20, ...getSelectedNonCertKeys().map(() => 30)], tabColor: '7C3AED' }), CENTRAL_EXECUTIVE_SHEETS.nonCert);
             XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.path, region, pathHeaders, pathRows, { colWidths: [15, 28, 28, 24, 38, 18, 18, ...certCourses.map(() => 30)], tabColor: EXECUTIVE_EXCEL_COLORS.amber }), CENTRAL_EXECUTIVE_SHEETS.path);
             XLSX.utils.book_append_sheet(wb, buildExecutiveAnalysisWorksheet(region, employees, courseLanguage), CENTRAL_EXECUTIVE_SHEETS.analysis);
             XLSX.utils.book_append_sheet(wb, createExecutiveTableWorksheet(CENTRAL_EXECUTIVE_SHEETS.elite, region, eliteHeaders, eliteRows, { colWidths: [15, 28, 28, 24, 20, ...eliteCoursesKeys.map(() => 34), 22, 20, 16], tabColor: 'CA8A04' }), CENTRAL_EXECUTIVE_SHEETS.elite);
@@ -7780,10 +7763,10 @@
             applyExcelStyles(wsAll);
             XLSX.utils.book_append_sheet(wb, wsAll, "جميع البائعين المعتمدين");
             
-            let nonCertAOA = [["الرقم الوظيفي", "الاسم", "المشرف", "الإقليم", ...nonCertCoursesKeys]];
+            let nonCertAOA = [["الرقم الوظيفي", "الاسم", "المشرف", "الإقليم", ...getSelectedNonCertKeys()]];
             validActive.forEach(emp => {
                 let row = [emp.id, emp.name, emp.supervisor || "بدون مشرف", emp.region];
-                nonCertCoursesKeys.forEach(c => { let p = emp.nonCertProgress[c]; row.push(p !== null ? p + "%" : "-"); });
+                getSelectedNonCertKeys().forEach(c => { let p = emp.nonCertProgress[c]; row.push(p !== null ? p + "%" : "-"); });
                 nonCertAOA.push(row);
             });
             let wsNonCert = XLSX.utils.aoa_to_sheet(nonCertAOA);
@@ -7846,10 +7829,10 @@
             applyExcelStyles(ws1);
             XLSX.utils.book_append_sheet(wb, ws1, "بائعين " + regionName.substring(0,20));
 
-            let nonCertAOA = [["الرقم الوظيفي", "الاسم", "المشرف", "الإقليم", ...nonCertCoursesKeys]];
+            let nonCertAOA = [["الرقم الوظيفي", "الاسم", "المشرف", "الإقليم", ...getSelectedNonCertKeys()]];
             employees.forEach(emp => {
                 let row = [emp.id, emp.name, emp.supervisor || "بدون مشرف", emp.region];
-                nonCertCoursesKeys.forEach(c => { let p = emp.nonCertProgress[c]; row.push(p !== null ? p + "%" : "-"); });
+                getSelectedNonCertKeys().forEach(c => { let p = emp.nonCertProgress[c]; row.push(p !== null ? p + "%" : "-"); });
                 nonCertAOA.push(row);
             });
             let ws2 = XLSX.utils.aoa_to_sheet(nonCertAOA);
@@ -8212,7 +8195,7 @@
             const overviewSupervisors = document.getElementById('gulfOverviewSupervisorsBody');
             if (overviewSupervisors) overviewSupervisors.innerHTML = supervisorGroups.length ? supervisorGroups.map(group => `<tr><td class="px-4 py-3 font-extrabold text-teal-800">${safeBotText(group.name)}</td><td class="px-4 py-3">${group.totalEmployees}</td><td class="px-4 py-3 font-extrabold text-indigo-700">${formatKpiValue(group.averageProgress)}%</td><td class="px-4 py-3"><span class="inline-flex rounded-full px-3 py-1 text-xs font-extrabold ${group.kpi === 100 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${formatKpiValue(group.kpi)}%</span></td></tr>`).join('') : '<tr><td colspan="4" class="py-8 text-center text-slate-500">لا توجد بيانات مشرفين بالخليج.</td></tr>';
 
-            const courseStats = gulfTrainingPathDef.map(course => {
+            const courseStats = getSelectedGulfCourses().map(course => {
                 const done = employees.filter(employee => isAcademyTrackCourseCompleted(employee, course, 'gulf')).length;
                 return { course, done, remaining: employees.length - done, percentage: employees.length ? roundKpiValue((done / employees.length) * 100) : 0 };
             });
@@ -8226,6 +8209,7 @@
             }).join('') : '<tr><td colspan="7" class="py-8 text-center text-slate-500">لا توجد بيانات مشرفين بالخليج.</td></tr>';
             renderGulfMonthlyEvaluation();
             if (currentGulfSupervisor) showGulfSupervisorDetails(currentGulfSupervisor);
+            renderGulfSupport();
             switchGulfSubTab(currentGulfSubTab);
         }
 
@@ -8252,7 +8236,7 @@
 
         function getGulfMonthlyMonths(employees = getSpecialTrackEmployees('gulf')) {
             const months = new Set();
-            employees.forEach(employee => gulfTrainingPathDef.forEach(course => {
+            employees.forEach(employee => getSelectedGulfCourses().forEach(course => {
                 const record = getGulfAcademyCourseRecord(employee, course);
                 if (record && record.hasCertificate && record.certificateMonth) months.add(normalizeAcademyMonthKey(record.certificateMonth));
             }));
@@ -8262,7 +8246,7 @@
         function getGulfCompletedThroughMonth(employee, monthKey) {
             const cutoff = getAcademyMonthSortValue(monthKey);
             if (cutoff < 0) return 0;
-            return gulfTrainingPathDef.filter(course => {
+            return getSelectedGulfCourses().filter(course => {
                 const record = getGulfAcademyCourseRecord(employee, course);
                 return record && record.hasCertificate && getAcademyMonthSortValue(record.certificateMonth) <= cutoff;
             }).length;
@@ -8336,7 +8320,7 @@
                 ['إحصائيات دورات الخليج'],
                 ['رقم الدورة', 'اسم الدورة', 'المستهدفون', 'المنجزون', 'المتبقي', 'نسبة الإنجاز']
             ];
-            gulfTrainingPathDef.forEach(course => {
+            getSelectedGulfCourses().forEach(course => {
                 const completed = employees.filter(employee => isAcademyTrackCourseCompleted(employee, course, 'gulf')).length;
                 aoa.push([course.certId, course.ar, total, completed, Math.max(0, total - completed), percentage(completed)]);
             });
@@ -8348,7 +8332,7 @@
                 headerRows: [5, 14],
                 colWidths: [18, 46, 20, 20, 20, 20],
                 tabColor: '0891B2',
-                autoFilterRef: `A15:F${15 + gulfTrainingPathDef.length}`
+                autoFilterRef: `A15:F${15 + getSelectedGulfCourses().length}`
             });
         }
 
@@ -8444,7 +8428,7 @@
                 return [employee.id, employee.name, employee.email || '', employee.supervisor || 'بدون مشرف', employee.manager || 'إقليم الخليج', formatDateDisplay(employee.hireDate), employee.totalCerts, summary.completedCount, target, summary.isComplete ? 'مكتمل' : 'قيد الإنجاز', `${formatKpiValue(summary.score)}%`];
             });
 
-            const progressHeaders = ['الرقم الوظيفي', 'الاسم', 'المشرف', 'مدير الإقليم', `المنجز / المستهدف (${target})`, 'KPI الخليج', ...gulfTrainingPathDef.map(course => `${course.certId}- ${course.ar}`)];
+            const progressHeaders = ['الرقم الوظيفي', 'الاسم', 'المشرف', 'مدير الإقليم', `المنجز / المستهدف (${target})`, 'KPI الخليج', ...getSelectedGulfCourses().map(course => `${course.certId}- ${course.ar}`)];
             const progressRows = employees.map(employee => {
                 const summary = getAcademyTrackSummary(employee, 'gulf');
                 return [
@@ -8454,7 +8438,7 @@
                     employee.manager || 'إقليم الخليج',
                     `${summary.completedCount} / ${target}`,
                     `${formatKpiValue(summary.score)}%`,
-                    ...gulfTrainingPathDef.map(course => {
+                    ...getSelectedGulfCourses().map(course => {
                         const record = getGulfAcademyCourseRecord(employee, course);
                         if (isAcademyTrackCourseCompleted(employee, course, 'gulf') || (record && record.hasCertificate)) return '100%';
                         const progress = record && record.progress !== null ? Number(record.progress) : 0;
@@ -8464,11 +8448,11 @@
                 ];
             });
 
-            const pathHeaders = ['الرقم الوظيفي', 'الاسم', 'المشرف', 'مدير الإقليم', 'المسار الحالي (نقطة التوقف)', 'إجمالي الشهادات', `المنجز / المستهدف (${target})`, 'KPI الخليج', ...gulfTrainingPathDef.map(course => `${course.certId}- ${course.ar}`)];
+            const pathHeaders = ['الرقم الوظيفي', 'الاسم', 'المشرف', 'مدير الإقليم', 'المسار الحالي (نقطة التوقف)', 'إجمالي الشهادات', `المنجز / المستهدف (${target})`, 'KPI الخليج', ...getSelectedGulfCourses().map(course => `${course.certId}- ${course.ar}`)];
             const pathRows = employees.map(employee => {
                 const summary = getAcademyTrackSummary(employee, 'gulf');
                 const stopper = summary.stopper;
-                return [employee.id, employee.name, employee.supervisor || 'بدون مشرف', employee.manager || 'إقليم الخليج', stopper ? `${stopper.certId}. ${stopper.ar}` : 'أتم مستهدف الخليج', employee.totalCerts, `${summary.completedCount} / ${target}`, `${formatKpiValue(summary.score)}%`, ...gulfTrainingPathDef.map(course => {
+                return [employee.id, employee.name, employee.supervisor || 'بدون مشرف', employee.manager || 'إقليم الخليج', stopper ? `${stopper.certId}. ${stopper.ar}` : 'أتم مستهدف الخليج', employee.totalCerts, `${summary.completedCount} / ${target}`, `${formatKpiValue(summary.score)}%`, ...getSelectedGulfCourses().map(course => {
                     if (isAcademyTrackCourseCompleted(employee, course, 'gulf')) return 'منجز';
                     return stopper && stopper.en === course.en ? 'واقف عليها' : 'لم يصلها';
                 })];
@@ -8491,12 +8475,13 @@
             };
             XLSX.utils.book_append_sheet(workbook, buildGulfExecutiveHomeWorksheet(employees, menuItems), GULF_EXECUTIVE_SHEETS.home);
             XLSX.utils.book_append_sheet(workbook, createExecutiveTableWorksheet(GULF_EXECUTIVE_SHEETS.employees, 'إقليم الخليج', employeeHeaders, employeeRows, { subtitle: 'كل موظفي إقليم الخليج في كشف واحد — بدون تقسيم حسب مدة الخدمة', colWidths: [15, 28, 28, 28, 24, 18, 18, 20, 16, 18, 16], tabColor: '2563EB' }), GULF_EXECUTIVE_SHEETS.employees);
-            XLSX.utils.book_append_sheet(workbook, createExecutiveTableWorksheet(GULF_EXECUTIVE_SHEETS.progress, 'إقليم الخليج', progressHeaders, progressRows, { subtitle: `نسبة تقدم كل موظف في ${gulfTrainingPathDef.length} دورة خليجية — المستهدف الحالي ${target} والدورة المكتملة تظهر 100%`, colWidths: [15, 28, 28, 24, 18, 16, ...gulfTrainingPathDef.map(() => 30)], tabColor: '7C3AED' }), GULF_EXECUTIVE_SHEETS.progress);
-            XLSX.utils.book_append_sheet(workbook, createExecutiveTableWorksheet(GULF_EXECUTIVE_SHEETS.path, 'إقليم الخليج', pathHeaders, pathRows, { subtitle: `مسار الخليج المستقل — ${gulfTrainingPathDef.length} دورة متاحة، المستهدف الحالي ${target}`, colWidths: [15, 28, 28, 24, 38, 18, 18, 16, ...gulfTrainingPathDef.map(() => 30)], tabColor: EXECUTIVE_EXCEL_COLORS.amber }), GULF_EXECUTIVE_SHEETS.path);
+            XLSX.utils.book_append_sheet(workbook, createExecutiveTableWorksheet(GULF_EXECUTIVE_SHEETS.progress, 'إقليم الخليج', progressHeaders, progressRows, { subtitle: `نسبة تقدم كل موظف في ${gulfTrainingPathDef.length} دورة خليجية — المستهدف الحالي ${target} والدورة المكتملة تظهر 100%`, colWidths: [15, 28, 28, 24, 18, 16, ...getSelectedGulfCourses().map(() => 30)], tabColor: '7C3AED' }), GULF_EXECUTIVE_SHEETS.progress);
+            XLSX.utils.book_append_sheet(workbook, createExecutiveTableWorksheet(GULF_EXECUTIVE_SHEETS.path, 'إقليم الخليج', pathHeaders, pathRows, { subtitle: `مسار الخليج المستقل — ${gulfTrainingPathDef.length} دورة متاحة، المستهدف الحالي ${target}`, colWidths: [15, 28, 28, 24, 38, 18, 18, 16, ...getSelectedGulfCourses().map(() => 30)], tabColor: EXECUTIVE_EXCEL_COLORS.amber }), GULF_EXECUTIVE_SHEETS.path);
             XLSX.utils.book_append_sheet(workbook, buildGulfExecutiveAnalysisWorksheet(employees), GULF_EXECUTIVE_SHEETS.analysis);
             XLSX.utils.book_append_sheet(workbook, buildGulfExecutiveKpiWorksheet(employees), GULF_EXECUTIVE_SHEETS.kpi);
             XLSX.utils.book_append_sheet(workbook, removeExecutiveSheetNavigation(createExecutiveTableWorksheet(GULF_EXECUTIVE_SHEETS.elite, 'إقليم الخليج', eliteHeaders, eliteRows, { subtitle: 'شيت مخفي اختياري — استخدم Unhide لعرض بيانات النخبة', colWidths: [15, 28, 28, 24, 20, ...eliteCoursesKeys.map(() => 34), 22, 20], tabColor: 'CA8A04' })), GULF_EXECUTIVE_SHEETS.elite);
             XLSX.utils.book_append_sheet(workbook, removeExecutiveSheetNavigation(createExecutiveTableWorksheet(GULF_EXECUTIVE_SHEETS.bot, 'إقليم الخليج', gulfBot.headers, gulfBot.rows, { subtitle: 'شيت مخفي اختياري — استخدم Unhide لعرض بيانات Back on Track', colWidths: [15, 28, 28, 22, 24, 28, 18, 28, ...botCoursesKeys.map(() => 34), 22, 22, 42], tabColor: '7C3AED' })), GULF_EXECUTIVE_SHEETS.bot);
+            appendGulfSupportSheets(workbook, employees);
             workbook.Workbook = workbook.Workbook || {};
             workbook.Workbook.Sheets = workbook.SheetNames.map(sheetName => ({
                 Hidden: sheetName === GULF_EXECUTIVE_SHEETS.elite || sheetName === GULF_EXECUTIVE_SHEETS.bot ? 1 : 0
@@ -8538,8 +8523,8 @@
             const pathRegion = document.getElementById('pathRegionFilter').value;
             const pathSearch = document.getElementById('pathSearchFilter').value.toLowerCase();
 
-            let certCourses = trainingPathDef.filter(c => c.hasCert);
-            let nonCertCourses = trainingPathDef.filter(c => !c.hasCert);
+            let certCourses = getSelectedStandardCourses();
+            let nonCertCourses = getSelectedStandardNonCertCourses();
 
             let filteredEmployees = globalData.allActive.filter(emp => {
                 let matchReg = pathRegion === "" || emp.region === pathRegion;
@@ -8610,8 +8595,8 @@
         function exportTrainingPath() {
             const pathRegion = document.getElementById('pathRegionFilter').value;
             const pathSearch = document.getElementById('pathSearchFilter').value.toLowerCase();
-            let certCourses = trainingPathDef.filter(c => c.hasCert);
-            let nonCertCourses = trainingPathDef.filter(c => !c.hasCert);
+            let certCourses = getSelectedStandardCourses();
+            let nonCertCourses = getSelectedStandardNonCertCourses();
 
             let filteredEmployees = globalData.allActive.filter(emp => {
                 let matchReg = pathRegion === "" || emp.region === pathRegion;
@@ -8670,8 +8655,8 @@
         }
         
         function buildTrainingPathHeaders() {
-            let certCourses = trainingPathDef.filter(c => c.hasCert);
-            let nonCertCourses = trainingPathDef.filter(c => !c.hasCert);
+            let certCourses = getSelectedStandardCourses();
+            let nonCertCourses = getSelectedStandardNonCertCourses();
 
             let certHeaderHtml = `
                 <tr>
@@ -8771,5 +8756,388 @@
             });
         }
     </script>
+<script>
+// Course selection and administration, October 2026.
+const COURSE_SELECTION_KEY = 'academyCourseSelectionsV20261018';
+const gulfSupportCatalog = [
+    {en:'Capsule', countries:[]},
+    {en:'Updates and New Circulars', countries:[]},
+    {en:"Deraah's new products", countries:[]},
+    {en:'Visual Merchandising Inside Stores (Qatar – UAE)', countries:['qatar','uae']},
+    {en:'Visual Merchandising in the Oman Stores', countries:['oman']},
+    {en:'Letters Perfumes (Oman)', countries:['oman']},
+    {en:'Letters Perfumes (Qatar&Emirates)', countries:['qatar','uae']},
+    {en:'Snoonu App (Qatar)', countries:['qatar']}
+];
+const administrationCourses = ['Time Management', 'Professional Problem Solving'];
+const countryLabels = {qatar:'قطر', oman:'عمان', uae:'الإمارات', unknown:'غير محدد', conflict:'أكثر من دولة'};
+let latestAcademyRows = [], latestOldAcademyRows = [], administrationRoster = [], administrationReportRows = null;
+let administrationRosterMessage = 'ارفع تقسيم الإدارة لبدء المقارنة.', administrationReportName = '';
+let gulfSupportScope = 'common', coursePickerGroup = '', coursePickerDraft = new Set();
+let courseSelections = loadCourseSelections();
+
+function loadCourseSelections() {
+    try { const value = JSON.parse(localStorage.getItem(COURSE_SELECTION_KEY) || '{}'); return value && typeof value === 'object' && !Array.isArray(value) ? value : {}; }
+    catch { return {}; }
+}
+function courseIsSelected(group, name) { return !Array.isArray(courseSelections[group]) || !courseSelections[group].includes(name); }
+function getSelectedStandardCourses() { return trainingPathDef.filter(c => c.hasCert && courseIsSelected('standard', c.en)); }
+function getSelectedGulfCourses() { return gulfTrainingPathDef.filter(c => courseIsSelected('gulf', c.en)); }
+function getSelectedNonCertKeys() { return nonCertCoursesKeys.filter(c => courseIsSelected('support', c)); }
+function getSelectedStandardNonCertCourses() { return trainingPathDef.filter(c => !c.hasCert && courseIsSelected('support', c.en)); }
+function getSelectedGulfSupportCourses() { return gulfSupportCatalog.filter(c => courseIsSelected('gulfSupport', c.en)); }
+function getCoursePickerCatalog(group) {
+    if (group === 'standard') return trainingPathDef.filter(c => c.hasCert);
+    if (group === 'gulf') return gulfTrainingPathDef;
+    if (group === 'support') return nonCertCoursesKeys.map(en => ({en}));
+    return gulfSupportCatalog;
+}
+function updateCourseSelectionLabels() {
+    targetCertsCount = getSelectedStandardCourses().length;
+    gulfTargetCoursesCount = getSelectedGulfCourses().length;
+    document.getElementById('targetCertsInput').value = targetCertsCount;
+    document.getElementById('gulfTargetCoursesInput').value = gulfTargetCoursesCount;
+    document.getElementById('standardSelectedCount').textContent = `(${targetCertsCount} دورة)`;
+    document.getElementById('gulfSelectedCount').textContent = `(${gulfTargetCoursesCount} دورة)`;
+    document.querySelectorAll('[data-support-count]').forEach(el => el.textContent = `(${getSelectedNonCertKeys().length} دورة)`);
+    const certTab = document.querySelector('[onclick*="switchPathSubTab"][onclick*="pathCertSection"]');
+    if(certTab) certTab.textContent = `الدورات الأساسية (${targetCertsCount} دورة محتسبة)`;
+    const supportTab = document.querySelector('[onclick*="switchPathSubTab"][onclick*="pathNonCertSection"]');
+    if(supportTab) supportTab.textContent = `الدورات الداعمة (${getSelectedNonCertKeys().length} دورة)`;
+    updateDynamicLabels(); updateGulfTargetLabels();
+    document.getElementById('gulfCourseCountHint').textContent = `المحتسب: ${gulfTargetCoursesCount} من ${gulfTrainingPathDef.length} دورة؛ المنجز يحسب من الاختيارات فقط.`;
+}
+function openCoursePicker(group) {
+    coursePickerGroup = group;
+    coursePickerDraft = new Set(getCoursePickerCatalog(group).filter(c => courseIsSelected(group,c.en)).map(c => c.en));
+    document.getElementById('coursePickerTitle').textContent = ({standard:'الدورات الأساسية',gulf:'دورات الخليج الأساسية',support:'الدورات الداعمة / بدون شهادة',gulfSupport:'دورات الخليج الداعمة / بدون شهادة'})[group];
+    document.getElementById('coursePickerSearch').value = '';
+    renderCoursePicker();
+    document.getElementById('coursePicker').showModal();
+    document.getElementById('coursePickerSearch').focus();
+}
+function renderCoursePicker() {
+    const search = document.getElementById('coursePickerSearch').value.toLowerCase();
+    document.getElementById('coursePickerItems').innerHTML = getCoursePickerCatalog(coursePickerGroup).map((c,i) => {
+        if(!`${c.en} ${c.ar||''}`.toLowerCase().includes(search)) return '';
+        return `<label class="picker-row"><input type="checkbox" data-course-index="${i}" ${coursePickerDraft.has(c.en)?'checked':''} onchange="toggleCourseDraft(${i},this.checked)"><span dir="auto">${safeBotText(c.en)}</span></label>`;
+    }).join('');
+    document.getElementById('coursePickerCount').textContent = `المختار ${coursePickerDraft.size} من ${getCoursePickerCatalog(coursePickerGroup).length}`;
+}
+function toggleCourseDraft(index,checked) {
+    const name = getCoursePickerCatalog(coursePickerGroup)[index].en;
+    checked ? coursePickerDraft.add(name) : coursePickerDraft.delete(name);
+    document.getElementById('coursePickerCount').textContent = `المختار ${coursePickerDraft.size} من ${getCoursePickerCatalog(coursePickerGroup).length}`;
+}
+function selectAllCourseDraft(checked) { coursePickerDraft = new Set(checked ? getCoursePickerCatalog(coursePickerGroup).map(c=>c.en) : []); renderCoursePicker(); }
+function saveCoursePicker() {
+    if((coursePickerGroup==='standard'||coursePickerGroup==='gulf')&&!coursePickerDraft.size){alert('اختر دورة واحدة على الأقل لحساب التارجت.');return;}
+    courseSelections[coursePickerGroup] = getCoursePickerCatalog(coursePickerGroup).filter(c => !coursePickerDraft.has(c.en)).map(c => c.en);
+    let saved = true;
+    try { localStorage.setItem(COURSE_SELECTION_KEY, JSON.stringify(courseSelections)); } catch { saved=false; }
+    document.getElementById('coursePicker').close();
+    updateCourseSelectionLabels(); recountSelectedCertificates(); buildTrainingPathHeaders();
+    refreshAllViewsForRegion(); renderGulfRegionDashboard(); renderGulfSupport(); renderAdminTab();
+    if(!saved) alert('تم تطبيق الاختيارات، لكن المتصفح منع حفظها محليًا. اسمح بالتخزين المحلي لحفظها للمرة القادمة.');
+}
+function isSelectedCertificateRecord(employee, record) {
+    const catalog = getEmployeeAcademyTrack(employee) === 'gulf' ? getSelectedGulfCourses() : getSelectedStandardCourses();
+    const course = getEmployeeAcademyTrack(employee) === 'gulf' ? findGulfCourse(record.name) : findStandardTrainingCourse(record.name);
+    return Boolean(course && catalog.some(c => c.en === course.en));
+}
+function recountSelectedCertificates() {
+    const oldById = new Map();
+    latestOldAcademyRows.slice(1).forEach(row => {
+        const id = cleanString(row[14]), name=cleanString(row[1]);
+        if(!id || !parseCertificateDate(row[38])) return;
+        if(!oldById.has(id)) oldById.set(id,new Map());
+        oldById.get(id).set(normalizeAcademyCourseName(name), {name});
+    });
+    [...globalData.allActive,...globalData.excludedEmployees,...globalData.missingEmployees].forEach(emp => {
+        finalizeEmployeeCertificateCounts(emp);
+        emp.oldTotalCerts = [...(oldById.get(emp.id)||new Map()).values()].filter(r=>isSelectedCertificateRecord(emp,r)).length;
+    });
+}
+function rebuildSupportProgress() {
+    [...globalData.allActive,...globalData.excludedEmployees,...globalData.missingEmployees].forEach(emp => {
+        emp.nonCertProgress = emp.nonCertProgress || {};
+        nonCertCoursesKeys.forEach(name => {
+            const records = Object.values(emp.academyCourses||{}).filter(r=>normalizeAcademyCourseName(r.name)===normalizeAcademyCourseName(name));
+            const values=records.map(r=>r.hasCertificate?100:r.progress).filter(v=>v!==null && v!==undefined);
+            emp.nonCertProgress[name] = values.length ? Math.max(...values) : null;
+            if(emp.pathProgress) emp.pathProgress[name] = emp.nonCertProgress[name]===100;
+        });
+    });
+}
+const GULF_SUPPORT_ASSIGNMENTS_KEY = 'academyGulfSupportAssignmentsV2';
+const gulfSupportGroups = {common:'الخليج العام',uae:'الإمارات',qatar:'قطر',oman:'عمان',saudi:'السعودية',kuwait:'الكويت',bahrain:'البحرين'};
+let gulfSupportAssignments = loadGulfSupportAssignments();
+let gulfAssignmentDraft = null, gulfAssignmentCountry = 'common';
+
+function loadGulfSupportAssignments() {
+    let saved=null;
+    try {saved=JSON.parse(localStorage.getItem(GULF_SUPPORT_ASSIGNMENTS_KEY)||'null');} catch {}
+    const assignments={};
+    Object.keys(gulfSupportGroups).forEach(key=>{
+        assignments[key]=saved && Array.isArray(saved[key])
+            ? [...new Set(saved[key].filter(name=>typeof name==='string'&&name.trim()))]
+            : gulfSupportCatalog.filter(c=>courseIsSelected('gulfSupport',c.en) && (key==='common'?!c.countries.length:c.countries.includes(key))).map(c=>c.en);
+    });
+    return assignments;
+}
+function getGulfSupportCatalog() {
+    const courses = new Map(gulfSupportCatalog.map(c=>[normalizeAcademyCourseName(c.en),{en:c.en}]));
+    getSpecialTrackEmployees('gulf').forEach(employee=>Object.values(employee.academyCourses||{}).forEach(record=>{
+        if(record.hasCertificate||findGulfCourse(record.name)||findBotCourse(record.name)||findEliteCourse(record.name)||administrationCourses.some(c=>normalizeAcademyCourseName(c)===record.key))return;
+        const standard=findStandardTrainingCourse(record.name);if(standard&&standard.hasCert)return;
+        const key=normalizeAcademyCourseName(record.name);if(key&&!courses.has(key))courses.set(key,{en:record.name});
+    }));
+    Object.values(gulfSupportAssignments).flat().forEach(name=>{const key=normalizeAcademyCourseName(name);if(!courses.has(key))courses.set(key,{en:name});});
+    return [...courses.values()];
+}
+function getGulfSupportCoursesForScope(scope='common') {
+    const catalog=getGulfSupportCatalog();
+    return (gulfSupportAssignments[scope]||[]).map(name=>catalog.find(c=>normalizeAcademyCourseName(c.en)===normalizeAcademyCourseName(name))||{en:name});
+}
+function getGulfSupportRecord(employee,course) {
+    return Object.values(employee.academyCourses||{}).find(r=>normalizeAcademyCourseName(r.name)===normalizeAcademyCourseName(course.en))||null;
+}
+function getGulfSupportProgress(employee,course) {
+    const record=getGulfSupportRecord(employee,course);return record?(record.hasCertificate?100:record.progress):null;
+}
+function getGulfSupportEmployees(scope='common',employees=getSpecialTrackEmployees('gulf'),search='') {
+    const courses=getGulfSupportCoursesForScope(scope),query=cleanString(search).toLowerCase();
+    return employees.filter(employee=>courses.some(c=>getGulfSupportRecord(employee,c))&&(!query||`${employee.id} ${employee.name} ${employee.supervisor}`.toLowerCase().includes(query)));
+}
+function supportExportRows(employees,courses,scope='common') {
+    return [['الرقم الوظيفي','الاسم','البريد الإلكتروني','القسم','المشرف',...courses.map(c=>c.en),'المنجز','المستهدف'],...employees.map(employee=>{
+        const values=courses.map(c=>{
+            const record=getGulfSupportRecord(employee,c);if(!record)return 'غير مسجل';
+            const progress=getGulfSupportProgress(employee,c);return progress===null?'مسجل — بدون نسبة':progress+'%';
+        });
+        return [employee.id,employee.name,employee.email||'',gulfSupportGroups[scope],employee.supervisor||'',...values,courses.filter(c=>getGulfSupportProgress(employee,c)===100).length,courses.length];
+    })];
+}
+function openGulfSupportFilter() {
+    gulfAssignmentDraft=JSON.parse(JSON.stringify(gulfSupportAssignments));
+    document.getElementById('gulfAssignmentSearch').value='';
+    renderGulfSupportFilter();document.getElementById('gulfAssignmentDialog').showModal();
+}
+function chooseGulfAssignmentCountry(key) {
+    gulfAssignmentCountry=key;document.getElementById('gulfAssignmentSearch').value='';renderGulfSupportFilter();
+}
+function renderGulfSupportFilter() {
+    const catalog=getGulfSupportCatalog(),selected=gulfAssignmentDraft[gulfAssignmentCountry]||[];
+    const search=cleanString(document.getElementById('gulfAssignmentSearch').value).toLowerCase();
+    document.getElementById('gulfAssignmentCountries').innerHTML=Object.entries(gulfSupportGroups).map(([key,label])=>`<button type="button" class="assignment-country ${key===gulfAssignmentCountry?'selected':''}" onclick="chooseGulfAssignmentCountry('${key}')"><span>${label}</span><span>${gulfAssignmentDraft[key].length}</span></button>`).join('');
+    document.getElementById('gulfAssignmentHeading').textContent=`دورات ${gulfSupportGroups[gulfAssignmentCountry]}`;
+    document.getElementById('gulfAssignmentCount').textContent=`${selected.length} دورة مختارة`;
+    const items=catalog.map((course,index)=>{
+        if(search&&!course.en.toLowerCase().includes(search))return '';
+        const assignedTo=Object.entries(gulfSupportGroups).filter(([key])=>gulfAssignmentDraft[key].includes(course.en)).map(([,label])=>label);
+        return `<label class="assignment-course"><input type="checkbox" ${selected.includes(course.en)?'checked':''} onchange="toggleGulfCourseAssignment(${index},this.checked)"><span><span dir="auto" class="assignment-course-name">${safeBotText(course.en)}</span><small>${assignedTo.length?'مضافة إلى: '+assignedTo.join('، '):'غير مضافة لأي قسم'}</small></span></label>`;
+    }).join('');
+    document.getElementById('gulfAssignmentCourses').innerHTML=items||'<p class="assignment-empty">لا توجد دورات مطابقة للبحث.</p>';
+}
+function toggleGulfCourseAssignment(index,checked) {
+    const name=getGulfSupportCatalog()[index].en,selected=new Set(gulfAssignmentDraft[gulfAssignmentCountry]);
+    checked?selected.add(name):selected.delete(name);gulfAssignmentDraft[gulfAssignmentCountry]=[...selected];renderGulfSupportFilter();
+}
+function selectGulfCountryCourses(checked) {
+    gulfAssignmentDraft[gulfAssignmentCountry]=checked?getGulfSupportCatalog().map(c=>c.en):[];renderGulfSupportFilter();
+}
+function saveGulfSupportAssignments() {
+    gulfSupportAssignments=JSON.parse(JSON.stringify(gulfAssignmentDraft));
+    let saved=true;try{localStorage.setItem(GULF_SUPPORT_ASSIGNMENTS_KEY,JSON.stringify(gulfSupportAssignments));}catch{saved=false;}
+    document.getElementById('gulfAssignmentDialog').close();renderGulfSupport();
+    if(!saved)alert('تم تطبيق التوزيع، لكن المتصفح منع الحفظ المحلي.');
+}
+function renderGulfSupport() {
+    const panel=document.getElementById('gulfSupportPanel');if(!panel)return;
+    if(!panel.dataset.ready){
+        panel.innerHTML=`<div class="feature-card"><div class="feature-actions"><h3 style="flex:1">الدورات الداعمة / بدون شهادة — الخليج</h3><button type="button" class="course-filter-btn selected" onclick="openGulfSupportFilter()"><i class="fas fa-filter"></i> فلتر</button><button type="button" class="course-filter-btn" onclick="exportGulfSupport()">تنزيل Excel</button></div><p>من «فلتر» اختار الدولة وحدد دوراتها. نفس الدورة ممكن تتضاف لأكثر من دولة؛ كل قسم يعرض المسجلين في أي دورة داخله، حتى لو لم يبدأوا.</p><input id="gulfSupportSearch" type="search" placeholder="ابحث بالاسم أو الرقم أو المشرف" oninput="renderGulfSupport()"><p id="gulfSupportCount"></p><div id="gulfSupportGroups"></div></div>`;
+        panel.dataset.ready='1';
+    }
+    const search=cleanString(document.getElementById('gulfSupportSearch').value),active=Object.entries(gulfSupportGroups).filter(([key])=>getGulfSupportCoursesForScope(key).length);
+    const ids=new Set();
+    document.getElementById('gulfSupportGroups').innerHTML=active.map(([key,label])=>{
+        const courses=getGulfSupportCoursesForScope(key),employees=getGulfSupportEmployees(key,undefined,search),rows=supportExportRows(employees,courses,key);
+        employees.forEach(e=>ids.add(e.id));
+        return `<section class="support-country-section" data-support-group="${key}"><div class="support-country-heading"><h4>${label}</h4><span>${employees.length} موظف · ${courses.length} دورة</span><button type="button" class="course-filter-btn" onclick="exportGulfSupport('${key}')">Excel</button></div><div class="support-course-badges">${courses.map(c=>`<span dir="auto">${safeBotText(c.en)}</span>`).join('')}</div><div class="table-container"><table class="feature-table"><thead><tr>${rows[0].map(v=>`<th>${safeBotText(v)}</th>`).join('')}</tr></thead><tbody>${rows.slice(1).map(row=>'<tr>'+row.map(v=>`<td>${safeBotText(v)}</td>`).join('')+'</tr>').join('')||`<tr><td colspan="${rows[0].length}">لا يوجد موظفون مسجلون في الدورات المختارة لهذا القسم حسب التقرير والبحث الحالي.</td></tr>`}</tbody></table></div></section>`;
+    }).join('')||'<div class="assignment-empty">لم يتم اختيار دورات. اضغط «فلتر» وأضف الدورات تحت الدول المطلوبة.</div>';
+    document.getElementById('gulfSupportCount').textContent=`${active.length} أقسام · ${new Set(active.flatMap(([key])=>gulfSupportAssignments[key])).size} دورات مختلفة · ${ids.size} موظف بدون تكرار. قد يظهر الموظف في أكثر من قسم حسب توزيع الدورات.`;
+}
+function appendGulfSupportSheets(wb,employees,onlyScope=null,search='') {
+    for(const [key,label] of Object.entries(gulfSupportGroups)){
+        const courses=getGulfSupportCoursesForScope(key);if(!courses.length||(onlyScope&&onlyScope!==key))continue;
+        const selected=getGulfSupportEmployees(key,employees,search),ws=XLSX.utils.aoa_to_sheet(supportExportRows(selected,courses,key));
+        applyExcelStyles(ws);XLSX.utils.book_append_sheet(wb,ws,'داعم - '+label);
+    }
+}
+function exportGulfSupport(scope=null) {
+    const wb=XLSX.utils.book_new();appendGulfSupportSheets(wb,getSpecialTrackEmployees('gulf'),scope,cleanString(document.getElementById('gulfSupportSearch')?.value));
+    if(!wb.SheetNames.length){alert('اختار الدورات والدول من «فلتر» أولًا.');return;}
+    XLSX.writeFile(wb,scope?'دورات_داعمة_'+gulfSupportGroups[scope]+'.xlsx':'دورات_الخليج_الداعمة.xlsx');
+}
+function setupGulfSupportFilter() {
+    const style=document.createElement('style');style.textContent=`#gulfAssignmentDialog{width:min(920px,95vw);max-height:90vh;border:0;border-radius:20px;padding:0;color:#1e293b}#gulfAssignmentDialog[open]{display:flex;flex-direction:column;overflow:hidden}#gulfAssignmentDialog::backdrop{background:#0f172a99}.assignment-header,.assignment-footer{padding:18px 22px;display:flex;align-items:center;gap:12px;flex-shrink:0;background:#f8fafc}.assignment-header{border-bottom:1px solid #e2e8f0}.assignment-header h2{font-size:23px;font-weight:800;flex:1}.assignment-description{padding:14px 22px 0;line-height:1.8;color:#64748b;font-size:14px;flex-shrink:0}.assignment-layout{display:grid;grid-template-columns:170px minmax(0,1fr);min-height:0;overflow:hidden;flex:1 1 auto;margin-top:14px}#gulfAssignmentCountries{padding:12px;border-left:1px solid #e2e8f0;background:#f8fafc;overflow:auto}.assignment-country{display:flex;justify-content:space-between;gap:8px;width:100%;text-align:right;border:1px solid transparent;border-radius:10px;padding:12px;margin-bottom:6px;color:#475569;font-weight:700}.assignment-country.selected{background:#ecfdf5;color:#047857;border-color:#6ee7b7}.assignment-course-panel{display:flex;flex-direction:column;min-height:0;padding:14px 20px}.assignment-course-panel h3{font-size:19px;font-weight:800}.assignment-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;flex-shrink:0}.assignment-toolbar button{padding:6px 10px;font-size:12px}#gulfAssignmentSearch{border:1px solid #cbd5e1;padding:10px;border-radius:9px;width:100%;margin:10px 0;flex-shrink:0}#gulfAssignmentCourses{overflow:auto;max-height:44vh;min-height:0;flex:1 1 auto}.assignment-course{display:flex;align-items:flex-start;gap:12px;padding:13px 4px;border-bottom:1px solid #e2e8f0;cursor:pointer}.assignment-course input{width:19px;height:19px;margin-top:3px;flex-shrink:0;accent-color:#059669}.assignment-course-name{display:block;line-height:1.7;overflow-wrap:anywhere}.assignment-course small{display:block;color:#64748b;margin-top:5px;font-size:11px}.assignment-footer{border-top:1px solid #e2e8f0;justify-content:flex-start;flex-wrap:wrap}.assignment-empty{padding:28px;color:#64748b;text-align:center}.support-country-section{border:1px solid #e2e8f0;border-radius:14px;margin-top:22px;overflow:hidden}.support-country-heading{display:flex;gap:14px;align-items:center;padding:16px;background:#f8fafc;flex-wrap:wrap}.support-country-heading h4{font-size:20px;font-weight:800;color:#065f46}.support-country-heading>span{flex:1;color:#64748b;font-size:13px}.support-course-badges{display:flex;gap:7px;flex-wrap:wrap;padding:14px}.support-course-badges span{font-size:11px;border:1px solid #d1fae5;color:#065f46;background:#f0fdf4;padding:6px 10px;border-radius:20px}.support-country-section .table-container{max-height:420px}@media(max-width:600px){.assignment-layout{grid-template-columns:1fr}.assignment-header,.assignment-footer{padding:14px}.assignment-description{padding:10px 14px 0;font-size:12px}.assignment-header h2{font-size:19px}#gulfAssignmentCountries{display:flex;gap:6px;overflow:auto;flex-shrink:0;border:0;padding:8px;grid-row:1}.assignment-country{white-space:nowrap;min-width:max-content;width:auto;margin:0;padding:8px;gap:10px}.assignment-layout{display:flex;flex-direction:column}.assignment-course-panel{padding:10px 14px;flex:1 1 auto}.assignment-toolbar{padding:4px 0}#gulfAssignmentCourses{max-height:35vh}}`;
+    document.head.append(style);
+    document.body.insertAdjacentHTML('beforeend',`<dialog id="gulfAssignmentDialog" dir="rtl" aria-labelledby="gulfAssignmentTitle"><div class="assignment-header"><h2 id="gulfAssignmentTitle">فلتر الدورات بدون شهادة</h2><button type="button" class="course-filter-btn" onclick="document.getElementById('gulfAssignmentDialog').close()">إغلاق</button></div><p class="assignment-description">اختار الدولة، ثم علّم على الدورات اللي هتظهر تحتها. تقدر تضيف نفس الدورة في أكثر من دولة، والاختيارات بتتحفظ على جهازك.</p><div class="assignment-layout"><nav id="gulfAssignmentCountries" aria-label="الدول"></nav><div class="assignment-course-panel"><h3 id="gulfAssignmentHeading"></h3><input id="gulfAssignmentSearch" type="search" placeholder="ابحث عن دورة بدون شهادة" oninput="renderGulfSupportFilter()"><div class="assignment-toolbar"><button type="button" class="course-filter-btn" onclick="selectGulfCountryCourses(true)">تحديد الكل للدولة</button><button type="button" class="course-filter-btn" onclick="selectGulfCountryCourses(false)">إلغاء الكل للدولة</button><span id="gulfAssignmentCount"></span></div><div id="gulfAssignmentCourses"></div></div></div><div class="assignment-footer"><button type="button" class="course-filter-btn selected" onclick="saveGulfSupportAssignments()">حفظ محلي وتطبيق</button><button type="button" class="course-filter-btn" onclick="document.getElementById('gulfAssignmentDialog').close()">إلغاء</button></div></dialog>`);
+}
+
+function normalizeEmployeeId(value) { return cleanString(value).replace(/\.0+$/,''); }
+function administrationHeaderKey(value) { return cleanString(value).toLowerCase().replace(/[أإآ]/g,'ا').replace(/[^a-z0-9\u0600-\u06ff]/g,''); }
+function parseAdministrationRoster(rows) {
+    const aliases={id:['الرقم الوظيفي','رقم الموظف','employee id','employee number','id'],email:['الميل','الايميل','البريد الإلكتروني','البريد الالكتروني','email','e-mail'],name:['الاسم','اسم الموظف','name','employee name']};
+    let headerIndex=-1, columns={};
+    for(let i=0;i<Math.min(rows.length,15);i++) {
+        const keys=rows[i].map(administrationHeaderKey), found={};
+        Object.entries(aliases).forEach(([field,names])=>found[field]=keys.findIndex(k=>names.some(n=>administrationHeaderKey(n)===k)));
+        if(Object.values(found).every(c=>c>=0)){headerIndex=i;columns=found;break;}
+    }
+    if(headerIndex<0) throw new Error('استخدم القالب: الرقم الوظيفي، البريد الإلكتروني، الاسم. لم أجد الأعمدة الثلاثة.');
+    const roster=[], ids=new Set(), emails=new Set(), errors=[];
+    rows.slice(headerIndex+1).forEach((row,index)=>{
+        if(row.every(v=>!cleanString(v))) return;
+        const id=normalizeEmployeeId(row[columns.id]), email=cleanString(row[columns.email]).toLowerCase(), name=cleanString(row[columns.name]);
+        const line=headerIndex+index+2;
+        if(!id||!email||!name) {errors.push(`صف ${line}: بيانات ناقصة`);return;}
+        if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {errors.push(`صف ${line}: بريد غير صحيح`);return;}
+        if(ids.has(id)||emails.has(email)) {errors.push(`صف ${line}: رقم أو بريد مكرر`);return;}
+        ids.add(id);emails.add(email);roster.push({id,email,name});
+    });
+    if(errors.length) throw new Error(errors.slice(0,8).join('\n')+(errors.length>8?`\nو${errors.length-8} أخطاء أخرى`:''));
+    if(!roster.length) throw new Error('التقسيم فارغ. أضف بيانات الموظفين ثم ارفعه.');
+    return roster;
+}
+const administrationUploadState = {roster:{busy:false,name:''},report:{busy:false,name:''}};
+function administrationUploadZone(kind) {
+    const roster=kind==='roster',title=roster?'تقسيم الإدارة':'تقرير الأكاديمية',icon=roster?'fa-users':'fa-graduation-cap';
+    return `<div class="admin-upload-wrapper"><label for="adminUpload-${kind}" id="adminDrop-${kind}" class="drop-zone admin-upload-zone ${roster?'admin-upload-blue':'admin-upload-green'}" role="button" tabindex="0" aria-label="رفع ${title}"><span class="admin-upload-icon"><i class="fas ${icon}" aria-hidden="true"></i></span><h3>${roster?'1':'2'}. ${title}</h3><span class="admin-upload-hint">اسحب الملف وأفلته هنا أو اضغط لاختياره</span><span class="admin-upload-format">Excel أو CSV</span><span id="adminUploadStatus-${kind}" class="admin-upload-status" aria-live="polite" hidden></span></label><input id="adminUpload-${kind}" type="file" accept=".xlsx,.xls,.csv" hidden onchange="handleAdministrationUpload('${kind}',this.files)"></div>`;
+}
+function setupAdministrationUploads() {
+    if(!document.getElementById('administrationUploadStyles')){
+        const style=document.createElement('style');style.id='administrationUploadStyles';style.textContent=`.admin-upload-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin:24px 0}.admin-upload-zone{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:225px;padding:26px;border-radius:16px;background:#f8fafc;cursor:pointer;gap:9px}.admin-upload-zone:hover{background:#f1f5f9}.admin-upload-zone:focus-visible{outline:3px solid #818cf8;outline-offset:4px}.admin-upload-zone h3{font-size:18px!important;font-weight:700!important;margin:2px 0!important;color:#334155}.admin-upload-icon{display:flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:50%;font-size:23px;margin-bottom:6px;box-shadow:0 1px 2px #0f172a0d}.admin-upload-blue .admin-upload-icon{color:#2563eb;background:#dbeafe}.admin-upload-green .admin-upload-icon{color:#059669;background:#d1fae5}.admin-upload-hint{font-size:13px;color:#64748b}.admin-upload-format{font-size:11px;color:#94a3b8}.admin-upload-status{max-width:100%;font-size:12px;font-weight:600;border-radius:14px;padding:7px 12px;overflow-wrap:anywhere;background:#eef2ff;color:#4338ca}.admin-upload-green .admin-upload-status{background:#ecfdf5;color:#047857}.admin-upload-status.upload-error{background:#fef2f2;color:#b91c1c}.admin-upload-zone[aria-busy=true]{opacity:.7;cursor:progress}.admin-upload-actions{margin-bottom:20px}@media(max-width:640px){.admin-upload-grid{grid-template-columns:1fr;gap:16px}.admin-upload-zone{min-height:195px;padding:20px}}`;
+        document.head.append(style);
+    }
+    ['roster','report'].forEach(kind=>{
+        const zone=document.getElementById(`adminDrop-${kind}`);let dragDepth=0;
+        const clear=()=>{dragDepth=0;zone.classList.remove('dragover');};
+        zone.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();document.getElementById(`adminUpload-${kind}`).click();}});
+        zone.addEventListener('dragenter',event=>{event.preventDefault();if(!administrationUploadState[kind].busy){dragDepth++;zone.classList.add('dragover');}});
+        zone.addEventListener('dragover',event=>{event.preventDefault();if(event.dataTransfer)event.dataTransfer.dropEffect=administrationUploadState[kind].busy?'none':'copy';});
+        zone.addEventListener('dragleave',event=>{event.preventDefault();dragDepth=Math.max(0,dragDepth-1);if(!dragDepth)clear();});
+        zone.addEventListener('drop',event=>{event.preventDefault();event.stopPropagation();clear();handleAdministrationUpload(kind,event.dataTransfer.files);});
+    });
+}
+async function handleAdministrationUpload(kind,files) {
+    if(!files||!files.length||administrationUploadState[kind].busy)return;
+    const zone=document.getElementById(`adminDrop-${kind}`),input=document.getElementById(`adminUpload-${kind}`),status=document.getElementById(`adminUploadStatus-${kind}`);
+    status.hidden=false;status.classList.remove('upload-error');
+    if(files.length!==1||!/\.(xlsx|xls|csv)$/i.test(files[0].name)){
+        status.textContent=files.length!==1?'اختار ملف واحد فقط.':'اختار ملف Excel أو CSV.';status.classList.add('upload-error');input.value='';return;
+    }
+    const file=files[0];administrationUploadState[kind].busy=true;zone.setAttribute('aria-busy','true');input.disabled=true;status.textContent='جارٍ قراءة الملف…';
+    try{
+        const loaded=await(kind==='roster'?uploadAdministrationRoster(file):uploadAdministrationReport(file));
+        if(loaded){administrationUploadState[kind].name=file.name;status.textContent=`✓ ${file.name}`;}
+        else {status.textContent='تعذر قراءة الملف. راجع البيانات وحاول مرة أخرى.';status.classList.add('upload-error');}
+    }catch(error){status.textContent='تعذر قراءة الملف. حاول مرة أخرى.';status.classList.add('upload-error');}
+    finally{administrationUploadState[kind].busy=false;zone.removeAttribute('aria-busy');input.disabled=false;input.value='';}
+}
+
+async function uploadAdministrationRoster(file) {
+    if(!file) return;
+    try {const roster=parseAdministrationRoster(await readExcel(file));administrationRoster=roster;administrationRosterMessage=`تم تحميل ${roster.length} موظف من ${file.name}`;}
+    catch(e){alert(e.message);return false;}
+    renderAdminTab();return true;
+}
+async function uploadAdministrationReport(file) {
+    if(!file) return;
+    try {const rows=await readExcel(file); if(!rows.slice(1).some(r=>r.length>26 && cleanString(r[1]))) throw new Error('استخدم نفس تنسيق تقرير الأكاديمية الرئيسي.'); administrationReportRows=rows;administrationReportName=file.name;}
+    catch(e){alert(e.message);return false;}
+    renderAdminTab();return true;
+}
+function downloadAdministrationTemplate() {
+    const wb=XLSX.utils.book_new(),ws=XLSX.utils.aoa_to_sheet([['الرقم الوظيفي','البريد الإلكتروني','الاسم']]);
+    applyExcelStyles(ws); ws['!cols']=[{wch:22},{wch:38},{wch:38}]; XLSX.utils.book_append_sheet(wb,ws,'تقسيم الإدارة');XLSX.writeFile(wb,'قالب_تقسيم_الإدارة.xlsx');
+}
+function getAdministrationResults() {
+    const rows=(administrationReportRows||latestAcademyRows).slice(1), byId=new Map(), byEmail=new Map();
+    rows.forEach(row=>{
+        const id=normalizeEmployeeId(row[14]), email=cleanString(row[6]).toLowerCase();
+        if(id){if(!byId.has(id))byId.set(id,[]);byId.get(id).push(row);}
+        if(email){if(!byEmail.has(email))byEmail.set(email,[]);byEmail.get(email).push(row);}
+    });
+    return administrationRoster.map(employee=>{
+        const idRows=byId.get(employee.id)||[], emailRows=byEmail.get(employee.email)||[];
+        const emailIds=new Set(emailRows.map(r=>normalizeEmployeeId(r[14])).filter(Boolean));
+        const conflict=[...emailIds].some(id=>id!==employee.id);
+        const matched=conflict?[]:idRows.length?idRows:emailRows;
+        const method=conflict?'تعارض الرقم والبريد':idRows.length?'الرقم الوظيفي':emailRows.length?'البريد الإلكتروني':'غير موجود في التقرير';
+        const courses=administrationCourses.map(name=>{
+            const relevant=matched.filter(r=>normalizeAcademyCourseName(r[1])===normalizeAcademyCourseName(name));
+            const completed=relevant.some(r=>Boolean(parseCertificateDate(r[38]))||parseProgress(r[26])===100);
+            const progress=relevant.map(r=>parseProgress(r[26])).filter(v=>v!==null);
+            return {name,completed,progress:completed?100:progress.length?Math.max(...progress):null,enrolled:relevant.length>0};
+        });
+        return {...employee,method,courses,completed:courses.filter(c=>c.completed).length,found:matched.length>0};
+    });
+}
+function administrationCourseLabel(c) {return c.completed?'مكتمل 100%':c.enrolled?(c.progress===null?'مسجل — بدون نسبة':c.progress+'%'):'غير مسجل';}
+function getAdministrationExportRows() {
+    return [['الرقم الوظيفي','البريد الإلكتروني','الاسم','المطابقة',...administrationCourses,'المنجز','المستهدف','نسبة الإنجاز'],...getAdministrationResults().map(e=>[e.id,e.email,e.name,e.method,...e.courses.map(administrationCourseLabel),e.completed,administrationCourses.length,Math.round(e.completed/administrationCourses.length*100)+'%'])];
+}
+function exportAdministration() {
+    if(!administrationRoster.length){alert('ارفع تقسيم الإدارة أولًا.');return;}
+    const wb=XLSX.utils.book_new(),ws=XLSX.utils.aoa_to_sheet(getAdministrationExportRows());applyExcelStyles(ws);XLSX.utils.book_append_sheet(wb,ws,'الإدارة');XLSX.writeFile(wb,'تقرير_الإدارة.xlsx');
+}
+function renderAdminTab() {
+    const panel=document.getElementById('adminPanel');if(!panel)return;
+    if(!panel.dataset.ready){
+        panel.innerHTML=`<div class="feature-card"><h2>إدارة</h2><p>نزّل القالب، املأ الرقم الوظيفي والبريد الإلكتروني والاسم، ثم ارفع التقسيم. المقارنة بالرقم الوظيفي أولًا ثم البريد الإلكتروني. التعارضات تظهر للمراجعة.</p><div class="admin-upload-grid">${administrationUploadZone('roster')}${administrationUploadZone('report')}</div><div class="feature-actions admin-upload-actions"><button class="course-filter-btn" onclick="downloadAdministrationTemplate()"><i class="fas fa-file-excel"></i> تنزيل قالب Excel</button><button class="course-filter-btn" onclick="exportAdministration()"><i class="fas fa-download"></i> تنزيل تقرير الإدارة</button></div><p id="adminRosterStatus"></p><p id="adminReportStatus"></p><p id="adminSummary"></p><div class="table-container"><table class="feature-table"><thead id="adminHead"></thead><tbody id="adminBody"></tbody></table></div></div>`;
+        panel.dataset.ready='1';setupAdministrationUploads();
+    }
+    const results=getAdministrationResults(),rows=getAdministrationExportRows();
+    document.getElementById('adminRosterStatus').textContent=administrationRosterMessage;
+    document.getElementById('adminReportStatus').textContent=administrationReportRows?`التقرير: ${administrationReportName}`:latestAcademyRows.length?'المقارنة بتقرير الأكاديمية المرفوع في الصفحة.':'ارفع تقرير الأكاديمية هنا، أو استخدم التقرير المرفوع في صفحة الأكاديمية.';
+    document.getElementById('adminSummary').textContent=`الموظفون: ${results.length} | مطابق: ${results.filter(e=>e.found).length} | مكتمل الدورتين: ${results.filter(e=>e.completed===2).length} | غير مطابق / تعارض: ${results.filter(e=>!e.found).length}`;
+    document.getElementById('adminHead').innerHTML='<tr>'+rows[0].map(v=>`<th>${safeBotText(v)}</th>`).join('')+'</tr>';
+    document.getElementById('adminBody').innerHTML=rows.slice(1).map(row=>'<tr>'+row.map(v=>`<td>${safeBotText(v)}</td>`).join('')+'</tr>').join('')||'<tr><td colspan="9">ارفع تقسيم الإدارة لعرض النتائج.</td></tr>';
+}
+function openAdministration() {
+    location.hash='administration';applyAcademyPageRoute();
+}
+function closeAdministration() {
+    location.hash='';applyAcademyPageRoute();
+}
+function applyAcademyPageRoute() {
+    const isAdministration=location.hash==='#administration';
+    const workspace=document.getElementById('academyWorkspace'),admin=document.getElementById('administrationPage');
+    if(!workspace||!admin)return;
+    workspace.hidden=isAdministration;admin.hidden=!isAdministration;
+    document.body.classList.toggle('administration-page',isAdministration);
+    document.title=isAdministration?'الإدارة | تحليل الأكاديمية':'منظومة مطابقة القوى والأكاديمية - المطور';
+    if(isAdministration)renderAdminTab();
+    window.scrollTo(0,0);
+}
+function setupAdministrationPage() {
+    document.querySelector('#academyWorkspace>header').insertAdjacentHTML('beforeend',`<button type="button" id="openAdministrationButton" class="course-filter-btn" style="position:relative;z-index:1;background:#0f172a;color:white;border:0;padding:13px 24px" onclick="openAdministration()"><i class="fas fa-building"></i> الإدارة</button>`);
+    const style=document.createElement('style');style.textContent=`[hidden]{display:none!important}#administrationPage{max-width:1536px;margin:auto;padding:32px 20px;min-height:100vh}#administrationPage>header{background:linear-gradient(120deg,#0f172a,#312e81);border-radius:20px;padding:28px;color:white;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}#administrationPage>header h1{font-size:30px;font-weight:800}#administrationPage>header p{color:#c7d2fe;margin-top:8px}.administration-page{background:#f1f5f9}#administrationPage .feature-card{padding:26px}#openAdministrationButton{flex-shrink:0}@media(max-width:600px){#administrationPage{padding:16px 10px}#administrationPage>header{padding:20px}#administrationPage .feature-card{padding:16px}#openAdministrationButton{margin-top:12px}}`;
+    document.head.append(style);
+    document.body.insertAdjacentHTML('beforeend',`<main id="administrationPage" hidden dir="rtl"><header><div><h1>الإدارة</h1><p>تقسيم الموظفين، متابعة الدورات، وتقارير الإدارة</p></div><button type="button" class="course-filter-btn" onclick="closeAdministration()"><i class="fas fa-arrow-right"></i> الرجوع للأكاديمية</button></header><div id="adminPanel"></div></main>`);
+    window.addEventListener('hashchange',applyAcademyPageRoute);
+    applyAcademyPageRoute();
+}
+
+window.addEventListener('DOMContentLoaded',()=>{
+    const style=document.createElement('style');style.textContent=`.course-filter-btn{display:inline-flex;gap:8px;align-items:center;padding:10px 14px;border:1px solid #cbd5e1;border-radius:10px;background:white;color:#334155;font-weight:700;cursor:pointer;white-space:nowrap}.course-filter-btn:hover,.course-filter-btn.selected{background:#ecfdf5;border-color:#059669;color:#065f46}.feature-card{padding:22px;border:1px solid #e2e8f0;border-radius:16px;background:white;margin-bottom:20px}.feature-card h2,.feature-card h3{font-weight:800;font-size:24px;margin-bottom:12px}.feature-card p{margin:12px 0;color:#475569}.feature-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.feature-table{border-collapse:collapse;width:100%;text-align:right;font-size:13px}.feature-table th,.feature-table td{padding:12px;border-bottom:1px solid #e2e8f0;white-space:nowrap}.feature-table th{background:#f1f5f9}.feature-card input[type=search]{border:1px solid #cbd5e1;border-radius:8px;padding:10px;width:300px;max-width:100%}.feature-actions input[type=file]{display:block;font-weight:400;font-size:11px;max-width:190px}#coursePicker{width:min(660px,94vw);border:0;border-radius:18px;padding:24px;max-height:88vh;color:#1e293b}#coursePicker[open]{display:flex;flex-direction:column;overflow:hidden}#coursePicker>.feature-actions{flex-shrink:0}#coursePicker::backdrop{background:#0f172a99}#coursePickerItems{min-height:0;flex:1 1 auto;max-height:48vh;overflow:auto;margin:12px 0}.picker-row{display:flex;align-items:center;gap:12px;padding:13px;border-bottom:1px solid #e2e8f0;cursor:pointer}.picker-row input{width:19px;height:19px;flex-shrink:0;accent-color:#059669}#coursePickerSearch{width:100%;border:1px solid #cbd5e1;padding:12px;border-radius:8px;margin:12px 0}`;document.head.append(style);
+    document.body.insertAdjacentHTML('beforeend',`<dialog id="coursePicker" dir="rtl" aria-labelledby="coursePickerTitle"><div class="feature-actions"><h2 id="coursePickerTitle" style="font-size:22px;font-weight:800;flex:1"></h2><button class="course-filter-btn" onclick="document.getElementById('coursePicker').close()" aria-label="إغلاق">إغلاق</button></div><p>إلغاء العلامة يستبعد الدورة من التارجت والجداول وملفات Excel.</p><input id="coursePickerSearch" type="search" placeholder="ابحث عن دورة" oninput="renderCoursePicker()"><div class="feature-actions"><button class="course-filter-btn" onclick="selectAllCourseDraft(true)">تحديد الكل</button><button class="course-filter-btn" onclick="selectAllCourseDraft(false)">إلغاء الكل</button><span id="coursePickerCount" aria-live="polite"></span></div><div id="coursePickerItems"></div><div class="feature-actions"><button class="course-filter-btn selected" onclick="saveCoursePicker()">حفظ محلي وتطبيق</button><button class="course-filter-btn" onclick="document.getElementById('coursePicker').close()">إلغاء</button></div></dialog>`);
+    setupAdministrationPage();setupGulfSupportFilter();
+    ['nonCertTab','pathNonCertSection'].forEach(id=>document.getElementById(id)?.insertAdjacentHTML('afterbegin',`<div class="feature-actions" style="margin-bottom:14px"><button class="course-filter-btn" onclick="openCoursePicker('support')">فلتر الدورات بدون شهادة <span data-support-count></span></button></div>`));
+    updateCourseSelectionLabels();buildTrainingPathHeaders();renderAdminTab();renderGulfSupport();
+});
+
+</script>
 </body>
 </html>
