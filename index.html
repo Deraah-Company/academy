@@ -1997,7 +1997,186 @@
         ];
         const ELITE_TARGET_COUNT = eliteCoursesKeys.length;
 
-        const gulfTrainingPathDef = [{"certId": 1, "ar": "Building the Customer Experience (Gulf)", "en": "Building the Customer Experience (Gulf)", "hasCert": true}, {"certId": 2, "ar": "Frequently Asked Questions and Answers (Gulf)", "en": "Frequently Asked Questions and Answers (Gulf)", "hasCert": true}, {"certId": 3, "ar": "Time Management and Organization (Gulf)", "en": "Time Management and Organization (Gulf)", "hasCert": true}, {"certId": 4, "ar": "Communication Skills (Gulf)", "en": "Communication Skills (Gulf)", "hasCert": true}, {"certId": 5, "ar": "Sales Scenarios for Deraah Oud's Top Products (Gulf)", "en": "Sales Scenarios for Deraah Oud's Top Products (Gulf)", "hasCert": true}, {"certId": 6, "ar": "Negotiation and Conflict Resolution (Gulf)", "en": "Negotiation and Conflict Resolution (Gulf)", "hasCert": true}, {"certId": 7, "ar": "Sales Scenarios for DERAAH's Top Products (Gulf)", "en": "Sales Scenarios for DERAAH's Top Products (Gulf)", "hasCert": true}, {"certId": 8, "ar": "Advanced Sales Skills (Gulf)", "en": "Advanced Sales Skills (Gulf)", "hasCert": true}, {"certId": 9, "ar": "Key Strategic Oud Products (Gulf)", "en": "Key Strategic Oud Products (Gulf)", "hasCert": true}, {"certId": 10, "ar": "Key Strategic Perfume Products (Gulf)", "en": "Key Strategic Perfume Products (Gulf)", "hasCert": true}, {"certId": 11, "ar": "Hair Care (Gulf)", "en": "Hair Care (Gulf)", "hasCert": true}, {"certId": 12, "ar": "Deraah Men Accessories (Gulf)", "en": "Deraah Men Accessories (Gulf)", "hasCert": true}, {"certId": 13, "ar": "EL OUD (Gulf)", "en": "EL OUD (Gulf)", "hasCert": true}, {"certId": 14, "ar": "Perfumes (Gulf)", "en": "Perfumes (Gulf)", "hasCert": true}, {"certId": 15, "ar": "Company Policies (Gulf)", "en": "Company Policies (Gulf)", "hasCert": true}, {"certId": 16, "ar": "Customer Experience (Gulf)", "en": "Customer Experience (Gulf)", "hasCert": true}, {"certId": 17, "ar": "Sell Like A Pro (Gulf)", "en": "Sell Like A Pro (Gulf)", "hasCert": true}, {"certId": 18, "ar": "System (Gulf)", "en": "System (Gulf)", "hasCert": true}, {"certId": 19, "ar": "\"My Rewards-Gulf\" Loyalty Program", "en": "\"My Rewards-Gulf\" Loyalty Program", "hasCert": true}, {"certId": 20, "ar": "Gifts (Gulf)", "en": "Gifts (Gulf)", "hasCert": true}, {"certId": 21, "ar": "Women’s Accessories (Gulf)", "en": "Women’s Accessories (Gulf)", "hasCert": true}, {"certId": 22, "ar": "Deraah History (Gulf)", "en": "Deraah History (Gulf)", "hasCert": true}, {"certId": 23, "ar": "Delivery Order Software (Gulf)", "en": "Delivery Order Software (Gulf)", "hasCert": true}, {"certId": 24, "ar": "Working Under Pressure (Gulf)", "en": "Working Under Pressure (Gulf)", "hasCert": true}, {"certId": 25, "ar": "Operating Systems Part 2 (Gulf)", "en": "Operating Systems Part 2 (Gulf)", "hasCert": true}, {"certId": 26, "ar": "Air Fresheners (Gulf)", "en": "Air Fresheners (Gulf)", "hasCert": true}];
+        const gulfTrainingPathDef = [
+    {
+        "certId": 1,
+        "ar": "تاريخ درعة (الخليج)",
+        "en": "Deraah History (Gulf)",
+        "hasCert": true,
+        "path": 1,
+        "pathTitle": "المسار الأول"
+    },
+    {
+        "certId": 2,
+        "ar": "العطور (الخليج)",
+        "en": "Perfumes (Gulf)",
+        "hasCert": true,
+        "path": 1,
+        "pathTitle": "المسار الأول"
+    },
+    {
+        "certId": 3,
+        "ar": "العود (الخليج)",
+        "en": "EL OUD (Gulf)",
+        "hasCert": true,
+        "path": 1,
+        "pathTitle": "المسار الأول"
+    },
+    {
+        "certId": 4,
+        "ar": "إكسسوارات درعة الرجالية (الخليج)",
+        "en": "Deraah Men Accessories (Gulf)",
+        "hasCert": true,
+        "path": 1,
+        "pathTitle": "المسار الأول"
+    },
+    {
+        "certId": 5,
+        "ar": "الإكسسوارات النسائية (الخليج)",
+        "en": "Women’s Accessories (Gulf)",
+        "hasCert": true,
+        "path": 1,
+        "pathTitle": "المسار الأول"
+    },
+    {
+        "certId": 6,
+        "ar": "الهدايا (الخليج)",
+        "en": "Gifts (Gulf)",
+        "hasCert": true,
+        "path": 1,
+        "pathTitle": "المسار الأول"
+    },
+    {
+        "certId": 7,
+        "ar": "السيستم (الخليج)",
+        "en": "System (Gulf)",
+        "hasCert": true,
+        "path": 1,
+        "pathTitle": "المسار الأول"
+    },
+    {
+        "certId": 8,
+        "ar": "البيع كمحترف (الخليج)",
+        "en": "Sell Like A Pro (Gulf)",
+        "hasCert": true,
+        "path": 1,
+        "pathTitle": "المسار الأول"
+    },
+    {
+        "certId": 9,
+        "ar": "تجربة العملاء (الخليج)",
+        "en": "Customer Experience (Gulf)",
+        "hasCert": true,
+        "path": 1,
+        "pathTitle": "المسار الأول"
+    },
+    {
+        "certId": 10,
+        "ar": "برنامج الولاء مكافآتي (الخليج)",
+        "en": "\"My Rewards-Gulf\" Loyalty Program",
+        "hasCert": true,
+        "path": 1,
+        "pathTitle": "المسار الأول"
+    },
+    {
+        "certId": 11,
+        "ar": "سياسات الشركة (الخليج)",
+        "en": "Company Policies (Gulf)",
+        "hasCert": true,
+        "path": 1,
+        "pathTitle": "المسار الأول"
+    },
+    {
+        "certId": 12,
+        "ar": "العناية بالشعر (الخليج)",
+        "en": "Hair Care (Gulf)",
+        "hasCert": true,
+        "path": 2,
+        "pathTitle": "المسار الثاني: مسار البيع المتقدم"
+    },
+    {
+        "certId": 13,
+        "ar": "منتجات العطور الاستراتيجية الرئيسية (الخليج)",
+        "en": "Key Strategic Perfume Products (Gulf)",
+        "hasCert": true,
+        "path": 2,
+        "pathTitle": "المسار الثاني: مسار البيع المتقدم"
+    },
+    {
+        "certId": 14,
+        "ar": "منتجات العود الاستراتيجية الرئيسية (الخليج)",
+        "en": "Key Strategic Oud Products (Gulf)",
+        "hasCert": true,
+        "path": 2,
+        "pathTitle": "المسار الثاني: مسار البيع المتقدم"
+    },
+    {
+        "certId": 15,
+        "ar": "مهارات بيع متقدمة (الخليج)",
+        "en": "Advanced Sales Skills (Gulf)",
+        "hasCert": true,
+        "path": 2,
+        "pathTitle": "المسار الثاني: مسار البيع المتقدم"
+    },
+    {
+        "certId": 16,
+        "ar": "سيناريوهات بيعية لأبرز عطور درعه (الخليج)",
+        "en": "Sales Scenarios for DERAAH's Top Products (Gulf)",
+        "hasCert": true,
+        "path": 3,
+        "pathTitle": "المسار الثالث: التميز في الأداء البيعي"
+    },
+    {
+        "certId": 17,
+        "ar": "سيناريوهات بيعية لأبرز عطور درعه للعود (الخليج)",
+        "en": "Sales Scenarios for Deraah Oud's Top Products (Gulf)",
+        "hasCert": true,
+        "path": 3,
+        "pathTitle": "المسار الثالث: التميز في الأداء البيعي"
+    },
+    {
+        "certId": 18,
+        "ar": "مهارات التواصل (الخليج)",
+        "en": "Communication Skills (Gulf)",
+        "hasCert": true,
+        "path": 3,
+        "pathTitle": "المسار الثالث: التميز في الأداء البيعي"
+    },
+    {
+        "certId": 19,
+        "ar": "التفاوض وحل النزاعات (الخليج)",
+        "en": "Negotiation and Conflict Resolution (Gulf)",
+        "hasCert": true,
+        "path": 3,
+        "pathTitle": "المسار الثالث: التميز في الأداء البيعي"
+    },
+    {
+        "certId": 20,
+        "ar": "أكثر الأسئلة شيوعًا بين العملاء (الخليج)",
+        "en": "Frequently Asked Questions and Answers (Gulf)",
+        "hasCert": true,
+        "path": 4,
+        "pathTitle": "المسار الرابع: التميز في تجربة العملاء"
+    },
+    {
+        "certId": 21,
+        "ar": "بناء تجربة العميل (الخليج)",
+        "en": "Building the Customer Experience (Gulf)",
+        "hasCert": true,
+        "path": 4,
+        "pathTitle": "المسار الرابع: التميز في تجربة العملاء"
+    },
+    {
+        "certId": 22,
+        "ar": "إدارة الوقت والتنظيم (الخليج)",
+        "en": "Time Management and Organization (Gulf)",
+        "hasCert": true,
+        "path": 4,
+        "pathTitle": "المسار الرابع: التميز في تجربة العملاء"
+    }
+];
+        // Retain recognition of older reports without adding these courses to the required path.
+        const gulfAdditionalCourseDef = [{"certId":23,"ar":"Delivery Order Software (Gulf)","en":"Delivery Order Software (Gulf)","hasCert":true},{"certId":24,"ar":"Working Under Pressure (Gulf)","en":"Working Under Pressure (Gulf)","hasCert":true},{"certId":25,"ar":"Operating Systems Part 2 (Gulf)","en":"Operating Systems Part 2 (Gulf)","hasCert":true},{"certId":26,"ar":"Air Fresheners (Gulf)","en":"Air Fresheners (Gulf)","hasCert":true}];
         const GULF_TARGET_STORAGE_KEY = 'academyGulfTargetCoursesV15';
         let gulfTargetCoursesCount = Math.min(gulfTrainingPathDef.length, Math.max(1, parseInt(localStorage.getItem(GULF_TARGET_STORAGE_KEY), 10) || gulfTrainingPathDef.length));
 
@@ -2324,7 +2503,7 @@
 
         function findGulfCourse(courseName) {
             const normalized = normalizeAcademyCourseName(courseName);
-            return gulfTrainingPathDef.find(c => normalizeAcademyCourseName(c.en) === normalized) || null;
+            return [...gulfTrainingPathDef, ...gulfAdditionalCourseDef].find(c => normalizeAcademyCourseName(c.en) === normalized || normalizeAcademyCourseName(c.ar) === normalized) || null;
         }
         function findStandardTrainingCourse(courseName) {
             const normalized = normalizeAcademyCourseName(courseName);
@@ -7947,10 +8126,11 @@
 
             const statsBody = document.getElementById(`${config.prefix}CourseStatsBody`);
             if (statsBody) {
-                statsBody.innerHTML = courses.map(course => {
+                statsBody.innerHTML = courses.map((course, index) => {
                     const done = allEmployees.filter(employee => isAcademyTrackCourseCompleted(employee, course, trackKey)).length;
                     const percentage = allEmployees.length ? roundKpiValue((done / allEmployees.length) * 100) : 0;
-                    return `<tr class="hover:bg-slate-50"><td class="px-5 py-3 font-bold">${course.certId}</td><td class="px-5 py-3"><span class="font-bold text-slate-800">${safeBotText(course.ar)}</span><span class="block text-xs text-slate-500" dir="ltr">${safeBotText(course.en)}</span></td><td class="px-5 py-3 font-extrabold text-emerald-700">${done}</td><td class="px-5 py-3 font-extrabold text-orange-700">${allEmployees.length - done}</td><td class="px-5 py-3 font-extrabold text-indigo-700">${formatKpiValue(percentage)}%</td></tr>`;
+                    const pathHeading = trackKey === 'gulf' && (index === 0 || courses[index - 1].path !== course.path) ? `<tr class="bg-emerald-50"><th colspan="5" class="px-5 py-3 text-right font-extrabold text-emerald-800">${safeBotText(course.pathTitle)}</th></tr>` : '';
+                    return `${pathHeading}<tr class="hover:bg-slate-50"><td class="px-5 py-3 font-bold">${course.certId}</td><td class="px-5 py-3"><span class="font-bold text-slate-800">${safeBotText(course.ar)}</span><span class="block text-xs text-slate-500" dir="ltr">${safeBotText(course.en)}</span></td><td class="px-5 py-3 font-extrabold text-emerald-700">${done}</td><td class="px-5 py-3 font-extrabold text-orange-700">${allEmployees.length - done}</td><td class="px-5 py-3 font-extrabold text-indigo-700">${formatKpiValue(percentage)}%</td></tr>`;
                 }).join('');
             }
         }
@@ -8200,7 +8380,7 @@
                 return { course, done, remaining: employees.length - done, percentage: employees.length ? roundKpiValue((done / employees.length) * 100) : 0 };
             });
             const overviewCourses = document.getElementById('gulfOverviewCoursesBody');
-            if (overviewCourses) overviewCourses.innerHTML = courseStats.slice().sort((a, b) => a.percentage - b.percentage || a.course.certId - b.course.certId).map(item => `<tr><td class="px-4 py-3"><span class="font-extrabold text-slate-800">${safeBotText(item.course.ar)}</span><span class="block text-[11px] text-slate-500" dir="ltr">${safeBotText(item.course.en)}</span></td><td class="px-4 py-3 font-bold text-emerald-700">${item.done}</td><td class="px-4 py-3 font-bold text-orange-700">${item.remaining}</td><td class="px-4 py-3 font-extrabold text-indigo-700">${formatKpiValue(item.percentage)}%</td></tr>`).join('');
+            if (overviewCourses) overviewCourses.innerHTML = courseStats.map(item => `<tr><td class="px-4 py-3"><span class="font-extrabold text-slate-800">${safeBotText(item.course.ar)}</span><span class="block text-[11px] text-slate-500" dir="ltr">${safeBotText(item.course.en)}</span></td><td class="px-4 py-3 font-bold text-emerald-700">${item.done}</td><td class="px-4 py-3 font-bold text-orange-700">${item.remaining}</td><td class="px-4 py-3 font-extrabold text-indigo-700">${formatKpiValue(item.percentage)}%</td></tr>`).join('');
 
             const supervisorsBody = document.getElementById('gulfSupervisorsTableBody');
             if (supervisorsBody) supervisorsBody.innerHTML = supervisorGroups.length ? supervisorGroups.map(group => {
@@ -8820,7 +9000,8 @@ function renderCoursePicker() {
     const search = document.getElementById('coursePickerSearch').value.toLowerCase();
     document.getElementById('coursePickerItems').innerHTML = getCoursePickerCatalog(coursePickerGroup).map((c,i) => {
         if(!`${c.en} ${c.ar||''}`.toLowerCase().includes(search)) return '';
-        return `<label class="picker-row"><input type="checkbox" data-course-index="${i}" ${coursePickerDraft.has(c.en)?'checked':''} onchange="toggleCourseDraft(${i},this.checked)"><span dir="auto">${safeBotText(c.en)}</span></label>`;
+        const pathHeading = coursePickerGroup === 'gulf' && !getCoursePickerCatalog(coursePickerGroup).slice(0,i).some(previous => previous.path === c.path && `${previous.en} ${previous.ar||''}`.toLowerCase().includes(search)) ? `<h3 class="px-3 py-2 font-bold text-emerald-800">${safeBotText(c.pathTitle)}</h3>` : '';
+        return `${pathHeading}<label class="picker-row"><input type="checkbox" data-course-index="${i}" ${coursePickerDraft.has(c.en)?'checked':''} onchange="toggleCourseDraft(${i},this.checked)"><span dir="auto">${safeBotText(c.en)}</span></label>`;
     }).join('');
     document.getElementById('coursePickerCount').textContent = `المختار ${coursePickerDraft.size} من ${getCoursePickerCatalog(coursePickerGroup).length}`;
 }
@@ -8905,9 +9086,42 @@ function getGulfSupportRecord(employee,course) {
 function getGulfSupportProgress(employee,course) {
     const record=getGulfSupportRecord(employee,course);return record?(record.hasCertificate?100:record.progress):null;
 }
+// Only a course naming one country identifies the employee's country.
+// A shared Qatar/UAE title does not override a Qatar-only enrollment.
+function getGulfSupportCourseCountries(name) {
+    const title=cleanString(name).toLowerCase().normalize('NFKD').replace(/[\u064b-\u065f\u0670]/g,'').replace(/[أإآ]/g,'ا');
+    const patterns={
+        qatar: /\bqatar\b|قطر/,
+        uae: /\bu\.?a\.?e\.?\b|\bemirates\b|\bunited arab emirates\b|الامارات/,
+        oman: /\boman\b|عمان/,
+        saudi: /\bsaudi(?: arabia)?\b|\bksa\b|السعودية/,
+        kuwait: /\bkuwait\b|الكويت/,
+        bahrain: /\bbahrain\b|البحرين/
+    };
+    return Object.keys(patterns).filter(key=>patterns[key].test(title));
+}
+function isGulfSupportCourseRecord(record) {
+    if(record.hasCertificate||findGulfCourse(record.name)||findBotCourse(record.name)||findEliteCourse(record.name)||administrationCourses.some(c=>normalizeAcademyCourseName(c)===normalizeAcademyCourseName(record.name)))return false;
+    const standard=findStandardTrainingCourse(record.name);
+    return !(standard&&standard.hasCert);
+}
+function getGulfSupportEmployeeCountries(employee) {
+    const countries=new Set();
+    Object.values(employee.academyCourses||{}).forEach(record=>{
+        if(!isGulfSupportCourseRecord(record))return;
+        const namedCountries=getGulfSupportCourseCountries(record.name);
+        if(namedCountries.length===1)countries.add(namedCountries[0]);
+    });
+    return countries;
+}
+function matchesGulfSupportEmployeeCountry(employee,scope) {
+    if(scope==='common')return true;
+    const countries=getGulfSupportEmployeeCountries(employee);
+    return !countries.size||countries.has(scope);
+}
 function getGulfSupportEmployees(scope='common',employees=getSpecialTrackEmployees('gulf'),search='') {
     const courses=getGulfSupportCoursesForScope(scope),query=cleanString(search).toLowerCase();
-    return employees.filter(employee=>courses.some(c=>getGulfSupportRecord(employee,c))&&(!query||`${employee.id} ${employee.name} ${employee.supervisor}`.toLowerCase().includes(query)));
+    return employees.filter(employee=>matchesGulfSupportEmployeeCountry(employee,scope)&&courses.some(c=>getGulfSupportRecord(employee,c))&&(!query||`${employee.id} ${employee.name} ${employee.supervisor}`.toLowerCase().includes(query)));
 }
 function supportExportRows(employees,courses,scope='common') {
     return [['الرقم الوظيفي','الاسم','البريد الإلكتروني','القسم','المشرف',...courses.map(c=>c.en),'المنجز','المستهدف'],...employees.map(employee=>{
@@ -8955,7 +9169,7 @@ function saveGulfSupportAssignments() {
 function renderGulfSupport() {
     const panel=document.getElementById('gulfSupportPanel');if(!panel)return;
     if(!panel.dataset.ready){
-        panel.innerHTML=`<div class="feature-card"><div class="feature-actions"><h3 style="flex:1">الدورات الداعمة / بدون شهادة — الخليج</h3><button type="button" class="course-filter-btn selected" onclick="openGulfSupportFilter()"><i class="fas fa-filter"></i> فلتر</button><button type="button" class="course-filter-btn" onclick="exportGulfSupport()">تنزيل Excel</button></div><p>من «فلتر» اختار الدولة وحدد دوراتها. نفس الدورة ممكن تتضاف لأكثر من دولة؛ كل قسم يعرض المسجلين في أي دورة داخله، حتى لو لم يبدأوا.</p><input id="gulfSupportSearch" type="search" placeholder="ابحث بالاسم أو الرقم أو المشرف" oninput="renderGulfSupport()"><p id="gulfSupportCount"></p><div id="gulfSupportGroups"></div></div>`;
+        panel.innerHTML=`<div class="feature-card"><div class="feature-actions"><h3 style="flex:1">الدورات الداعمة / بدون شهادة — الخليج</h3><button type="button" class="course-filter-btn selected" onclick="openGulfSupportFilter()"><i class="fas fa-filter"></i> فلتر</button><button type="button" class="course-filter-btn" onclick="exportGulfSupport()">تنزيل Excel</button></div><p>من «فلتر» اختار الدولة وحدد دوراتها. نفس الدورة ممكن تتضاف لأكثر من دولة. لو الموظف مسجل في دورة خاصة بدولة واحدة، يظهر في دولته فقط؛ الدورة المشتركة وحدها لا تحدد الدولة. يشمل المسجلين حتى لو لم يبدأوا.</p><input id="gulfSupportSearch" type="search" placeholder="ابحث بالاسم أو الرقم أو المشرف" oninput="renderGulfSupport()"><p id="gulfSupportCount"></p><div id="gulfSupportGroups"></div></div>`;
         panel.dataset.ready='1';
     }
     const search=cleanString(document.getElementById('gulfSupportSearch').value),active=Object.entries(gulfSupportGroups).filter(([key])=>getGulfSupportCoursesForScope(key).length);
@@ -8965,7 +9179,7 @@ function renderGulfSupport() {
         employees.forEach(e=>ids.add(e.id));
         return `<section class="support-country-section" data-support-group="${key}"><div class="support-country-heading"><h4>${label}</h4><span>${employees.length} موظف · ${courses.length} دورة</span><button type="button" class="course-filter-btn" onclick="exportGulfSupport('${key}')">Excel</button></div><div class="support-course-badges">${courses.map(c=>`<span dir="auto">${safeBotText(c.en)}</span>`).join('')}</div><div class="table-container"><table class="feature-table"><thead><tr>${rows[0].map(v=>`<th>${safeBotText(v)}</th>`).join('')}</tr></thead><tbody>${rows.slice(1).map(row=>'<tr>'+row.map(v=>`<td>${safeBotText(v)}</td>`).join('')+'</tr>').join('')||`<tr><td colspan="${rows[0].length}">لا يوجد موظفون مسجلون في الدورات المختارة لهذا القسم حسب التقرير والبحث الحالي.</td></tr>`}</tbody></table></div></section>`;
     }).join('')||'<div class="assignment-empty">لم يتم اختيار دورات. اضغط «فلتر» وأضف الدورات تحت الدول المطلوبة.</div>';
-    document.getElementById('gulfSupportCount').textContent=`${active.length} أقسام · ${new Set(active.flatMap(([key])=>gulfSupportAssignments[key])).size} دورات مختلفة · ${ids.size} موظف بدون تكرار. قد يظهر الموظف في أكثر من قسم حسب توزيع الدورات.`;
+    document.getElementById('gulfSupportCount').textContent=`${active.length} أقسام · ${new Set(active.flatMap(([key])=>gulfSupportAssignments[key])).size} دورات مختلفة · ${ids.size} موظف بدون تكرار. الدورات الخاصة بدولة تحدد ظهور الموظف؛ قد يظهر المسجل في دورات مشتركة فقط بأكثر من قسم.`;
 }
 function appendGulfSupportSheets(wb,employees,onlyScope=null,search='') {
     for(const [key,label] of Object.entries(gulfSupportGroups)){
