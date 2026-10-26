@@ -6720,7 +6720,8 @@
             analysis: 'التحليل والإحصاء',
             kpi: 'KPI',
             elite: 'النخبة',
-            bot: 'Back on Track'
+            bot: 'Back on Track',
+            support: 'دورات داعمة'
         });
 
         const EXECUTIVE_COURSE_NAMES_AR = Object.freeze({
@@ -8600,7 +8601,8 @@
                 { label: GULF_EXECUTIVE_SHEETS.progress, sheet: GULF_EXECUTIVE_SHEETS.progress },
                 { label: GULF_EXECUTIVE_SHEETS.path, sheet: GULF_EXECUTIVE_SHEETS.path },
                 { label: GULF_EXECUTIVE_SHEETS.analysis, sheet: GULF_EXECUTIVE_SHEETS.analysis },
-                { label: GULF_EXECUTIVE_SHEETS.kpi, sheet: GULF_EXECUTIVE_SHEETS.kpi }
+                { label: GULF_EXECUTIVE_SHEETS.kpi, sheet: GULF_EXECUTIVE_SHEETS.kpi },
+                { label: GULF_EXECUTIVE_SHEETS.support, sheet: GULF_EXECUTIVE_SHEETS.support }
             ];
             const employeeHeaders = ['الرقم الوظيفي', 'الاسم', 'الإيميل', 'المشرف', 'مدير الإقليم', 'تاريخ التعيين', 'إجمالي الشهادات', 'المنجز من الخليج', 'المستهدف', 'الحالة', 'KPI الخليج'];
             const employeeRows = employees.map(employee => {
@@ -8661,7 +8663,7 @@
             XLSX.utils.book_append_sheet(workbook, buildGulfExecutiveKpiWorksheet(employees), GULF_EXECUTIVE_SHEETS.kpi);
             XLSX.utils.book_append_sheet(workbook, removeExecutiveSheetNavigation(createExecutiveTableWorksheet(GULF_EXECUTIVE_SHEETS.elite, 'إقليم الخليج', eliteHeaders, eliteRows, { subtitle: 'شيت مخفي اختياري — استخدم Unhide لعرض بيانات النخبة', colWidths: [15, 28, 28, 24, 20, ...eliteCoursesKeys.map(() => 34), 22, 20], tabColor: 'CA8A04' })), GULF_EXECUTIVE_SHEETS.elite);
             XLSX.utils.book_append_sheet(workbook, removeExecutiveSheetNavigation(createExecutiveTableWorksheet(GULF_EXECUTIVE_SHEETS.bot, 'إقليم الخليج', gulfBot.headers, gulfBot.rows, { subtitle: 'شيت مخفي اختياري — استخدم Unhide لعرض بيانات Back on Track', colWidths: [15, 28, 28, 22, 24, 28, 18, 28, ...botCoursesKeys.map(() => 34), 22, 22, 42], tabColor: '7C3AED' })), GULF_EXECUTIVE_SHEETS.bot);
-            appendGulfSupportSheets(workbook, employees);
+            appendGulfCombinedSupportSheet(workbook, employees);
             workbook.Workbook = workbook.Workbook || {};
             workbook.Workbook.Sheets = workbook.SheetNames.map(sheetName => ({
                 Hidden: sheetName === GULF_EXECUTIVE_SHEETS.elite || sheetName === GULF_EXECUTIVE_SHEETS.bot ? 1 : 0
@@ -8680,7 +8682,7 @@
             }
             try {
                 const styledBlob = await addExecutiveShapeNavigation(workbook, {
-                    drawingSheetIndexes: [1, 2, 3, 4, 5, 6],
+                    drawingSheetIndexes: [1, 2, 3, 4, 5, 6, 9],
                     homeButtons: menuItems,
                     copyAppProps: false
                 });
@@ -9181,6 +9183,45 @@ function renderGulfSupport() {
     }).join('')||'<div class="assignment-empty">لم يتم اختيار دورات. اضغط «فلتر» وأضف الدورات تحت الدول المطلوبة.</div>';
     document.getElementById('gulfSupportCount').textContent=`${active.length} أقسام · ${new Set(active.flatMap(([key])=>gulfSupportAssignments[key])).size} دورات مختلفة · ${ids.size} موظف بدون تكرار. الدورات الخاصة بدولة تحدد ظهور الموظف؛ قد يظهر المسجل في دورات مشتركة فقط بأكثر من قسم.`;
 }
+// The combined workbook includes every Gulf employee and supporting course.
+// Country assignments remain available through the existing filter.
+function buildGulfCombinedSupportData(employees) {
+    const courses = getGulfSupportCatalog();
+    const seen = new Set();
+    const uniqueEmployees = employees.filter(employee => {
+        const key = cleanString(employee.id) || cleanString(employee.email).toLowerCase();
+        if (!key) return true;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
+    const headers = ['الرقم الوظيفي', 'الاسم', 'البريد الإلكتروني', 'المشرف', 'مدير الإقليم', ...courses.map(course => course.en), 'الدورات المكتملة', 'الدورات المسجل بها'];
+    const rows = uniqueEmployees.map(employee => {
+        let assigned = 0, completed = 0;
+        const values = courses.map(course => {
+            const record = getGulfSupportRecord(employee, course);
+            if (!record) return 'غير مستهدف';
+            assigned++;
+            const rawProgress = getGulfSupportProgress(employee, course);
+            if (rawProgress === null || rawProgress === undefined || rawProgress === '' || !Number.isFinite(Number(rawProgress))) return 'مسجل — بدون نسبة';
+            const progress = Math.max(0, Math.min(100, Number(rawProgress)));
+            if (progress === 100) completed++;
+            return formatKpiValue(progress) + '%';
+        });
+        return [employee.id, employee.name, employee.email || '', employee.supervisor || 'بدون مشرف', employee.manager || 'إقليم الخليج', ...values, completed, assigned];
+    });
+    return { courses, headers, rows };
+}
+function appendGulfCombinedSupportSheet(workbook, employees) {
+    const data = buildGulfCombinedSupportData(employees);
+    const worksheet = createExecutiveTableWorksheet(GULF_EXECUTIVE_SHEETS.support, 'إقليم الخليج', data.headers, data.rows, {
+        subtitle: 'جميع موظفي الخليج والدورات الداعمة في جدول واحد | غير مستهدف = غير مسجل بالدورة | المسجل يظهر بنسبة التقدم المتاحة',
+        colWidths: [15, 28, 30, 28, 24, ...data.courses.map(() => 34), 22, 22],
+        tabColor: '059669'
+    });
+    XLSX.utils.book_append_sheet(workbook, worksheet, GULF_EXECUTIVE_SHEETS.support);
+}
+
 function appendGulfSupportSheets(wb,employees,onlyScope=null,search='') {
     for(const [key,label] of Object.entries(gulfSupportGroups)){
         const courses=getGulfSupportCoursesForScope(key);if(!courses.length||(onlyScope&&onlyScope!==key))continue;
