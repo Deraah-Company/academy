@@ -224,6 +224,52 @@ body.studio:not(.studio-legacy) #academyWorkspace{max-width:none;margin:0;paddin
 @media(max-width:680px){#studioShell{display:block}.studio-sidebar{left:auto;right:0;transform:translateX(100%);padding-left:0}.studio-menu-open .studio-sidebar{transform:translateX(0)}.studio-main{border-radius:0}.studio-dialog-footer{flex-direction:column-reverse;align-items:stretch}.studio-dialog-top{flex-wrap:wrap}.studio-dialog-controls{margin-right:auto}.studio-decline{font-size:10px;padding:9px 10px}}
 @media(max-width:480px){.studio-dialog-top{flex-direction:column-reverse;align-items:stretch;gap:17px}.studio-dialog-controls{align-self:flex-end;margin-right:0}.studio-dialog-body{max-height:calc(94dvh - 190px)}}
 
+/* Shareable course plans, driven by the original saved selections. */
+#studioCourseDashboard{margin:30px 0 34px}
+.studio-course-intro h2{font-size:23px;line-height:1.6;font-weight:750;color:#253355;margin:5px 0}
+.studio-course-intro p{font-size:11px;line-height:1.9;color:#8b96ac;margin:0}
+.studio-course-kicker{display:block;font-size:10px;color:#8492ae;letter-spacing:.2px}
+.studio-course-jumps{display:flex;flex-wrap:wrap;gap:9px;margin:19px 0 25px}
+.studio-course-jumps a{display:flex;align-items:center;gap:12px;border:1px solid #e3e8f3;border-radius:11px;background:#fff;color:#596e9c;padding:10px 12px;font-size:10px;text-decoration:none}
+.studio-course-jumps b{display:grid;place-items:center;min-width:24px;height:24px;background:#edf1fa;border-radius:8px;font-size:11px;color:#4f639a}
+.studio-course-section{margin:0 0 26px;scroll-margin-top:22px}
+.studio-course-tools{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 2px 10px;color:#91a0b8;font-size:10px}
+.studio-course-tools>div{display:flex;gap:8px}
+.studio-course-tools button,.studio-course-presentation-tools button{display:flex;align-items:center;gap:7px;background:white;border:1px solid #dfe5f1;border-radius:10px;color:#6075a3;padding:9px 12px;font-size:10px}
+.studio-course-tools button:last-child{color:#fff;background:#40569c;border-color:#40569c}
+.studio-course-board{--course-accent:#526da7;--course-wash:#edf2fc;background:#fff;border:1px solid #e4e9f3;border-radius:22px;overflow:hidden;box-shadow:0 7px 28px #324c7c06}
+.studio-course-board.tone-teal{--course-accent:#397e78;--course-wash:#eaf6f2}.studio-course-board.tone-gold{--course-accent:#9e793c;--course-wash:#fbf4e6}.studio-course-board.tone-violet{--course-accent:#7463ad;--course-wash:#f1edfa}.studio-course-board.tone-rose{--course-accent:#a85f86;--course-wash:#faeef5}
+.studio-course-board-head{padding:25px 26px 18px;display:flex;align-items:center;justify-content:space-between;gap:20px;border-top:4px solid var(--course-accent);background:linear-gradient(110deg,#fff 45%,var(--course-wash))}
+.studio-course-heading{min-width:0}
+.studio-course-heading h3{display:flex;align-items:center;gap:10px;color:#293b5b;font-size:21px;font-weight:750;margin:8px 0 5px;line-height:1.5}
+.studio-course-heading h3 i{color:var(--course-accent);font-size:18px}
+.studio-course-heading p{margin:0;font-size:10px;line-height:1.8;color:#8593ad}
+.studio-course-brand{display:flex;direction:ltr;gap:8px;flex-shrink:0}
+.studio-course-brand>span{display:block;width:48px;height:48px;overflow:hidden;border-radius:8px}
+.studio-course-brand img{display:block;width:100%;height:auto;max-width:none}
+.studio-course-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 26px 17px;padding-top:13px;border-top:1px solid #eaf0f6;font-size:10px;color:#96a2b6}
+.studio-course-meta>span:first-child{color:var(--course-accent);background:var(--course-wash);border-radius:8px;padding:5px 10px}
+.studio-course-meta b{font-size:15px;margin-left:4px}
+.studio-course-body{padding:0 26px 22px}
+.studio-course-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0;padding:0;list-style:none}
+.studio-course-row{display:flex;align-items:center;gap:10px;min-height:64px;padding:12px 10px;border:1px solid #edf0f6;border-radius:12px;background:#fcfdff;break-inside:avoid}
+.studio-course-order{align-self:flex-start;display:grid;place-items:center;flex:0 0 28px;width:28px;height:28px;border-radius:9px;background:var(--course-wash);color:var(--course-accent);font-size:11px;font-weight:750;font-variant-numeric:tabular-nums}
+.studio-course-row>div{flex:1;min-width:0}
+.studio-course-row strong{display:block;color:#445675;font-size:11px;line-height:1.65;font-weight:650;overflow-wrap:anywhere}
+.studio-course-row small{display:block;color:#91a0b6;font-size:9px;line-height:1.5;margin-top:4px;text-align:right;overflow-wrap:anywhere}
+.studio-course-path+.studio-course-path{margin-top:18px}
+.studio-course-path h4{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px;color:var(--course-accent);font-size:11px;font-weight:700;line-height:1.8}
+.studio-course-path h4 span{font-size:9px;font-weight:400;color:#97a2b5}
+.studio-course-board-foot{display:flex;align-items:center;justify-content:space-between;gap:18px;background:#f8fafd;border-top:1px solid #edf1f7;padding:12px 26px;color:#8c9bb3;font-size:9px}
+.studio-course-empty{font-size:12px;color:#94a0b6;text-align:center;padding:28px 10px}
+#studioCoursePresentation{width:min(1160px,96vw);max-width:96vw;max-height:94dvh;padding:15px;border:1px solid #e8edf7;border-radius:22px;background:#f3f6fc;color:#293b5b;box-shadow:0 25px 100px #182d6344;overflow-y:auto}
+#studioCoursePresentation::backdrop{background:#24385e80;backdrop-filter:blur(8px)}
+.studio-course-presentation-tools{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:0 3px 13px;font-size:12px}
+#studioCoursePresentation .studio-course-row{min-height:58px;padding:10px}
+@media(max-width:1150px){#studioCourseDashboard .studio-course-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:800px){#studioCoursePresentation .studio-course-list{grid-template-columns:repeat(2,minmax(0,1fr))}.studio-course-board-head{padding:21px 18px 17px;gap:12px}.studio-course-heading h3{font-size:18px}.studio-course-meta{margin-left:18px;margin-right:18px}.studio-course-body{padding-left:18px;padding-right:18px}.studio-course-brand>span{width:40px;height:40px}}
+@media(max-width:500px){#studioCourseDashboard .studio-course-list,#studioCoursePresentation .studio-course-list{grid-template-columns:1fr}.studio-course-tools{align-items:start;flex-direction:column;gap:9px}.studio-course-heading h3{font-size:16px}.studio-course-brand{gap:5px}.studio-course-brand>span{width:33px;height:33px}.studio-course-board-foot{padding:12px 18px;font-size:8px}.studio-course-intro h2{font-size:21px}#studioCoursePresentation{padding:10px;border-radius:17px}.studio-course-presentation-tools{font-size:10px}}
+
 </style>
 </head>
 <body class="text-slate-800">
@@ -10279,6 +10325,64 @@ window.addEventListener('DOMContentLoaded',()=>{
     renderGlobalFilterSummary=function(...args){const out=originalSummary(...args);if(ready)renderOverview();return out;};
     applyAcademyPageRoute=function(...args){const out=originalRoute(...args);if(ready&&layoutMode!=='old')showPage(location.hash==='#administration'?'administration':'studioOverview');return out;};
     window.addEventListener('DOMContentLoaded',()=>{document.body.classList.add('studio');try{setLayoutMode('new',false);buildShell();}catch(error){console.error(error);document.body.classList.remove('studio');}});
+})();
+
+</script>
+<script>
+(function installCourseDashboard(){
+    const $=id=>document.getElementById(id);
+    const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const arabic=name=>String(name||'').replaceAll('درعة','درعه');
+    const gulfSupportNames={
+        'Visual Merchandising Inside Stores (Qatar – UAE)':'العرض المرئي داخل المعارض — قطر والإمارات',
+        'Visual Merchandising in the Oman Stores':'العرض المرئي داخل المعارض — عُمان',
+        'Letters Perfumes (Oman)':'عطور ليترز — عُمان',
+        'Letters Perfumes (Qatar&Emirates)':'عطور ليترز — قطر والإمارات',
+        'Snoonu App (Qatar)':'تطبيق سنونو — قطر'
+    };
+    function courseInfo(course){
+        const en=typeof course==='string'?course:course.en;
+        return {en,ar:arabic((typeof course==='object'&&course.ar)||gulfSupportNames[en]||getExecutiveCourseDisplayName(en)),path:course.path||null,pathTitle:arabic(course.pathTitle||'')};
+    }
+    function sections(){return [
+        {id:'standard',title:'الدورات الأساسية',subtitle:'القطاع الأساسي · دورات بشهادات',icon:'graduation-cap',tone:'blue',courses:getSelectedStandardCourses().map(courseInfo),catalogCount:getCoursePickerCatalog('standard').length,editable:true},
+        {id:'support',title:'الدورات الداعمة',subtitle:'القطاع الأساسي · دورات بدون شهادات',icon:'book-open',tone:'teal',courses:getSelectedNonCertKeys().map(courseInfo),catalogCount:getCoursePickerCatalog('support').length,editable:true},
+        {id:'elite',title:'دورات النخبة',subtitle:'برنامج النخبة وأفضل 100 معرض',icon:'star',tone:'gold',courses:eliteCoursesKeys.map(courseInfo),catalogCount:eliteCoursesKeys.length,editable:false},
+        {id:'gulf',title:'دورات الخليج الأساسية',subtitle:'إقليم الخليج · مسارات التدريب بشهادات',icon:'water',tone:'violet',courses:getSelectedGulfCourses().map(courseInfo),catalogCount:getCoursePickerCatalog('gulf').length,editable:true},
+        {id:'gulfSupport',title:'دورات الخليج الداعمة',subtitle:'إقليم الخليج · دورات بدون شهادات',icon:'compass',tone:'rose',courses:getSelectedGulfSupportCourses().map(courseInfo),catalogCount:getCoursePickerCatalog('gulfSupport').length,editable:true}
+    ];}
+    const serial=n=>String(n).padStart(2,'0');
+    function rowsMarkup(courses,start=0){return courses.map((course,index)=>'<li class="studio-course-row" data-course-name="'+escape(course.en)+'"><span class="studio-course-order">'+serial(start+index+1)+'</span><div><strong dir="auto">'+escape(course.ar)+'</strong>'+(course.ar!==course.en?'<small dir="ltr">'+escape(course.en)+'</small>':'')+'</div></li>').join('');}
+    function boardMarkup(section){
+        const company=$('studioCompanyLogo')?.getAttribute('src')||'',academy=$('studioAcademyLogo')?.getAttribute('src')||'';
+        const date=new Date().toLocaleDateString('ar-EG',{day:'numeric',month:'long',year:'numeric',timeZone:'Asia/Riyadh'});
+        let body;
+        if(!section.courses.length)body='<p class="studio-course-empty">لا توجد دورات مختارة في هذا القسم.</p>';
+        else if(section.id==='gulf'){
+            const paths=[...new Set(section.courses.map(c=>c.path))];let offset=0;
+            body=paths.map(path=>{const list=section.courses.filter(c=>c.path===path),out='<div class="studio-course-path"><h4>'+escape(list[0].pathTitle)+' <span>'+list.length+' دورات</span></h4><ol class="studio-course-list" start="'+(offset+1)+'">'+rowsMarkup(list,offset)+'</ol></div>';offset+=list.length;return out;}).join('');
+        }else body='<ol class="studio-course-list">'+rowsMarkup(section.courses)+'</ol>';
+        return '<div class="studio-course-board tone-'+section.tone+'" dir="rtl"><header class="studio-course-board-head"><div class="studio-course-heading"><span class="studio-course-kicker">أكاديمية درعه · خطة التعلّم</span><h3><i class="fas fa-'+section.icon+'" aria-hidden="true"></i>'+escape(section.title)+'</h3><p>'+escape(section.subtitle)+'</p></div><div class="studio-course-brand"><span><img src="'+escape(company)+'" alt="درعه"></span><span><img src="'+escape(academy)+'" alt="أكاديمية درعه"></span></div></header><div class="studio-course-meta"><span><b>'+section.courses.length+'</b> دورة'+(section.editable?' مختارة':'')+'</span><span>ترتيب الدورات</span></div><div class="studio-course-body">'+body+'</div><footer class="studio-course-board-foot"><span>أكاديمية درعه · التدريب والتطوير</span><span>'+escape(date)+'</span></footer></div>';
+    }
+    let presentedSection=null;
+    function render(){
+        const host=$('studioCourseDashboard');if(!host)return;
+        const groups=sections();
+        host.innerHTML='<div class="studio-course-intro"><div><span class="studio-course-kicker">دوراتك في مكان واحد</span><h2>خريطة الدورات التدريبية</h2><p>الدورات المختارة بالترتيب، وكل برنامج في قسم مستقل.</p></div></div><nav class="studio-course-jumps" aria-label="أقسام الدورات">'+groups.map(s=>'<a href="#studioCourses_'+s.id+'">'+escape(s.title)+'<b>'+s.courses.length+'</b></a>').join('')+'</nav>'+groups.map(s=>'<section class="studio-course-section" id="studioCourses_'+s.id+'" aria-label="'+escape(s.title)+'"><div class="studio-course-tools"><span>'+s.courses.length+' من '+s.catalogCount+' دورة</span><div>'+(s.editable?'<button type="button" data-course-edit="'+s.id+'"><i class="fas fa-sliders"></i> اختيار الدورات</button>':'')+'<button type="button" data-course-present="'+s.id+'"><i class="fas fa-expand"></i> عرض للتصوير</button></div></div>'+boardMarkup(s)+'</section>').join('');
+        if(presentedSection&&$('studioCoursePresentation')?.open){const section=groups.find(s=>s.id===presentedSection);if(section)$('studioCoursePresentationContent').innerHTML=boardMarkup(section);}
+    }
+    function present(id){const section=sections().find(s=>s.id===id);if(!section)return;presentedSection=id;$('studioCoursePresentationTitle').textContent=section.title;$('studioCoursePresentationContent').innerHTML=boardMarkup(section);if(!$('studioCoursePresentation').open)$('studioCoursePresentation').showModal();}
+    function mount(){
+        if(!$('studioOverview')||$('studioCourseDashboard'))return;
+        const host=document.createElement('section');host.id='studioCourseDashboard';host.setAttribute('aria-label','خريطة الدورات التدريبية');document.querySelector('#studioOverview .studio-metrics').before(host);
+        host.addEventListener('click',event=>{const edit=event.target.closest('[data-course-edit]'),view=event.target.closest('[data-course-present]');if(edit)openCoursePicker(edit.dataset.courseEdit);if(view)present(view.dataset.coursePresent);});
+        const dialog=document.createElement('dialog');dialog.id='studioCoursePresentation';dialog.dir='rtl';dialog.setAttribute('aria-labelledby','studioCoursePresentationTitle');dialog.innerHTML='<div class="studio-course-presentation-tools"><strong id="studioCoursePresentationTitle"></strong><button type="button" id="studioCloseCoursePresentation" aria-label="إغلاق عرض التصوير"><i class="fas fa-xmark"></i> إغلاق</button></div><div id="studioCoursePresentationContent"></div>';document.body.append(dialog);
+        $('studioCloseCoursePresentation').addEventListener('click',()=>dialog.close());dialog.addEventListener('close',()=>presentedSection=null);render();
+    }
+    const originalUpdate=updateCourseSelectionLabels;
+    updateCourseSelectionLabels=function(...args){const out=originalUpdate(...args);render();return out;};
+    window.academyCourseDashboard={sections,render,present,boardMarkup};
+    window.addEventListener('DOMContentLoaded',mount);
 })();
 
 </script>
