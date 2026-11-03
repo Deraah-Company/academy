@@ -1463,7 +1463,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
+                    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-4 mb-6">
                         <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl text-center shadow-sm">
                             <p class="text-slate-600 text-xs md:text-sm font-bold">إجمالي المستهدفين (بالعمل)</p>
                             <p class="text-3xl font-extrabold text-slate-800 mt-1" id="eliteStatTotal">0</p>
@@ -1484,8 +1484,12 @@
                             <p class="text-fuchsia-600 text-xs md:text-sm font-bold">أكملوا الرابعة</p>
                             <p class="text-3xl font-extrabold text-fuchsia-800 mt-1" id="eliteStatC4">0</p>
                         </div>
+                        <div class="bg-cyan-50 border border-cyan-200 p-4 rounded-xl text-center shadow-sm">
+                            <p class="text-cyan-600 text-xs md:text-sm font-bold">أكملوا الخامسة</p>
+                            <p class="text-3xl font-extrabold text-cyan-800 mt-1" id="eliteStatC5">0</p>
+                        </div>
                         <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-center shadow-sm">
-                            <p class="text-emerald-600 text-xs md:text-sm font-bold">أكملوا (الـ 4) كاملة</p>
+                            <p class="text-emerald-600 text-xs md:text-sm font-bold" id="eliteStatCompleteLabel">أكملوا (الـ 5) كاملة</p>
                             <p class="text-3xl font-extrabold text-emerald-800 mt-1" id="eliteStatBoth">0</p>
                         </div>
                     </div>
@@ -1502,6 +1506,7 @@
                                     <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteCourse2Head">Sales Scenarios for DERAAH's Top Products</th>
                                     <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteCourse3Head">Time Management and Organization</th>
                                     <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteCourse4Head">policies ( elite )</th>
+                                    <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteCourse5Head">First Steps in Leadership</th>
                                     <th class="px-5 py-4 font-semibold tracking-wider">حالة الاستكمال</th>
                                 </tr>
                             </thead>
@@ -1526,6 +1531,7 @@
                                         <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteOffCourse2Head">دورة النخبة 2</th>
                                         <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteOffCourse3Head">دورة النخبة 3</th>
                                         <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteOffCourse4Head">دورة النخبة 4</th>
+                                        <th class="px-5 py-4 font-semibold tracking-wider text-xs" id="eliteOffCourse5Head">First Steps in Leadership</th>
                                     </tr>
                                 </thead>
                                 <tbody id="eliteOffTargetTableBody" class="bg-white divide-y divide-slate-100"></tbody>
@@ -1993,7 +1999,8 @@
             "Sales Scenarios for Deraah Oud's Top Products", 
             "Sales Scenarios for DERAAH's Top Products",
             "Time Management and Organization",
-            "policies ( elite )"
+            "policies ( elite )",
+            "First Steps in Leadership"
         ];
         const ELITE_TARGET_COUNT = eliteCoursesKeys.length;
 
@@ -3520,13 +3527,13 @@
             supervisors: [
                 "الإقليم", "مدير الإقليم", "المشرف", "إجمالي الموظفين الفريد",
                 "عدد أقل من 3 شهور", "أقل من 3 محقق الهدف", "أقل من 3 لسه", "KPI أقل من 3 شهور",
-                "عدد النخبة", "النخبة مكمل 4", "KPI النخبة",
+                "عدد النخبة", `النخبة مكمل ${ELITE_TARGET_COUNT}`, "KPI النخبة",
                 "عدد 3 شهور فأكثر", "3 شهور فأكثر محقق الهدف", "3 شهور فأكثر لسه", "KPI 3 شهور فأكثر",
                 "عدد موظفي BOT", "BOT مكتمل", "BOT غير مكتمل", "KPI Back on Track",
                 "عدد المحاور المتاحة", "KPI المشرف"
             ],
             less3: ["الإقليم", "مدير الإقليم", "المشرف", "الرقم الوظيفي", "اسم الموظف", "المستهدف", "إجمالي الدورات", "عدد الموظفين", "محقق الهدف", "لسه", "KPI أقل من 3"],
-            elite: ["الإقليم", "مدير الإقليم", "المشرف", "الرقم الوظيفي", "اسم الموظف", "دورات النخبة المنجزة", "دورات النخبة المتبقية", "مكمل 4 نخبة", "KPI النخبة"],
+            elite: ["الإقليم", "مدير الإقليم", "المشرف", "الرقم الوظيفي", "اسم الموظف", "دورات النخبة المنجزة", "دورات النخبة المتبقية", `مكمل ${ELITE_TARGET_COUNT} نخبة`, "KPI النخبة"],
             more3: ["الإقليم", "مدير الإقليم", "المشرف", "الرقم الوظيفي", "اسم الموظف", "المستهدف الحالي", "إجمالي الدورات", "عدد الموظفين", "محقق الهدف", "لسه", "KPI 3 شهور فأكثر"],
             bot: ["الإقليم", "مدير الإقليم", "المشرف", "الرقم الوظيفي", "اسم الموظف", "دورات BOT المسجل عليها", "دورات BOT المكتملة", "دورات BOT المتبقية", "أكمل كل دورات BOT", "KPI Back on Track"]
         };
@@ -4521,9 +4528,9 @@
                 if (!file) continue;
                 let xml = await file.async('string');
                 const updated = xml
-                    .replace(/النخبة مكمل 3/g, 'النخبة مكمل 4')
-                    .replace(/مكمل 3 نخبة/g, 'مكمل 4 نخبة')
-                    .replace(/النخبة[^<]{0,80}3\/3/g, match => match.replace(/3\/3/g, '4/4'))
+                    .replace(/النخبة مكمل [34]/g, `النخبة مكمل ${ELITE_TARGET_COUNT}`)
+                    .replace(/مكمل [34] نخبة/g, `مكمل ${ELITE_TARGET_COUNT} نخبة`)
+                    .replace(/النخبة[^<]{0,80}(?:3\/3|4\/4)/g, match => match.replace(/[34]\/[34]/g, `${ELITE_TARGET_COUNT}/${ELITE_TARGET_COUNT}`))
                     .replace(/مخلص\s*(?:10|21)/g, 'محقق الهدف')
                     .replace(/الهدف الشهري/g, 'المستهدف الحالي');
                 if (updated !== xml) zip.file(path, updated);
@@ -5999,6 +6006,7 @@
                 if (offHeadElement) offHeadElement.innerText = course;
             });
             const statBothEl = document.getElementById('eliteStatBoth'); if (statBothEl) statBothEl.innerText = finishedBoth;
+            const statCompleteLabel = document.getElementById('eliteStatCompleteLabel'); if (statCompleteLabel) statCompleteLabel.innerText = `أكملوا (الـ ${ELITE_TARGET_COUNT}) كاملة`;
 
             let bodyHtml = eliteTargets.map(emp => {
                 const completedCount = getEliteCompletedCount(emp);
@@ -6737,6 +6745,7 @@
             "Sales Scenarios for DERAAH's Top Products": 'سيناريوهات بيع أبرز منتجات درعه',
             'Time Management and Organization': 'إدارة الوقت والتنظيم',
             'policies ( elite )': 'السياسات (النخبة)',
+            'First Steps in Leadership': 'الخطوات الأولى في القيادة',
             'Communication Skills ( BOT)': 'مهارات التواصل (BOT)',
             'Advanced Sales Skills ( BOT)': 'مهارات البيع المتقدمة (BOT)',
             'Customer EX ( BOT)': 'تجربة العملاء (BOT)',
@@ -9392,6 +9401,576 @@ window.addEventListener('DOMContentLoaded',()=>{
     ['nonCertTab','pathNonCertSection'].forEach(id=>document.getElementById(id)?.insertAdjacentHTML('afterbegin',`<div class="feature-actions" style="margin-bottom:14px"><button class="course-filter-btn" onclick="openCoursePicker('support')">فلتر الدورات بدون شهادة <span data-support-count></span></button></div>`));
     updateCourseSelectionLabels();buildTrainingPathHeaders();renderAdminTab();renderGulfSupport();
 });
+
+</script>
+<script>
+// Formula-only export enhancement. Existing sheet styles, objects and layouts stay owned by the original builders.
+(function installDynamicExcelExports() {
+    if (typeof XLSX === 'undefined' || XLSX.__dynamicExports) return;
+    XLSX.__dynamicExports = true;
+    const col = n => XLSX.utils.encode_col(n);
+    const address = (r,c) => col(c) + r;
+    const quote = s => '"' + String(s).replace(/"/g,'""') + '"';
+    const sheetRef = s => "'" + s.replace(/'/g,"''") + "'!";
+    const value = (ws,r,c) => ws[address(r,c)]?.v ?? '';
+    const text = (ws,r,c) => String(value(ws,r,c));
+    function formula(ws,r,c,f,format) {
+        const cell = ws[address(r,c)] || (ws[address(r,c)] = {t:'n',v:0});
+        cell.f = f;
+        delete cell.w;
+        if (format) {
+            if (typeof cell.v === 'string' && /^-?\d+(?:\.\d+)?%$/.test(cell.v.trim())) cell.v = Number(cell.v.replace('%',''))/100;
+            cell.t = typeof cell.v === 'number' ? 'n' : 's'; cell.z = format;
+            // xlsx-js-style gives the style number format precedence over z.
+            if (cell.s) cell.s = {...cell.s,numFmt:format};
+        } else cell.t = typeof cell.v === 'number' ? 'n' : 's';
+        return cell;
+    }
+    const pct = (ws,r,c,f,scale=1) => formula(ws,r,c,scale===100 ? `(${f})/100` : f,'0.##%');
+    function tables(wb) {
+        const out=[];
+        for (const name of wb.SheetNames) {
+            const ws=wb.Sheets[name]; if(!ws['!ref']) continue;
+            const range=XLSX.utils.decode_range(ws['!ref']);
+            for(let r=1;r<=range.e.r+1;r++) {
+                const headers=Array.from({length:range.e.c+1},(_,c)=>text(ws,r,c));
+                const id=headers.indexOf('الرقم الوظيفي');
+                const isHeader=id>=0 || (headers.includes('المشرف') && headers.some(h=>/^(عدد الموظفين|عدد البائعين|إجمالي الموظفين الفريد)$/.test(h))) || headers[0]==='اسم المشرف' || headers[0]==='اسم الإقليم';
+                if(!isHeader) continue;
+                let end=r;
+                while(end<range.e.r+1 && String(value(ws,end+1,0)).trim()!=='') end++;
+                const t={name,ws,h:headers,header:r,start:r+1,end,id,idx:h=>headers.indexOf(h)};
+                t.range=c=>`${sheetRef(name)}$${col(c)}$${t.start}:$${col(c)}$${t.id<0?t.end:Math.max(t.end+1000,20000)}`;
+                t.cell=(r,c)=>address(r,c);
+                t.count=(extra=[])=>`(COUNTIFS(${t.range(t.id)},"?*",${t.range(t.id)},"<>لا يوجد*",${t.range(t.id)},"<>لا توجد*"${extra.length?','+extra.join(','):''})+COUNTIFS(${t.range(t.id)},">=0"${extra.length?','+extra.join(','):''}))`;
+                out.push(t); r=end;
+            }
+        }
+        return out;
+    }
+    function courseColumns(t) {
+        if(t.h.includes('حالة الموظف') && t.h.includes('عدد الدورات المسجل عليها')) return [t.idx('حالة الموظف')+1,t.idx('عدد الدورات المسجل عليها')-1];
+        if(t.h.includes('الفئة')) return [t.idx('الفئة')+1,Math.max(t.idx('عدد الدورات المكتملة'),t.idx('مجموع المستكمل'))-1];
+        const path=t.h.findIndex(h=>h.includes('المسار الحالي')||h==='نقطة الوقوف');
+        if(path>=0) {
+            let first=t.h.findIndex(h=>/^\d+[.\-]/.test(h));
+            if(first>=0)return [first,t.h.length-1];
+        }
+        if(t.name==='الإدارة')return [4,t.idx('المنجز')-1];
+        if(t.h.includes('KPI الخليج')&&t.h.some(h=>h.startsWith('المنجز / المستهدف'))&&!t.h.some(h=>h.includes('المسار الحالي')))return [t.idx('KPI الخليج')+1,t.h.length-1];
+        if(t.name.startsWith('داعم - '))return [5,t.idx('المنجز')-1];
+        const completed=t.h.findIndex(h=>/^(الدورات المكتملة|عدد المكتمل)$/.test(h));
+        if(completed>=5 && /داعم|دورات/.test(t.name))return [5,completed-1];
+        if(t.h.includes('عدد الدورات المكتملة') && /بدون شهادات/.test(t.name))return [t.idx('عدد الدورات المكتملة')+1,t.h.length-1];
+        if(t.h.includes('إجمالي المنجز'))return [t.idx('إجمالي المنجز')+1,t.h.length-1];
+        return null;
+    }
+    function completedFormula(range) { return `COUNTIF(${range},"منجز")+COUNTIF(${range},"نعم")+COUNTIF(${range},"مكتمل*")+COUNTIF(${range},1)`; }
+    // Use header anchors rather than a frozen last-course address. New course columns
+    // can be inserted in the course block or appended after the original report columns.
+    // Calculated columns are excluded, so these ranges never read their own totals.
+    function courseGeometry(t,r) {
+        const cc=courseColumns(t);if(!cc||cc[1]<cc[0])return null;
+        const start=`INDEX(${r}:${r},1,COLUMN($${col(cc[0])}$${t.header}))`;
+        const end=`INDEX(${r}:${r},1,COLUMNS(${r}:${r}))`;
+        const parts=[],headerParts=[];
+        if(cc[1]===t.h.length-1){
+            parts.push(`${start}:${end}`);
+            headerParts.push(`INDEX($${t.header}:$${t.header},1,COLUMN($${col(cc[0])}$${t.header})):INDEX($${t.header}:$${t.header},1,COLUMNS($${t.header}:$${t.header}))`);
+        }else{
+            parts.push(`${start}:INDEX(${r}:${r},1,COLUMN($${col(cc[1]+1)}$${t.header})-1)`);
+            parts.push(`INDEX(${r}:${r},1,COLUMN($${col(t.h.length-1)}$${t.header})+1):${end}`);
+            headerParts.push(`INDEX($${t.header}:$${t.header},1,COLUMN($${col(cc[0])}$${t.header})):INDEX($${t.header}:$${t.header},1,COLUMN($${col(cc[1]+1)}$${t.header})-1)`);
+            headerParts.push(`INDEX($${t.header}:$${t.header},1,COLUMN($${col(t.h.length-1)}$${t.header})+1):INDEX($${t.header}:$${t.header},1,COLUMNS($${t.header}:$${t.header}))`);
+        }
+        return {cc,parts,headerParts,done:parts.map(completedFormula).join('+'),assigned:parts.map(rg=>`COUNTIF(${rg},">=0")+COUNTIF(${rg},"مسجل*")+COUNTIF(${rg},"✓*")`).join('+'),available:headerParts.map(rg=>`COUNTA(${rg})`).join('+')};
+    }
+    function inSheet(f,t){return f.replace(/\$?\d+:\$?\d+|\$?[A-Z]{1,3}\$?\d+/g,ref=>sheetRef(t.name)+ref);}
+    function courseSummary(wb,t){
+        if(!t||!courseColumns(t))return null;
+        if(t.__courseSummary)return t.__courseSummary;
+        let name='حسابات الدورات';
+        if(!wb.__courseCalculationSheet){while(wb.Sheets[name])name+='ـ';wb.__courseCalculationSheet=name;XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['الرقم الوظيفي','مجموع التقدم','عدد النسب المتاحة','الدورات المكتملة','الدورات المتاحة','مصدر البيانات']]),name);}
+        else name=wb.__courseCalculationSheet;
+        const ws=wb.Sheets[name],first=XLSX.utils.decode_range(ws['!ref']).e.r+2;
+        let at=first;
+        for(let r=t.start;r<=t.end;r++,at++){
+            const input=t.__courseInputMaster||t,inputRow=input===t?r:input.start;
+            const g=courseGeometry(input,inputRow),key=`IFERROR(INDEX(${sheetRef(t.name)}$${col(t.id)}:$${col(t.id)},${r}),"")`;
+            const rowNumber=input===t?String(r):`MATCH(__HELPER_KEY__,__MASTER_IDS__,0)+${input.start-1}`;
+            const scopeRange=f=>inSheet(f.replaceAll(`COLUMNS(${inputRow}:${inputRow})`,'16384').replaceAll(`INDEX(${inputRow}:${inputRow},1,`,`INDEX(__FULL_SHEET__,${rowNumber},`),input).replaceAll('__FULL_SHEET__',sheetRef(input.name)+'$1:$1048576').replaceAll('__MASTER_IDS__',input.range(input.id)).replaceAll('__HELPER_KEY__',`A${at}`);
+            const keyCell=formula(ws,at,0,key);keyCell.v=value(t.ws,r,t.id);keyCell.t=typeof keyCell.v==='number'?'n':'s';
+            const inputs=g.parts.map(scopeRange);
+            const fraction=t.h.findIndex(h=>h==='المنجز من المسار'||h.startsWith('المنجز / المستهدف'));
+            const fractionCell=fraction>=0?`INDEX(${sheetRef(t.name)}$${col(fraction)}:$${col(fraction)},${r})`:null;
+            const completed=fractionCell?`IFERROR(VALUE(LEFT(${fractionCell},FIND(" / ",${fractionCell})-1)),${scopeRange(g.done)})`:scopeRange(g.done);
+            const available=fractionCell?`IFERROR(VALUE(MID(${fractionCell},FIND(" / ",${fractionCell})+3,99)),${inSheet(g.available,input)})`:inSheet(g.available,input);
+            for(const [c,f]of [[1,`SUM(${inputs.join(',')})`],[2,`COUNT(${inputs.join(',')})`],[3,completed],[4,available]])formula(ws,at,c,`IF(A${at}="",0,${f})`);
+            ws[address(at,5)]={t:'s',v:t.name};
+        }
+        ws['!ref']=`A1:F${Math.max(1,at-1)}`;
+        wb.Workbook=wb.Workbook||{};wb.Workbook.Sheets=wb.Workbook.Sheets||wb.SheetNames.map(()=>({}));
+        while(wb.Workbook.Sheets.length<wb.SheetNames.length)wb.Workbook.Sheets.push({});
+        wb.Workbook.Sheets[wb.SheetNames.indexOf(name)]={...wb.Workbook.Sheets[wb.SheetNames.indexOf(name)],Hidden:1};
+        const sum=c=>`SUM(${sheetRef(name)}${col(c)}${first}:${col(c)}${Math.max(first,at-1)})`;
+        return t.__courseSummary={sum};
+    }
+    function localCalculations(t) {
+        if(t.id<0) return;
+        const cc=courseColumns(t);
+        const path=t.h.findIndex(h=>h.includes('المسار الحالي')||h==='نقطة الوقوف');
+        const total=t.idx('إجمالي الشهادات');
+        const target=t.h.findIndex(h=>/^(المستهدف|إجمالي دورات المسار)$/.test(h));
+        for(let r=t.start;r<=t.end;r++) {
+            if(!value(t.ws,r,t.id)||/^لا (يوجد|توجد)/.test(String(value(t.ws,r,t.id))))continue;
+            const id=address(r,t.id), active=`${id}<>""`;
+            if(t.name==='بيانات المشرف'&&t.h.includes('الشهادات/الدورات المنجزة')) {
+                const p=address(r,t.idx('الشهادات/الدورات المنجزة')),track=text(t.ws,r,t.idx('المسار'));
+                const gate=track.includes('أقل من')?`${p}>=${less3KpiTarget}`:track.includes('3 شهور')?`${p}>=${targetCertsCount}`:`IFERROR(VALUE(LEFT(${p},FIND(" / ",${p})-1))>=VALUE(MID(${p},FIND(" / ",${p})+3,FIND(" —",${p}&" —")-FIND(" / ",${p})-3)),FALSE)`;
+                formula(t.ws,r,t.idx('حالة الانجاز'),`IF(${active},IF(${gate},"مكتمل","غير مكتمل"),"")`);
+            }
+            let done=null, assigned=null;
+            if(cc && cc[1]>=cc[0]) {
+                const geometry=courseGeometry(t,r);
+                const rg=`${col(cc[0])}${r}:${col(cc[1])}${r}`;
+                done=geometry.done;
+                assigned=geometry.assigned;
+                // A certificate total can include courses excluded by the current filter. Keep that raw input in that case.
+                const initial=Array.from({length:cc[1]-cc[0]+1},(_,i)=>value(t.ws,r,cc[0]+i)).filter(v=>v==='منجز'||v==='نعم'||v===1||v==='100%').length;
+                if(path>=0 && total>=0 && Number(value(t.ws,r,total))>=initial) {
+                    // Raw certificates outside a filtered course view remain a fixed source balance.
+                    const outside=Number(value(t.ws,r,total))-initial;
+                    formula(t.ws,r,total,`IF(${active},${done}${outside?'+'+outside:''},0)`);
+                }
+                const n=t.h.findIndex(h=>/^(عدد الدورات المكتملة|الدورات المكتملة|مجموع المستكمل|إجمالي المنجز|الدورات المنجزة|المنجز)$/.test(h));
+                if(n>=0)formula(t.ws,r,n,`IF(${active},${done},0)`);
+                const a=t.h.findIndex(h=>/^(عدد الدورات المسجل عليها|الدورات المسجل بها)$/.test(h));
+                if(a>=0)formula(t.ws,r,a,`IF(${active},${assigned},0)`);
+                if((t.name==='الإدارة'||t.name.startsWith('داعم - ')||t.h[target]==='إجمالي دورات المسار')&&target>=0)formula(t.ws,r,target,geometry.available);
+                const d=t.h.findIndex(h=>h==='المنجز من المسار'||h.startsWith('المنجز / المستهدف'));
+                if(d>=0) {
+                    const denominator=t.h[d]==='المنجز من المسار'?`(${geometry.available})`:String(Number(String(value(t.ws,r,d)).split('/')[1])||cc[1]-cc[0]+1);
+                    formula(t.ws,r,d,`IF(${active},(${done})&" / "&${denominator},"")`);
+                    const gc=t.idx('KPI الخليج');if(gc>=0&&path<0)pct(t.ws,r,gc,`IF(${active},MIN(1,IFERROR((${done})/${denominator},0)),0)`);
+                }
+                if(path>=0) {
+                    const hdr=geometry.headerParts[0],courses=geometry.parts[0];
+                    formula(t.ws,r,path,`IF(${active},IFERROR(INDEX(${hdr},1,MATCH(FALSE,INDEX((${courses}="منجز")+(${courses}="نعم")+(${courses}=1)+(LEFT(${courses},5)="مكتمل")+(${hdr}="")>0,1,0),0)),"أتم المسار بالكامل"),"")`);
+                }
+                const notes=t.idx('ملاحظات');
+                if(notes>=0 && a>=0 && n>=0)formula(t.ws,r,notes,`"أكمل "&${address(r,n)}&" من "&${address(r,a)}&" دورة من الدورات المسجل عليها"`);
+            }
+            const n=t.h.findIndex(h=>/^(عدد الدورات المكتملة|مجموع المستكمل|الدورات المنجزة|المنجز من الخليج|المنجز من دورات الخليج|المنجز)$/.test(h));
+            const achieved=n>=0?address(r,n):total>=0?address(r,total):null;
+            const state=t.h.findIndex(h=>/^(الحالة|الحالة الوصفية)$/.test(h));
+            const kpi=t.h.findIndex(h=>/^(KPI|KPI النخبة|KPI الخليج|نسبة الإنجاز|KPI الموظف)$/.test(h));
+            const elite=t.h.includes('الفئة');
+            const gulf=/الخليج/.test(t.h.join(' '));
+            if(achieved && (target>=0||elite)) {
+                const goal=target>=0?address(r,target):String(ELITE_TARGET_COUNT);
+                const rate=gulf||t.h.includes('إجمالي دورات المسار')||t.name==='الإدارة'?`MIN(1,IFERROR(${achieved}/${goal},0))`:`IF(${achieved}>=${goal},1,0)`;
+                if(kpi>=0)pct(t.ws,r,kpi,`IF(${active},${rate},0)`);
+                if(state>=0) {
+                    const original=text(t.ws,r,state);
+                    const yes=/محقق/.test(original)?'محقق':/استكمل/.test(original)?'استكمل بالكامل':'مكتمل';
+                    const no=/محقق/.test(original)?'غير محقق':gulf?'قيد الإنجاز':'غير مكتمل';
+                    formula(t.ws,r,state,`IF(${active},${t.h[state]==='الحالة الوصفية'?`IF(${achieved}>=${goal},"استكمل بالكامل",IF(${achieved}>0,"جزء","لم يستكمل"))`:`IF(${achieved}>=${goal},${quote(yes)},${quote(no)})`},"")`);
+                }
+                const remaining=t.idx('المتبقي');
+                if(remaining>=0)formula(t.ws,r,remaining,`IF(${active},MAX(0,${goal}-${achieved}),0)`);
+            }
+            // Monthly detail: each percentage is driven by its own completed and target cells.
+            t.h.forEach((h,c)=>{
+                if(/ - KPI %$/.test(h)&&c>=2&&typeof value(t.ws,r,c-2)==='number') {
+                    formula(t.ws,r,c,`IF(${id}="","",IF(${address(r,c-1)}>0,ROUND(MIN(100,MAX(0,${address(r,c-2)}/${address(r,c-1)}*100)),2),"لا يوجد تارجت جديد"))`);
+                }
+            });
+            // Monthly raw certificate totals use the displayed month inputs when the export contains the full total.
+            const monthCols=t.h.map((h,c)=>/^\d{4}\/\d{1,2}$/.test(h)?c:-1).filter(c=>c>=0);
+            if(total>=0&&monthCols.length){const shown=monthCols.reduce((s,c)=>s+(Number(value(t.ws,r,c))||0),0),outside=Number(value(t.ws,r,total))-shown;if(outside>=0)formula(t.ws,r,total,`SUM(${col(monthCols[0])}${r}:INDEX(${r}:${r},1,COLUMNS(${r}:${r})))${outside?'+'+outside:''}`);}
+            const progress=t.idx('نسبة التقدم'),progressState=t.idx('حالة التقدم');
+            if(progress>=0&&progressState>=0)formula(t.ws,r,progressState,`IF(${id}="","",IF(ISNUMBER(${address(r,progress)}),IF(${address(r,progress)}>=1,"مكتمل",IF(${address(r,progress)}>0,"قيد التقدم","لم يبدأ")),"غير متاح"))`);
+        }
+    }
+    function lookup(source,column,id) {
+        return `IFERROR(INDEX(${source.range(column)},MATCH(${id},${source.range(source.id)},0)),0)`;
+    }
+    function linkValue(t,r,c,source,sourceCol) {
+        const id=address(r,t.id);
+        return formula(t.ws,r,c,`IF(${id}="","",${lookup(source,sourceCol,id)})`);
+    }
+    function sourceForScope(ts,names) {
+        return ts.find(t=>t.name===names?.employees) || ts.find(t=>t.name===names?.path) || null;
+    }
+    function criteria(t,r,source) {
+        const parts=[];
+        for(const options of [['الإقليم','اسم الإقليم'],['مدير الإقليم'],['المشرف','اسم المشرف']]) {
+            const c=options.map(h=>t.idx(h)).find(c=>c>=0),sc=options.map(h=>source.idx(h)).find(c=>c>=0);
+            if(c!==undefined&&sc!==undefined)parts.push(source.range(sc),address(r,c));
+        }
+        return parts;
+    }
+    function averageBy(source,column,parts=[]) {
+        return `IFERROR((${sumBy(source,column,parts)})/${source.count([...parts,source.range(column),'">=0"'])},0)`;
+    }
+    function sumBy(t,c,parts=[]){return `SUMIFS(${t.range(c)},${t.range(t.id)},"?*"${parts.length?','+parts.join(','):''})+SUMIFS(${t.range(c)},${t.range(t.id)},">=0"${parts.length?','+parts.join(','):''})`;}
+    function uniqueCount(t,c,extra=[]) {
+        // COUNTIFS in the denominator avoids counting duplicate supervisor/region names.
+        const rg=t.range(c),ids=t.range(t.id);
+        const filter=extra.length?extra.map(([i,criterion])=>`(${t.range(i)}=${criterion})`).join('*'):'1';
+        const tail=extra.length?','+extra.flatMap(([i])=>[t.range(i),t.range(i)]).join(','):'';
+        return `SUMPRODUCT(IFERROR((${ids}<>"")*(${rg}<>"")*${filter}/(COUNTIFS(${rg},${rg},${ids},"?*"${tail})+COUNTIFS(${rg},${rg},${ids},">=0"${tail})),0))`;
+    }
+    function dynamicScope(wb,ts,home,names,employees) {
+        const source=sourceForScope(ts,names); if(!source)return;
+        const gulf=names===GULF_EXECUTIVE_SHEETS;
+        const sourceTotal=source.idx('إجمالي الشهادات');
+        const sourceDone=gulf?source.idx('المنجز من الخليج'):sourceTotal;
+        if(gulf){const progress=ts.find(t=>t.name===names.progress),cc=progress&&courseColumns(progress);if(progress&&cc)for(let r=source.start;r<=source.end;r++){
+            const id=value(source.ws,r,source.id),pr=Array.from({length:Math.max(0,progress.end-progress.start+1)},(_,i)=>progress.start+i).find(n=>String(value(progress.ws,n,progress.id))===String(id));if(pr===undefined)continue;
+            const completed=Array.from({length:cc[1]-cc[0]+1},(_,i)=>value(progress.ws,pr,cc[0]+i)).filter(v=>v===1).length;
+            const outside=Number(value(source.ws,r,sourceDone))-completed;
+            if(outside>=0)formula(source.ws,r,sourceDone,`IFERROR(COUNTIF(INDEX(${sheetRef(progress.name)}$${col(cc[0])}$${progress.start}:$XFD$${Math.max(progress.end+1000,20000)},MATCH(${address(r,source.id)},${progress.range(progress.id)},0),0),1),0)${outside?'+'+outside:''}`);
+        }}
+        const count=source.count();
+        // Stable IDs join views to the main roster. Clearing/deleting a source employee removes them from all linked counts.
+        for(const name of Object.values(names))for(const t of ts.filter(t=>t.name===name&&t.id>=0&&t!==source)) {
+            for(let r=t.start;r<=t.end;r++) {
+                const original=value(t.ws,r,t.id);if(!original||/^لا (يوجد|توجد)/.test(String(original)))continue;
+                formula(t.ws,r,t.id,`IF(COUNTIF(${source.range(source.id)},${quote(original)})>0,${quote(original)},"")`);
+            }
+        }
+        const sum=c=>sumBy(source,c);
+        const target=gulf?getGulfTargetCoursesCount():targetCertsCount;
+        const achieved=source.count([source.range(sourceDone),`">=${target}"`]);
+        // Keep the existing main employee sheet (Gulf) or path sheet (standard) as the editable source.
+        const path=ts.find(t=>t.name===names.path);
+        if(gulf&&path) {
+            const progress=ts.find(t=>t.name===names.progress),pc=progress&&courseColumns(progress),pathc=courseColumns(path);
+            for(let r=path.start;r<=path.end;r++) {
+                if(path.id<0||!value(path.ws,r,path.id))continue;
+                const total=path.idx('إجمالي الشهادات'),k=path.idx('KPI الخليج'),done=path.h.findIndex(h=>h.startsWith('المنجز /'));
+                if(total>=0)linkValue(path,r,total,source,sourceTotal);
+                if(k>=0)linkValue(path,r,k,source,source.idx('KPI الخليج'));
+                if(done>=0)formula(path.ws,r,done,`(${lookup(source,sourceDone,address(r,path.id))})&" / ${target}"`);
+                if(progress&&pc&&pathc){const id=value(path.ws,r,path.id),pr=Array.from({length:progress.end-progress.start+1},(_,i)=>progress.start+i).find(rr=>String(value(progress.ws,rr,progress.id))===String(id));if(pr!==undefined)for(let c=pathc[0];c<=pathc[1];c++){
+                    const progressCol=pc[0]+c-pathc[0];if(progressCol>pc[1])break;
+                    const wasDone=value(path.ws,r,c)==='منجز',progressDone=value(progress.ws,pr,progressCol)===1;if(wasDone!==progressDone)continue;
+                    const prev=c-pathc[0],previous=prev?`COUNTIF(${col(pathc[0])}${r}:${col(c-1)}${r},"منجز")=${prev}`:'TRUE';
+                    formula(path.ws,r,c,`IF(${address(r,path.id)}="","",IF(${lookup(progress,progressCol,address(r,path.id))}>=1,"منجز",IF(${previous},"واقف عليها","لم يصلها")))`);
+                }}
+            }
+        }
+        const tenure=[names.less3,names.more3].filter(Boolean).map(n=>ts.find(t=>t.name===n)).filter(Boolean);
+        for(const t of tenure)for(let r=t.start;r<=t.end;r++)if(value(t.ws,r,t.id)){
+            const c=t.idx('إجمالي الشهادات');if(c>=0)linkValue(t,r,c,source,sourceTotal);
+        }
+        // Employees removed from the source no longer contribute to any auxiliary program.
+        const enrollment=[names.elite,names.bot].map(n=>ts.find(t=>t.name===n)).filter(Boolean);
+        const eligible=(t,r)=>`AND(${address(r,t.id)}<>"",COUNTIF(${source.range(source.id)},${address(r,t.id)})>0)`;
+        const hws=wb.Sheets[home];
+        if(hws) {
+            formula(hws,5,0,`${quote('الموظفون\n')}&(${count})`);
+            // SUMPRODUCT is limited to the used source block for speed. Counts and KPIs below use spare rows too.
+            const sc=source.idx('المشرف');
+            if(sc>=0)formula(hws,5,3,`${quote('المشرفون\n')}&IFERROR(${uniqueCount(source,sc)},0)`);
+            formula(hws,5,6,`${quote(gulf?'دورات الخليج المنجزة\n':'إجمالي الشهادات\n')}&(${sum(sourceDone)})`);
+            const label=text(hws,5,9).split('\n')[0];formula(hws,5,9,`${quote(label+'\n')}&(${achieved})`);
+        }
+        const analysis=wb.Sheets[names.analysis];
+        if(analysis) {
+            formula(analysis,7,1,count);pct(analysis,7,2,'IF(B7>0,1,0)');
+            if(gulf) {
+                const sc=source.idx('المشرف'); if(sc>=0)formula(analysis,8,1,`IFERROR(${uniqueCount(source,sc)},0)`);
+                formula(analysis,9,1,sum(sourceDone));formula(analysis,10,1,achieved);pct(analysis,10,2,'IFERROR(B10/B7,0)');
+                formula(analysis,11,1,'IFERROR(ROUND(B9/B7,2),0)');pct(analysis,12,1,averageBy(source,source.idx('KPI الخليج')));
+            } else {
+                formula(analysis,8,1,sum(sourceTotal));formula(analysis,9,1,achieved);
+                formula(analysis,10,1,source.count([source.range(sourceTotal),'">0"',source.range(sourceTotal),`"<${target}"`]));
+                formula(analysis,11,1,source.count([source.range(sourceTotal),'0']));
+                for(const r of [9,10,11])pct(analysis,r,2,`IFERROR(B${r}/B7,0)`);
+                formula(analysis,12,1,'IFERROR(ROUND(B8/B7,2),0)');
+            }
+            if(path) {
+                const cr=courseColumns(path);
+                if(cr)for(let r=16;r<=XLSX.utils.decode_range(analysis['!ref']).e.r+1;r++) {
+                    const c=cr[0]+r-16;if(c>cr[1])break;
+                    // Standard path is the source itself. Gulf path remains a raw per-course input view.
+                    const courseDone=path.count([path.range(c),'"منجز"']);
+                    if(gulf){formula(analysis,r,2,count);formula(analysis,r,3,courseDone);formula(analysis,r,4,`MAX(0,C${r}-D${r})`);pct(analysis,r,5,`IFERROR(D${r}/C${r},0)`);}
+                    else{formula(analysis,r,2,courseDone);formula(analysis,r,3,`MAX(0,$B$7-C${r})`);pct(analysis,r,4,`IFERROR(C${r}/$B$7,0)`);}
+                }
+            }
+        }
+        const kpiTables=ts.filter(t=>t.name===names.kpi);
+        const detail=kpiTables.find(t=>t.id>=0);
+        if(detail) {
+            for(let r=detail.start;r<=detail.end;r++) {
+                if(!value(detail.ws,r,detail.id))continue;
+                const dc=gulf?detail.idx('المنجز من دورات الخليج'):detail.idx('المنجز');
+                const track=detail.idx('المسار'),g=detail.idx('المستهدف'),k=detail.idx('KPI الموظف'),s=detail.idx('الحالة');
+                let from=source,fc=sourceDone;
+                const tr=track>=0?text(detail.ws,r,track):'';
+                if(tr==='النخبة') {from=enrollment.find(t=>t.name===names.elite);fc=from?.idx('عدد الدورات المكتملة');}
+                if(tr.includes('Back on Track')){from=enrollment.find(t=>t.name===names.bot);fc=from?.idx('عدد الدورات المكتملة');}
+                const live=eligible(detail,r);
+                if(from&&fc>=0&&dc>=0) {
+                    const done=lookup(from,fc,address(r,detail.id));
+                    if(tr.includes('Back on Track')) {
+                        const ac=from.idx('عدد الدورات المسجل عليها'),assigned=lookup(from,ac,address(r,detail.id));
+                        formula(detail.ws,r,dc,`IF(${live},(${done})&" من "&(${assigned}),"")`);
+                        formula(detail.ws,r,g,`"إكمال "&(${assigned})`);
+                        if(k>=0)pct(detail.ws,r,k,`IF(${live},IF(AND(${assigned}>0,${done}=${assigned}),1,0),0)`);
+                    } else {
+                        formula(detail.ws,r,dc,`IF(${live},${done},0)`);
+                        if(k>=0)pct(detail.ws,r,k,`IF(${live},${gulf?`MIN(1,IFERROR(${address(r,dc)}/${address(r,g)},0))`:`IF(${address(r,dc)}>=${address(r,g)},1,0)`},0)`);
+                    }
+                    if(s>=0&&k>=0)formula(detail.ws,r,s,`IF(${live},IF(${address(r,k)}=1,"${gulf?'مكتمل':'محقق'}","${gulf?'قيد الإنجاز':'غير محقق'}"),"")`);
+                }
+            }
+            const dk=detail.idx('KPI الموظف');
+            for(const t of kpiTables.filter(t=>t.id<0))for(let r=t.start;r<=t.end;r++) {
+                if(gulf) {
+                    const parts=criteria(t,r,source),den=source.count(parts);
+                    formula(t.ws,r,2,den);formula(t.ws,r,3,sumBy(source,sourceDone,parts));
+                    formula(t.ws,r,4,`IFERROR(ROUND(D${r}/C${r},2),0)`);
+                    formula(t.ws,r,5,source.count([...parts,source.range(sourceDone),`">=${target}"`]));
+                    pct(t.ws,r,6,averageBy(source,source.idx('KPI الخليج'),parts));
+                } else {
+                    const parts=criteria(t,r,detail),ids=detail.range(detail.id),tracks=detail.range(detail.idx('المسار'));
+                    const byTrack=track=>[...parts,tracks,quote(track)];
+                    const liveTracks=['أقل من 3 شهور','النخبة','3 شهور فأكثر','Back on Track (BOT)'];
+                    const countColumns=t.h.map((h,c)=>h.startsWith('عدد أقل')||h==='عدد النخبة'||h==='عدد 3 شهور فأكثر'||h==='عدد موظفي BOT'?c:-1).filter(c=>c>=0);
+                    const axisCols=[];
+                    liveTracks.forEach((tr,i)=>{
+                        const c=countColumns[i];if(c===undefined)return;
+                        // Detail KPI is zero for deleted employees; count source presence through numeric completed values.
+                        const validParts=[...byTrack(tr),detail.range(detail.idx('الحالة')),'"?*"'];
+                        formula(t.ws,r,c,detail.count(validParts));
+                        const kc=c+1;axisCols.push(address(r,kc));
+                        pct(t.ws,r,kc,`IF(${address(r,c)}>0,${averageBy(detail,dk,validParts)},"لا ينطبق")`);
+                    });
+                    const head=t.idx('عدد الموظفين');if(head>=0)formula(t.ws,r,head,source.count(criteria(t,r,source)));
+                    const supervisors=t.idx('عدد المشرفين');if(supervisors>=0&&source.idx('المشرف')>=0)formula(t.ws,r,supervisors,`IFERROR(${uniqueCount(source,source.idx('المشرف'))},0)`);
+                    const overall=t.h.findIndex(h=>h.startsWith('متوسط KPI'));
+                    if(overall>=0&&axisCols.length)pct(t.ws,r,overall,`IFERROR((${axisCols.map((a,i)=>`IF(${address(r,countColumns[i])}>0,${a},0)`).join('+')})/(${countColumns.map(c=>`IF(${address(r,c)}>0,1,0)`).join('+')}),0)`);
+                }
+            }
+        }
+        // Link the values printed on the existing navigation cards to the same formulas.
+        if(hws) {
+            const metrics={};
+            for(const key of ['less3','more3','elite']) {
+                const t=ts.find(t=>t.name===names[key]);const kc=t?.h.findIndex(h=>/^KPI/.test(h));
+                if(t&&kc>=0)metrics[names[key]]=averageBy(t,kc);
+            }
+            if(analysis)metrics[names.analysis]=gulf?`${sheetRef(names.analysis)}B12`:`${sheetRef(names.analysis)}C9`;
+            if(path){const summary=courseSummary(wb,path);if(summary)metrics[names.path]=`IFERROR(${summary.sum(3)}/(${gulf?`(${count})*${target}`:summary.sum(4)}),0)`;}
+            const kt=kpiTables.find(t=>t.id<0),overall=kt?.h.findIndex(h=>h.startsWith('متوسط KPI')||h==='KPI المشرف');
+            if(kt&&overall>=0)metrics[names.kpi]=`IFERROR(AVERAGE(${kt.range(overall)}),0)`;
+            const support=ts.find(t=>t.name===names.nonCert);
+            if(support){const summary=courseSummary(wb,support);if(summary)metrics[names.nonCert]=`IFERROR(${summary.sum(1)}/${summary.sum(2)},0)`;}
+            if(detail&&!gulf){
+                const tr=detail.range(detail.idx('المسار')),valid=detail.range(detail.idx('الحالة')),dk=detail.idx('KPI الموظف');
+                const axes=['أقل من 3 شهور','النخبة','3 شهور فأكثر','Back on Track (BOT)'];
+                const counts=axes.map(a=>detail.count([tr,quote(a),valid,'"?*"']));
+                const rates=axes.map(a=>averageBy(detail,dk,[tr,quote(a),valid,'"?*"']));
+                metrics[names.bot]=rates[3];
+                metrics[names.kpi]=`IFERROR((${rates.join('+')})/(${counts.map(c=>`IF(${c}>0,1,0)`).join('+')}),0)`;
+            }
+            Object.entries(hws).forEach(([a,cell])=>{
+                if(a.startsWith('!')||!cell?.l?.Target||typeof cell.v!=='string'||!cell.v.includes('\n'))return;
+                const targetName=cell.l.Target.match(/#'((?:[^']|'')+)'!/);if(!targetName)return;
+                const name=targetName[1].replace(/''/g,"'"),metric=metrics[name];if(!metric)return;
+                const label=cell.v.slice(0,cell.v.lastIndexOf(':')+1)+' ';
+                formula(hws,XLSX.utils.decode_cell(a).r+1,XLSX.utils.decode_cell(a).c,`${quote(label)}&ROUND((${metric})*100,2)&"%"`);
+            });
+        }
+    }
+    function ordinarySummaries(wb,ts) {
+        const increment=ts.find(t=>t.id>=0&&t.h.some(h=>h.endsWith(' - منجز الشهر')));
+        const cumulative=ts.find(t=>t.id>=0&&t.h.some(h=>h.endsWith(' - المنجز التراكمي')));
+        if(increment)for(let r=increment.start;r<=increment.end;r++){const cols=increment.h.map((h,c)=>h.endsWith(' - منجز الشهر')?c:-1).filter(c=>c>=0);const total=increment.idx('إجمالي الشهادات المحتسبة');if(total>=0&&cols.length)formula(increment.ws,r,total,`SUM(${cols.map(c=>address(r,c)).join(',')})`);}
+        if(increment&&cumulative)for(let r=cumulative.start;r<=cumulative.end;r++){
+            const id=value(cumulative.ws,r,cumulative.id);if(!id)continue;
+            formula(cumulative.ws,r,cumulative.id,`IF(COUNTIF(${increment.range(increment.id)},${quote(id)})>0,${quote(id)},"")`);
+            const completed=[],targets=[];
+            cumulative.h.forEach((h,c)=>{if(!h.endsWith(' - المنجز التراكمي'))return;const sc=increment.idx(h.replace(' - المنجز التراكمي',' - منجز الشهر'));if(sc<0)return;
+                completed.push(lookup(increment,sc,address(r,cumulative.id)));targets.push(`IF(COUNTIFS(${increment.range(increment.id)},${address(r,cumulative.id)},${increment.range(sc+1)},">=0")>0,${lookup(increment,sc+1,address(r,cumulative.id))},IFERROR(AVERAGE(${increment.range(sc+1)}),0))`);
+                if(typeof value(cumulative.ws,r,c)!=='number')return;
+                formula(cumulative.ws,r,c,`SUM(${completed.join(',')})`);formula(cumulative.ws,r,c+1,`SUM(${targets.join(',')})`);
+            });
+            const total=cumulative.idx('إجمالي الشهادات المحتسبة');if(total>=0&&completed.length)formula(cumulative.ws,r,total,`SUM(${completed.join(',')})`);
+        }
+        const raw=ts.find(t=>t.name==='جميع البائعين المعتمدين')||ts.find(t=>t.name.startsWith('بائعين '));
+        if(raw)for(const name of wb.SheetNames) {
+            const ws=wb.Sheets[name],rc=raw.idx('الإقليم'),tc=raw.idx('إجمالي الشهادات');
+            if(name==='تحليل الأقاليم المعتمدة')for(let r=2;r<=XLSX.utils.decode_range(ws['!ref']).e.r+1;r++){
+                const by=[raw.range(rc),`A${r}`];
+                formula(ws,r,1,raw.count(by));
+                formula(ws,r,2,raw.count([...by,raw.range(tc),`">=${targetCertsCount}"`]));
+                formula(ws,r,4,raw.count([...by,raw.range(tc),'">0"',raw.range(tc),`"<${targetCertsCount}"`]));
+                formula(ws,r,6,raw.count([...by,raw.range(tc),'0']));
+                for(const [c,n]of [[3,2],[5,4],[7,6]])pct(ws,r,c,`IFERROR(${address(r,n)}/B${r},0)`);
+            }
+            if(name==='إحصائيات الإقليم'){
+                formula(ws,2,1,raw.count());pct(ws,2,2,'IF(B2>0,1,0)');
+                formula(ws,3,1,raw.count([raw.range(tc),`">=${targetCertsCount}"`]));
+                formula(ws,4,1,raw.count([raw.range(tc),'">0"',raw.range(tc),`"<${targetCertsCount}"`]));
+                formula(ws,5,1,raw.count([raw.range(tc),'0']));
+                for(const r of [3,4,5])pct(ws,r,2,`IFERROR(B${r}/$B$2,0)`);
+            }
+        }
+        for(const t of ts) {
+            if(t.h[0]==='اسم المشرف'&&t.h.includes('إجمالي البائعين'))for(let r=t.start;r<=t.end;r++)formula(t.ws,r,t.idx('إجمالي البائعين'),`SUM(D${r}:F${r})`);
+            if(t.h[0]==='اسم المشرف'&&t.h.includes('مقدار التقدم'))for(let r=t.start;r<=t.end;r++)formula(t.ws,r,t.idx('مقدار التقدم'),`D${r}-G${r}`);
+            if(!t.h.includes('متوسط الفترة'))continue;
+            const mode=t.name.includes('تراكم')?'cumulative':'increment';
+            const source=ts.find(s=>s.id>=0&&s.h.some(h=>h.endsWith(' - KPI %'))&&(mode==='cumulative'?s.name.includes('تراكم'):!s.name.includes('تراكم')));
+            if(!source)continue;
+            for(let r=t.start;r<=t.end;r++) {
+                const by=criteria(t,r,source),n=t.idx('عدد البائعين');if(n>=0)formula(t.ws,r,n,source.count(by));
+                const metrics=[];
+                t.h.forEach((h,c)=>{
+                    if(!h.endsWith(' - متوسط KPI %'))return;
+                    const sc=source.idx(h.replace(' - متوسط KPI %',' - KPI %'));if(sc<0)return;
+                    formula(t.ws,r,c,`ROUND(${averageBy(source,sc,by)},2)`);metrics.push(address(r,c));
+                });
+                const avg=t.idx('متوسط الفترة');if(avg>=0&&metrics.length)formula(t.ws,r,avg,`IFERROR(ROUND(AVERAGE(${metrics.join(',')}),2),0)`);
+            }
+        }
+        // La Beaute's detail is the editable record list; summary aggregates follow it.
+        const details=ts.find(t=>t.name==='تفاصيل الدورات');
+        if(details&&wb.Sheets['ملخص مؤقت']){
+            const ws=wb.Sheets['ملخص مؤقت'];formula(ws,6,1,details.count());
+            for(const [name,row]of [['معهم شهادات',4],['دورات فقط',5]]){
+                const t=ts.find(t=>t.name===name);if(t)formula(ws,row,1,t.count());
+            }
+        }
+    }
+    function process(wb) {
+        if(!wb?.Sheets||wb.__formulasReady)return wb;
+        wb.__formulasReady=true;
+        const ts=tables(wb);
+        // Input percentages become genuine Excel numbers, retaining all existing visual cell styles.
+        for(const name of wb.SheetNames)for(const [a,cell]of Object.entries(wb.Sheets[name])) {
+            if(a[0]==='!'||!cell||typeof cell.v!=='string'||! /^(?:✓ - )?\d+(\.\d+)?%$/.test(cell.v))continue;
+            const marked=cell.v.startsWith('✓');cell.v=Number(cell.v.replace('✓ - ','').slice(0,-1))/100;cell.t='n';cell.z=marked?'"✓ - "0.##%':'0.##%';delete cell.w;
+            if(cell.s)cell.s={...cell.s,numFmt:cell.z};
+        }
+        ts.forEach(localCalculations);
+        const scopes=wb.SheetNames.map(n=>({name:n,scope:wb.Sheets[n].__dynamicScope})).filter(x=>x.scope);
+        const largest=scopes.filter(x=>x.scope.names!==GULF_EXECUTIVE_SHEETS).sort((a,b)=>b.scope.employees.length-a.scope.employees.length)[0];
+        if(largest){const master=sourceForScope(ts,largest.scope.names);if(master)for(const entry of scopes){const other=sourceForScope(ts,entry.scope.names);if(!other||other===master||entry.scope.names===GULF_EXECUTIVE_SHEETS)continue;for(let r=other.start;r<=other.end;r++){const id=value(other.ws,r,other.id);if(!id||/^لا (يوجد|توجد)/.test(String(id)))continue;formula(other.ws,r,other.id,`IF(COUNTIF(${master.range(master.id)},${quote(id)})>0,${quote(id)},"")`);other.h.forEach((h,c)=>{const mc=master.idx(h);if(c!==other.id&&mc>=0)linkValue(other,r,c,master,mc);});}}}
+        if(largest){
+            const master=ts.find(t=>t.name===largest.scope.names.nonCert);
+            if(master)for(const entry of scopes){
+                const other=ts.find(t=>t.name===entry.scope.names.nonCert);if(!other||other===master)continue;
+                other.__courseInputMaster=master;
+                for(let r=other.start;r<=other.end;r++)if(value(other.ws,r,other.id))other.h.forEach((h,c)=>{const mc=master.idx(h);if(c!==other.id&&mc>=0)linkValue(other,r,c,master,mc);});
+            }
+        }
+        for(const name of wb.SheetNames) {
+            const scope=wb.Sheets[name].__dynamicScope;
+            if(scope)dynamicScope(wb,ts,name,scope.names,scope.employees);
+        }
+        ordinarySummaries(wb,ts);
+        for(const name of wb.SheetNames){const ws=wb.Sheets[name];if(!ws.__selectorButtons)continue;ws.__selectorButtons.forEach((b,i)=>{const ref=sheetRef(b.sheet);const r=9+Math.floor(i/2)*5,c=i%2?6:0;formula(ws,r,c,`${quote('✦ '+b.shortLabel+' ✦\n')}&${ref}A5&"  |  "&${ref}J5&CHAR(10)&${ref}G18`);});const master=largest&&sourceForScope(ts,largest.scope.names);if(master){formula(ws,5,3,`${quote('الموظفون\n')}&${master.count()}`);formula(ws,5,9,`${quote('إجمالي الشهادات\n')}&SUMIFS(${master.range(master.idx('إجمالي الشهادات'))},${master.range(master.id)},"<>")`);}}
+        wb.Workbook=wb.Workbook||{};
+        wb.Workbook.CalcPr={...(wb.Workbook.CalcPr||{}),calcMode:'auto',fullCalcOnLoad:true,forceFullCalc:true};
+        return wb;
+    }
+    const homeBuilder=buildExecutiveHomeWorksheet;
+    buildExecutiveHomeWorksheet=function(region,employees,menuItems,options={}) {
+        const ws=homeBuilder(region,employees,menuItems,options);
+        const names={home:options.homeSheet||CENTRAL_EXECUTIVE_SHEETS.home};
+        const keys=['less3','more3','nonCert','path','analysis','elite','bot','kpi'];
+        menuItems.forEach((item,i)=>{names[keys[i]]=item.sheet;});
+        ws.__dynamicScope={names,employees};return ws;
+    };
+    const gulfHome=buildGulfExecutiveHomeWorksheet;
+    buildGulfExecutiveHomeWorksheet=function(employees,menuItems){const ws=gulfHome(employees,menuItems);ws.__dynamicScope={names:GULF_EXECUTIVE_SHEETS,employees};return ws;};
+    const selector=buildExecutiveRegionSelectorWorksheet;
+    buildExecutiveRegionSelectorWorksheet=function(regions,employees,buttons){const ws=selector(regions,employees,buttons);ws.__selectorButtons=buttons;return ws;};
+    const write=XLSX.write,writeFile=XLSX.writeFile;
+    XLSX.write=function(wb,...args){return write.call(this,process(wb),...args);};
+    XLSX.writeFile=function(wb,filename,options={}){
+        process(wb);
+        if(typeof JSZip==='undefined')return writeFile.call(this,wb,filename,options);
+        // CalcPr is not emitted by this bundled SheetJS version. Add it to the package for every download.
+        const bytes=write.call(this,wb,{...options,bookType:'xlsx',type:'array',cellStyles:true});
+        return JSZip.loadAsync(bytes).then(async zip=>{await forceWorkbookRecalculation(zip);const p='xl/workbook.xml';zip.file(p,(await zip.file(p).async('string')).replace('<calcPr ','<calcPr calcMode="auto" '));return zip.generateAsync({type:'blob',compression:'DEFLATE',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});}).then(blob=>saveBlob(blob,filename)).catch(error=>{console.error('Formula workbook packaging failed',error);return writeFile.call(this,wb,filename,options);});
+    };
+    // Pivot data stays native, with live formula inputs and ordinary formula-based report sheets.
+    const worksheetXml=buildWorksheetXml;
+    buildWorksheetXml=function(headers,rows){
+        let xml=worksheetXml(headers,rows);
+        const kind=Object.keys(KPI_PIVOT_HEADERS).find(k=>KPI_PIVOT_HEADERS[k].join('|')===headers.join('|'));
+        if(!kind)return xml;
+        const fcell=(r,c,f)=>{const ref=address(r,c),v=rows[r-2]?.[c]??0;xml=xml.replace(new RegExp(`<c r="${ref}"[^>]*>[\\s\\S]*?<\\/c>`),`<c r="${ref}"${typeof v==='string'?' t="str"':''}><f>${xmlEscape(f)}</f><v>${xmlEscape(v)}</v></c>`);};
+        const rg=(name,c)=>`${sheetRef(name)}$${col(c)}$2:$${col(c)}$20000`;
+        for(let r=2;r<=rows.length+1;r++){
+            if(kind==='less3'||kind==='more3') {
+                fcell(r,7,`IF(AND(D${r}<>"",D${r}<>"لا يوجد"),1,0)`);
+                fcell(r,8,`IF(H${r}=1,IF(G${r}>=F${r},1,0),0)`);fcell(r,9,`H${r}-I${r}`);fcell(r,10,`I${r}*100`);
+            }else if(kind==='elite'){
+                fcell(r,6,`MAX(0,${ELITE_TARGET_COUNT}-F${r})`);fcell(r,7,`IF(AND(D${r}<>"",D${r}<>"لا يوجد",F${r}>=${ELITE_TARGET_COUNT}),1,0)`);fcell(r,8,`H${r}*100`);
+            }else if(kind==='bot'){
+                fcell(r,7,`MAX(0,F${r}-G${r})`);fcell(r,8,`IF(AND(D${r}<>"",F${r}>0,G${r}>=F${r}),1,0)`);fcell(r,9,`I${r}*100`);
+            }else if(kind==='supervisors'){
+                const by=name=>[rg(name,0),`A${r}`,rg(name,1),`B${r}`,rg(name,2),`C${r}`,rg(name,3),'"<>"',rg(name,3),'"<>لا يوجد"'].join(',');
+                const count=name=>`COUNTIFS(${by(name)})`;
+                const sum=(name,c)=>`SUMIFS(${rg(name,c)},${by(name)})`;
+                fcell(r,3,`${count(KPI_PIVOT_SHEETS.dataLess3)}+${count(KPI_PIVOT_SHEETS.dataMore3)}`);
+                for(const [name,n,completed,kpi,countc]of [[KPI_PIVOT_SHEETS.dataLess3,4,5,7,8],[KPI_PIVOT_SHEETS.dataElite,8,9,10,7],[KPI_PIVOT_SHEETS.dataMore3,11,12,14,8],[KPI_PIVOT_SHEETS.dataBot,15,16,18,8]]){
+                    fcell(r,n,count(name));fcell(r,completed,sum(name,countc));fcell(r,kpi,`IFERROR(${address(r,completed)}/${address(r,n)}*100,0)`);
+                }
+                for(const [c,n,d]of [[6,4,5],[13,11,12],[17,15,16]])fcell(r,c,`${address(r,n)}-${address(r,d)}`);
+                fcell(r,19,`IF(E${r}>0,1,0)+IF(I${r}>0,1,0)+IF(L${r}>0,1,0)+IF(P${r}>0,1,0)`);
+                fcell(r,20,`IFERROR(SUM(H${r},K${r},O${r},S${r})/T${r},0)`);
+            }
+        }return xml;
+    };
+    const reportSheets=buildKpiReportSheets;
+    buildKpiReportSheets=function(rows,styles){
+        const reports=reportSheets(rows,styles);
+        const source=sheetRef(KPI_PIVOT_SHEETS.dataSup);
+        for(const report of reports.filter(x=>[KPI_PIVOT_SHEETS.regionSupervisors,KPI_PIVOT_SHEETS.courseTargets].includes(x.sheet))){
+            report.xml=report.xml.replace(/<row r="(\d+)"[^>]*>[\s\S]*?<\/row>/g,(row,rn)=>{
+                if(Number(rn)<(report.sheet===KPI_PIVOT_SHEETS.courseTargets?12:5))return row;
+                for(const [c,sc]of [[3,4],[4,8],[5,11],[6,15]]){
+                    const ref=address(Number(rn),c),f=`SUMIFS(${source}$${col(sc)}$2:$${col(sc)}$20000,${source}$A$2:$A$20000,A${rn},${source}$B$2:$B$20000,B${rn},${source}$C$2:$C$20000,C${rn})`;
+                    row=row.replace(new RegExp(`(<c r="${ref}"[^>]*>)([\\s\\S]*?)(<\\/c>)`),(_,open,body,close)=>open+`<f>${xmlEscape(f)}</f>`+body.replace(/<f>[\s\S]*?<\/f>/,'')+close);
+                }
+                if(report.sheet===KPI_PIVOT_SHEETS.regionSupervisors){
+                    for(const [c,sc]of [[7,3],[8,20]]){const ref=address(Number(rn),c),f=`SUMIFS(${source}$${col(sc)}$2:$${col(sc)}$20000,${source}$A$2:$A$20000,A${rn},${source}$B$2:$B$20000,B${rn},${source}$C$2:$C$20000,C${rn})`;row=row.replace(new RegExp(`(<c r="${ref}"[^>]*>)([\\s\\S]*?)(<\\/c>)`),(_,a,b,c)=>a+`<f>${xmlEscape(f)}</f>`+b+c);}
+                }return row;
+            });
+        }return reports;
+    };
+    async function linkShapes(blob,wb){
+        const zip=await JSZip.loadAsync(await blob.arrayBuffer());
+        for(let i=0;i<wb.SheetNames.length;i++){
+            const name=wb.SheetNames[i],rels=zip.file(`xl/worksheets/_rels/sheet${i+1}.xml.rels`);if(!rels)continue;
+            const relXml=await rels.async('string'),m=relXml.match(/Target="(?:\.\.\/)?drawings\/(drawing\d+\.xml)"/);if(!m)continue;
+            const path='xl/drawings/'+m[1],file=zip.file(path);if(!file)continue;
+            let xml=await file.async('string');
+            xml=xml.replace(/<xdr:twoCellAnchor\b[^>]*>[\s\S]*?<\/xdr:twoCellAnchor>/g,anchor=>{
+                const from=anchor.match(/<xdr:from>([\s\S]*?)<\/xdr:from>/)?.[1];if(!from)return anchor;
+                const c=Number(from.match(/<xdr:col>(\d+)<\/xdr:col>/)?.[1]),r=Number(from.match(/<xdr:row>(\d+)<\/xdr:row>/)?.[1])+1;
+                const cell=wb.Sheets[name][address(r,c)];if(!cell?.f)return anchor;
+                return anchor.replace(/<xdr:sp\b([^>]*)>/,(_,attrs)=>`<xdr:sp${attrs.replace(/ textlink="[^"]*"/,'')} textlink="${xmlEscape(sheetRef(name)+address(r,c))}">`);
+            });zip.file(path,xml);
+        }
+        await forceWorkbookRecalculation(zip);
+        return zip.generateAsync({type:'blob',compression:'DEFLATE',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    }
+    const shapeNavigation=addExecutiveShapeNavigation,multiShapeNavigation=addExecutiveMultiScopeShapeNavigation;
+    addExecutiveShapeNavigation=async function(wb,options){const blob=await shapeNavigation(wb,options);return linkShapes(blob,wb);};
+    addExecutiveMultiScopeShapeNavigation=async function(wb,plans){const blob=await multiShapeNavigation(wb,plans);return linkShapes(blob,wb);};
+    // Exposed for the XML-only Pivot route and isolated verification, never used by the website UI.
+    window.academyDynamicExcel={process,tables,formula,pct};
+})();
 
 </script>
 </body>
